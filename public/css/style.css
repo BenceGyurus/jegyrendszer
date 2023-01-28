@@ -1,0 +1,42 @@
+body{
+    padding: 0px;
+    margin: 0px;
+}
+
+.event-image{
+    width: 300px;
+    border-radius: 5px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.event-divs{
+    width: 300px;
+    padding: 10px 10px 10px 10px;
+    margin: 20px;
+    display: inline-table;
+    background-color: rgba(87, 84, 83, 255);
+    height: 500px;
+    border-radius: 20px;
+}
+
+.event-title{
+    color: rgba(169,206,21,255);
+}
+
+.event-date{
+    color: white;
+    background-color: rgba(169,206,21,255);
+    width: max-content;
+    padding: 1px 3px 1px 3px;
+    border-radius: 3px;
+    position: relative;
+    top: -15px;
+}
+
+.calendar{
+    position: relative;
+    top: 3px;
+    padding-right: 5px;
+    width: 17px;
+}

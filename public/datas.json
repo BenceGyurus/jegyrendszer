@@ -1,0 +1,23 @@
+[
+    {
+        "_id" : 1,
+        "title" : "Nikola TESLA - Végtelen energia",
+        "desciption" : "A két felvonásos, lendületes és rendkívül látványos zenés darab amellett, hogy ragyogó szórakozást ígér, segíthet újra felfedezni, új oldaláról megismerni a mára közismert név mögött rejtőző csodálatos zseni elméjét és életének rejtélyeit!",
+        "date" : "2023.02.17, 19:00",
+        "image" : "images/tesla.jpeg"
+    },
+    {
+        "_id" : 2,
+        "title" : "Németh Juci és G. Szabó Hunor duó - Szerda Esti Akusztik",
+        "desciption" : "Szerda esti akusztik koncert\n\nA Szent Márton-kártya kedvezmény csak az ELŐVÉTELBEN, személyesen a jegyirodában megvásárolt jegyek esetén érvényesíthető.",
+        "date" : "2023.03.22, 19:00",
+        "image" : "images/duo.jpg"
+    },
+    {
+        "_id" : 3,
+        "title" : "„CSIRIBIRI” - HALÁSZ JUDIT ELŐADÁSA",
+        "desciption" : "A kedvezményes jegyárak csak elővételben, személyesen a jegyirodában vásárolt jegyekre érvényesíthető!",
+        "date" : "2023.05.07, 15:00",
+        "image" : "images/halasz.jpg"
+    }    
+]

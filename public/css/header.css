@@ -1,0 +1,17 @@
+body{
+    padding: 0px;
+    margin: 0px;
+}
+
+#logo{
+    width: 17%;
+    user-select: none;
+    -webkit-user-select: none;
+    min-width: 150px;
+}
+
+#header{
+    background-color: rgba(87, 84, 83, 255);
+    height: max-content;
+    padding: 0px;
+}
