@@ -1,0 +1,147 @@
+*{
+    font-family: Arial, Helvetica, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+html {
+    scroll-behavior: smooth;
+  }
+
+body{
+    padding: 0px;
+    margin: 0px;
+}
+
+#loading img{
+    width: 30%;
+}
+
+#loading{
+    position: absolute;
+    top: 40%;
+    left: 50%;
+}
+
+.event-image{
+    width: 120%;
+    position: fixed;
+    top: -10%;
+    left: -10%;
+    padding: 0px;
+    margin: 0px;
+}
+
+.event-title{
+    animation: titleLoadAnimation 0.5s linear 1;
+    position: fixed;
+    top: 0px;
+    left: 30px;
+    color: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 40%;
+    font-size: 72px;
+    background:linear-gradient(to right, white, rgba(169,206,21,255));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    z-index: 99;
+}
+
+.image-div{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    opacity: 0.9;
+}
+
+.image-background-bottom{
+    position: fixed;
+    height: 50%;
+    bottom: 0;
+    width: 100%;
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), black);
+    z-index: 99;
+}
+
+.image-background-top{
+    position: fixed;
+    height: 50%;
+    top: 0;
+    width: 100%;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), black);
+    z-index: 99;
+}
+
+.desciption{
+    color: rgba(169,206,21,255);
+    width: 65%;
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+    text-align: left;
+    font-size: 15px;
+}
+
+.date{
+    position: absolute;
+    top: 10px;
+    font-size: 25px;
+    right: 50px;
+    font-weight: bold;
+    color: white;
+}
+.time{
+    position: absolute;
+    top: 20px;
+    font-size: 40px;
+    right: 0px;
+    font-weight: bold;
+    color:  rgba(169,206,21,255);
+}
+
+.but-ticket-button{
+    padding: 10px;
+    position: absolute;
+    z-index: 99;
+    bottom: 25px;
+    left: 20px;
+    font-size: 20px;
+    border: none;
+    background-color: rgba(169,206,21,255);
+    cursor: pointer;
+    color: white;
+    border-radius: 5px;
+    width: 20%;
+}
+
+#site2{
+    width: 100%;
+    height: 125%;
+    position: absolute;
+    top: 100%;
+    z-index: 99;
+}
+
+
+@keyframes titleLoadAnimation{
+    0%{
+        position: absolute;
+        opacity: 0.1;
+        left: -100px;
+        top: 0px;
+    }
+    100%{
+        position: absolute;
+        opacity: 1;
+        left:30px;
+        top: 0px;
+    }
+}
+
+#footer{
+    position: absolute;
+    bottom: -130%;
+    width: 100%;
+}
