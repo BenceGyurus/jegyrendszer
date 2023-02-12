@@ -1,0 +1,135 @@
+.logoImage{
+    width: 20%;
+    /*margin: 3px;*/
+}
+
+.loadingBackground{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: white;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+}
+
+.logoO{
+    animation: spin 1.9s;
+    animation-delay: 0.8s;
+    animation-iteration-count: infinite;
+}
+
+.logoDiv{
+    width: 40%;
+    position: absolute;
+    top: 40%;
+    left: 30%;
+    animation: fromLeft 0.6s;
+    animation-delay: 0.1s;
+}
+
+.logoA{
+    animation: aAnimation 1.9s;
+    animation-delay: 1.2s;
+    animation-iteration-count: infinite;
+}
+.logoG{
+    animation: gAnimation 1.9s;
+    animation-delay: 1.18s;
+    animation-iteration-count: infinite;
+}
+.logoR{
+    animation: rAnimation 1.9s;
+    animation-delay: 1.2s;
+    animation-iteration-count: infinite;
+}
+.logoA2{
+    animation: a2Animation 1.9s;
+    animation-delay: 1.18s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes fromLeft {
+    0%{
+        top: 40%;
+        left: -100%;
+    }
+    100%{
+        top: 40%;
+        left: 30%;
+    }
+}
+
+@keyframes spin{
+    0%{
+        transform: rotate(0deg)
+    }
+    8%{
+        transform: rotate(-60deg);
+    }
+    10%{
+        transform: rotate(-70deg);
+    }
+    100%{
+        transform: rotate(2880deg);
+    }
+    
+}
+
+@keyframes aAnimation {
+    0%{
+        transform: translate(0px,0px);
+    }
+    30%{
+        transform: translate(-18px,-2px);
+    }
+    98%{
+        transform: translate(-1px,0px);
+    }
+    100%{
+        transform: translate(0px,0px);
+    }
+}
+
+@keyframes gAnimation {
+    0%{
+        transform: translate(0px,0px);
+    }
+    30%{
+        transform: translate(-15px,-3px);
+    }
+    98%{
+        transform: translate(-1px,0px);
+    }
+    100%{
+        transform: translate(0px,0px);
+    }
+}
+@keyframes rAnimation {
+    0%{
+        transform: translate(0px,0px);
+    }
+    30%{
+        transform: translate(18px,-2px);
+    }
+    98%{
+        transform: translate(1px,0px);
+    }
+    100%{
+        transform: translate(0px,0px);
+    }
+}
+@keyframes a2Animation {
+    0%{
+        transform: translate(0px,0px);
+    }
+    30%{
+        transform: translate(15px,-3px);
+    }
+    98%{
+        transform: translate(1px,0px);
+    }
+    100%{
+        transform: translate(0px,0px);
+    }
+}

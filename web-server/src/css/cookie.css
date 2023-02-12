@@ -1,0 +1,22 @@
+.CookiePopUpWindow{
+    position: fixed;
+    bottom: 0;
+    height: 100px;
+    width: max-content;
+    height: 120px;
+    background-color: #3b3b3b;
+    width: 100%;
+    margin: 0px;
+    z-index: 999;
+    opacity: 0.9;
+}
+
+.cookieButton{
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid black;
+    outline: none;
+    cursor: pointer;
+    color: black;
+    border-radius: 0px;
+}

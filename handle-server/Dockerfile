@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
-FROM node:8.11.0
+FROM node:16
 WORKDIR /
+COPY package*.json ./
+RUN npm install
 COPY . .
-RUN npm install express
-RUN npm install mongodb
 CMD [ "node", "index.js" ]
-EXPOSE 3000
+EXPOSE 3001

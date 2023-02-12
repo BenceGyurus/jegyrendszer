@@ -1,0 +1,26 @@
+{
+    "admin" : {
+        "database" : "users",
+        "collection" : "admin-users"
+    },
+    "short-token" : {
+        "database": "connected-users",
+        "collection" : "login-token-users"
+    },
+    "long-token" : {
+        "database" : "connected-users",
+        "collection" : "long-token"
+    },
+    "events" : {
+        "database" : "event",
+        "collection" : "event"
+    },
+    "venue" : {
+        "database" : "event",
+         "collection" : "venue"
+    },
+    "new-user" : {
+        "database" : "users",
+        "collection" : "pending-new-user"
+    }
+}

@@ -10,9 +10,19 @@ services:
       - 27017:27017
     volumes:
       - /data/db
+    expose:
+      - 27017
 
 
   handle-services:
-    image: bencegyurus/handle-server:lastes
+    image: bencegyurus/handle-server:latest
+    ports:
+      - 3001:3001
+    stdin_open: true
+    tty: true
+  
+
+  web-service:
+    image: bencegyurus/web-server:latest
     ports:
       - 3000:3000

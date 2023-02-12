@@ -1,0 +1,49 @@
+body{
+    padding: 0px;
+    margin: 0px;
+}
+
+.logoDivheader{
+    width: 17%;
+    user-select: none;
+    -webkit-user-select: none;
+    min-width: 150px;
+    margin: 0px;
+}
+
+.logoOheader{
+    animation: oAnimation 5s;
+    animation-delay: 2s;
+    animation-iteration-count:infinite;
+}
+
+.logoImageheader{
+    margin: 0px;
+    width: 18%;
+    margin: 1%
+}
+
+#header{
+    background-color: rgba(87, 84, 83, 255);
+    height: max-content;
+    z-index: 99;
+    width:100%;
+    margin: 0px;
+    position: relative;
+    padding: 20px;
+}
+
+@keyframes oAnimation {
+    0%{
+        transform: rotate(0deg);
+    }
+    5%{
+        transform: rotate(-50deg);
+    }
+    30%{
+        transform: rotate(360deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,57 @@
+{
+    "000" : {
+        "message" : "Váratlan hiba történt kérjük próbálja megkésőbb",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "001" : {
+        "message" : "Hiba történt az adatbázis betöltése közben, kérjük próbálja újra később.",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "002" : {
+        "message" : "Megváltozott az IP cím a bejelentkezés közben vagy időtúllépés történt",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "003": {
+        "message" : "Ehhez a művelethez speciális jogosultságra van szükség",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "004" : {
+        "message" : "Nincs hozzáférése az adott művelet elvégzésére",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "005" : {
+        "message" : "",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "006" : {
+        "message" : "Helytelen a megadott felhasználónév vagy jelszó",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "007" : {
+        "message" : "Hibás regisztrációs link vagy lejárt az idő",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "008" : {
+        "message" : "A jelszónak minimum 8 karakterből kell állnia és tartalmaznia kell leglább egy számjegyet",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "009" : {
+        "message" : "A felhasználó nem található",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "010" : {
+        "message" : "A megadott felhasználónév foglalat",
+        "type" : "error",
+        "reponseCode" : 400
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "edit-users" : ["Felhasználók szerkesztése","/felhasznalok"],
+    "edit-events" : ["Rendezvények", "/rendezvenyek"],
+    "edit-rooms" : ["Termek", "/termek"],
+    "statistics" : ["Statisztika", "/statisztika"],
+    "profile" : ["Profil" , "/profil"],
+    "ticket-sells" : ["Jegy eladások", "/jegy-eladasok"],
+    "settings" : ["Beállítások", "/beallitasok"]
+}

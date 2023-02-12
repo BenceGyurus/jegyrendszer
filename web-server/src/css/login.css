@@ -1,0 +1,17 @@
+.loginContainer{
+    width: max-content;
+    margin: auto;
+}
+.loginPanel{
+    width: max-content;
+    margin: auto;
+}
+.loginInput{
+    width: 150px;
+    padding: 5px;
+    text-align: center;
+    display: block;
+    margin: 5px auto;
+    outline: none;
+}
+
