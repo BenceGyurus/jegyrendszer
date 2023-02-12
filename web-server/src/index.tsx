@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import "./css/style.css";
 import Navigation from "./navigation/navigation";
-import CookiePopUp from './components/cookies/cookies.component';
+/*import CookiePopUp from './components/cookies/cookies.component';*/
 import Header from "./components/siteElements/header.component";
 import Footer from "./components/siteElements/footer.component";
 
