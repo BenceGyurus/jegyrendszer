@@ -1,10 +1,9 @@
-//import RadioButtons from "./radioButton.component";
-import Chairs from "./chairs.component";
+import Main from "./seats/main";
 const addNewRoom = ()=>{
     return (
         <div>
             <h1>Új helyszín létrehozása</h1>
-            <Chairs />
+            <Main />
         </div>
     );
 }
