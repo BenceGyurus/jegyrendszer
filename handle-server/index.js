@@ -41,7 +41,7 @@ app.post("/get-long-token", async (req,res, next) =>{
                 let token = Functions.genrateToken();
                 console.log(await Topology.longTokenData(token, tokenDatas.userData, req));
                 collection.insertOne(await Topology.longTokenData(token, tokenDatas.userData, req));
-                res.send({token : token, access : Functions.merge_Access(tokenDatas.userData.access)});
+                res.send({token : token, access : Functions.merge_Access(tokenDatas.userData.access), expires_in : 21600000});
                 return 0;
             }
             else{

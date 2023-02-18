@@ -1,0 +1,12 @@
+.accessListUl{
+    margin-left: 0px;
+    min-width: 200px;
+    width: 18%;
+    display: inline-table;
+}
+
+.container{
+    min-width: 600px;
+    width: 68%;
+    display: inline-table;
+}

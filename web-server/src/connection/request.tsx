@@ -1,18 +1,31 @@
-const  ajax = (method:string, url:string, data:string)=>{
-    return new Promise((resolve,reject)=>{
-        let req = new XMLHttpRequest();
-        req.onreadystatechange = ()=>{
-            if (req.status >= 200 && req.status < 300){
-                resolve(req.responseText);
-            }
-            else{
-                reject(req.responseText);
-            }
-        };
-        req.open(method, url);
-        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        req.send(data);
-        });
-}
+async function postData(url = '', data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: JSON.stringify(data)
+    });
+    let responseData;
+    try{
+      responseData = response.json();
+    }
+    catch{
+      responseData = response; 
+    }
+    if (response.status >= 200 && response.status < 300){
+      return responseData;
+    }
+    else{
+      return {error: true, responseData : responseData};
+    }
 
-export default ajax;
+  }
+
+export default postData;

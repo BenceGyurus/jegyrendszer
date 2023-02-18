@@ -2,13 +2,11 @@ footer {
     background-color: rgba(87, 84, 83, 255);
     padding: 1em;
     max-height: 150px;
-    position: absolute;
-    bottom: -100px;
     width: 100%;
     margin: 0px;
 }
 
-#root{
+/*#root{
     position: absolute;
     min-height: 100%;
     min-width: 100%;
@@ -16,7 +14,7 @@ footer {
     overflow-x: hidden;
     margin: 0px;
 
-}
+}*/
 
 footer p {
     margin: 0;

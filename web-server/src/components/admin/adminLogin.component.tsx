@@ -1,13 +1,31 @@
 import {useState} from "react";
-import ajax from "../../connection/request";
+import postData from "../../connection/request";
 import "../../css/login.css";
+import insertCookie from "../../cookies/insertCookie";
+import { useNavigate } from 'react-router-dom';
 const Admin = ()=>{
     const [username, setUsername] = useState("");
     const [password, setpassword] = useState("");
+    const navigate = useNavigate();
 
-    const login = async ()=>{
-        console.log(await ajax("POST", "/login", JSON.stringify({username: username, password: password})));
-    };
+    const login = ()=>{
+        postData('/login', { username: username, password: password })
+        .then((data) => {
+            if (data.error || !data.token){
+                return Promise.reject(data);
+            }
+            else{
+                return postData("/get-long-token", {token : data.token});
+            }
+        })
+        .then((data)=>{
+            if (data.token){
+                insertCookie("long_token", String(data.token), new Date(new Date().setTime(new Date().getTime())+(data.expires_in)),"/");
+                navigate('/admin');
+            }
+        })
+        .catch((err)=>{console.log(err)});
+    }
     const changePassword = (event:any)=>{setpassword(event.target.value);};
     const changeUsername = (event:any)=>{setUsername(event.target.value);};
     return (
