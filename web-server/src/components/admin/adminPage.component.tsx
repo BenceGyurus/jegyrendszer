@@ -1,5 +1,5 @@
 import AccessList from "./accessList.component";
-import postData from "../../connection/request";
+import postData from "../connection/request";
 import ParseCookies from "../../cookies/parseCookies";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +23,11 @@ const Admin = (params:any)=>{
 
     return (
         <div>
+            <div className = "admin-menu">
             <ul className="accessListUl">
                 <AccessList access = {access}/>
             </ul>
+            </div>
             <div className = "container">
                 {params.component}
             </div>

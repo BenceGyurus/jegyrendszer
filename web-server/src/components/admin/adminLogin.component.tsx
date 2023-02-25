@@ -1,5 +1,5 @@
 import {useState} from "react";
-import postData from "../../connection/request";
+import postData from "../connection/request";
 import "../../css/login.css";
 import insertCookie from "../../cookies/insertCookie";
 import { useNavigate } from 'react-router-dom';

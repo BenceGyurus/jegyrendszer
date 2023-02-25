@@ -9,6 +9,20 @@ const mongodb = require("mongodb");
 const Topology = require("./databasesTopology.js");
 module.exports = app;
 const handleError = require("./handleError.js");
+const multer = require('multer');
+const Jimp = require('jimp');
+
+const storage = multer.diskStorage({
+    destination: (req, file, callBack) => {
+        callBack(null, 'uploads')
+    },
+    filename: (req, file, callBack) => {
+        callBack(null, `${Functions.genrateToken()}.${file.mimetype.split("/")[1]}`)
+    }
+  })
+
+
+let upload = multer({ storage: storage })
 
 app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -21,6 +35,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 //access query
+
+
+app.use(express.static('uploads'));
 
 app.post("/get-access", async (req,res)=>{
     let body = Functions.parseBody(req.body);
@@ -191,5 +208,35 @@ app.post("/new-long-token", async (req,res)=>{
         //res.send({error : true, errorCode : "004"})     //Nincs hozzáférése
     }
 })
+
+app.post('/upload-backgroumd-image-to-venue', upload.single('file'), async (req, res, next) => {
+    const file = req.file;
+    console.log(file.buffer);
+    if (!file) {
+      const error = new Error('No File')
+      error.httpStatusCode = 400
+      return next(error)
+    }
+    console.log(file);
+    let newFilePath = "";
+    for (let i = 1; i < file.path.split("/").length; i++){
+        newFilePath += "/"+ file.path.split("/")[i];
+    }
+    let width = 0;
+    let height = 0;
+    try{
+        let jimage = await Jimp.read(`${__dirname}/${file.path}`);
+        width = jimage.bitmap.width;
+        height = jimage.bitmap.height;
+    }catch{
+
+    }
+    res.send({path : newFilePath, width: width,height : height});
+  })
+
+/*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
+    console.log(req.files);
+})*/
+
 
 app.listen(process.env.PORT || 3001);

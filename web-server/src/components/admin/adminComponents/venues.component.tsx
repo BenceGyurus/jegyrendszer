@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import postData from "../../../connection/request";
+import postData from "../../connection/request";
 import ParseCookies from "../../../cookies/parseCookies";
 import { useNavigate } from 'react-router-dom';
 import "../../../css/venues.css";

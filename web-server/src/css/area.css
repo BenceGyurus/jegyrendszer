@@ -1,0 +1,9 @@
+body{
+    overflow-x: scroll;
+}
+
+.seatArea{
+    margin: 0px auto;
+    border-radius: 5px;
+    display: block;
+}

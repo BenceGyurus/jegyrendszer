@@ -1,0 +1,158 @@
+.tab {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding-left: 5px;
+    height: 35px;
+    border-radius: 5px 5px 0 0;
+    margin-bottom: 0;
+  }
+  
+  .tab button {
+    background-color: #f8f8f8;
+    color: #333;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0 20px;
+    height: 30px;
+    font-size: 14px;
+    margin-right: -1px;
+    position: relative;
+    transition: background-color 0.3s;
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .tab button.active {
+    background-color: #2196F3;
+    color: #fff;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    height: 35px;
+    font-weight: bold;
+    z-index: 1;
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .tab button.active::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -1px;
+    left: 0px;
+    width: 100%;
+    height: 2px;
+    background-color: #2196F3;
+    z-index: 2;
+  }
+.tab button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  
+.tab button:hover .close-tab {
+    display: block;
+  }
+  
+.tab button .close-tab {
+    display: none;
+    position: absolute;
+    right: 5px;
+    top: 0px;
+    font-size: 18px;
+    color: #ccc;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 2px;
+    transition: color 0.3s, background-color 0.3s;
+  }
+  
+.tab button.active .close-tab{
+    top: 1px;
+}
+  
+
+.tab button:hover .close-tab {
+    color: #fff;
+    z-index: 1;
+}
+
+
+.tab-content {
+    background-color: #f8f8f8;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-top: none;
+    border-radius: 0 5px 5px 5px;
+    height: 300px;
+    overflow-y: auto;
+  }
+  
+  .form-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .form-group input[type="text"]{
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    border-radius: 5px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  }
+  
+.form-group input[type="text"]:focus{
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  }
+  
+.Group-Div{
+    width: 80%;
+    margin: 10px auto;
+  }
+
+
+.tab-content input[type="button"] {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #2196F3;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+.tab-content input[type="button"]:hover {
+    background-color: #48B5D5;
+  }
+
+.numberOfSeat{
+    margin: 0;
+    padding: 0;
+    margin-left: 10px;
+    margin-top: 20px;
+}

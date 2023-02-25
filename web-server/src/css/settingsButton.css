@@ -1,0 +1,48 @@
+  .settings-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007aff;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .icon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .line {
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: #fff;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease;
+  }
+  
+  .line:first-child {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  
+  .line:last-child {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+  
+  .settings-button:hover .line:first-child {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  
+  .settings-button:hover .line:last-child {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  

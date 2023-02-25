@@ -1,17 +1,25 @@
 import Draggable from "react-draggable";
+import "../../../../../css/seat.css"
+import { v4 as uuid } from 'uuid';
 type Params = {
     name : string,
     title : string,
     id : string,
     posX : number,
-    posY : number
+    posY : number,
+    size : number,
+    newPositionFunction:any,
+    index:number,
+    color : string
 }
-const Seat = ({name , title, id, posX, posY, }:Params)=>{
+const Seat = ({name , title, id, posX, posY, size,newPositionFunction,index, color}:Params)=>{
     return (
-        <Draggable onDrag={(event, data)=>{console.log(event, data)}} defaultPosition={{x: posX, y: posY}}>
-            <span>{title}<span className = "tooltip">{name}</span></span>
+        <Draggable onStop={(event:any, data)=>{newPositionFunction(index, data.lastX, data.lastY)}} key = {uuid()}>
+            <span className = "seat" style = {{background : color ,width : size, height: size, position: "absolute", top : `${posY}px`, left : `${posX}px`, borderRadius : Math.ceil(size/5)}}>{title}<span className = "tooltip">{name}</span></span>
         </Draggable>
     )
 }
+
+//newPositionFunction(index, event.screenX, event.screenY)}
 
 export default Seat;
