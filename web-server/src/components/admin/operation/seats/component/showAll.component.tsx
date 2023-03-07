@@ -7,8 +7,7 @@ type paramsTypeOfShowAllSeats = {
 const ShowAllSeats = ({showAll,onChangeFunction}:paramsTypeOfShowAllSeats):any=>{
     return (
         <div>
-            <label htmlFor="showAll">Összes ülőhely mutatása</label>
-            <Checkbox onChangeFunction={ onChangeFunction } defaultChecked = {showAll} />
+            <Checkbox onChangeFunction={ onChangeFunction } defaultChecked = {showAll} title = "Összes ülőhely mutatása" />
         </div>
     )
 }

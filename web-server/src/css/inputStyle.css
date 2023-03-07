@@ -1,0 +1,22 @@
+.inputLabel{
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+.textInput{
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    transition: border-bottom-color 0.3s ease-in-out;
+    margin-bottom: 20px;
+  }
+  
+.textInput:focus {
+    outline: none;
+    border-bottom-color: #007bff;
+  }
+  

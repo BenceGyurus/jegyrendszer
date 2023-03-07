@@ -1,0 +1,28 @@
+.numberInputLabel{
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .inputNumber {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    transition: border-bottom-color 0.3s ease-in-out;
+    -moz-appearance: textfield; /* Firefox */
+  }
+  
+  .inputNumber::-webkit-outer-spin-button,
+  .inputNumber::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .inputNumber:focus {
+    outline: none;
+    border-bottom-color: #007bff;
+  }
+  

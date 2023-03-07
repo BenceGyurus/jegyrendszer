@@ -40,3 +40,10 @@
   input[type="checkbox"]:checked + .slider:before {
     transform: translateX(20px);
   }
+
+  .checkBoxLabel{
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    
+  }

@@ -81,7 +81,6 @@ app.post("/login", async (req, res, next) =>{
     if (user){
         let {collection} = new Database("short-token");
         let token = Functions.genrateToken();
-        //console.log(otherData(req));
         let datas = await otherData(req);
         let userData = Topology.newUserDatas(user);
         await collection.insertOne({token : token, datas : datas, userData : userData});
@@ -178,6 +177,25 @@ app.post("/add-event", async (req,res)=>{
     }
 });
 
+app.post("/upload-venue/:id", async (req,res)=>{
+    if (body.params.id){
+        console.log(body.params.id);
+    }
+    else{
+        console.log("nincs")
+    }
+    console.log(Functions.parseBody(req.body));
+});
+
+
+app.post("/upload-venue", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    let access = await control_Token(body.token, req);
+    if (access && access.includes("edit-rooms")){
+        console.log(access);
+        console.log(body);
+    }
+})
 app.post("/new-long-token", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     let access = await control_Token(body.token, req);

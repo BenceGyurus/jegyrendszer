@@ -1,6 +1,7 @@
 .seat{
     background-color: black;
     z-index:1000;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .seat:hover{

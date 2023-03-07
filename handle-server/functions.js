@@ -84,6 +84,5 @@ class Functions{
     
 }
 
-console.log(Functions.encryption("admin"));
 
 module.exports = Functions;

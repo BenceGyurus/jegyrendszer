@@ -1,0 +1,23 @@
+.save-button {
+  background-color: #007bff; /* Blue */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
+  left: 40%;
+  margin: 10px;
+  width: 20%;
+  margin-top: 50px
+}
+.save-button:hover {
+  background-color: #0062cc; /* Dark blue */
+  transition: 0.3s;
+  transform: scale(1.05);
+}

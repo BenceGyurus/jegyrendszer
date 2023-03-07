@@ -1,4 +1,4 @@
-import { Children } from 'react';
+import { Children, useEffect, useRef } from 'react';
 import "../../../../../css/area.css";
 type BackgroundType = {
     name : string,
@@ -11,10 +11,12 @@ type AreaParams = {
     background : BackgroundType
     children : any,
     clickEvent : any,
-    size:number
+    size:number,
+    posYOfArea:Function,
+    posXOfArea:Function
 };
 
-const Area = ({width, height, background, children, clickEvent, size}:AreaParams) =>{
+const Area = ({width, height, background, children, clickEvent, size, posYOfArea,posXOfArea}:AreaParams) =>{
     const classname = "seatArea";
     const mappedChildren = Children.map(children, child =>
         <div>
@@ -27,8 +29,20 @@ const Area = ({width, height, background, children, clickEvent, size}:AreaParams
             clickEvent(event.pageX-size/2, event.pageY-size/2, "", "");
         }
     }
+    const areaRef:any = useRef(null);
+
+    useEffect(()=>{
+        if (areaRef.current){
+            console.log("top", areaRef.current.offsetTop);
+            posYOfArea(areaRef.current.offsetTop);
+            posXOfArea(areaRef.current.offsetLeft);
+        }
+        
+    })
+    console.log((window.innerWidth/2)-width/2);
+
     return (
-        <div>
+        <div ref={areaRef} style = {{left : (window.innerWidth/2)-width/2, position: "relative"}}>
             {
         background.isImage ? <div><img src={background.name} crossOrigin='anonymous'  className = {classname}  style ={{width : `${width}px`, height : `${height}px`}} onClick = {event => handleClick(event)} />{mappedChildren}</div>
          : 
