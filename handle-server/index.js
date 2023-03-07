@@ -192,7 +192,7 @@ app.post("/upload-venue", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-rooms")){
-        console.log(access);
+        console.log(access );
         console.log(body);
     }
 })
