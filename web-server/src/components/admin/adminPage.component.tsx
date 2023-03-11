@@ -22,7 +22,7 @@ const Admin = (params:any)=>{
     }, []);
 
     return (
-        <div>
+        <div className = "admin">
             <div className = "admin-menu">
             <ul className="accessListUl">
                 <AccessList access = {access}/>

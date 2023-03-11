@@ -3,12 +3,14 @@ import postData from "../../connection/request";
 import ParseCookies from "../../../cookies/parseCookies";
 import { useNavigate } from 'react-router-dom';
 import "../../../css/venues.css";
+import VenueList from "./venuesList.component";
 
 const Venues = ()=>{
 
     const [rooms, setRooms] = useState([]);
     const navigate = useNavigate();
-    useEffect(()=>{
+
+    const load = ()=>{
         let token = ParseCookies().long_token;
         if (token){
             postData("/venues", {token : token})
@@ -21,13 +23,19 @@ const Venues = ()=>{
         else{
             navigate('/admin-login');
         }
+    }
+
+    useEffect(()=>{
+        load();
         
     }, []);
 
+    console.log("rooms", rooms);
+
     return (
         <div>
-            <h1>Termek hozzáadása és szerkesztése</h1>
             <input type="button" value="+" className="add-venue-button" onClick = {()=>{navigate("/uj-terem")}}/>
+            <VenueList venues={rooms} newRequest = {load}/>
         </div>
     )
 }

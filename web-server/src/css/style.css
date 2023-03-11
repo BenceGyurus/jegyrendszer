@@ -114,3 +114,7 @@ body{
     width: max-content;
     margin: 10px auto;
 }
+
+.mainDiv{
+    min-height: 75vh;
+}

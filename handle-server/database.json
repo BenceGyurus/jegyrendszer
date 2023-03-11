@@ -22,5 +22,9 @@
     "new-user" : {
         "database" : "users",
         "collection" : "pending-new-user"
+    },
+    "deleted-venues" : {
+        "database" : "deleted",
+        "collection" : "venues"
     }
 }

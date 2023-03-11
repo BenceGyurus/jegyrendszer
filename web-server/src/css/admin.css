@@ -2,11 +2,14 @@
     margin-left: 0px;
     min-width: 200px;
     width: 18%;
-    display: inline-table;
+    height: 100%;
 }
 
 .container{
-    min-width: 600px;
-    width: 68%;
-    display: inline-table;
+    width: 100%;
+    padding-left: 220px;
+}
+
+.admin{
+    height: 100%;
 }

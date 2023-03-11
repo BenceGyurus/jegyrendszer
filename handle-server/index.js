@@ -11,6 +11,8 @@ module.exports = app;
 const handleError = require("./handleError.js");
 const multer = require('multer');
 const Jimp = require('jimp');
+const controlTypesOfVenues = require("./typesOfDatas/veunes.js");
+const  { ObjectId } = require('mongodb');
 
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
@@ -191,9 +193,15 @@ app.post("/upload-venue/:id", async (req,res)=>{
 app.post("/upload-venue", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     let access = await control_Token(body.token, req);
-    if (access && access.includes("edit-rooms")){
-        console.log(access );
-        console.log(body);
+    console.log(controlTypesOfVenues(body.datas));
+    if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas)){
+        let { collection } = new Database("venue");
+        let datas = await collection.insertOne(body.datas);
+        console.log(datas);
+        res.send(datas);
+    }
+    else{
+        handleError("004", res);
     }
 })
 app.post("/new-long-token", async (req,res)=>{
@@ -251,6 +259,47 @@ app.post('/upload-backgroumd-image-to-venue', upload.single('file'), async (req,
     }
     res.send({path : newFilePath, width: width,height : height});
   })
+
+
+app.post("/venues", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    let access = await control_Token(body.token, req);
+    if (access && access.includes("edit-rooms")){
+        let { collection } = new Database("venue");
+        let datas = await collection.find().toArray();
+        let sendDatas = [];
+        for (let i = 0; i < datas.length; i++){
+            sendDatas.push({
+                name : datas[i].name,
+                places : datas[i].places,
+                seatsDatas : datas[i].seatsDatas,
+                colorOfBackGround : datas[i].colorOfBackGround,
+                id : datas[i]._id,
+                sizeOfSeat : datas[i].sizeOfSeat,
+                colorOfSeat : datas[i].colorOfSeat,
+                sizeOfArea : datas[i].sizeOfArea
+            });
+        }
+        res.send({venues : sendDatas});
+    }
+    else{
+        handleError("004", res);
+    }
+})
+
+app.post("/delete-venue/:id", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    let access = await control_Token(body.token, req);
+    if (access && access.includes("edit-rooms") && req.params.id){
+        id = new ObjectId(req.params.id);
+        let { collection } = new Database("venue");
+        let Ddatas = await collection.findOne({_id : id});
+        let datas = await collection.deleteOne({_id : id});
+        let deletedDb = new Database("deleted-venues").collection;
+        deletedDb.insertOne(Ddatas);
+        res.send(datas);
+    }
+})
 
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
     console.log(req.files);

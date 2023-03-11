@@ -4,6 +4,8 @@ footer {
     max-height: 150px;
     width: 100%;
     margin: 0px;
+    z-index: 800;
+    position: absolute;
 }
 
 /*#root{
