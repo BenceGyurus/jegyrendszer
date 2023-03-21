@@ -13,6 +13,13 @@ const multer = require('multer');
 const Jimp = require('jimp');
 const controlTypesOfVenues = require("./typesOfDatas/veunes.js");
 const  { ObjectId } = require('mongodb');
+const e = require("express");
+const TypeOfBody = "object";
+
+const parseBodyMiddleeware = (req, next)=>{
+    req.body = Functions.parseBody(req.body);
+    next();
+}
 
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
@@ -58,7 +65,6 @@ app.post("/get-long-token", async (req,res, next) =>{
             if (tokenDatas.datas.ip == Functions.getIp(req) && tokenDatas.datas.timeInMil + 60000 > new Date().getTime()){
                 let {collection} = new Database("long-token");
                 let token = Functions.genrateToken();
-                console.log(await Topology.longTokenData(token, tokenDatas.userData, req));
                 collection.insertOne(await Topology.longTokenData(token, tokenDatas.userData, req));
                 res.send({token : token, access : Functions.merge_Access(tokenDatas.userData.access), expires_in : 21600000});
                 return 0;
@@ -78,27 +84,33 @@ app.post("/get-long-token", async (req,res, next) =>{
 
 app.post("/login", async (req, res, next) =>{
     let body = Functions.parseBody(req.body);
-    let {collection} = new Database("admin");
-    user = await collection.findOne({username : body.username, password : Functions.encryption(body.password)});
-    if (user){
-        let {collection} = new Database("short-token");
-        let token = Functions.genrateToken();
-        let datas = await otherData(req);
-        let userData = Topology.newUserDatas(user);
-        await collection.insertOne({token : token, datas : datas, userData : userData});
-        res.send({
-            token : token
-        })
-    }
+    if (body && typeof body == TypeOfBody && body.username && body.password){
+        let {collection} = new Database("admin");
+        user = await collection.findOne({username : body.username, password : Functions.encryption(body.password)});
+        if (user){
+            let {collection} = new Database("short-token");
+            let token = Functions.genrateToken();
+            let datas = await otherData(req);
+            let userData = Topology.newUserDatas(user);
+            await collection.insertOne({token : token, datas : datas, userData : userData});
+            res.send({
+                token : token
+            })
+        }
+        else{
+            handleError("006", res);//res.send({error : true,errorCode : "006"}) //Rossz felhasználónév vagy jelszó
+        }
+        }
     else{
-        handleError("006", res);//res.send({error : true,errorCode : "006"}) //Rossz felhasználónév vagy jelszó
-    }
+        handleError("006", res);
+    }       
 });
 
         //login end
 
 app.post("/add-new-user", async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
     let access = await  control_Token(body.token, req);
     if (access && access.includes("edit-users")){
         let { collection } = new Database("new-user");
@@ -110,11 +122,16 @@ app.post("/add-new-user", async (req,res)=>{
         handleError("004", res);
         //res.send({error : true, errorCode : "004"});        //Nincs hozzáférése
     }
+    }
+    else{
+        handleError("004", res);
+    }
 });
 
 app.post("/create-profile/:token", async (req,res)=>{
     let token = req.params.token;
     let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token && token){
     let { collection } = new Database("new-user");
     let datas = await collection.findOne({token : token});
     let access = Functions.control_Access(body);
@@ -138,74 +155,71 @@ app.post("/create-profile/:token", async (req,res)=>{
         handleError("007", res);
         //res.send({error : true, errorCode : "007"});         //Rossz regisztrációs token vagy időtúllépés
     }
+    }
+    else{
+        handleError("007", res);
+    }
 });
 
 app.delete("/delete-user", async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
     let access = control_Token(body, req);
     let usersCollection = new Database("admin").collection;
     if (access && access.includes("edit-users")){
         if (body.deletingUserId){
-
+            handleError("011", res);
         }
     }else{
         handleError("004", res);
         //res.send({error : true, errorCode : "004"});
     }
-});
-
-
-app.post("/create-venue", async (req,res)=>{
-    let body = Functions.parseBody(req.body);
-    let access = await control_Token(body.token, req);
-    if (access && access.includes("edit-rooms")){
-        let { collection } = new Database("venue");
     }
     else{
         handleError("004", res);
-        //res.send({error : true, errorCode : "004"});        //Nincs hozzáférése
     }
 });
 
 app.post("/add-event", async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    if (body && typeof body && body.token){
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-users")){
         let { collection } = new Database("events");
+        return;
     }
-    else{
-        handleError("004", res);
-        //res.send({error : true, errorCode : "004"});        //Nincs hozzáférése
     }
+    handleError("004", res);
 });
 
-app.post("/upload-venue/:id", async (req,res)=>{
-    if (body.params.id){
-        console.log(body.params.id);
+app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
+        
     }
-    else{
-        console.log("nincs")
-    }
-    console.log(Functions.parseBody(req.body));
+    handleError("004", res);
 });
 
 
 app.post("/upload-venue", async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
     let access = await control_Token(body.token, req);
-    console.log(controlTypesOfVenues(body.datas));
     if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas)){
         let { collection } = new Database("venue");
-        let datas = await collection.insertOne(body.datas);
-        console.log(datas);
-        res.send(datas);
-    }
-    else{
-        handleError("004", res);
-    }
+        let datas = await collection.insertOne({content : body.datas, addedBy : await otherData(req, body.token), versions : {}});
+        if (datas.insertedId){
+        res.send({id : datas.insertedId});
+        }
+        else{
+            handleError("000", res);
+        }
+        return;
+    }}
+    handleError("004", res);
 })
 app.post("/new-long-token", async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
     let access = await control_Token(body.token, req);
     if (access && access.includes("profile")){
         let { collection } = new Database("long-token");
@@ -213,37 +227,32 @@ app.post("/new-long-token", async (req,res)=>{
         let usersCollection = new Database("admin").collection;
         let userData = await usersCollection.findOne({username : datas.userData.username, _id : mongodb.ObjectId(datas.userData.id)});
         let newToken = Functions.genrateToken();
-        console.log(userData);
         if (userData){
-            console.log(await Topology.longTokenData(newToken, Topology.newUserDatas(userData), req, body.token));
             let result = collection.insertOne(await Topology.longTokenData(newToken,Topology.newUserDatas(userData), req, body.token));
             let result2;
             if (result){
                 result2 = (await collection.updateOne({token : body.token}, {$set : {status : false}})).acknowledged;
-                console.log(result2);
             }
             res.send(result && result2 ? {token : newToken} : {error : true, errorCode : "001"});
+            return;
         }
         else{
             handleError("009", res);
+            return;
             //res.send({error : true, errorCode : "009"});        //Felhasználó nem található
         }
     }
-    else{
-        handleError("004", res);
-        //res.send({error : true, errorCode : "004"})     //Nincs hozzáférése
     }
+    handleError("004", res);
 })
 
 app.post('/upload-backgroumd-image-to-venue', upload.single('file'), async (req, res, next) => {
     const file = req.file;
-    console.log(file.buffer);
     if (!file) {
       const error = new Error('No File')
       error.httpStatusCode = 400
       return next(error)
     }
-    console.log(file);
     let newFilePath = "";
     for (let i = 1; i < file.path.split("/").length; i++){
         newFilePath += "/"+ file.path.split("/")[i];
@@ -258,11 +267,12 @@ app.post('/upload-backgroumd-image-to-venue', upload.single('file'), async (req,
 
     }
     res.send({path : newFilePath, width: width,height : height});
-  })
+  });
 
 
 app.post("/venues", async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-rooms")){
         let { collection } = new Database("venue");
@@ -270,36 +280,61 @@ app.post("/venues", async (req,res)=>{
         let sendDatas = [];
         for (let i = 0; i < datas.length; i++){
             sendDatas.push({
-                name : datas[i].name,
-                places : datas[i].places,
-                seatsDatas : datas[i].seatsDatas,
-                colorOfBackGround : datas[i].colorOfBackGround,
+                name : datas[i].content.name,
+                places : datas[i].content.places,
+                seatsDatas : datas[i].content.seatsDatas,
+                colorOfBackGround : datas[i].content.colorOfBackGround,
                 id : datas[i]._id,
-                sizeOfSeat : datas[i].sizeOfSeat,
-                colorOfSeat : datas[i].colorOfSeat,
-                sizeOfArea : datas[i].sizeOfArea
+                sizeOfSeat : datas[i].content.sizeOfSeat,
+                colorOfSeat : datas[i].content.colorOfSeat,
+                sizeOfArea : datas[i].content.sizeOfArea
             });
         }
         res.send({venues : sendDatas});
+        return;
+        }
     }
-    else{
-        handleError("004", res);
+    handleError("004", res);
+});
+
+app.post("/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), async (req,res)=> {
+    if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-rooms") && req.params.id){
+                if (req.params.id.length === 24){
+                id = new ObjectId(req.params.id);
+                let { collection } = new Database("venue");
+                datas = await collection.findOne({ _id : id });
+                if (datas){
+                    datas.content.id = datas._id;
+                    res.send(datas.content);
+                    return;
+            }
+            }
+        }
     }
+    handleError("004", res);
 })
 
 app.post("/delete-venue/:id", async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-rooms") && req.params.id){
         id = new ObjectId(req.params.id);
         let { collection } = new Database("venue");
-        let Ddatas = await collection.findOne({_id : id});
+        let Ddatas = {}
+        Ddatas.deletedContent = await collection.findOne({_id : id});
         let datas = await collection.deleteOne({_id : id});
         let deletedDb = new Database("deleted-venues").collection;
+        Ddatas.deletedBy = await otherData(req, body.token);
         deletedDb.insertOne(Ddatas);
         res.send(datas);
+        return;
     }
-})
+    }
+    handleError("004", res);
+});
 
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
     console.log(req.files);

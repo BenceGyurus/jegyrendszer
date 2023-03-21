@@ -53,5 +53,10 @@
         "message" : "A megadott felhasználónév foglalat",
         "type" : "error",
         "reponseCode" : 400
+    },
+    "011" : {
+        "message" : "Sikeres törlés",
+        "type" : "successful",
+        "responseCode" : 200
     }
 }
