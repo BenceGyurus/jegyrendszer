@@ -21,6 +21,7 @@ function Navigation() {
           <Route path = "/admin" element = {<AdminPage component = {<Welcome />}/>}/>
           <Route path = "/admin/termek" element = {<AdminPage component = {<Venues />}/>}/>
           <Route path = "/uj-terem" element = {<NewVenue />}/>
+          <Route path = "/admin/terem-szerkesztes/*" element = {<NewVenue />}/>
           <Route path= "*" element = {<ErrorPage />} />
         </Routes>
       </BrowserRouter>

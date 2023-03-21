@@ -34,29 +34,50 @@ type seatOfType = {
     group : string
 }
 
-type propsType = {
-    seatsDatas : Array<seatOfType>
-    groupsDatas : any
+type typeOfBackGround = {
+    isImage: boolean,
+    name : string
 }
 
-const SeatMain = ({seatsDatas, groupsDatas}:propsType)=>{
-    const [colorOfBackGround, setColorOfBackGround] = useState("#808080");
-    const [sizeOfArea, setSizeOfArea] = useState({width : 720, height : 480});
-    const [background, setBackground] = useState({isImage : false, name: colorOfBackGround});
-    const [seats, setSeats] = useState(seatsDatas);
-    const [groups, setGroups] = useState(groupsDatas.length >= 1 ? groupsDatas : [{name : "Default", posX : 0, posY : 0, id : uuid(), status: false, opened : false}]);
-    const [selecttedGroup, setSelectedGroup] = useState(groups[0].id);
-    const [sizeOfSeat, setSizeOfSeat] = useState(30);
+type typeOfSizeOfArea = {
+    width : number,
+    height: number
+}
+
+type propsType = {
+    seatsDatas? : Array<seatOfType>
+    groupsDatas? : any,
+    bg? : typeOfBackGround,
+    cbg? : string,
+    places? : number,
+    area? : typeOfSizeOfArea,
+    sGroups? : string,
+    sOfSeat? : number,
+    cOfSeat? : string,
+    seatMode? : boolean,
+    suGroups? : Array<Array<string>>,
+    name?: string,
+    id? : string 
+}
+
+const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfSeat, cOfSeat, seatMode, suGroups, name, id}:propsType)=>{
+    const [colorOfBackGround, setColorOfBackGround] = useState(cbg ? cbg : "#808080");
+    const [sizeOfArea, setSizeOfArea] = useState(area ? area : {width : 720, height : 480});
+    const [background, setBackground] = useState(bg ? bg : {isImage : false, name: colorOfBackGround});
+    const [seats, setSeats] = useState(seatsDatas ? seatsDatas : []);
+    const [groups, setGroups] = useState(groupsDatas && groupsDatas.length >= 1 ? groupsDatas : [{name : "Default", posX : 0, posY : 0, id : uuid(), status: false, opened : false}]);
+    const [selecttedGroup, setSelectedGroup] = useState(sGroups? sGroups : groups[0].id);
+    const [sizeOfSeat, setSizeOfSeat] = useState(sOfSeat ? sOfSeat : 30);
     const [showAllSeats, setShowAllSeats] = useState(false);
     const [showSettingsWindow, setShowSettingsWindow] = useState(false);
-    const [colorOfSeat, setColorOfSeat] = useState("#000000");
-    const [turnOnSeats, setTurnOnSeats] = useState(false);
+    const [colorOfSeat, setColorOfSeat] = useState(cOfSeat ? cOfSeat : "#000000");
+    const [turnOnSeats, setTurnOnSeats] = useState(seatMode ? seatMode : false);
     const [positionOfTheAreaFromTop, setPotionOfTheAreaFromTop] = useState(0);
     const [positionOfTheAreaFromLeft, setPotionOfTheAreaFromLeft] = useState(0);
-    const [suggestedGroups, setSuggestedGroups] = useState(Array<Array<string>>);
-    const [nameOfVenue, setNameOfVenue] = useState("");
-    const [numberOfPlaces, setNumberOfPlaces] = useState(0);
-
+    const [suggestedGroups, setSuggestedGroups] = useState(suGroups ? suGroups : Array<Array<string>>);
+    const [nameOfVenue, setNameOfVenue] = useState(name ? name : "");
+    const [numberOfPlaces, setNumberOfPlaces] = useState(places ? places : 0);
+    const [idOfVenue, setIdOfVenue] = useState(id ? id : "");
 
     const save = ()=>{
         let datas = {
@@ -73,7 +94,14 @@ const SeatMain = ({seatsDatas, groupsDatas}:propsType)=>{
             seatsMode : turnOnSeats,
             suggestedGroups : suggestedGroups
         }
-        postData(`/upload-venue/`, {token : ParseCookies().long_token, datas : datas});
+        if (ParseCookies().long_token){
+            postData(`/upload-venue/${idOfVenue}`, {token : ParseCookies().long_token, datas : datas})
+            .then((datas)=>{
+                if (!datas.error && datas.id && !idOfVenue){
+                    window.location.href = `/admin/terem-szerkesztes/${datas.id}`;
+                }
+            });
+        }
 
     }
 

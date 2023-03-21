@@ -26,6 +26,10 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
             newRequest();
         });
     }
+
+    const handleEditFunction = (id:string)=>{
+        window.location.href = `/admin/terem-szerkesztes/${id}`;
+    }
     
 
     return venues.map((element, index)=>{
@@ -35,7 +39,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
                 <div className = "venue-body">
                 <h3 className = "venue-title">{element.name}</h3>
                 <div className = "venue-buttons">
-                <input type="button" value="Szerkesztés" className = "edit-button" />
+                <input type="button" value="Szerkesztés" className = "edit-button" onClick = {e => {handleEditFunction(element.id)}} />
                 <input type="button" value="Törlés" className = "delete-button" onClick = {event=>handleDeleteFunction(element.id)} />
                 </div>
                 </div>

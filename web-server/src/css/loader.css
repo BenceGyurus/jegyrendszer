@@ -1,0 +1,28 @@
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .loader::before {
+    content: "";
+    display: inline-block;
+    width: 50px;
+    height: 4px;
+    background-color: #3498db;
+    animation: loading 1s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  }
+  
+  @keyframes loading {
+    0% {
+      transform: translateX(-60px);
+    }
+    50% {
+      transform: translateX(60px);
+    }
+    100% {
+      transform: translateX(-60px);
+    }
+  }
+  

@@ -1,5 +1,5 @@
 import NonDragableSeat from "./nonDragableSeat.component";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuid } from 'uuid';
 import "../../../css/smallMap.css"
 type typesOfSmallMapParams = {
@@ -12,6 +12,12 @@ type typesOfSmallMapParams = {
 const SmallMap = ({sizeOfArea, colorOfBackGround, sizeOfSeats, colorOfSeat, seatDatas}:typesOfSmallMapParams) =>{
 
     const [expectedWidth, setExpectedWidth] = useState(250);
+
+    useEffect(()=>{
+        if (!sizeOfArea){
+            sizeOfArea = {width : 800, height : 1200}
+        }
+    })
 
     const getSizeOfArea = (width:number, height:number):{width:number, height:number}=>{
         return {
@@ -29,16 +35,16 @@ const SmallMap = ({sizeOfArea, colorOfBackGround, sizeOfSeats, colorOfSeat, seat
             posY : Math.floor(posY*e)
         }
     };
+        return (
+            <div className = "map" style={{background : colorOfBackGround, height : getSizeOfArea(sizeOfArea.width, sizeOfArea.height).height , width:getSizeOfArea(sizeOfArea.width, sizeOfArea.height).width, position:"relative" }} key = {uuid()}>
+            {seatDatas.map(
+                (element)=>{
+                    return <NonDragableSeat size = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).sizeOfSeat} color = {colorOfSeat} posX = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posX} posY = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posY} key = {uuid()} />;
+                }
+            )}
+            </div>
+        )
 
-    return (
-        <div className = "map" style={{background : colorOfBackGround, height : getSizeOfArea(sizeOfArea.width, sizeOfArea.height).height , width:getSizeOfArea(sizeOfArea.width, sizeOfArea.height).width, position:"relative" }} key = {uuid()}>
-        {seatDatas.map(
-            (element)=>{
-                return <NonDragableSeat size = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).sizeOfSeat} color = {colorOfSeat} posX = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posX} posY = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posY} key = {uuid()} />;
-            }
-        )}
-        </div>
-    )
 }
 
 export default SmallMap;
