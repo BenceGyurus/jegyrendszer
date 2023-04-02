@@ -10,7 +10,7 @@ import Footer from "./components/siteElements/footer.component";
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
     <div>
-        <Header />
+        <Header listOfNavMenu={[{title : "Főoldal", link : "/"}, {title : "Admin", link : "/admin"}]}/>
         <div className = "mainDiv">
             <Navigation />
         </div>

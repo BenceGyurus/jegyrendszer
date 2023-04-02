@@ -33,18 +33,17 @@ const Area = ({width, height, background, children, clickEvent, size, posYOfArea
 
     useEffect(()=>{
         if (areaRef.current){
-            console.log("top", areaRef.current.offsetTop);
+            posYOfArea(areaRef.current.offsetTop);
             posYOfArea(areaRef.current.offsetTop);
             posXOfArea(areaRef.current.offsetLeft);
         }
         
     })
-    console.log((window.innerWidth/2)-width/2);
 
     return (
         <div ref={areaRef} style = {{left : (window.innerWidth/2)-width/2, position: "relative"}}>
             {
-        background.isImage ? <div><img src={background.name} crossOrigin='anonymous'  className = {classname}  style ={{width : `${width}px`, height : `${height}px`}} onClick = {event => handleClick(event)} />{mappedChildren}</div>
+        background.isImage ? <div><img src={background.name} crossOrigin='anonymous'  className = {classname}  style ={{width : `${width}px`, height : `${height}px`, position: "relative"}} onClick = {event => handleClick(event)} />{mappedChildren}</div>
          : 
         <div className = {classname}  style ={{width : `${width}px`, height : `${height}px`, background : background.isImage ? `url("${background.name}"), cover;` : background.name}} onClick = {event => handleClick(event)}>
             {mappedChildren}

@@ -1,10 +1,36 @@
 import "../../css/header.css";
-import Logo from "../logo/logo.component";
-const header = ()=>{
+
+type typeOfMenu = {
+    title : string,
+    link : string
+}
+
+type typeOfHeaderParams = {
+    listOfNavMenu? : Array<typeOfMenu> 
+}
+
+const header = ( {listOfNavMenu}:typeOfHeaderParams )=>{
     return (
-       <header className = "header" id = "header">
-        <Logo name = "header" />
-       </header> 
+
+<header>
+<div className="header-container">
+  <a href="/"><img src="/images/logo.png" alt="agora-logo" className = "logo" /></a>
+  <nav>
+  <ul className="nav">
+              {listOfNavMenu ? listOfNavMenu.map((element:typeOfMenu, index)=>{
+                return (
+                  <li className="nav-item">
+                    <a className="nav-link" href={element.link}>{element.title}</a>
+                  </li>
+                )
+            }) : ""}
+            </ul>
+  </nav>
+</div>
+</header>
+
+    
+      
     );
 }
 

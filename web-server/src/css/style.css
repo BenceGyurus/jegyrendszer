@@ -4,6 +4,18 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 
+#root{
+    padding-top: 80px;
+}
+/*html {
+    overflow: hidden;
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    overflow: auto;
+}*/
 body{
     padding: 0px;
     margin: 0px;
