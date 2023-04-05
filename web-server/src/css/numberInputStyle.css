@@ -23,6 +23,6 @@
   
   .inputNumber:focus {
     outline: none;
-    border-bottom-color: #007bff;
+    border-bottom-color: rgb(185,211,65);
   }
   

@@ -2,6 +2,7 @@ import "../../../css/venuesStyle.css";
 import SmallMap from "./smallMap.component"
 import postData from "../../connection/request";
 import ParseCookies from "../../../cookies/parseCookies";
+import Tooltip from "../../tooltip/tooltip.component";
 
 type typeOfVenueDatas = {
     name : string,
@@ -12,6 +13,7 @@ type typeOfVenueDatas = {
     sizeOfSeat : number,
     colorOfSeat : string,
     sizeOfArea : {width : number, height: number},
+    addedBy : string
 }
 
 type typeOfVenueListParams = {
@@ -42,6 +44,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
                 <input type="button" value="Szerkesztés" className = "edit-button" onClick = {e => {handleEditFunction(element.id)}} />
                 <input type="button" value="Törlés" className = "delete-button" onClick = {event=>handleDeleteFunction(element.id)} />
                 </div>
+                <div className = "tooltip-position-div"><Tooltip title = {<i className="fas fa-info-circle"></i>} text = {`Hozzáadta: ${element.addedBy}`} /></div>
                 </div>
             </div>
         );

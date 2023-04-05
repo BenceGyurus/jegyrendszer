@@ -8,14 +8,15 @@ const handleError = (errorCode, res, numberOfTrys)=>{
             return 0;
         }
         else if (!error && numberOfTrys >= 1){
-            error = {message : "Váratlan hiba történt kérjük próbálja megkésőbb", type : "error", responseCode : 404}
+            error = {message : "Váratlan hiba történt kérjük próbálja megkésőbb", type : "error", responseCode : 404, error : true}
         }
     }
     catch{
         error = {message : "Váratlan hiba történt kérjük próbálja újra később", error : true, type : "error", responseCode : 404};
     }
-    res.status(error.responseCode);
-    res.send({message : error.message,type : error.type});
+    console.log(error);
+    error.responseCode ? res.status(error.responseCode) : false; 
+    res.send({message : error.message,type : error.type, error : error.type == "error"});
 }
 
 module.exports = handleError;

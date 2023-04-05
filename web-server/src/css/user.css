@@ -1,0 +1,77 @@
+    .username {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .access-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .access-list li {
+    font-style: italic;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    background-color: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: #666;
+  }
+  
+  .user-id {
+    font-size: 12px;
+    color: #999;
+    background-color: #f5f5f5;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+  
+  .user-actions {
+    display: flex;
+  }
+  
+  .edit-button,
+  .delete-button {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: #666;
+    font-weight: bold;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  .edit-button:hover,
+  .delete-button:hover {
+    background-color: #ccc;
+  }
+  
+.link{
+    color: #26aafc;
+}
+
+  .status{
+    padding: 3px;
+    margin: 3px;
+    border-radius: 10px;
+    display: block;
+    width: max-content;
+    font-size: 8px;
+    font-weight: bold;
+  }
+
+  .pedding{
+    border: 2px solid #bdba02;
+    background-color: #e6e202;
+    color: white;
+  }
+
+  .registered{
+    border: 2px solid #38b502;
+    background-color: #46e302;
+    color: white;
+  }

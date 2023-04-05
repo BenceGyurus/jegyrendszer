@@ -58,5 +58,15 @@
         "message" : "Sikeres törlés",
         "type" : "successful",
         "responseCode" : 200
+    },
+    "012" : {
+        "message" : "Nincs megadva id",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "013" : {
+        "message" : "Nem található a felhasználó",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

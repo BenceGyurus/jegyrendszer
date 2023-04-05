@@ -1,0 +1,36 @@
+.new-user-window{
+    width: 40%;
+    min-width: 300px;
+    padding: 0;
+    position: fixed;
+    left: 35%;
+    top: 15%;
+    height: 50%;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.accesses{
+    padding: 5px 20px 20px 20px;
+    height: 60%;
+    overflow-y: scroll;
+}
+
+.accesses li {
+    list-style: none;
+    padding: 3px;
+    margin: 8px;
+}
+
+.accesses li label{
+    margin: 3px 3px 3px 3px;
+}
+
+.accesses li .checkbox{
+    float: right;
+}
+
+.new-user-button{
+    padding: 20px;
+    padding-top: 0px;
+}

@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react"
 import Area from "./component/seatArea.component"
 import { v4 as uuid } from 'uuid';
-import NewGroup from "./component/newGroup.component";
 import GroupList from "./component/groupList.component";
 import DatasToArea from "./component/datasOnArea";
 import ShowAllSeats from "./component/showAll.component";
-import ImageUpload from "./component/uploadImage";
 import axios from 'axios';
 import Settings from "./component/Settings.component";
 import "../../../../css/createNewVenueMain.css";
@@ -15,6 +13,7 @@ import Auto_Addition from "./autoAddition";
 import SuggestNewGroups from "./component/newGroupSuggestion.component";
 import postData from "../../../connection/request";
 import ParseCookies from "../../../../cookies/parseCookies";
+import BackButton from "../../../back/backbutton.component";
 
 type groupType = {
     name : string,
@@ -286,6 +285,9 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
 
     return (
         <div>
+            <div className = "back-button-locate-div">
+                <BackButton url = "/admin/termek" />
+            </div>
         <VenueDatas nameOfVenue={nameOfVenue} numberOfPlaces = {numberOfPlaces} seatsStatus = {turnOnSeats} onChangeFunction = {setTurnOnSeats} changeName = {setNameOfVenue} changeNumberOfPlaces = {setNumberOfPlaces} />
         {turnOnSeats ? <div><Area width = {!background.isImage ? sizeOfArea.width : sizeOfArea.width} height = {!background.isImage ? sizeOfArea.height : sizeOfArea.height} background = {background} clickEvent = {addNewSeat} size = {sizeOfSeat} posYOfArea = {setPotionOfTheAreaFromTop} posXOfArea = {setPotionOfTheAreaFromLeft}>
         <DatasToArea groups={groups} seats = {getAbsoluteSeats()} size = {sizeOfSeat} selected = {selecttedGroup} newPositionFunction = {newPositionToSeat} showAll = {showAllSeats} colorOfSeat = {colorOfSeat}/>

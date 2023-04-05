@@ -64,13 +64,13 @@ class Functions{
     }
     static control_Password_And_Username(json){
         let regex = new RegExp("(?=.*[0-9])");
-        return (json.username && json.username.length > 3 && json.password && json.password.length >= 8 && regex.test(json.password));
+        return (json.username && json.username.length > 4 && json.password && json.password.length >= 8 && regex.test(json.password));
     }
     static control_Access(json){
         try {
             let returnAccess = [];
             let acceses = JSON.parse(fs.readFileSync(`${__dirname}/user/accesslist.json`));
-            Object.keys(json.access).jsonforEach((x)=>{
+            json.access.forEach((x)=>{
                 Object.keys(acceses).forEach((y)=>{
                     x == y ? returnAccess.push(y) : false;
                 });
@@ -80,6 +80,13 @@ class Functions{
         } catch{
             return false;
         } 
+    }
+    static readJson(fileName){
+        try{
+            return JSON.parse(fs.readFileSync(`${__dirname}/${fileName}`));
+        }catch{
+            return false;
+        }
     }
     
 }

@@ -46,3 +46,13 @@
     margin: 3px auto;
 }
   
+.fa-info-circle {
+  font-size: 15px;
+  color: #b8b8b8;
+}
+
+.tooltip-position-div{
+  float: right;
+  margin: 3px;
+  padding: 1px;
+}

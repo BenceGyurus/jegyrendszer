@@ -1,0 +1,17 @@
+.reg-conteiner{
+        width: 40%;
+        margin: 10px auto;
+        height: 50%;
+        position: relative;
+        top: 15%;
+}
+
+@media (max-width:800px) {
+    .reg-conteiner{
+        width: 80%;
+        margin: 10px auto;
+        height: 50%;
+        position: relative;
+        top: 15%;
+    }
+}

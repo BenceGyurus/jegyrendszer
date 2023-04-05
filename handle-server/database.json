@@ -26,5 +26,9 @@
     "deleted-venues" : {
         "database" : "deleted",
         "collection" : "venues"
+    },
+    "deleted-users" : {
+        "database" : "deleted",
+        "collection" : "deleted-users"
     }
 }

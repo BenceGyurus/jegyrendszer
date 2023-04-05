@@ -13,7 +13,6 @@ const multer = require('multer');
 const Jimp = require('jimp');
 const controlTypesOfVenues = require("./typesOfDatas/veunes.js");
 const  { ObjectId } = require('mongodb');
-const e = require("express");
 const TypeOfBody = "object";
 
 const parseBodyMiddleeware = (req, next)=>{
@@ -114,9 +113,21 @@ app.post("/add-new-user", async (req,res)=>{
     let access = await  control_Token(body.token, req);
     if (access && access.includes("edit-users")){
         let { collection } = new Database("new-user");
-        let token = await Functions.genrateToken();
-        collection.insertOne({token : token, datas : await otherData(req, body.token)});
-        res.send({token : token});
+        let token = Functions.genrateToken();
+        let userAccess = [];
+        let accesses = Functions.readJson("user/accesslist.json");
+        console.log(body.access, accesses);
+        if (body.access && accesses){
+            for (let i = 0; i < Object.keys(body.access).length; i++){
+                for (let j = 0; j < Object.keys(accesses).length; j++){
+                    if (Object.keys(body.access)[i] == Object.keys(accesses)[j] && body.access[Object.keys(body.access)[i]]){
+                        userAccess.push(Object.keys(body.access)[i]);
+                    }
+                }
+            }
+        }
+        collection.insertOne({token : token,access: userAccess ,datas : await otherData(req, body.token)});
+        res.send({token : token, url : "/uj-profil/"});
     }
     else{
         handleError("004", res);
@@ -131,16 +142,20 @@ app.post("/add-new-user", async (req,res)=>{
 app.post("/create-profile/:token", async (req,res)=>{
     let token = req.params.token;
     let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.token && token){
+    if (token){
     let { collection } = new Database("new-user");
     let datas = await collection.findOne({token : token});
+    body.access = datas ? datas.access : false;
     let access = Functions.control_Access(body);
+    console.log(access);
+    console.log(datas && datas.datas.timeInMil + 259200000,new Date().getTime())
     if (datas && datas.datas.timeInMil + 259200000 > new Date().getTime()){
         if (Functions.control_Password_And_Username(body) && access){
             let { collection } = new Database("admin");
+            let pedding = new Database("new-user").collection;
             if (!await collection.findOne({username : body.username})){
-                collection.insertOne({username : body.username, password : body.password, readable_user_id : Functions.sanitizeingId(body.username), addedBy : datas.datas.userData, datas : await otherData(req), deleteable : true, access : access});
-                res.send({error : !await (collection.deleteOne({token : token})).acknowledged});
+                collection.insertOne({username : body.username, password : Functions.encryption(body.password), readable_user_id : Functions.sanitizeingId(body.username), addedBy : datas.datas.userData, datas : await otherData(req), deleteable : true, access : access});
+                res.send({error :  !(await pedding.deleteOne({token : token})).acknowledged});
             }
             else{
                 handleError("010", res);
@@ -161,14 +176,28 @@ app.post("/create-profile/:token", async (req,res)=>{
     }
 });
 
-app.delete("/delete-user", async (req,res)=>{
+app.post("/delete-user", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
-    let access = control_Token(body, req);
-    let usersCollection = new Database("admin").collection;
+        console.log(body);
+        let access = await control_Token(body.token, req);
+        console.log(access);
+        let usersCollection = new Database("admin").collection;
     if (access && access.includes("edit-users")){
-        if (body.deletingUserId){
-            handleError("011", res);
+        if (body.userId){
+            let id = new ObjectId(body.userId);
+            let user = await usersCollection.findOne({_id : id});
+            let deletedUsersCollection = new Database("deleted-users").collection;
+            if (user && user.deleteable){ 
+                usersCollection.deleteOne({_id : id}); 
+                await deletedUsersCollection.insertOne({ userData : user, deletedBy : await otherData(req, req.token) , datas : Functions.getBrowerDatas});
+                handleError("011", res);
+                return ;
+            }
+            handleError("013", res);
+        }
+        else{
+            handleError("012", res);
         }
     }else{
         handleError("004", res);
@@ -287,7 +316,8 @@ app.post("/venues", async (req,res)=>{
                 id : datas[i]._id,
                 sizeOfSeat : datas[i].content.sizeOfSeat,
                 colorOfSeat : datas[i].content.colorOfSeat,
-                sizeOfArea : datas[i].content.sizeOfArea
+                sizeOfArea : datas[i].content.sizeOfArea,
+                addedBy: datas[i].addedBy.userData.username
             });
         }
         res.send({venues : sendDatas});
@@ -335,6 +365,55 @@ app.post("/delete-venue/:id", async (req,res)=>{
     }
     handleError("004", res);
 });
+
+app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-users")){
+            let { collection } = new Database("admin");
+            let sendDatas = [];
+            let datas = await collection.find().toArray();
+            for (let i = 0; i < datas.length; i++){
+                sendDatas.push({
+                    id : datas[i]._id,
+                    username : datas[i].username,
+                    access : Functions.merge_Access(datas[i].access),
+                    cantEdit : datas[i].cantEdit,
+                    status : true
+                });
+            }
+            let pedding = new Database("new-user").collection;
+            datas = await pedding.find().toArray();
+            for (let i = 0; i < datas.length; i++){
+                if (datas[i].datas.timeInMil+259200000 > new Date().getTime()){
+                    console.log(datas[i].access);
+                sendDatas.push({
+                    id : datas[i]._id,
+                    addedBy : datas[i].datas.userData.username,
+                    validTo : datas[i].datas.timeInMil+259200000,
+                    created : datas[i].datas.timeInMil,
+                    status: false,
+                    access : Functions.merge_Access(datas[i].access),
+                    token : datas[i].token,
+                    url : "/uj-profil/"
+                })
+                }
+            }
+            res.send({users : sendDatas});
+            return;
+        }
+    }
+    handleError("004", res);
+})
+
+app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-users")){
+            res.send(Functions.readJson("user/accesslist.json"));
+        }
+    }
+})
 
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
     console.log(req.files);

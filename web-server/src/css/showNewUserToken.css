@@ -1,0 +1,36 @@
+.showNewUserToken{
+    width: 40%;
+    position: fixed;
+    top: 20%;
+    right: 27%;
+    background-color: #fff;
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+/* input field */
+.inputOfToken{
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: none;
+    width: 70%;
+  }
+  
+  /* copy button */
+  .copy-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  /* copy button hover effect */
+  .copy-button:hover {
+    background-color: #3e8e41;
+  }
