@@ -223,7 +223,29 @@ app.post("/add-event", async (req,res)=>{
 
 app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
     if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
-        
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-rooms") && controlTypesOfVenues(req.body.datas)){
+            let { collection } = new Database("venue");
+            let id = new ObjectId(req.params.id);
+            let lastVersion = await collection.findOne({_id : id});
+            if (lastVersion){
+                console.log(lastVersion.versions);
+            lastVersion.versions.push({content : lastVersion.content, addedBy: lastVersion.addedBy, id : Functions.genrateToken})
+            let updated = await collection.updateOne({_id : id}, {$set : {content : req.body.datas, addedBy : await otherData(req, req.body.token), versions : lastVersion.versions}});
+            console.log(updated);
+            if (updated.modifiedCount){
+                res.send({id : req.params.id});
+                return;
+            }
+            else{
+                handleError("000", res);
+                return;
+            }}
+            else{
+                handleError("000", res);
+                return;
+            }
+        }
     }
     handleError("004", res);
 });
@@ -235,7 +257,7 @@ app.post("/upload-venue", async (req,res)=>{
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas)){
         let { collection } = new Database("venue");
-        let datas = await collection.insertOne({content : body.datas, addedBy : await otherData(req, body.token), versions : {}});
+        let datas = await collection.insertOne({content : body.datas, addedBy : await otherData(req, body.token), versions : []});
         if (datas.insertedId){
         res.send({id : datas.insertedId});
         }
@@ -404,6 +426,15 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
         }
     }
     handleError("004", res);
+});
+
+app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-users")){
+            console.log(req.body.datas);
+        }
+    }
 })
 
 app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
@@ -413,6 +444,26 @@ app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), asyn
             res.send(Functions.readJson("user/accesslist.json"));
         }
     }
+});
+
+app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    console.log(req.body);
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-events")){
+            let {collection} = new Database("venue")
+            let datas = await collection.find().toArray();
+            let sendArray = []
+            if (datas){
+                for (let i = 0; i < datas.length; i++){
+                    sendArray.push({title : datas[i].content.name, value : datas[i]._id});
+                }
+            }
+            res.send({datas : sendArray});
+            return;
+        }
+    }
+    handleError("004", res);
 })
 
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{

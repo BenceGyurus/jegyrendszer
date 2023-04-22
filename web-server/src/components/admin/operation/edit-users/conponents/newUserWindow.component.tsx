@@ -15,7 +15,7 @@ const NewUserWindow = ({closeFunction, readyState}:typeOfNewUserWindow)=>{
     const [accessList, setAccesList]:any = useState();
     const [checkedAccesses, setCheckedAccesses]:any = useState();
     useEffect(()=>{
-        postData("/get-all-access", {token : ParseCookies().long_token})
+        postData("/get-all-access", {token : ParseCookies("long_token")})
         .then((data:any)=>{
             if (!data.error){
                 setAccesList(data);
@@ -35,7 +35,7 @@ const NewUserWindow = ({closeFunction, readyState}:typeOfNewUserWindow)=>{
     }
 
     const newUser = ()=>{
-        postData("/add-new-user", {token : ParseCookies().long_token, access : checkedAccesses})
+        postData("/add-new-user", {token : ParseCookies("long_token"), access : checkedAccesses})
         .then((data)=>{
             if (!data.error && data.token){
                 readyState(data.token, data.url);

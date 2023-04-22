@@ -1,0 +1,29 @@
+.select {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: #f6f6f6;
+    transition: all 0.3s ease;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+.select:hover,
+.select:focus {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+.select option {
+    padding: 10px;
+  }
+  
+.select option:hover {
+    background-color: #3498db;
+    color: #fff;
+  }
+  

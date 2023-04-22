@@ -11,7 +11,7 @@ const Venues = ()=>{
     const navigate = useNavigate();
 
     const load = ()=>{
-        let token = ParseCookies().long_token;
+        let token = ParseCookies("long_token");
         if (token){
             postData("/venues", {token : token})
             .then((datas)=>{

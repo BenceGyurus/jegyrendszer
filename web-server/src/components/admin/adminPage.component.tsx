@@ -8,7 +8,7 @@ const Admin = (params:any)=>{
     const [access, setAccess] = useState(false);
     const navigate = useNavigate();
     useEffect(()=>{
-        let token = ParseCookies().long_token;
+        let token = ParseCookies("long_token");
         if (token){
             postData("/get-access", {token : token})
             .then((data)=>{

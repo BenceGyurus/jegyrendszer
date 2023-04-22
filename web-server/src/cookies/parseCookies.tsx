@@ -8,8 +8,8 @@ const strip = (text:string):string=>{
     return newText;
 }
 
-const ParseCookies = ():any=>{
-    let cookiesInString = document.cookie;
+const ParseCookies = (name:string):any=>{
+    /*let cookiesInString = document.cookie;
     let cookiesInList = cookiesInString.split(";");
     let Cookies:any = [];
     cookiesInList.forEach((cookieData)=>{
@@ -19,7 +19,8 @@ const ParseCookies = ():any=>{
         }
         Cookies[strip(cookieData.split("=")[0])] =  strip(valueOfCookie);
     });
-    return Cookies;
+    return Cookies;*/
+    return localStorage.getItem(name);
 }
 
 export default ParseCookies;

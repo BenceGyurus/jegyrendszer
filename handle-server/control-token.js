@@ -6,7 +6,9 @@ async function control_Token(token, req){
     let {collection, database} = new Database("long-token");
     let datas = await collection.findOne({token : token});
         if (datas && Functions.getIp(req) == datas.datas.ip && datas.datas.timeInMil + 28800000 > new Date().getTime() && datas.status){
-            return datas.userData.access;
+            let user = await new Database("admin").collection.findOne({_id : datas.userData.id});
+            console.log(user);
+            return user ? datas.userData.access : false;
         }
     }
     return false;

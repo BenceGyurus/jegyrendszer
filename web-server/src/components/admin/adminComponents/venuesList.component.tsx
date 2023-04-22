@@ -23,7 +23,7 @@ type typeOfVenueListParams = {
 const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
 
     const handleDeleteFunction = (id:string)=>{
-        postData(`/delete-venue/${id}`, {token : ParseCookies().long_token})
+        postData(`/delete-venue/${id}`, {token : ParseCookies("long_token")})
         .then((data)=>{
             newRequest();
         });

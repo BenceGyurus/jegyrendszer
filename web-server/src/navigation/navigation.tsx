@@ -9,6 +9,7 @@ import Venues from "../components/admin/adminComponents/venues.component"
 import NewVenue from "../components/admin/operation/new_Room.component"
 import Main from "../components/admin/operation/edit-users/main";
 import Registration from "../components/admin/operation/registrationNewUser.component";
+import Create_Event_Main from "../components/admin/operation/events/main";
 
 
 
@@ -25,6 +26,7 @@ function Navigation() {
           <Route path = "/admin/felhasznalok" element = {<AdminPage component = {<Main />}/>}/>
           <Route path = "/uj-terem" element = {<NewVenue />}/>
           <Route path = "/uj-profil/*" element = {<Registration />}/>
+          <Route path = "/uj-rendezveny" element = {<Create_Event_Main />} />
           <Route path = "/admin/terem-szerkesztes/*" element = {<NewVenue />}/>
           <Route path= "*" element = {<ErrorPage />} />
         </Routes>

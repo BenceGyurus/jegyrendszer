@@ -52,7 +52,7 @@
     "010" : {
         "message" : "A megadott felhasználónév foglalat",
         "type" : "error",
-        "reponseCode" : 400
+        "responseCode" : 400
     },
     "011" : {
         "message" : "Sikeres törlés",
@@ -68,5 +68,10 @@
         "message" : "Nem található a felhasználó",
         "type" : "error",
         "responseCode" : 400
+    },
+    "020": {
+        "message" : "Sikeres frissítés",
+        "type" : "successful",
+        "responseCode" : 200
     }
 }

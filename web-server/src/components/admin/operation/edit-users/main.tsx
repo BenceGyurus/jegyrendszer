@@ -35,7 +35,7 @@ const Main = ()=>{
     }, []);
 
     const updateUsers = ()=>{
-        postData("/users", {token : ParseCookies().long_token})
+        postData("/users", {token : ParseCookies("long_token")})
         .then((data)=>{
             if (!data.error){
                 setUsers(data.users);
@@ -50,7 +50,7 @@ const Main = ()=>{
     }
 
     const delete_User = (token:string)=>{
-        postData("/delete-user", {token : ParseCookies().long_token, userId : token})
+        postData("/delete-user", {token : ParseCookies("long_token"), userId : token})
         .then( async (data)=>{
             let d = data;
             if (data.responseData){
