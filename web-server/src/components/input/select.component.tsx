@@ -8,9 +8,10 @@ type typesOfSelectParams = {
     options : Array<typeOfOption>,
     onChangeFunction? : Function,
     className? : string,
-    value? : string
+    value? : string,
+    title? : string
 }
-const Select = ({options, onChangeFunction, className, value}:typesOfSelectParams)=>{
+const Select = ({options, onChangeFunction, className, value, title}:typesOfSelectParams)=>{
 
     const selectRef:any = useRef(null);
 
@@ -25,11 +26,12 @@ const Select = ({options, onChangeFunction, className, value}:typesOfSelectParam
 
     return (
         <div>
-            <select ref={selectRef} className = {className ? `select ${className}` : "select"} name="" id="" onChange={e =>onChangeFunction ? onChangeFunction(e.target.value) : ""}>
+            <label htmlFor="select" className = "select-label">{title}</label>
+            <select ref={selectRef} className = {className ? `select ${className}` : "select"} name="" id="select" onChange={e =>onChangeFunction ? onChangeFunction(e.target.value) : ""} value={value}>
                 <option value="default">-</option>
                 {options.map(
                     (option)=>{
-                        return <option value={option.value}>{option.title}</option>
+                        return <option value={option.value}>{option.title}</option>;
                     }
                 )}
             </select>

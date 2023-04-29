@@ -9,7 +9,7 @@ type typeOfShowSeatsParams = {
     closeFunction : Function,
     addNewSeat : Function,
     seatList : Array<string>,
-    allSelected : Array<string>
+    allSelected : Array<string>,
 };
 
 type typeOfGroups = {
@@ -44,7 +44,6 @@ type typeOfVenues = {
     sizeOfArea : {width : number, height : number},
     sizeOfSeat : number,
     suggestedGroups : Array<string>
-
 }
 
 const ShowSeats = ({datasOfVenue, closeFunction, addNewSeat, seatList, allSelected}:typeOfShowSeatsParams)=>{
@@ -63,7 +62,7 @@ const ShowSeats = ({datasOfVenue, closeFunction, addNewSeat, seatList, allSelect
             {
                 venueData ? venueData.seatsDatas.map(
                     (venue:any)=>{
-                        return !allSelected.includes(venue.id) ? <span key = {uuid()} onClick={e => {addNewSeat(venue.id); setStatus(!status)}} className = "place" style = {{background:`${seatList.includes(venue.id) ? "red":"black"}`, width : venueData.sizeOfSeat, position: "absolute", top : venue.posY, left : venue.posX, height: venueData.sizeOfSeat}}></span> : "";
+                        return !allSelected.includes(venue.id) || seatList.includes(venue.id) ? <span key = {uuid()} onClick={e => {addNewSeat(venue.id); setStatus(!status)}} className = "place" style = {{background:`${seatList.includes(venue.id) ? "red":"black"}`, width : venueData.sizeOfSeat, position: "absolute", top : venue.posY, left : venue.posX, height: venueData.sizeOfSeat}}></span> : "";
                     }
                 ): ""
             }

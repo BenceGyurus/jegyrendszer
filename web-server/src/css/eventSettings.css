@@ -1,10 +1,13 @@
 .create-Event-Settings-Main{
-    max-width: 500px;
+    max-width: 600px;
     margin: 20px auto;
-    width: 40%;
+    width: 50%;
     min-width: 200px;
 }
 .create-event-upload-image{
     width: max-content;
     margin: 10px auto;
+}
+.ticket-button{
+    margin: 10px;
 }

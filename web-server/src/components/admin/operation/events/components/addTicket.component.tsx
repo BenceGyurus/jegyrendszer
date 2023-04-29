@@ -17,18 +17,32 @@ type typeOfAddTicketParams = {
     maxPriceOfTicket? : number,
     minPriceOfTicket? : number,
     seatsOfTicket? : Array<string>,
-    allSelected : Array<string>
+    allSelected : Array<string>,
+    id? : string,
+    editFunction? : Function,
+    numberOfTicket? : number
 }
 
-const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, priceOfTicket, minPriceOfTicket, maxPriceOfTicket, seatsOfTicket, allSelected}:typeOfAddTicketParams)=>{
+const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, priceOfTicket, minPriceOfTicket, maxPriceOfTicket, seatsOfTicket, allSelected, id, editFunction, numberOfTicket}:typeOfAddTicketParams)=>{
 
+    const [idOfTicket, setId] = useState(id ? id : "");
     const [seats, setSeats] = useState(false);
     const [idsOfSeats, setIdsOfSeats]:[Array<string>, Function] = useState(seatsOfTicket ? seatsOfTicket : []);
     const [price, setPrice]:[number, Function] = useState(priceOfTicket ? priceOfTicket : 0);
     const [minPrice, setMinPrice]:[number, Function] = useState(minPriceOfTicket ? minPriceOfTicket : 0);
     const [maxPrice, setMaxPrice]:[number, Function] = useState(maxPriceOfTicket ? maxPriceOfTicket : 0);
     const [name, setName]:[string, Function] = useState(nameOfTicket ? nameOfTicket : "");
-    const [nOfTicket, setNumberOfTicket]:[number, Function] = useState(0); 
+    const [nOfTicket, setNumberOfTicket]:[number, Function] = useState(numberOfTicket ? numberOfTicket : 0); 
+
+    console.log(price);
+
+    const deleteFromAllSelected = (id:string)=>{
+        let l = [];
+        for (let i = 0; i < allSelected.length; i++){
+            if (allSelected[i] === id){l.push(allSelected[i])}
+        }
+        return l;
+    }
 
 
     const select_Seat = (id:string)=>{
@@ -38,6 +52,7 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
             l.forEach((element)=>{
                 if (element != id){
                     newList.push(element);
+                    allSelected = deleteFromAllSelected(id);
                 }
             })
             setIdsOfSeats(newList);
@@ -52,7 +67,6 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
 
     const changeNumberOfTicket = (status:boolean, n:number|null)=>{
         let l = nOfTicket;
-        console.log(n);
         if (status){
             setNumberOfTicket(n ? l+n: l+1);
         }else{
@@ -81,6 +95,7 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
                 for (let j = 0; j < l.length; j++){
                     if (list[i].id === l[j]){
                         delete l[j];
+                        allSelected = deleteFromAllSelected(l[j]);
                         a++;
                     }
                 }
@@ -95,8 +110,20 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
         }
     }
 
-
-    console.log("idsOfSeats", idsOfSeats);
+    const newAllSelected = ()=>{
+        let newList = [];
+        console.log(seatsOfTicket);
+        if (id){
+            for (let i = 0; i < allSelected.length; i++){
+                if (!seatsOfTicket?.includes(allSelected[i])){
+                    newList.push(allSelected[i]);
+                }
+            }
+            console.log(allSelected, newList);
+            return newList;
+        }
+        return allSelected;
+    }
 
     return (
         <div className = "add-ticket-window">
@@ -108,9 +135,9 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
             <InputNumber title = "Minimum jegyár" onChangeFunction={setMinPrice} value = {minPrice} />
             <InputNumber title = "Jegyek száma" onChangeFunction={setNumberOfTicket} value = {nOfTicket > 0 ? nOfTicket : "0"} />
             <Button title = "Jegyek kiválasztása" onClickFunction={()=>{setSeats(true)}} />
-            {seats ? <ShowSeats closeFunction = {()=>{setSeats(false)} } datasOfVenue = {datasOfVenue} addNewSeat = {select_Seat} seatList = {idsOfSeats} allSelected = {allSelected} /> : ""}
-            <Group_List groups={datasOfVenue.groups} seats = {datasOfVenue.seatsDatas} changeFunction = {appendGroup} seatList = {allSelected}/>
-            <Button title = "Mentés" onClickFunction={()=>{saveFunction({name : name, price : price, minPrice : minPrice, maxPrice : maxPrice, seats : idsOfSeats}); closeFunction()}} />
+            {seats ? <ShowSeats closeFunction = {()=>{setSeats(false)} } datasOfVenue = {datasOfVenue} addNewSeat = {select_Seat} seatList = {idsOfSeats} allSelected = {newAllSelected()} /> : ""}
+            <Group_List groups={datasOfVenue.groups} seats = {datasOfVenue.seatsDatas} changeFunction = {appendGroup} seatList = {newAllSelected()}/>
+            <Button title = "Mentés" onClickFunction={()=>{idOfTicket && editFunction ? editFunction({name : name, price : price, minPrice : minPrice, maxPrice : maxPrice, seats : idsOfSeats, numberOfTicket : nOfTicket}, idOfTicket) : saveFunction({name : name, price : price, minPrice : minPrice, maxPrice : maxPrice, seats : idsOfSeats, numberOfTicket : nOfTicket}); closeFunction()}} />
             </div>
 
         </div>

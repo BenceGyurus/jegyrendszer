@@ -13,6 +13,7 @@ const multer = require('multer');
 const Jimp = require('jimp');
 const controlTypesOfVenues = require("./typesOfDatas/veunes.js");
 const  { ObjectId } = require('mongodb');
+const controlTypeOfEvents = require("./typesOfDatas/events.js");
 const TypeOfBody = "object";
 
 const parseBodyMiddleeware = (req, next)=>{
@@ -209,17 +210,6 @@ app.post("/delete-user", async (req,res)=>{
     }
 });
 
-app.post("/add-event", async (req,res)=>{
-    let body = Functions.parseBody(req.body);
-    if (body && typeof body && body.token){
-    let access = await control_Token(body.token, req);
-    if (access && access.includes("edit-users")){
-        let { collection } = new Database("events");
-        return;
-    }
-    }
-    handleError("004", res);
-});
 
 app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
     if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
@@ -474,6 +464,86 @@ app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next),
     }
     handleError("004", res);
 })
+
+
+app.post("/add-event",async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body === TypeOfBody &&body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data)){
+            let {collection} = new Database("events");
+            let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name)};
+            let insert = await collection.insertOne({eventData : insertData, otherDatas : await otherData(req,body.token), versions : []});
+            if (insert.insertedId){
+                res.send({id : (await collection.findOne({_id : insert.insertedId}))._id});
+                return;
+            }
+        }
+    }
+    return handleError("004", res);
+});
+
+app.post("/get-event-data/:id", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    let id = req.params.id;
+    if (body && typeof body === TypeOfBody &&body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-events") && id){
+            let { collection } = new Database("events");
+            id = new ObjectId(id);
+            let datas = await collection.findOne({_id : id});
+            if (datas && datas.eventData){
+                res.send(datas.eventData);
+                return;
+            }
+            else{
+
+            }
+        }
+    }
+    handleError("004");
+});
+
+app.post("/add-event/:id",async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    let id = req.params.id;
+    console.log(id);
+    if (body && typeof body === TypeOfBody &&body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data) && id){
+            let {collection} = new Database("events");
+            id = new ObjectId(id);
+            let data = await collection.findOne({_id : id});
+            body.data = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name)};
+            l = await collection.updateOne({_id : id}, {$set : {eventData : body.data, versions : [...data.versions, { eventData : data.eventData, otherDatas : data.otherDatas }], otherDatas : await otherData(req,body.token)}});
+            if (l.modifiedCount){
+                res.send({id : id});
+                return;
+            }
+            return handleError("000")
+        }
+    }
+    return handleError("004", res);
+});
+
+app.post("/events", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body === TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-events")){
+            let {collection} = new Database("events");
+            let datas = await collection.find().toArray();
+            let events = [];
+            datas.forEach((element)=>{
+                events.push({eventData : element.eventData, addedBy : element.otherDatas.userData});
+            })
+            res.send(events);
+            return
+        }
+    }
+    return handleError("004");
+})
+
 
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
     console.log(req.files);

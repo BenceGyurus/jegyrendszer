@@ -8,5 +8,22 @@
     "ó" : "o",
     "ő" : "o",
     "ú" : "u",
-    " " : "-"
+    " " : "-",
+    "\"" : null,
+    "'" : null,
+    "„" : null,
+    "”" : null,
+    "/" : null,
+    "\\" : null,
+    "%" : null,
+    "!" : null,
+    "=" : null,
+    "?" : null,
+    "#" : null,
+    "+" : null,
+    "(" : null,
+    ")" : null,
+    "&" : null,
+    "|" : null,
+    "’" : null
 }

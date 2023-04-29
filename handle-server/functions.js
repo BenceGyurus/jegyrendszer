@@ -37,7 +37,7 @@ class Functions{
         try{
             let replaceChars = JSON.parse(fs.readFileSync(path));
             text.split("").forEach((char)=>{
-                newText += replaceChars[char] ? replaceChars[char] : char;
+                newText += replaceChars[char] || replaceChars[char] === null ? replaceChars[char] === null ? "" : replaceChars[char] : char;
             })
             return newText;
         }catch{
@@ -45,11 +45,12 @@ class Functions{
         }
     }
     static sanitizeingText(data){
-        newText = this.replaceInText(`${__dirname}/charset/htmlReadyTextChars.json`, data);
+        let newText = this.replaceInText(`${__dirname}/charset/htmlReadyTextChars.json`, data);
         return newText ? newText : data;
     }
     static sanitizeingId(text){
         let newText = "";
+        text = text.toLowerCase();
         newText = this.replaceInText(`${__dirname}/charset/idchars.json`, text);
         text = newText ? newText : text;
         text = "";

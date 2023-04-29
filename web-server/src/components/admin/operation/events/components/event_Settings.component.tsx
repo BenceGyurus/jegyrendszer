@@ -13,6 +13,7 @@ import ImageUpload from "../../../../image-upload/imageUpload.component";
 import { v4 as uuid } from 'uuid';
 import TicketList from "./ticketList.component";
 import Calendar from "../../../../calendar/calendar.component";
+import Error from "../../../../natification/error.component";
 
 type typeOfGroups = {
     id : string,
@@ -58,19 +59,31 @@ type typeOfTicket = {
     name : string
 }
 
-const EventSettings = ()=>{
+type typeOfEventSettingsParams = {
+    name? : string,
+    description? : string,
+    tickets_? : any,
+    background? : string,
+    dOfEvent? : string,
+    dOfRelease? : string,
+    venue? : string
+}
 
-    const [nameOfEvent, setNameOfEvent]:[string, Function] = useState("");
-    const [desciption, setDescription]:[string, Function] = useState("");
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue }:typeOfEventSettingsParams )=>{
+
+    const [id, setId]:[string, Function] = useState(window.location.pathname.split("/")[3]);
+    const [nameOfEvent, setNameOfEvent]:[string, Function] = useState(name ? name : "");
+    const [desciption, setDescription]:[string, Function] = useState(description ? description : "");
     const [addWindow, setAddWindow]:[boolean, Function] = useState(false);
-    const [tickets, setTickets]:[Array<any>, Function] = useState(Array<typeOfTicket>);
-    const [selectedVenue, setSelectedVenue]:[string, Function] = useState("");
+    const [tickets, setTickets]:[Array<any>, Function] = useState(tickets_ ? tickets_ : []);
+    const [selectedVenue, setSelectedVenue]:[string, Function] = useState(venue ? venue : "");
     const [venues, setVenues]:[Array<{value : string, title : string}>, Function] = useState([]);
-    const [backgroundImage, setBackgroundImage]:[string, Function] = useState(""); 
+    const [backgroundImage, setBackgroundImage]:[string, Function] = useState(background ? background : ""); 
     const [venueDatas, setVenueDatas]:any = useState();
     const [all_Selected, setAll_Selected]:[Array<string>, Function] = useState([]);
-    const [dateOfEvent, setDateOfEvent]:[string, Function] = useState("");
-    const [dateOfRelease, setDateOfRelease]:[string, Function] = useState("");
+    const [dateOfEvent, setDateOfEvent]:[string, Function] = useState(dOfEvent ? dOfEvent : "");
+    const [dateOfRelease, setDateOfRelease]:[string, Function] = useState(dOfRelease ? dOfRelease : "");
+    const [editTicket, setEditTicket]:[any, Function] = useState(false);
 
     const getPlaceDatas = (id:string)=>{
         if (id){
@@ -98,8 +111,6 @@ const EventSettings = ()=>{
         setAll_Selected(l);
     }
 
-    console.log(all_Selected);
-
     useEffect(()=>{
         postData("/get-venues-in-array", {token : ParseCookies("long_token")})
         .then((datas)=>{
@@ -110,10 +121,13 @@ const EventSettings = ()=>{
 
             }
         });
+        if (selectedVenue){
+            getPlaceDatas(selectedVenue);
+        }
     }, []);
 
     const changeSelectedVenue = (d:string)=>{
-        setSelectedVenue(d);console.log(selectedVenue) ;getPlaceDatas(d);
+        setSelectedVenue(d) ;getPlaceDatas(d);
     }
 
     const addNewTickets = (datas:typeOfTicket)=>{
@@ -137,18 +151,75 @@ const EventSettings = ()=>{
     }
 
 
+    const save = ()=>{
+        let sendData = {
+            name : nameOfEvent,
+            description : desciption,
+            tickets : tickets,
+            background : backgroundImage,
+            dateOfEvent : dateOfEvent,
+            dateOfRelease : dateOfRelease ? dateOfRelease : getNowDate(),
+            venue : selectedVenue
+        };
+
+        postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseCookies("long_token")})
+        .then(async (data)=>{
+            if (data.datas){
+                <Error message={(await data.datas).message} />
+            }
+            else if (data.id && !id){
+                window.location.pathname += `/${data.id}`;
+            }
+        })
+    }
+
+
+    const edit_Ticket = (id:string)=>{
+        for (let i = 0; i < tickets.length; i++){
+            if (tickets[i].id === id){
+                setEditTicket(tickets[i]);
+            }
+        }
+    }
+
+    const saveEditedTicket = (datas:any, id:string)=>{
+        let l = [];
+        for (let i = 0; i < tickets.length; i++){
+            if (id == tickets[i].id){
+                console.log({...datas, id : id});
+                l.push({...datas, id : id});
+            }else{
+                l.push(tickets[i]);
+            }
+        }
+        appendToAllSelected(l);
+        setTickets(l);
+    }
+
+
+    const reload_All_Selected = ()=>{
+        let l = [];
+        for (let i = 0; i < tickets.length; i++){
+            for (let j = 0; j < tickets[i].seats.length; j++){
+                l.push(tickets[i].seats[j]);
+            }
+        }
+        setAll_Selected(l);
+    }
+
+
     return (
         <div className = "create-Event-Settings-Main">
             <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} />
-            <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" />
-            <AddNewButton onClick={()=>{ selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
+            <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} />
+            <AddNewButton onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
             <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" />
             <Calendar onChangeFunction={setDateOfRelease} value = {getNowDate()} title="Rendevény megjelenése az oldalon" />
-            <Select options = {venues} onChangeFunction = {changeSelectedVenue} />
+            <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
-            {addWindow ? <AddTicket closeFunction={()=>{setAddWindow(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} /> : ""}
-            { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas}/> : "" }
-            <SaveButton onClickFunction={()=>{}} />
+            {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
+            { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
+            <SaveButton onClickFunction={save} />
         </div>
     );
 }

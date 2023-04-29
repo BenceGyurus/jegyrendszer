@@ -30,7 +30,6 @@ const SmallMap = ({sizeOfArea, colorOfBackGround, sizeOfSeats, colorOfSeat, seat
 
     const calculateSeatDatas = (width:number, sizeOfSeat:number, posX:number, posY:number)=>{
         let e = expectedWidth/width;
-        console.log(posX, posX*e, Math.floor(posX*e));
         return {
             sizeOfSeat : Math.ceil(sizeOfSeat*e),
             posX : Math.floor(posX*e),

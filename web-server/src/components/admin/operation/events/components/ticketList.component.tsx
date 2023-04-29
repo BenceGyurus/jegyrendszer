@@ -6,7 +6,8 @@ type typeOfTicket = {
     price : number,
     minPrice : number,
     maxPrice : number,
-    name : string
+    name : string,
+    numberOfTicket : number
 }
 
 type typeOfTicketList = {
@@ -14,6 +15,8 @@ type typeOfTicketList = {
     seatDatas : typeOfPlace,
     sizeOfSeat : number,
     sizeOfArea : {width: number, height: number},
+    deleteFunction : Function,
+    editFunction : Function
 }
 
 type typeOfPlace = {
@@ -25,11 +28,12 @@ type typeOfPlace = {
     colorOfSeat : string
 }
 
-const TicketList = ( { tickets, sizeOfSeat, sizeOfArea, seatDatas }:typeOfTicketList )=>{
-    return <div>
+const TicketList = ( { tickets, sizeOfSeat, sizeOfArea, seatDatas,deleteFunction,editFunction }:typeOfTicketList )=>{
+    console.log(tickets);
+    return <div className = "ticket">
         {
             tickets.map((ticket)=>{
-                return <Ticket ticket = {ticket} sizeOfSeat = {sizeOfSeat} sizeOfArea = {sizeOfArea} seatsDatas = {seatDatas} />
+                return <Ticket ticket = {ticket} sizeOfSeat = {sizeOfSeat} sizeOfArea = {sizeOfArea} seatsDatas = {seatDatas} deleteFunction = {deleteFunction} editFunction = {editFunction} />
             }
             )
         }

@@ -49,6 +49,8 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
         deleteFunction();
     }
 
+    console.log(image);
+
     return (
         <div className={`${className ? className : ""} upload-image-div`}>
             {title ? <h3 className = "upload-image-title">{title}</h3> : ""}

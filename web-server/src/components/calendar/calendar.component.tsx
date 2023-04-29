@@ -18,7 +18,7 @@ const Calendar = ( { title, onChangeFunction, value }:typeOfCalendarParams )=>{
     });
 
     return <div className = "calendar-div">
-        {title ? <label htmlFor="datetime-input">{title}</label> : ""}
+        {title ? <label className = "calendar-label" htmlFor="datetime-input">{title}</label> : ""}
         <div><input type="datetime-local" id="datetime-input" name="datetime-input" onChange={e=>onChangeFunction ? onChangeFunction(e.target.value) : ""} ref={dateRef} /></div>
         </div>
     

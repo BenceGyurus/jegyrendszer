@@ -11,16 +11,17 @@ input[type="datetime-local"] {
   border-radius: 4px;
   padding: 8px;
   font-size: 16px;
-  width: 300px;
+  width: 100%;
 }
 
 /* Style the label */
-label {
-  font-size: 16px;
+.calendar-label {
+  font-size: 18px;
   margin-right: 8px;
+  font-weight: bold;
 }
 
 .calendar-div{
-    margin: 10px;
+    margin: 20px 0;
     width: 100%;
 }

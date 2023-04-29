@@ -26,8 +26,9 @@ function Navigation() {
           <Route path = "/admin/felhasznalok" element = {<AdminPage component = {<Main />}/>}/>
           <Route path = "/uj-terem" element = {<NewVenue />}/>
           <Route path = "/uj-profil/*" element = {<Registration />}/>
-          <Route path = "/uj-rendezveny" element = {<Create_Event_Main />} />
+          <Route path = "/admin/rendezveny/*" element = {<Create_Event_Main />} />
           <Route path = "/admin/terem-szerkesztes/*" element = {<NewVenue />}/>
+          <Route path = "/admin/rendezvenyek" element = {<NewVenue />}/>
           <Route path= "*" element = {<ErrorPage />} />
         </Routes>
       </BrowserRouter>

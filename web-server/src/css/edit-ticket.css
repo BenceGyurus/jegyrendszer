@@ -1,0 +1,9 @@
+.edit-ticket-div{
+    width: 45%;
+    display: inline-table;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    margin: 10px;
+    min-width: 200px;
+}
