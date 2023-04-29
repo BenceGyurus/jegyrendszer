@@ -1,0 +1,26 @@
+/* Hide the default arrow in the input */
+input[type="datetime-local"]::-webkit-inner-spin-button,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Style the input to look like a calendar and time input */
+input[type="datetime-local"] {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 16px;
+  width: 300px;
+}
+
+/* Style the label */
+label {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.calendar-div{
+    margin: 10px;
+    width: 100%;
+}

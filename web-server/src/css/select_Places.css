@@ -1,0 +1,34 @@
+.select-places-div{
+    background-color: white;
+    position: fixed;
+    top: 15%;
+    left : 25%;
+    z-index:99999999;
+    width: 50%;
+    height: 70%;
+    overflow-y: auto;
+    overflow-x: none;
+}
+
+.select-place-div-2{
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+
+.select-places-place-div{
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.place{
+    border-radius: 20%;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.select-places-window-header{
+    position: fixed;
+    width: 50%;
+}

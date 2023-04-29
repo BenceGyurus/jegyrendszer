@@ -250,7 +250,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
     const uploadFile = (event:any)=>{
         const data = new FormData() ;
         data.append('file', event.target.files[0]);
-        axios.post("/upload-backgroumd-image-to-venue", data)
+        axios.post(`/upload-image/${ParseCookies("long_token")}`, data)
         .then(res => { // then print response status
             setBackground({isImage : true, name : res.data.path});
             if (res.data.width && res.data.height){

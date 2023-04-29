@@ -297,27 +297,36 @@ app.post("/new-long-token", async (req,res)=>{
     handleError("004", res);
 })
 
-app.post('/upload-backgroumd-image-to-venue', upload.single('file'), async (req, res, next) => {
-    const file = req.file;
-    if (!file) {
-      const error = new Error('No File')
-      error.httpStatusCode = 400
-      return next(error)
-    }
-    let newFilePath = "";
-    for (let i = 1; i < file.path.split("/").length; i++){
-        newFilePath += "/"+ file.path.split("/")[i];
-    }
-    let width = 0;
-    let height = 0;
-    try{
-        let jimage = await Jimp.read(`${__dirname}/${file.path}`);
-        width = jimage.bitmap.width;
-        height = jimage.bitmap.height;
-    }catch{
+app.post('/upload-image/:token', upload.single('file'), async (req, res, next) => {
+    const token = req.params.token;
+    if (token){
+        let access = await control_Token(token, req);
+        if (access.includes("edit-events") || access.includes("edit-rooms")){
+            const file = req.file;
+            if (!file) {
+                const error = new Error('No File')
+                error.httpStatusCode = 400
+                return next(error)
+            }
+            let newFilePath = "";
+            for (let i = 1; i < file.path.split("/").length; i++){
+                newFilePath += "/"+ file.path.split("/")[i];
+            }
+            let width = 0;
+            let height = 0;
+            try{
+                let jimage = await Jimp.read(`${__dirname}/${file.path}`);
+                width = jimage.bitmap.width;
+                height = jimage.bitmap.height;
+            }catch{
 
+            }
+            res.send({path : `${newFilePath}`, width: width,height : height});
+        }
     }
-    res.send({path : newFilePath, width: width,height : height});
+    else{
+        handleError("004", res);
+    }
   });
 
 

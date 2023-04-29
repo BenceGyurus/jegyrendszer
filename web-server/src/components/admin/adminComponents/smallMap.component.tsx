@@ -7,9 +7,11 @@ type typesOfSmallMapParams = {
     colorOfBackGround : string,
     sizeOfSeats : number,
     colorOfSeat : string,
-    seatDatas : Array<any>
+    seatDatas : Array<any>,
+    selectedSeats? : Array<string>,
+    selectColor? : string
 };
-const SmallMap = ({sizeOfArea, colorOfBackGround, sizeOfSeats, colorOfSeat, seatDatas}:typesOfSmallMapParams) =>{
+const SmallMap = ({sizeOfArea, colorOfBackGround, sizeOfSeats, colorOfSeat, seatDatas, selectedSeats, selectColor}:typesOfSmallMapParams) =>{
 
     const [expectedWidth, setExpectedWidth] = useState(250);
 
@@ -39,7 +41,7 @@ const SmallMap = ({sizeOfArea, colorOfBackGround, sizeOfSeats, colorOfSeat, seat
             <div className = "map" style={{background : colorOfBackGround, height : getSizeOfArea(sizeOfArea.width, sizeOfArea.height).height , width:getSizeOfArea(sizeOfArea.width, sizeOfArea.height).width, position:"relative" }} key = {uuid()}>
             {seatDatas.map(
                 (element)=>{
-                    return <NonDragableSeat size = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).sizeOfSeat} color = {colorOfSeat} posX = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posX} posY = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posY} key = {uuid()} />;
+                    return <NonDragableSeat size = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).sizeOfSeat} color = {selectedSeats && selectedSeats.includes(element.id) ? selectColor ? selectColor : "red" : colorOfSeat} posX = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posX} posY = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posY} key = {uuid()} />;
                 }
             )}
             </div>

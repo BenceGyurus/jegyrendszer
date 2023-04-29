@@ -1,0 +1,20 @@
+.add-ticket-window{
+    min-width: 200px;
+    width: 50%;
+    position: fixed;
+    top: 20%;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    padding: 0;
+    border-radius: 10px 10px 10px 10px;
+    z-index: 99999;
+    left: 25%;
+    height: 60%;
+    outline: none;
+    overflow-y: auto;
+
+}
+
+.add-ticket-div{
+    padding: 20px;
+}
