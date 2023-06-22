@@ -34,6 +34,7 @@ const Venues = ()=>{
 
     return (
         <div>
+            <h1>Helyszínek</h1>
             <input type="button" value="+" className="add-venue-button" onClick = {()=>{navigate("/uj-terem")}}/>
             <VenueList venues={rooms} newRequest = {load}/>
         </div>

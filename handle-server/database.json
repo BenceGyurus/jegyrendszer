@@ -30,5 +30,13 @@
     "deleted-users" : {
         "database" : "deleted",
         "collection" : "deleted-users"
+    },
+    "deleted-events" : {
+        "database" : "deleted",
+        "collection" : "deleted-events"
+    },
+    "pre-buying" : {
+        "database" : "buying",
+        "collection" : "pre-buying"
     }
 }

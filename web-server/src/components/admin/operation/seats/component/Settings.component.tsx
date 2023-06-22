@@ -2,12 +2,13 @@ import SetSizeOfBackground from "./setSizeOfBackground.component";
 import SetSizeOfSeats from "./setSizeOfSeats.component";
 import ImageUpload from "./uploadImage";
 import SetColorOfBackground from "./setColorOfBackground.component";
-import SetColorOfSeatComponent from "./seatInSettings";
+import SetColorOfSeatComponent from "./seatInSettings.component";
 import ChangeColorOfSeats from "./changeColorOfSeats.component";
 import "../../../../../css/createNewVenueSettings.css"
 import NewGroup from "./newGroup.component";
 import WindowHeader from "../../../../window-header/windowHeader.component";
 import SettingsButton from "./settingsButton.component";
+import Stage from "./stageInSettings.component";
 type typesOfSettingsParams = {
     widthOfArea : number,
     heightOfArea : number,
@@ -24,9 +25,11 @@ type typesOfSettingsParams = {
     colorOfSeat : string,
     changeColorOfSeats:Function,
     nameOfBackgroundImage: {isImage : boolean, name : string},
-    newGroupFunction : Function
+    newGroupFunction : Function,
+    selectedStage : number,
+    setSelectedStage : Function
 }
-const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,setSizeOfSeatsFunction, sizeOfSeat, uploadFile, delteImageFunction, showSettingsWindow, settingsWindow, colorOfBackground, setColorOfBackground, colorOfSeat,changeColorOfSeats, nameOfBackgroundImage, newGroupFunction}:typesOfSettingsParams )=>{
+const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,setSizeOfSeatsFunction, sizeOfSeat, uploadFile, delteImageFunction, showSettingsWindow, settingsWindow, colorOfBackground, setColorOfBackground, colorOfSeat,changeColorOfSeats, nameOfBackgroundImage, newGroupFunction, selectedStage, setSelectedStage}:typesOfSettingsParams )=>{
     return (
         showSettingsWindow ? 
         <div className = "settings opendSettings">
@@ -46,6 +49,8 @@ const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,s
             <ChangeColorOfSeats color = {colorOfSeat} setColorFunction = {changeColorOfSeats} />
             <label>Ülőhely kinézete</label>
             <SetColorOfSeatComponent color = {colorOfSeat} size = {sizeOfSeat}/>
+            <h2>Színpad helye</h2>
+            <Stage size = {{width : widthOfArea, height : heightOfArea}} backgroundColor={colorOfBackground} selectedStage={selectedStage} setSelectedStage = {setSelectedStage} />
             <h3>Új csoport létrehozása</h3>
             <NewGroup addNewFunction = {newGroupFunction} />
             </div>

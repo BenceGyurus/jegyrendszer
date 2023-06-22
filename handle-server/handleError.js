@@ -14,7 +14,6 @@ const handleError = (errorCode, res, numberOfTrys)=>{
     catch{
         error = {message : "Váratlan hiba történt kérjük próbálja újra később", error : true, type : "error", responseCode : 404};
     }
-    console.log(error);
     error.responseCode ? res.status(error.responseCode) : false; 
     res.send({message : error.message,type : error.type, error : error.type == "error"});
 }

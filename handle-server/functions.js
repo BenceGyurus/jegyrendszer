@@ -1,6 +1,7 @@
 const uuid = require("uuid");
 const fs = require("fs");
 var browser = require('browser-detect');
+
 class Functions{
     static getBrowerDatas(req){return browser(req.headers['user-agent'])}
     static genrateToken(){return uuid.v4();}
@@ -89,6 +90,24 @@ class Functions{
             return false;
         }
     }
+    static getPlaces(places){
+        let result = [];
+        if (places){
+        for (let i = 0; i < places.length; i++){
+            result.push(
+                {
+                    price : places[i].price,
+                    places : places[i].seats,
+                    id : places[i].id,
+                    numberOfTicket : places[i].numberOfTicket,
+                    name : places[i].name
+                }
+            );
+        }
+        }
+        return result;
+    }
+
     
 }
 

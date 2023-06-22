@@ -2,9 +2,8 @@
     background-color: black;
     z-index:1000;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.seat:hover{
+    text-align: center;
+    justify-content: center;
     cursor:grab
 }
 
@@ -42,3 +41,17 @@
     visibility: visible;
     opacity: 1;
   }
+.user-disabled{
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-allowed{
+  cursor: pointer;
+}
+
+.user-selected{
+  background-color: #028fed !important;
+  cursor: pointer;
+}

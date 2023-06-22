@@ -10,9 +10,11 @@ const App = ()=>{
     useEffect(
         ()=>{
             fetch("/events")
-            .then((response:any)=>{response.status === 404 ? setTimeout(()=>{setIsItLoad(true)}, 2500) : JSON.parse(response.body).error ? setIsItLoad(true) : setTimeout(()=>{setEvents(JSON.parse(response.body))}, 2500);});
+            .then(async (response:any)=>{response =  await response.json();response.status === 404 ? setTimeout(()=>{setIsItLoad(true)}, 2500) : response.error ? setIsItLoad(true) : setTimeout(()=>{setEvents(response.events); setIsItLoad(true)}, 2500);});
         },[]
     );
+
+    console.log(events);
 
     if (!events.length && !isItLoad){
         return <LoadingAnimation />;

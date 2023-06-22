@@ -15,8 +15,9 @@ type groupListType = {
     selected: string,
     seats: any,
     changeValue:any,
-    deleteSeatFunction:any,
-    changeOpened : any
+    deleteSeatFunction:Function,
+    changeOpened : any,
+    changeTitle:Function
 }
 const GroupList = (params:groupListType):any=>{
     if (params.groups.length == 0){
@@ -48,7 +49,7 @@ const GroupList = (params:groupListType):any=>{
                         </div>
                         <div className = "form-group">
                         <label htmlFor="titleOfSeat" className = "labelOfGroupList">Ülőhely felirata:</label>
-                        <input type="text" id = "titleOfSeat" className = "inputOfGroupList" defaultValue={seat.title}/>
+                        <input type="text" id = "titleOfSeat" className = "inputOfGroupList" defaultValue={seat.title} onChange={e => params.changeTitle(seatIndex, e.target.value) }/>
                         </div>
                         <input type="button" value="Törlés" onClick={event => params.deleteSeatFunction(seatIndex)} className = "deleteDataButton" />
                         </div>)

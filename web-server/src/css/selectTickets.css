@@ -1,0 +1,14 @@
+.selectTickets{
+    width: 100%;
+    margin: 20px auto;
+    overflow: auto;
+    position: relative;
+    outline: none;
+    border-radius: 2%;
+    display: inline-flex;
+}
+
+.select-ticket-main-div{
+    width: 80%;
+    margin: 10px auto;
+}

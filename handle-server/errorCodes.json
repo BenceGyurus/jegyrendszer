@@ -73,5 +73,35 @@
         "message" : "Sikeres frissítés",
         "type" : "successful",
         "responseCode" : 200
+    },
+    "014" : {
+        "message" : "Nem található az esemény",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "015" : {
+        "message" : "A hely nem már nem érhető el vagy az esemény nem létet",
+        "type" : "error",
+        "responseCode": 400
+    },
+    "016" : {
+        "messgae" : "A megadott mennyiség nem egyezik a kijelölt helyek számával",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "017" : {
+        "message" : "A kapott adatok hiányosak vagy az esemény már nem létezik",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "018" : {
+        "message" : "A felhasználónévnek minimum 5 karakternek kell lennie",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "019" : {
+        "message" : "A helytelen vagy lejárt token",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

@@ -1,0 +1,30 @@
+.user-page-stage{
+    background-color: #3d3d3d;
+}
+
+
+.user-side-top-stage{
+    display: block;
+    border-radius: 50% 50% 5px 5px;
+    margin: 10px auto;
+}
+
+.user-side-left-stage{
+    display: inline-flex;
+    border-radius: 50% 5px 5px 50%;
+    position: relative;
+    margin: 3%;
+}
+
+.user-side-right-stage{
+    display: inline-flex;
+    border-radius: 5px 50% 50% 5px;
+    position: relative;
+    margin: 3%;
+}
+
+.user-side-bottom-stage{
+    display: block;
+    margin: 10px auto;
+    border-radius: 5px 5px 50% 50%;
+}

@@ -1,0 +1,90 @@
+.ticket-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ticket{
+  width: 300px;
+  background-color: rgb(255,255,255);
+  opacity: 0.8;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 75px auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  top: 20%;
+  position: relative;
+  z-index: 1000;
+  padding: 30px;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ticket-title {
+  font-size: 18px;
+  margin: 0;
+}
+
+.ticket-price {
+  font-size: 14px;
+  color: #888;
+}
+
+.ticket-quantity {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quantity-button {
+  border: none;
+  background-color: #eee;
+  color: #555;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.quantity-button:hover {
+  background-color: #ddd;
+}
+
+#quantity_0,
+#quantity_1 {
+  margin: 0 8px;
+  font-size: 16px;
+}
+
+.ticket-box{
+  margin: 20px;
+}
+
+.summend-price-box{
+  margin-top: 40px;
+  width: 100%;
+}
+
+.summend-price{
+  font-size: 18px;
+  float: right;
+}
+
+.summend-price-title{
+  font-size: 20px;
+}
+
+.tickets-title{
+  margin-top: 5px;
+  margin-bottom: 30px;
+}
+
+.summed-price-box-space{
+  height: 50px;
+}

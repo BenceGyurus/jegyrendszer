@@ -12,7 +12,8 @@ const Datas = {
     sizeOfSeat : "number",
     colorOfSeat : "string",
     seatsMode : "boolean",
-    suggestedGroups : "object"
+    suggestedGroups : "object",
+    stage : "number"
 }
 
 const controlTypesOfVenues = (inputs)=>{

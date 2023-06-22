@@ -1,0 +1,126 @@
+.event-page-image-div{
+    width: 100%;
+    height: calc(100vh - 80px);
+    position: relative;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+}
+
+.event-page-div{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.image-gradient-bottom::after {
+    display: block;
+    position: absolute;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.0) 0%, rgba(0, 0, 0, 0.7) 100%);
+    top: 50%;
+    height: 50%;
+    width: 100%;
+    content: '';
+    z-index: 0;
+    margin: 0px;
+    padding: 0px;
+  }
+
+
+  .image-gradient-top::after {
+    display: block;
+    position: absolute;
+    background-image: linear-gradient(to top, rgba(255, 255, 255, 0) 0, rgba(0, 0, 0, 0.76) 100%);
+    top: 0%;
+    height: 50%;
+    width: 100%;
+    content: '';
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media screen and (min-width: 700px) {
+        .event-page-title-div{
+            position: absolute;
+            top: 10%;
+            margin: 20px;
+            
+        }
+        .image-gradient-top::after{
+            height: 25%;
+            z-index: 1;
+        }
+        .event-page-description{
+            position: absolute;
+            bottom: 120px;
+            margin: 10px;
+            color: white;
+        }
+        .buy-ticket-button{
+            position: absolute;
+            bottom: 10px;
+            height: max-content;
+        }
+  }
+
+  @media screen and (min-width: 288px ) {
+    .event-page-title{
+        font-size: 3.4em;
+    }
+  }
+
+  .event-page-title{
+    font-size: 3.5em;
+    margin: 30px 15px 0px 15px;
+    font-weight: bold;
+    z-index: 30;
+    color: black;
+    color: white;
+    padding: 0;
+  }
+
+  .event-page-title-div{
+    position: absolute;
+    bottom: 5%;
+    z-index: 30;
+  }
+.event-page-date{
+    margin: 10px;
+    margin-top: 0;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+.buy-ticket-button{
+    position: absolute;
+    top: 100px;
+    margin: 10px;
+    right: 1%;
+    font-size: 18px;
+    border-radius: 5px;
+    font-weight:bolder;
+    box-shadow: 1px 1px 1px 0.1px black;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #3ad60f;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 30;
+    cursor: pointer;
+}
+
+.buy-ticket-button:hover {
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
+  }
+
+.other-datas{
+    height: 100%;
+    position: relative;
+    bottom: 1rem;
+}

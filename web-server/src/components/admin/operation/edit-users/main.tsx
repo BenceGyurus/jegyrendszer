@@ -66,6 +66,7 @@ const Main = ()=>{
     }
 
     return (<div>
+        <h1>Felhasználók szerkesztése</h1>
         <AddNewButton onClick={()=>{setOpenNewUser(true)}}/>
         {!users.length ? <Loader /> : <Users deleteEvent={delete_User} users = {users}/>}
         {openNewUser ? <NewUserWindow closeFunction = { ()=>{setOpenNewUser(false)}} readyState = {showAddedUser}/> : ""}

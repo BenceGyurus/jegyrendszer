@@ -77,15 +77,18 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
     }
 
     const appendGroup = (a:any, list:Array<any>)=>{
+        console.log(list.length);
+        let appended = 0;
         if (a){
             let l = [...idsOfSeats];
             list.forEach((element)=>{
                 if (!allSelected.includes(element.id)){
                     l.push(element.id);
+                    appended++;
                 }
             })
-            changeNumberOfTicket(true, l.length);
-            setIdsOfSeats([...idsOfSeats, ...l]);
+            changeNumberOfTicket(true, appended);
+            setIdsOfSeats(l);
         }
         else{
             let newList:any = [];
@@ -112,7 +115,6 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
 
     const newAllSelected = ()=>{
         let newList = [];
-        console.log(seatsOfTicket);
         if (id){
             for (let i = 0; i < allSelected.length; i++){
                 if (!seatsOfTicket?.includes(allSelected[i])){

@@ -15,6 +15,9 @@ const controlTypesOfVenues = require("./typesOfDatas/veunes.js");
 const  { ObjectId } = require('mongodb');
 const controlTypeOfEvents = require("./typesOfDatas/events.js");
 const TypeOfBody = "object";
+const controlConnection = require("./controlConnection.js");
+const Control_Seats = require("./control-seats.js");
+const getTicketByReadableId = require("./getTicketByReadableId.js");
 
 const parseBodyMiddleeware = (req, next)=>{
     req.body = Functions.parseBody(req.body);
@@ -37,8 +40,80 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
         //GET requests//
 
+app.get("/events", async (req,res) =>{
+    let {collection} = new Database("events");
+    let datas = await collection.find().toArray();
+    let sendDatas = [];
+    for (let i = 0; i < datas.length; i++){
+        console.log(datas[i].eventData.background);
+        if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
+            sendDatas.push({
+                id : datas[i].eventData.readable_event_name,
+                date : datas[i].eventData.objectDateOfEvent,
+                title : datas[i].eventData.name,
+                description : datas[i].eventData.description,
+                imageName : datas[i].eventData.background
+            });
+        }
+        console.log(sendDatas);
+    }
+    res.status(200).send({events : sendDatas});
+});
 
 
+app.get("/event/:id", async (req,res)=>{
+    let id = req.params.id;
+    let {collection} = new Database("events");
+    let events = await collection.find().toArray();
+    let event = {};
+    if (events){
+        for (let i = 0; i < events.length; i++){
+            if (events[i].eventData.readable_event_name === id){
+                event = events[i].eventData;
+            }
+        }
+    }
+    if (event){
+        let placeCollection = new Database("venue").collection;
+        place = {};
+        if (event.venue){
+            place = await placeCollection.findOne({_id : new ObjectId(event.venue)});
+            if (place){
+            placesOfEvent = [];
+            place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
+            for (let i = 0; i < event.tickets.length; i++){
+                for (let j = 0; j < event.tickets[i].seats.length; j++){
+                    for (let k = 0; k < place.seatsDatas.length; k++){
+                        if (place.seatsDatas[k].id == event.tickets[i].seats[j]){
+                            placesOfEvent.push(place.seatsDatas[k]);
+                        }
+                    }
+                }
+            }
+            }
+            place.seatsDatas = placesOfEvent;
+            
+        }
+        res.send({id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
+        return;
+    }
+});
+
+
+app.get("/buy-ticket-details/:token", async (req,res)=>{
+    if (req.params && req.params.token){
+        const {collection} = new Database("pre-buying");
+        let datas = await collection.findOne({token : req.params.token});
+        if (datas.time + 1800000 >= new Date().getTime() && datas && datas.eventId){
+            let eventDetails = await getTicketByReadableId(datas.eventId);
+            if (eventDetails){
+                res.send({evetId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent});
+            }
+            return;
+        }
+    }
+    handleError("019", res);
+});
 
         //POST requests//
 
@@ -291,7 +366,7 @@ app.post('/upload-image/:token', upload.single('file'), async (req, res, next) =
     const token = req.params.token;
     if (token){
         let access = await control_Token(token, req);
-        if (access.includes("edit-events") || access.includes("edit-rooms")){
+        if (access && (access.includes("edit-events") || access.includes("edit-rooms"))){
             const file = req.file;
             if (!file) {
                 const error = new Error('No File')
@@ -472,7 +547,7 @@ app.post("/add-event",async (req,res)=>{
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data)){
             let {collection} = new Database("events");
-            let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name)};
+            let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name),objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)};
             let insert = await collection.insertOne({eventData : insertData, otherDatas : await otherData(req,body.token), versions : []});
             if (insert.insertedId){
                 res.send({id : (await collection.findOne({_id : insert.insertedId}))._id});
@@ -488,7 +563,7 @@ app.post("/get-event-data/:id", async (req,res)=>{
     let id = req.params.id;
     if (body && typeof body === TypeOfBody &&body.token){
         let access = await control_Token(body.token, req);
-        if (access && access.includes("edit-events") && id){
+        if (access && access.includes("edit-events") && id && id != "undefined"){
             let { collection } = new Database("events");
             id = new ObjectId(id);
             let datas = await collection.findOne({_id : id});
@@ -501,7 +576,7 @@ app.post("/get-event-data/:id", async (req,res)=>{
             }
         }
     }
-    handleError("004");
+    handleError("004", res);
 });
 
 app.post("/add-event/:id",async (req,res)=>{
@@ -515,12 +590,12 @@ app.post("/add-event/:id",async (req,res)=>{
             id = new ObjectId(id);
             let data = await collection.findOne({_id : id});
             body.data = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name)};
-            l = await collection.updateOne({_id : id}, {$set : {eventData : body.data, versions : [...data.versions, { eventData : data.eventData, otherDatas : data.otherDatas }], otherDatas : await otherData(req,body.token)}});
+            l = await collection.updateOne({_id : id}, {$set : {eventData : {...body.data, objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)}, versions : [...data.versions, { eventData : data.eventData, otherDatas : data.otherDatas }], otherDatas : await otherData(req,body.token)}});
             if (l.modifiedCount){
                 res.send({id : id});
                 return;
             }
-            return handleError("000")
+            return handleError("000", res)
         }
     }
     return handleError("004", res);
@@ -535,19 +610,147 @@ app.post("/events", async (req,res)=>{
             let datas = await collection.find().toArray();
             let events = [];
             datas.forEach((element)=>{
-                events.push({eventData : element.eventData, addedBy : element.otherDatas.userData});
+                events.push({eventData : element.eventData, addedBy : element.otherDatas.userData, id : element._id});
             })
             res.send(events);
             return
         }
     }
-    return handleError("004");
+    return handleError("004", res);
+});
+
+app.post("/delete-event/:id", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    let id = req.params.id;
+    if (body && typeof body === TypeOfBody && body.token && id){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-events")){
+            let {collection} = new Database("events");
+            id = ObjectId(id);
+            let datas = await collection.findOne({_id : id});
+            let deleted = await collection.deleteOne({_id : id});
+            if (deleted.deletedCount){
+                let deletedCollection = new Database("deleted-events").collection;
+                let insert = await deletedCollection.insertOne({eventData : datas.eventData, otherDatas : datas.otherDatas, versions : datas.versions});
+                if (insert.insertedId){
+                    return handleError("011",res);
+                }
+            } 
+            else{
+                return handleError("014", res);
+            }
+        }
+    }
+    handleError("003", res);
+});
+
+
+app.post("/get-user-data", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("profile")){
+            let {collection} = new Database("long-token");
+            datas = await collection.findOne({token : body.token});
+            let usersCollection = new Database("admin").collection
+            let username = (await usersCollection.findOne({_id : datas.userData.id})).username
+            res.send({username : username, id : datas.userData.id});
+            return;
+        }
+    }
+    handleError("003", res)
 })
 
+
+app.post("/change-username", async (req,res) =>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("profile")){
+            let changeUsernameCollection = new Database("admin").collection;
+            if (body.datas.username.length > 4 && !await changeUsernameCollection.findOne({username : body.datas.username})){
+            let {collection} = new Database("long-token");
+            datas = await collection.findOne({token : body.token});
+            response = await changeUsernameCollection.updateOne({_id : datas.userData.id},{$set : {username : body.datas.username}});
+            res.send({username : response.modifiedCount > 0 ? body.datas.username : (await changeUsernameCollection.findOne({_id : datas.userData.id})).username});
+            }
+            else{
+                body.datas.username.length <= 4 ? handleError("018", res) : handleError("010", res);
+            }
+            return
+        }
+    }
+    handleError("003", res)
+})
+
+
+app.post("/change-password", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("profile")){
+            let {collection} = new Database("long-token");
+            datas = await collection.findOne({token : body.token});
+            let changeUsernameCollection = new Database("admin").collection;
+            response = await changeUsernameCollection.updateOne({_id : datas.userData.id, password : Functions.encryption(body.datas.oldPassword)}, {$set : {password : Functions.encryption(body.datas.password)}});
+            res.send({update : response.modifiedCount > 0});
+            return;
+        }
+    }
+    handleError("003", res)
+});
+
+
+app.post("/order-ticket", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
+        let eventDatas = await getTicketByReadableId(body.eventId);
+        let savingDatas = {eventId : body.eventId, tickets : [], token : Functions.genrateToken(), time : new Date().getTime(), fullPrice : 0, fullAmount : 0};
+        for (let i = 0; i < body.datas.length; i++){
+            if (body.datas[i].ticketId && body.datas[i].eventId && eventDatas){
+                let response = await Control_Seats(body.datas[i].places, body.datas[i].ticketId, body.datas[i].eventId);
+                if (response){
+                    for (let j = 0; j < eventDatas.tickets.length; j++){
+                        if (eventDatas.tickets[j].id == body.datas[i].ticketId){
+                            if (!body.datas[i].places || (body.datas[i].places.length == body.datas[i].amount)){
+                                savingDatas.tickets.push({places : body.datas[i].places, price : eventDatas.tickets[j].price*body.datas[i].amount, amount : body.datas[i].amount, name : eventDatas.tickets[j].name})
+                                savingDatas.fullPrice += eventDatas.tickets[j].price*body.datas[i].amount
+                                savingDatas.fullAmount += body.datas[i].amount;
+                            }
+                            else{
+                                handleError("016", res);
+                                return;
+                            }
+                        }
+                    }
+                }
+                else{
+                    handleError("015", res);
+                    return;
+                }
+            }
+            else{
+                handleError("017", res);
+            }
+        }
+        let preBuyDatabaseCollection = new Database("pre-buying").collection;
+        preBuyDatabaseCollection.insertOne({...savingDatas, otherDatas : await otherData(req)});
+        res.send({error : false, token : savingDatas.token})
+        return
+    }
+    handleError("000", res);
+});
 
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
     console.log(req.files);
 })*/
 
 
-app.listen(process.env.PORT || 3001);
+
+if (controlConnection()){
+    console.log(`The connection is successfully, the app is listening on PORT${process.env.PORT || 3001}`)
+    app.listen(process.env.PORT || 3001);
+}
+else{
+    console.log("Couldn't connect to the database")
+}

@@ -10,6 +10,9 @@ import NewVenue from "../components/admin/operation/new_Room.component"
 import Main from "../components/admin/operation/edit-users/main";
 import Registration from "../components/admin/operation/registrationNewUser.component";
 import Create_Event_Main from "../components/admin/operation/events/main";
+import Show_Events_Main from "../components/admin/operation/show-events/main";
+import EditProfileMain from "../components/admin/operation/profile/main";
+import BuyTicketMainPage from "../components/buy-ticket/buy-ticket-main-page.component";
 
 
 
@@ -20,15 +23,17 @@ function Navigation() {
         <Routes>
           <Route index element={<Index />} />
           <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="event/*" element={<EventPage/>} />
+          <Route path="/rendezveny/*" element={<EventPage/>} />
+          <Route path="/jegyvasarlas/*" element={<BuyTicketMainPage/>} />
           <Route path = "/admin" element = {<AdminPage component = {<Welcome />}/>}/>
           <Route path = "/admin/termek" element = {<AdminPage component = {<Venues />}/>}/>
           <Route path = "/admin/felhasznalok" element = {<AdminPage component = {<Main />}/>}/>
+          <Route path = "/admin/profil" element = {<AdminPage component = {<EditProfileMain />} /> } />
           <Route path = "/uj-terem" element = {<NewVenue />}/>
           <Route path = "/uj-profil/*" element = {<Registration />}/>
           <Route path = "/admin/rendezveny/*" element = {<Create_Event_Main />} />
           <Route path = "/admin/terem-szerkesztes/*" element = {<NewVenue />}/>
-          <Route path = "/admin/rendezvenyek" element = {<NewVenue />}/>
+          <Route path = "/admin/rendezvenyek" element = {<AdminPage component = {<Show_Events_Main />} />} />
           <Route path= "*" element = {<ErrorPage />} />
         </Routes>
       </BrowserRouter>

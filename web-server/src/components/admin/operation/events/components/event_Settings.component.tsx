@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid';
 import TicketList from "./ticketList.component";
 import Calendar from "../../../../calendar/calendar.component";
 import Error from "../../../../natification/error.component";
+import BackButton from "../../../../back/backbutton.component";
 
 type typeOfGroups = {
     id : string,
@@ -84,6 +85,9 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [dateOfEvent, setDateOfEvent]:[string, Function] = useState(dOfEvent ? dOfEvent : "");
     const [dateOfRelease, setDateOfRelease]:[string, Function] = useState(dOfRelease ? dOfRelease : "");
     const [editTicket, setEditTicket]:[any, Function] = useState(false);
+
+
+    console.log(name);
 
     const getPlaceDatas = (id:string)=>{
         if (id){
@@ -209,6 +213,8 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
 
 
     return (
+        <div>
+        <BackButton url="/admin/rendezvenyek" className = "create-event-back-button" />
         <div className = "create-Event-Settings-Main">
             <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} />
             <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} />
@@ -220,6 +226,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
             <SaveButton onClickFunction={save} />
+        </div>
         </div>
     );
 }

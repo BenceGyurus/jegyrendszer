@@ -58,11 +58,12 @@ type propsType = {
     seatMode? : boolean,
     suGroups? : Array<Array<string>>,
     name?: string,
-    id? : string 
+    id? : string,
+    stageData? : number
 }
 
-const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfSeat, cOfSeat, seatMode, suGroups, name, id}:propsType)=>{
-    const [colorOfBackGround, setColorOfBackGround] = useState(cbg ? cbg : "#808080");
+const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfSeat, cOfSeat, seatMode, suGroups, name, id, stageData}:propsType)=>{
+    const [colorOfBackGround, setColorOfBackGround] = useState(cbg ? cbg : "#FFFFFF");
     const [sizeOfArea, setSizeOfArea] = useState(area ? area : {width : 720, height : 480});
     const [background, setBackground] = useState(bg ? bg : {isImage : false, name: colorOfBackGround});
     const [seats, setSeats] = useState(seatsDatas ? seatsDatas : []);
@@ -81,6 +82,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
     const [idOfVenue, setIdOfVenue] = useState(id ? id : "");
     const [errorVar, setErrorVar] = useState("");
     const [successVar, setSuccessVar] = useState("");
+    const [stage, setStage] = useState(stageData ? stageData : 0);
 
     const save = ()=>{
         let datas = {
@@ -95,7 +97,8 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
             sizeOfSeat : sizeOfSeat,
             colorOfSeat : colorOfSeat,
             seatsMode : turnOnSeats,
-            suggestedGroups : suggestedGroups
+            suggestedGroups : suggestedGroups,
+            stage : stage
         }
         if (ParseCookies("long_token")){
             postData(`/upload-venue/${idOfVenue}`, {token : ParseCookies("long_token"), datas : datas})
@@ -293,6 +296,12 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         setGroups(newData);
     }
 
+    const changeTitleOfSeat = (index:number,title:string)=>{
+        let l = [...seats];
+        l[index].title = title;
+        setSeats(l);
+    }
+
 
     return (
         <div>
@@ -306,8 +315,8 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         <DatasToArea groups={groups} seats = {getAbsoluteSeats()} size = {sizeOfSeat} selected = {selecttedGroup} newPositionFunction = {newPositionToSeat} showAll = {showAllSeats} colorOfSeat = {colorOfSeat}/>
         </Area>
         <ShowAllSeats showAll = {showAllSeats} onChangeFunction = {changeStatusOfShowAll}/>
-        <GroupList groups = {groups} handleEvent = {editNameOfGroup} editFunction = {setStatusOfGroup} deleteEvent = {deleteGroup} setSelected = {setSelectedInGroups} selected = {selecttedGroup} seats = {seats} changeValue = {changeValueOfSeat} deleteSeatFunction = {deleteSeat} changeOpened = {changeStatusOfOpened}/>
-        <Settings showSettingsWindow = {showSettingsWindow} widthOfArea={sizeOfArea.width} heightOfArea = {sizeOfArea.height} setHeightOfArea = {setHeightOfArea} setWidthOfArea = {setWidthOfArea} setSizeOfSeatsFunction = {(size:number) =>{setSizeOfSeat(size > 0 ? size : 1)}} sizeOfSeat = {sizeOfSeat} uploadFile = {uploadFile} delteImageFunction = {deleteImage} settingsWindow = {ChangeSettingsWindow} colorOfBackground = {colorOfBackGround} setColorOfBackground = {changeColorOfBackground} colorOfSeat = {colorOfSeat} changeColorOfSeats = {setColorOfSeat} nameOfBackgroundImage = {background} newGroupFunction = {addNewGroup}/>
+        <GroupList groups = {groups} handleEvent = {editNameOfGroup} editFunction = {setStatusOfGroup} deleteEvent = {deleteGroup} setSelected = {setSelectedInGroups} selected = {selecttedGroup} seats = {seats} changeValue = {changeValueOfSeat} deleteSeatFunction = {deleteSeat} changeOpened = {changeStatusOfOpened} changeTitle={changeTitleOfSeat}/>
+        <Settings showSettingsWindow = {showSettingsWindow} widthOfArea={sizeOfArea.width} heightOfArea = {sizeOfArea.height} setHeightOfArea = {setHeightOfArea} setWidthOfArea = {setWidthOfArea} setSizeOfSeatsFunction = {(size:number) =>{setSizeOfSeat(size > 0 ? size : 1)}} sizeOfSeat = {sizeOfSeat} uploadFile = {uploadFile} delteImageFunction = {deleteImage} settingsWindow = {ChangeSettingsWindow} colorOfBackground = {colorOfBackGround} setColorOfBackground = {changeColorOfBackground} colorOfSeat = {colorOfSeat} changeColorOfSeats = {setColorOfSeat} nameOfBackgroundImage = {background} newGroupFunction = {addNewGroup} setSelectedStage = {setStage} selectedStage={stage}/>
         {
             suggestedGroups.length ? <SuggestNewGroups suggestedGroups = {suggestedGroups} seats = {seats} changeSeatsFunctions = {setSeats} addGroupsFunction = {addMoreGroups} groups = {groups} /> : ""
         }
