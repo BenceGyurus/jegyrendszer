@@ -13,6 +13,7 @@ import Create_Event_Main from "../components/admin/operation/events/main";
 import Show_Events_Main from "../components/admin/operation/show-events/main";
 import EditProfileMain from "../components/admin/operation/profile/main";
 import BuyTicketMainPage from "../components/buy-ticket/buy-ticket-main-page.component";
+import ReferalMain from "../components/admin/operation/referals/main";
 
 
 
@@ -34,6 +35,7 @@ function Navigation() {
           <Route path = "/admin/rendezveny/*" element = {<Create_Event_Main />} />
           <Route path = "/admin/terem-szerkesztes/*" element = {<NewVenue />}/>
           <Route path = "/admin/rendezvenyek" element = {<AdminPage component = {<Show_Events_Main />} />} />
+          <Route path = "admin/kuponok" element = {<AdminPage component = {<ReferalMain />}/>} />
           <Route path= "*" element = {<ErrorPage />} />
         </Routes>
       </BrowserRouter>

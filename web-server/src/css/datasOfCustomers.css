@@ -1,0 +1,82 @@
+.datas-of-customer{
+    margin: 20px;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+@media screen and (width > 1000px) {
+    .datas-of-customer{
+        width: 45%;
+        display: inline-table;
+        margin: 20px;
+    }
+
+    .datas-of-customer input[type="text"],
+    .datas-of-customer input[type="phone"],
+    .datas-of-customer input[type = "email"]{
+        margin: 4px 0;
+        width: 80%;
+    }
+}
+
+.customer-data-component{
+    margin: 40px 0;
+}
+
+.datas-of-customer input[type="text"],
+.datas-of-customer input[type="phone"],
+.datas-of-customer input[type = "email"]
+{
+    width: 100%;
+    display: block;
+    margin: 4px auto;
+    padding: 10px;
+    font-size: 17px;
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.datas-of-customer input[type="text"]:focus
+.datas-of-customer input[type="phone"]:focus,
+.datas-of-customer input[type = "email"]:focus
+{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.datas-of-customer label{
+
+}
+
+#postal-code-div{
+    width: 35%;
+    display: inline-table;
+    margin: 0;
+}
+
+#postal-code-div input{
+    width: 100%;
+}
+
+#city-div input{
+    width: 100%;
+}
+
+#city-div{
+    width: 60%;
+    display: inline-table;
+    margin-left: 2.5%;
+}
+
+.postal-code-and-city-div{
+    width: 45%;
+    height: 40px;
+    display: inline-table;
+}

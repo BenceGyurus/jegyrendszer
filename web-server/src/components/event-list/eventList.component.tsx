@@ -14,14 +14,11 @@ const EventList = (events:any)=>{
         return textResult;
     }
 
-    let delay = 0;
     return (
         events.events.map((event:any)=>{
             console.log(event.title);
-            delay++;
             return (
                 <Event
-                    animationDelay = {delay}
                     id = {event.id}
                     imageName = {event.imageName}
                     date = {event.date}

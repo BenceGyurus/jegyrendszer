@@ -1,3 +1,5 @@
+import "../../css/buy-ticket-ticket-list.css";
+
 type typeOfTicketListParams = {
     tickets : Array<typeOfTicket>
 };
@@ -10,19 +12,21 @@ type typeOfTicket = {
 }
 
 const TicketList = ({tickets}:typeOfTicketListParams)=>{
-    return <div>
+    return <ul className = "tickets-overview">
         {
             tickets.map((ticket)=>{
                 return (
-                    <div>
-                        <h4>{ticket.name}</h4>
-                        <span className = "price-of-ticket">{ticket.price}</span>
-                        <span className = "amount-of-ticket">{ticket.amount}</span>
-                    </div>
+                    <li>
+                        <span className = "price-and-amount-sum">
+                        <span className = "name-of-ticket">{ticket.name}</span>
+                        <span className = "amount-of-ticket">({ticket.amount})</span>
+                        </span>
+                        <span className = "price-of-ticket buy-ticket-overview-price">{ticket.price}Ft</span>
+                    </li>
                 )
             })
         }
-    </div>
+    </ul>
 }
 
 export default TicketList;

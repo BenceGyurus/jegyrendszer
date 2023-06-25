@@ -17,7 +17,7 @@ const InputText = ({ title,onChangeFunction,value }:typeOfInputTextParams)=>{
     return (
         <div>
             <label htmlFor={id} className = "inputLabel">{title}</label>
-            <input type="text" className = "textInput" onChange={e => {onChangeFunction(e.target.value)}} ref = {inputRef}/>
+            <input type="text" id = {id} className = "textInput" onChange={e => {onChangeFunction(e.target.value)}} ref = {inputRef}/>
         </div>
     );
 }

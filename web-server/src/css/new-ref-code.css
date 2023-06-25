@@ -1,0 +1,40 @@
+.typeOfDiscount{
+    padding: 5px 10px 5px 10px;
+    border-radius: 15px;
+    text-align: center;
+    margin: 20px 5px;
+    cursor: pointer;
+    border: 2px solid #ccc;
+    color: #ccc;
+}
+
+
+.selected-type{
+    background-color: #0f9600;
+}
+
+.discountType{
+    margin: 20px 0;
+}
+
+.new-coupon-window{
+    width: 60%;
+    position: fixed;
+    height: 400px;
+    left: 20%;
+    overflow-y: auto;
+    z-index: 1000000;
+    background-color: #f2f2f2;
+    box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    padding: 0 10px 10px 10px
+}
+
+.new-coupon-window h3{
+    margin-top: 30px;
+}
+
+.new-ref-code-window-header{
+    position: fixed;
+    width: 60%;
+}

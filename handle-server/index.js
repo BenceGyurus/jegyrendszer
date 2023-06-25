@@ -18,6 +18,7 @@ const TypeOfBody = "object";
 const controlConnection = require("./controlConnection.js");
 const Control_Seats = require("./control-seats.js");
 const getTicketByReadableId = require("./getTicketByReadableId.js");
+const controlTypeOfCoupon = require("./typesOfDatas/coupons.js");
 
 const parseBodyMiddleeware = (req, next)=>{
     req.body = Functions.parseBody(req.body);
@@ -107,7 +108,7 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
         if (datas.time + 1800000 >= new Date().getTime() && datas && datas.eventId){
             let eventDetails = await getTicketByReadableId(datas.eventId);
             if (eventDetails){
-                res.send({evetId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent});
+                res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent});
             }
             return;
         }
@@ -740,6 +741,133 @@ app.post("/order-ticket", async (req,res)=>{
     }
     handleError("000", res);
 });
+
+app.post("/get-all-event", async (req,res)=>{
+    const body = Functions.parseBody(req.body);
+    if (body && typeof body === TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("ref")){
+            let sendList = [];
+            let {collection} = new Database("events")
+            let all_Events = await collection.find().toArray();
+            for (let i = 0; i < all_Events.length; i++){
+                console.log(all_Events[i].eventData.objectDateOfEvent.getTime());
+                if (all_Events[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
+                    sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent})
+                }
+            }
+            res.send({events : sendList});
+        }
+    }
+});
+
+
+app.post("/new-coupon", async (req,res)=>{
+    const body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token && body.datas){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("ref") && controlTypeOfCoupon(body.datas)){
+            let {collection} = new Database("coupons");
+            await collection.insertOne({
+                name : body.datas.name,
+                amount : body.datas.amount,
+                money : body.datas.money,
+                validity : body.datas.validity,
+                usedEvent : [],
+                events : body.datas.events,
+                usedTicket : 0,
+                type : body.datas.type
+            })
+        }
+    }
+})
+
+
+app.post("/get-coupons", async (req,res)=>{
+    const body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("ref")){
+            let {collection} = new Database("coupons");
+            let sendDatas = [];
+            let datas = await collection.find().toArray();
+            datas.forEach(element=>{
+                new Date(element.validity).getTime() >= new Date().getTime() ? sendDatas.push(element) : false;
+            });
+            res.send({coupons : sendDatas});
+            return;
+        }
+    }
+});
+
+
+app.post("/delete-coupon/:id", async (req,res) =>{
+    const body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("ref")){
+            if (req.params.id){
+                let {collection} = new Database("coupons");
+                d = await collection.deleteOne({_id : new ObjectId(req.params.id)});
+                res.send({error : !d.deletedCount==0});
+                return;
+            }
+        }
+    }
+});
+
+app.post("/edit-coupon/:id", async (req,res)=>{
+    const body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token && body.datas){
+        let access = await control_Token(body.token, req);
+        if (req.params.id){
+            if (access && access.includes("ref") && controlTypeOfCoupon(body.datas)){
+                let {collection} = new Database("coupons");
+                let d = await collection.updateOne({_id : new ObjectId(req.params.id)} , { $set:{
+                        name : body.datas.name,
+                        amount : body.datas.amount,
+                        money : body.datas.money,
+                        validity : body.datas.validity,
+                        events : body.datas.events,
+                        type : body.datas.type
+                }
+                });
+                res.send({error : d.matchedCount==0})
+            }
+    }
+    }
+})
+
+app.post("/control-coupon-code", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.code && body.eventId){
+        let {collection} = new Database("coupons");
+        console.log(body.code, body.eventId);
+        let coupon = await collection.findOne({name : body.code});
+        if (coupon){
+            console.log(coupon);
+            let send = false;
+            if (coupon.type == 0 && coupon.events.includes(body.eventId)){
+                send = true;
+            }
+            else if (coupon.type == 1 && coupon.events.includes(body.eventId) && !coupon.usedEvent.includes(body.eventId)){
+                send = true;
+            }
+            else if (coupon.type == 2 && coupon.usedTicket < 1 && coupon.events.includes(body.eventId)){
+                send = true;
+            }
+            if (send){
+                res.send({used : true, amount : coupon.amount, money : coupon.money});
+            }
+            else{
+                res.send({used : false, message : "Nem lehet használni ezt a kupont"})
+            }
+        }
+        else{
+            res.send({used : false, message : "Nincs ilyen kupon"})
+        }
+    }
+})
 
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
     console.log(req.files);

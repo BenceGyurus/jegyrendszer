@@ -5,5 +5,5 @@
     "statistics" : ["Statisztika", "admin/statisztika"],
     "profile" : ["Profil" , "admin/profil"],
     "ticket-sells" : ["Jegy eladások", "admin/jegy-eladasok"],
-    "settings" : ["Beállítások", "admin/beallitasok"]
+    "ref" : ["Kuponok", "admin/kuponok"]
 }

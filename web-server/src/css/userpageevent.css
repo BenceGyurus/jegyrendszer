@@ -20,6 +20,9 @@
         width: 28%;
         margin: 2%;
     }
+    .event:hover .event-image img{
+      transform: scale(1.05);
+    }
   }
   
 
@@ -62,11 +65,7 @@
     position: relative;
     border-radius: 30px;
     cursor: pointer;
-  }
-
-  .event-image img:hover{
-    height: 320px;
-    transition: 0.3s;
+    transition: transform .5s ease;
   }
   
   .event-details {
@@ -112,7 +111,7 @@
   .calendar{
     float: right;
     position: absolute;
-    z-index: 10000;
+    z-index: 1;
     margin: 15px 0 0 15px;
   }
 
@@ -129,4 +128,11 @@
   .event-list-div{
     display: flex;
     flex-wrap: wrap;
+  }
+
+
+  .event{
+    cursor: pointer;
+    outline: none;
+    overflow: hidden;
   }

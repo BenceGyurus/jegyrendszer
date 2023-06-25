@@ -1,0 +1,34 @@
+.tickets-overview {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+.tickets-overview li {
+    margin-bottom: 5px;
+    align-items: center;
+    width: 100%;
+  }
+  
+.tickets-overview li .name-of-ticket,
+.tickets-overview li .amount-of-ticket {
+    font-size: 15px;
+    font-weight: #888;
+    margin-right: 3px;
+  }
+
+  
+.tickets-overview li .price-of-ticket
+{
+    font-size: 14px;
+    color: #888;
+    font-weight: 500;
+    max-width: 25%;
+
+  }
+  
+
+.price-and-amount-sum{
+    display: inline-block;
+    max-width: 65%;
+}

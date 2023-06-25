@@ -38,5 +38,9 @@
     "pre-buying" : {
         "database" : "buying",
         "collection" : "pre-buying"
+    },
+    "coupons" : {
+        "database" : "coupons",
+         "collection" : "active" 
     }
 }

@@ -1,0 +1,14 @@
+@media screen and (width > 1000px) {
+    .deitals{
+        width: 45%;
+        display: inline-table;
+    }
+}
+
+.payingButton{
+    margin: 10px;
+    float: right;
+    padding: 5px;
+    outline: none;
+    border: none;
+}
