@@ -1,4 +1,5 @@
 import Event from "./event.component";
+import { v4 as uuid } from 'uuid';
 
 type typeOfTickets = {
     name : string,
@@ -38,7 +39,7 @@ const EventList = ( { events, editFunction,deleteFunction }:typeOfEventListParam
     return <div>
         {
             events.map((element)=>{
-                return <Event name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} />
+                return <Event key={uuid()} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} />
             })
         }
     </div>

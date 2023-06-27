@@ -12,8 +12,7 @@ const SetSizeOfBackground = ( { width, height, setWidth, setHeight }:typeOfSetSi
 
     return (
         <div className = "">
-            <label htmlFor="hold-scale">Oldalarány megtartása</label>
-            <Checkbox onChangeFunction={setHoldScale} defaultChecked = {holdScale} />
+            <Checkbox onChangeFunction={setHoldScale} defaultChecked = {holdScale} title = "Oldalarány megtartása" />
             <div>
                 <InputNumber title = "Szélesség" value = {width <= 0.9 ? "" : Math.round(width)} onChangeFunction = {setWidth} functionParams = {[holdScale]} />
                 <InputNumber title = "Magasság" value = {width <= 0.9 ? "" : Math.round(height)} onChangeFunction = {setHeight} disabled = {holdScale}/>

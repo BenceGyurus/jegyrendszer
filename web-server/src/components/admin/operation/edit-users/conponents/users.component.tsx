@@ -1,6 +1,7 @@
 import User from "./user.component";
 import "../../../../../css/users.css";
 import PeddingUser from "./peddingUser.component";
+import { v4 as uuid } from 'uuid';
 type typeOfUser = {
     username : string,
     access : Object,
@@ -27,7 +28,7 @@ const Users = ({users,deleteEvent}:typeOfUsersParams)=>{
         <ul className = "user-list">
             {
                 users.map((element)=>{
-                    return element.status ? <User deleteEvent={deleteEvent} user = {element} /> : <PeddingUser user = {element} />
+                    return element.status ? <User key={uuid()} deleteEvent={deleteEvent} user = {element} /> : <PeddingUser key = {uuid()} user = {element} />
                 })
             }
         </ul>

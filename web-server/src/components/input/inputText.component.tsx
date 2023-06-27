@@ -4,9 +4,10 @@ import "../../css/inputStyle.css";
 type typeOfInputTextParams = {
     title : string,
     onChangeFunction : Function,
-    value? : string
+    value? : string,
+    params? : Array<any>
 }
-const InputText = ({ title,onChangeFunction,value }:typeOfInputTextParams)=>{
+const InputText = ({ title,onChangeFunction,value,params }:typeOfInputTextParams)=>{
     const inputRef:any = useRef(null);
     let id = uuid();
 
@@ -17,7 +18,7 @@ const InputText = ({ title,onChangeFunction,value }:typeOfInputTextParams)=>{
     return (
         <div>
             <label htmlFor={id} className = "inputLabel">{title}</label>
-            <input type="text" id = {id} className = "textInput" onChange={e => {onChangeFunction(e.target.value)}} ref = {inputRef}/>
+            <input type="text" id = {id} className = "textInput" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} ref = {inputRef}/>
         </div>
     );
 }

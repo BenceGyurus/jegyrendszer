@@ -39,7 +39,6 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
     const [typeOfCoupon, setTypeOfCoupon] = useState(tOfCoupon ? String(tOfCoupon) : "0");
     const [eventId, setId] = useState(gotId ? gotId : false);
 
-    console.log(validity);
 
     const setNameOfCoupon = (name:string)=>{
         setRefName(name.toUpperCase());
@@ -67,7 +66,6 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
         postData("/get-all-event", {token : ParseCookies("long_token")})
         .then(response=>{
             if (response.events){
-                console.log(gotEvents);
                 let pushEvents = [];
                 for (let i = 0; i < response.events.length; i++){
                     pushEvents.push({...response.events[i], selected : gotEvents ? gotEvents.includes(response.events[i].id) ? true : false : false});
@@ -103,12 +101,14 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
         }
         if (eventId){
             postData(`/edit-coupon/${eventId}`, {token: ParseCookies("long_token"), datas : sendData})
-            .then(response=> {if (response.error){} ;refresh()});
+            .then(response=> {if (response.error){};refresh();});
         }
         else{
             postData("/new-coupon", {token: ParseCookies("long_token"), datas : sendData})
-            .then(response=> {console.log(response); refresh()});
+            .then(response=> {refresh()});
         }
+
+        closeFunction();
     }
 
     return (<div className = "new-coupon-window">

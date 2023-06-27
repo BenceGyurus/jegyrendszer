@@ -28,10 +28,10 @@ const Tickets = ({tickets, incrementFunction, decrementFunction}:typeOfTicketsPa
     }
 
     return (
-        <div className="ticket" id = "tickets">
+        <div className="user-page-ticket" id = "tickets">
             <h2 className = "tickets-title">Jegyek:</h2>
       {tickets.map((ticket)=>{
-                return <Ticket name = {ticket.name} price = {ticket.price} amount = {ticket.amount} id = {ticket.id} incrementFunction={incrementFunction} decrementFunction={decrementFunction} />
+                return <Ticket name = {ticket.name} price = {ticket.price} amount = {ticket.amount} id = {ticket.id} incrementFunction={incrementFunction} decrementFunction={decrementFunction} key = {ticket.id}/>
                 })
             }
             {getPriceOfAllSelected(tickets) ? <div className = "summend-price-box">

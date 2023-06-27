@@ -20,7 +20,7 @@ const Password = ({ title,onChangeFunction,value }:typeOfInputTextParams)=>{
     return (
         <div>
             <label htmlFor={id} className = "inputLabel">{title}</label>
-            <input type="password" className = "textInput" onChange={e => {onChangeFunction(e.target.value)}}/>
+            <input id = {id} type="password" className = "textInput" onChange={e => {onChangeFunction(e.target.value)}}/>
         </div>
     );
 }

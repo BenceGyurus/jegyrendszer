@@ -51,7 +51,7 @@ const NewUserWindow = ({closeFunction, readyState}:typeOfNewUserWindow)=>{
                 accessList && Object.keys(accessList).length ? 
                 Object.keys(accessList).map((element)=>{
                     let id = uuid();
-                    return <li onClick = {()=>{console.log(element)}}><label htmlFor={id}>{accessList[element][0]}</label><Checkbox params = {[element]} id = {id} className = "checkbox" title = "" onChangeFunction = {changeCheck} defaultChecked = {false}/></li>;
+                    return <li key = {element} ><label htmlFor={id}>{accessList[element][0]}</label><Checkbox params = {[element]} id = {id} className = "checkbox" title = "" onChangeFunction = {changeCheck} defaultChecked = {false}/></li>;
                 })
                 
                 : <Loader />

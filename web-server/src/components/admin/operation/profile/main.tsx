@@ -4,8 +4,8 @@ import Button from "../../../buttons/button.component";
 import { useEffect, useState } from "react";
 import postData from "../../../connection/request";
 import ParseCookies from "../../../../cookies/parseCookies";
-import Success from "../../../natification/success.component";
-import Error from "../../../natification/error.component";
+import Success from "../../../notification/success.component";
+import Error from "../../../notification/error.component";
 import Password from "../../../input/password.component";
 const EditProfileMain = ()=>{
 
@@ -39,7 +39,6 @@ const EditProfileMain = ()=>{
                     setEdit("Felhasználónév megváltoztatása sikeres")
                 }
                 else{
-                    console.log((await response.responseData).message);
                     setError((await response.responseData).message);
                 }
             });

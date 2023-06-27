@@ -13,7 +13,7 @@ import ImageUpload from "../../../../image-upload/imageUpload.component";
 import { v4 as uuid } from 'uuid';
 import TicketList from "./ticketList.component";
 import Calendar from "../../../../calendar/calendar.component";
-import Error from "../../../../natification/error.component";
+import Error from "../../../../notification/error.component";
 import BackButton from "../../../../back/backbutton.component";
 
 type typeOfGroups = {
@@ -87,7 +87,6 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [editTicket, setEditTicket]:[any, Function] = useState(false);
 
 
-    console.log(name);
 
     const getPlaceDatas = (id:string)=>{
         if (id){
@@ -190,7 +189,6 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         let l = [];
         for (let i = 0; i < tickets.length; i++){
             if (id == tickets[i].id){
-                console.log({...datas, id : id});
                 l.push({...datas, id : id});
             }else{
                 l.push(tickets[i]);

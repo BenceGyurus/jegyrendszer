@@ -3,7 +3,7 @@ import ParseCookies from "../../../../cookies/parseCookies";
 import postData from "../../../connection/request";
 import { useEffect, useState } from "react";
 import AddNewButton from "../../../buttons/add_New.component";
-import Error from "../../../natification/error.component";
+import Error from "../../../notification/error.component";
 import Loader from "../../../loader/loader.component";
 
 type typeOfTickets = {

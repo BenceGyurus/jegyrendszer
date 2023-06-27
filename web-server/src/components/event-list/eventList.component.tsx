@@ -1,4 +1,5 @@
 import Event from "../event/event.component";
+import { v4 as uuid } from 'uuid';
 
 const EventList = (events:any)=>{
 
@@ -16,7 +17,6 @@ const EventList = (events:any)=>{
 
     return (
         events.events.map((event:any)=>{
-            console.log(event.title);
             return (
                 <Event
                     id = {event.id}
@@ -24,7 +24,7 @@ const EventList = (events:any)=>{
                     date = {event.date}
                     description = {description_Control(event.description)}
                     title = {event.title}
-                    key = {event._id}
+                    key = {event.id}
                     />
                 )
     })

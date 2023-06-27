@@ -79,7 +79,7 @@ function App(): JSX.Element {
     .then(response => response.json())
     .then(datas  => setEvents(datas.events))
     .catch(
-      error => console.log(error)
+
     )
   }, []);
 

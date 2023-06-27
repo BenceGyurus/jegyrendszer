@@ -1,4 +1,5 @@
 import "../../css/buy-ticket-ticket-list.css";
+import {v4 as uuid} from "uuid";
 
 type typeOfTicketListParams = {
     tickets : Array<typeOfTicket>
@@ -16,7 +17,7 @@ const TicketList = ({tickets}:typeOfTicketListParams)=>{
         {
             tickets.map((ticket)=>{
                 return (
-                    <li>
+                    <li key = {uuid()}>
                         <span className = "price-and-amount-sum">
                         <span className = "name-of-ticket">{ticket.name}</span>
                         <span className = "amount-of-ticket">({ticket.amount})</span>

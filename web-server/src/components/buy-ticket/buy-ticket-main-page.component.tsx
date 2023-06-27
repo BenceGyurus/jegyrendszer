@@ -6,8 +6,8 @@ import BuyButton from "../event-page/buy-button.component";
 import "../../css/buy-ticket-main.css";
 import Coupon from "./buy-ticket-coupon.component";
 import postData from "../connection/request";
-import Error from "../natification/error.component";
-import Notification from "../natification/notification.component";
+import Error from "../notification/error.component";
+import Notification from "../notification/notification.component";
 
 type typeOfTicketDatas = {
     eventId : string, 

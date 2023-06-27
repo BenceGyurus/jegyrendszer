@@ -1,4 +1,5 @@
-import Coupon from "./admin-coupon.component"
+import Coupon from "./admin-coupon.component";
+import { v4 as uuid } from 'uuid';
 
 type typeOfCoupon = {
     _id : string,
@@ -22,7 +23,7 @@ const RefCodeList = ({coupons, editFunction, deleteFunction}:typeOfRefCodeListPa
         <div>
             {
                 coupons.map((element)=>{
-                    return <Coupon coupon={element} editFunction = {editFunction} deleteFunction = {deleteFunction} />
+                    return <Coupon key = {uuid()} coupon={element} editFunction = {editFunction} deleteFunction = {deleteFunction} />
                 })
             }
         </div>

@@ -32,13 +32,10 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
         data.append('file', event.target.files[event.target.files.length-1]);
         axios.post(`/upload-image/${ParseCookies("long_token")}`, data)
         .then(res => { // then print response status
-            console.log(res.data);
             if (res.data.path){
                 onChangeFunction(res.data.path);
                 setImage({path : res.data.path});
-                console.log(image);
                 setUploading(false);
-                console.log(image);
             }
         });
         }
@@ -49,7 +46,6 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
         deleteFunction();
     }
 
-    console.log(image);
 
     return (
         <div className={`${className ? className : ""} upload-image-div`}>

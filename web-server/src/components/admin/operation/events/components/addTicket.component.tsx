@@ -34,7 +34,6 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
     const [name, setName]:[string, Function] = useState(nameOfTicket ? nameOfTicket : "");
     const [nOfTicket, setNumberOfTicket]:[number, Function] = useState(numberOfTicket ? numberOfTicket : 0); 
 
-    console.log(price);
 
     const deleteFromAllSelected = (id:string)=>{
         let l = [];
@@ -77,12 +76,11 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
     }
 
     const appendGroup = (a:any, list:Array<any>)=>{
-        console.log(list.length);
         let appended = 0;
         if (a){
             let l = [...idsOfSeats];
             list.forEach((element)=>{
-                if (!allSelected.includes(element.id)){
+                if (!allSelected.includes(element.id) && !idsOfSeats.includes(element.id)){
                     l.push(element.id);
                     appended++;
                 }
@@ -121,7 +119,6 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
                     newList.push(allSelected[i]);
                 }
             }
-            console.log(allSelected, newList);
             return newList;
         }
         return allSelected;

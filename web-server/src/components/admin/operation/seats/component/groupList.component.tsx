@@ -1,4 +1,5 @@
 import "../../../../../css/groupSettings.css";
+import { v4 as uuid } from 'uuid';
 type groupType = {
     name : string,
     id : string,
@@ -28,28 +29,29 @@ const GroupList = (params:groupListType):any=>{
         <ul className = "tab">
         {params.groups.map((group:any, index)=>{
             if (group.status){
-                return (<input type="text" className = "tablinks" defaultValue={group.name} onBlur = {event =>{params.handleEvent(index, event.target.value)}}/>)}
+                return (<input key = {uuid()} type="text" className = "tablinks" defaultValue={group.name} onBlur = {event =>{params.handleEvent(index, event.target.value)}}/>)}
             else{
-                return <button className = {group.id != params.selected ? "tablinks" : "tablinks active"} onDoubleClick={event =>params.editFunction(index, true)} onClick = {event => params.setSelected(index)}>{group.name} <span className = "close-tab" onClick={event =>{params.deleteEvent(index)}}>&times;</span></button>
+                return <button key = {uuid()} className = {group.id != params.selected ? "tablinks" : "tablinks active"} onDoubleClick={event =>params.editFunction(index, true)} onClick = {event => params.setSelected(index)}>{group.name} <span className = "close-tab" onClick={event =>{params.deleteEvent(index)}}>&times;</span></button>
             }
         })}
         </ul>
         <div>
-        {params.groups.map((group:any)=>{
+        {params.groups.map((group:any, index:number)=>{
             if (params.selected == group.id){
             return (
-                <div className = "tab-content">
+                <div className = "tab-content" key = {index}>
                 {params.seats.map((seat:any, seatIndex:number)=>{
                     if ((seat.group === group.id && group.id == params.selected)){
-                        return (<div className = "form-container">
+                        let ids = [uuid(), uuid()];
+                        return (<div className = "form-container" key = {(seatIndex+1)*13}>
                         <h3 className = "numberOfSeat">{seatIndex+1}</h3>
                         <div className = "form-group">
-                        <label htmlFor="nameOfSeat" className = "labelOfGroupList">Ülőhely elnevezése:</label>
-                        <input type="text" id = "nameOfSeat" className = "inputOfGroupList" defaultValue={seat.name} onChange = {event => params.changeValue(seatIndex, event.target.value)}/>
+                        <label htmlFor={ids[0]} className = "labelOfGroupList">Ülőhely elnevezése:</label>
+                        <input type="text" id = {ids[0]} className = "inputOfGroupList" defaultValue={seat.name} onChange = {event => params.changeValue(event.target.value,seatIndex)}/>
                         </div>
                         <div className = "form-group">
-                        <label htmlFor="titleOfSeat" className = "labelOfGroupList">Ülőhely felirata:</label>
-                        <input type="text" id = "titleOfSeat" className = "inputOfGroupList" defaultValue={seat.title} onChange={e => params.changeTitle(seatIndex, e.target.value) }/>
+                        <label htmlFor={ids[1]} className = "labelOfGroupList">Ülőhely felirata:</label>
+                        <input type="text" id = {ids[1]} className = "inputOfGroupList" defaultValue={seat.title} onChange={e => params.changeTitle(seatIndex, e.target.value) }/>
                         </div>
                         <input type="button" value="Törlés" onClick={event => params.deleteSeatFunction(seatIndex)} className = "deleteDataButton" />
                         </div>)

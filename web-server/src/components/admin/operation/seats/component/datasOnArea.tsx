@@ -1,7 +1,6 @@
 import Group from "./group.component";
 import Seat from "./seat.component";
-
-/* Típus csere mindenhol*/
+import { v4 as uuid } from 'uuid';
 
 type groupType = {
     name : string,
@@ -36,12 +35,12 @@ const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,c
     return (groups.map(
         (group:any)=>{
             if (group.id == selected){
-            return (<Group posX = {group.posX} posY = {group.posY} id = {group.id}>
+            return (<Group key = {uuid()} posX = {group.posX} posY = {group.posY} id = {group.id}>
                 {
                     seats.map(
                         (seat:any, index:number)=>{
                             if ((seat.group == group.id) || showAll){
-                                return <Seat color = {colorOfSeat} name = {seat.name} id = {seat.id} posX = {seat.posX} posY = {seat.posY} title = {seat.title} size = {size} newPositionFunction = {newPositionFunction} index = {index}/>
+                                return <Seat key = {uuid()} color = {colorOfSeat} name = {seat.name} id = {seat.id} posX = {seat.posX} posY = {seat.posY} title = {seat.title} size = {size} newPositionFunction = {newPositionFunction} index = {index}/>
                             }
                         }
                     )

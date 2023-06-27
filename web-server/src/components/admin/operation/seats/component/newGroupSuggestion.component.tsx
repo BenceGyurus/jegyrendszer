@@ -8,7 +8,6 @@ type typeOfSuggestNewGroupsParams = {
     groups : Array<any>
 };
 const SuggestNewGroups = ({suggestedGroups, seats, changeSeatsFunctions, addGroupsFunction, groups }:typeOfSuggestNewGroupsParams)=>{
-    console.log(suggestedGroups.length);
     return (
         <div className = "popup show">
             <button className="close-button-new-group">x</button>

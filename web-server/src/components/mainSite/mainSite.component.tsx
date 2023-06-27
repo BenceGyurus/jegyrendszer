@@ -14,7 +14,6 @@ const App = ()=>{
         },[]
     );
 
-    console.log(events);
 
     if (!events.length && !isItLoad){
         return <LoadingAnimation />;

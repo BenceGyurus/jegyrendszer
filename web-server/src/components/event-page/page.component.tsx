@@ -4,9 +4,9 @@ import Tickets from "./tickets.component";
 import Seats from "./seats.component";
 import BuyButton from "./buy-button.component";
 import "../../css/buy-ticket-page.css";
-import Error from "../natification/error.component";
+import Error from "../notification/error.component";
 import postData from "../connection/request";
-import Notification from "../natification/notification.component";
+import Notification from "../notification/notification.component";
 
 type typeOfTicket = {
     id : string,
@@ -109,7 +109,6 @@ const Page = ({title, background, description, date, id, tickets, placeDatas}:ty
                 }
             }
         }
-        console.log(l);
         setTicketsAmount(l);
     }
 

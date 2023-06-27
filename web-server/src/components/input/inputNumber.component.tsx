@@ -17,7 +17,7 @@ const InputNumber = ({ title,onChangeFunction,value,disabled,functionParams }:ty
     return (
         <div>
             <label htmlFor={id} className = "numberInputLabel">{title}</label>
-            <input type="number" className = "inputNumber" onChange={e => functionParams ? onChangeFunction(Number(e.target.value), ...functionParams) : onChangeFunction(Number(e.target.value))} ref = {numberInputRef} disabled={disabled} />
+            <input id = {id} type="number" className = "inputNumber" onChange={e => functionParams ? onChangeFunction(Number(e.target.value), ...functionParams) : onChangeFunction(Number(e.target.value))} ref = {numberInputRef} disabled={disabled} />
         </div>
     );
 }

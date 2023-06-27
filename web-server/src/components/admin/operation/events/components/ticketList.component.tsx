@@ -1,4 +1,5 @@
-import Ticket from "./ticket.component"
+import Ticket from "./ticket.component";
+import { v4 as uuid } from 'uuid';
 
 type typeOfTicket = {
     id : string,
@@ -29,11 +30,10 @@ type typeOfPlace = {
 }
 
 const TicketList = ( { tickets, sizeOfSeat, sizeOfArea, seatDatas,deleteFunction,editFunction }:typeOfTicketList )=>{
-    console.log(tickets);
     return <div className = "ticket">
         {
             tickets.map((ticket)=>{
-                return <Ticket ticket = {ticket} sizeOfSeat = {sizeOfSeat} sizeOfArea = {sizeOfArea} seatsDatas = {seatDatas} deleteFunction = {deleteFunction} editFunction = {editFunction} />
+                return <Ticket ticket = {ticket} sizeOfSeat = {sizeOfSeat} sizeOfArea = {sizeOfArea} seatsDatas = {seatDatas} deleteFunction = {deleteFunction} editFunction = {editFunction} key={uuid()} />
             }
             )
         }

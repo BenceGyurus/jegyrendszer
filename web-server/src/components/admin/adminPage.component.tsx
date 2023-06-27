@@ -12,7 +12,6 @@ const Admin = (params:any)=>{
         if (token){
             postData("/get-access", {token : token})
             .then((data)=>{
-                console.log(data);
                 data.access ? setAccess(data.access) : navigate("/admin-login");
             });
         }

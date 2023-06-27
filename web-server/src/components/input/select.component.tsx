@@ -1,5 +1,6 @@
 import "../../css/select.css";
 import { useRef, useEffect } from "react";
+import { v4 as uuid } from 'uuid';
 type typeOfOption = {
     title : string,
     value : string
@@ -28,10 +29,10 @@ const Select = ({options, onChangeFunction, className, value, title}:typesOfSele
         <div>
             <label htmlFor="select" className = "select-label">{title}</label>
             <select ref={selectRef} className = {className ? `select ${className}` : "select"} name="" id="select" onChange={e =>onChangeFunction ? onChangeFunction(e.target.value) : ""} value={value}>
-                <option value="default">-</option>
+                <option value="default" key = {uuid()}>-</option>
                 {options.map(
                     (option)=>{
-                        return <option value={option.value}>{option.title}</option>;
+                        return <option key = {uuid()} value={option.value}>{option.title}</option>;
                     }
                 )}
             </select>

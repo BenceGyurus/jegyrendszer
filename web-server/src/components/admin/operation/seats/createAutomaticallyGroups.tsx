@@ -10,7 +10,6 @@ const createAutoGroups = (groups:Array<Array<string>>, seats:Array<any>, changeS
             seats[index].group = id;
         }
     }
-    console.log(oldGroups);
     addGroupsFunction(newGroups);
     changeSeatsFunctions(seats);
 }

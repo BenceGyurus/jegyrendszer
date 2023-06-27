@@ -1,4 +1,5 @@
 import "../../../../../css/user.css";
+import { v4 as uuid } from 'uuid';
 type typeOfUser = {
     username : string,
     access : any,
@@ -21,7 +22,7 @@ const User = ({ user,deleteEvent }:typeOfUserParams)=>{
             <ul className="access-list">
             {Object.keys(user.access).map(
                     (element, index)=>{
-                        return <li className = "access">{user.access[element][0]}</li>
+                        return <li key = {uuid()} className = "access">{user.access[element][0]}</li>
                     }
                 )}
             </ul>

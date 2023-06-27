@@ -37,7 +37,6 @@ function groupositobjects(objects:Array<seatOfType>, sizeOfSeats:number) {
   for (const object of objects) {
     const { posX, posY, ...rest } = object;
     let group = groups.find((c) => {
-        console.log(c);
       const correctElements = c.elements.filter((e:any) => {
         return (
           Math.abs(e.posX - object.posX) < sizeOfSeats*2.5 &&

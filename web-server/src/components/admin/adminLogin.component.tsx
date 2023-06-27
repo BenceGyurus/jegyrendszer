@@ -24,7 +24,7 @@ const Admin = ()=>{
                 navigate('/admin');
             }
         })
-        .catch((err)=>{console.log(err)});
+        .catch((err)=>{});
     }
     const changePassword = (event:any)=>{setpassword(event.target.value);};
     const changeUsername = (event:any)=>{setUsername(event.target.value);};

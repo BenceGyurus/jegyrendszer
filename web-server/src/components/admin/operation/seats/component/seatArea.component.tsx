@@ -25,7 +25,6 @@ const Area = ({width, height, background, children, clickEvent, size, posYOfArea
       );
     const handleClick = (event:any)=>{
         if (event.target.className == classname){
-            console.log(event)
             clickEvent(event.pageX-size/2, event.pageY-size/2, "", "");
         }
     }

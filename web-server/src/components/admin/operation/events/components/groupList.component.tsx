@@ -1,4 +1,5 @@
 import Checkbox from "../../../../checkbox/checkbox.component";
+import { v4 as uuid } from 'uuid';
 
 type typeOfGroup = {
     id : string,
@@ -50,7 +51,7 @@ const Group_List = ({groups, changeFunction, seats, seatList}:typesOfGroup_ListP
     return <div>
         {
             groups.map((group:typeOfGroup)=>{
-                return controlGroup(group) ? <Checkbox onChangeFunction={changeFunction} defaultChecked = {false} title = {group.name} params = {[seats.filter(seat=>seat.group == group.id)]} /> : ""
+                return controlGroup(group) ? <Checkbox onChangeFunction={changeFunction} defaultChecked = {false} title = {group.name} params = {[seats.filter(seat=>seat.group == group.id)]} key={group.id} /> : ""
             })
         }
     </div>

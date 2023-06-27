@@ -768,7 +768,7 @@ app.post("/new-coupon", async (req,res)=>{
         let access = await control_Token(body.token, req);
         if (access && access.includes("ref") && controlTypeOfCoupon(body.datas)){
             let {collection} = new Database("coupons");
-            await collection.insertOne({
+            let result = await collection.insertOne({
                 name : body.datas.name,
                 amount : body.datas.amount,
                 money : body.datas.money,
@@ -777,8 +777,20 @@ app.post("/new-coupon", async (req,res)=>{
                 events : body.datas.events,
                 usedTicket : 0,
                 type : body.datas.type
-            })
+            });
+            if (result.insertedId){
+                handleError("020", res);
+            }
+            else{
+                handleError("001", res);
+            }
         }
+        else{
+            handleError("004", res);
+        }
+    }
+    else{
+        handleError("030", res);
     }
 })
 
@@ -809,7 +821,7 @@ app.post("/delete-coupon/:id", async (req,res) =>{
             if (req.params.id){
                 let {collection} = new Database("coupons");
                 d = await collection.deleteOne({_id : new ObjectId(req.params.id)});
-                res.send({error : !d.deletedCount==0});
+                res.send({error : d.deletedCount==0});
                 return;
             }
         }

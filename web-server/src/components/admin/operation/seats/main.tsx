@@ -14,8 +14,9 @@ import SuggestNewGroups from "./component/newGroupSuggestion.component";
 import postData from "../../../connection/request";
 import ParseCookies from "../../../../cookies/parseCookies";
 import BackButton from "../../../back/backbutton.component";
-import Error from "../../../natification/error.component";
-import Success from "../../../natification/success.component";
+import Error from "../../../notification/error.component";
+import Success from "../../../notification/success.component";
+import Notification from "../../../notification/notification.component";
 
 type groupType = {
     name : string,
@@ -80,9 +81,9 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
     const [nameOfVenue, setNameOfVenue] = useState(name ? name : "");
     const [numberOfPlaces, setNumberOfPlaces] = useState(places ? places : 0);
     const [idOfVenue, setIdOfVenue] = useState(id ? id : "");
-    const [errorVar, setErrorVar] = useState("");
-    const [successVar, setSuccessVar] = useState("");
     const [stage, setStage] = useState(stageData ? stageData : 0);
+    const [error, setError] = useState("");
+    const [succ, setSucc] = useState("");
 
     const save = ()=>{
         let datas = {
@@ -104,14 +105,19 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
             postData(`/upload-venue/${idOfVenue}`, {token : ParseCookies("long_token"), datas : datas})
             .then(async (datas)=>{
                 if (!datas.error && datas.id && !idOfVenue){
-                    window.location.href = `/admin/terem-szerkesztes/${datas.id}`;
-                    setSuccessVar("Sikeres mentés");
+                    if (!id){
+                        window.location.href = `/admin/terem-szerkesztes/${datas.id}`;
+                        setSucc("Sikeres mentés");
+                    }
+                }
+                else if(!datas.error && datas.id){
+                    setSucc("Sikeres mentés");
                 }
                 else{
                     if (datas.responseData){
                         datas = await datas.responseData;
                     }
-                    setErrorVar(datas.message);
+                    setError(datas.message);
                 }
             });
         }
@@ -217,7 +223,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         setSelectedGroup(groups[index].id);
     }
 
-    const changeValueOfSeat = (index:number, name:string)=>{
+    const changeValueOfSeat = (name:string, index:number)=>{
         let newData = [...seats];
         newData[index] = ({posX : newData[index].posX, posY : newData[index].posY, name : name, title : newData[index].title, id : newData[index].id, group: newData[index].group});
         setSeats(newData);
@@ -305,11 +311,11 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
 
     return (
         <div>
+            { error ? <Notification element = {<Error closeFunction={()=>{setError("")}} message={error} />} /> : ""}
+            {succ ? <Notification element={<Success closeFunction={()=>{setSucc("")}} message = {succ} />} /> : ""}
             <div className = "back-button-locate-div">
                 <BackButton url = "/admin/termek" />
             </div>
-        { errorVar ? <div className = "error-natification-div"><Error message={errorVar} closeFunction = {()=>{setErrorVar("")}} /></div> : ""}
-        { successVar ? <div className = "error-natification-div"><Success message={successVar} closeFunction = {()=>{setSuccessVar("")}} /></div> : ""}
         <VenueDatas nameOfVenue={nameOfVenue} numberOfPlaces = {numberOfPlaces} seatsStatus = {turnOnSeats} onChangeFunction = {setTurnOnSeats} changeName = {setNameOfVenue} changeNumberOfPlaces = {setNumberOfPlaces} />
         {turnOnSeats ? <div><Area width = {!background.isImage ? sizeOfArea.width : sizeOfArea.width} height = {!background.isImage ? sizeOfArea.height : sizeOfArea.height} background = {background} clickEvent = {addNewSeat} size = {sizeOfSeat} posYOfArea = {setPotionOfTheAreaFromTop} posXOfArea = {setPotionOfTheAreaFromLeft}>
         <DatasToArea groups={groups} seats = {getAbsoluteSeats()} size = {sizeOfSeat} selected = {selecttedGroup} newPositionFunction = {newPositionToSeat} showAll = {showAllSeats} colorOfSeat = {colorOfSeat}/>

@@ -4,6 +4,7 @@ import ParseCookies from "../../../cookies/parseCookies";
 import { useNavigate } from 'react-router-dom';
 import "../../../css/venues.css";
 import VenueList from "./venuesList.component";
+import { v4 as uuid } from 'uuid';
 
 const Venues = ()=>{
 
@@ -30,10 +31,9 @@ const Venues = ()=>{
         
     }, []);
 
-    console.log("rooms", rooms);
 
     return (
-        <div>
+        <div key = {uuid()}>
             <h1>Helyszínek</h1>
             <input type="button" value="+" className="add-venue-button" onClick = {()=>{navigate("/uj-terem")}}/>
             <VenueList venues={rooms} newRequest = {load}/>

@@ -3,6 +3,7 @@
     position: fixed;
     top: 90px;
     left: 25px;
+    z-index: 1001;
 }
 .error-natification-div{
     max-width: 500px;

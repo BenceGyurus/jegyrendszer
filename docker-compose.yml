@@ -15,6 +15,7 @@ services:
 
 
   handle-services:
+    build: "./handle-server"
     image: bencegyurus/handle-server:latest
     ports:
       - 3001:3001
@@ -23,6 +24,7 @@ services:
   
 
   web-service:
+    build : "./web-server"
     image: bencegyurus/web-server:latest
     ports:
       - 3000:3000

@@ -34,13 +34,11 @@ const Create_Event_Main = ()=>{
             .then((d:any)=>{
                 if (d && !d.datas){
                     setDatas(d);
-                    console.log(d);
                 }
             })
         }
     }, []);
 
-    console.log(datas);
 
     return (window.location.pathname.split("/")[3] ? Object.keys(datas).length > 9 ? <EventSettings name = {datas && datas.name ? datas.name : ""} description = {datas && datas.description ? datas.description : ""} tickets_ = {datas && datas.tickets ? datas.tickets : []} background = {datas && datas.background ? datas.background : ""} dOfEvent = {datas && datas.dateOfEvent ? datas.dateOfEvent : ""} dOfRelease = {datas && datas.dateOfRelease ? datas.dateOfRelease : ""} venue = {datas && datas.venue ? datas.venue : ""} /> : <div/>: <EventSettings />);
 }

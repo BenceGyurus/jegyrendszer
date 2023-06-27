@@ -1,7 +1,6 @@
 import Calendar from "./calendar.component";
 import "../../css/userpageevent.css";
 const Event = (params:any)=>{
-    console.log(params.title);
 
     const openEvent = (id:string)=>{
         window.location.pathname = `/rendezveny/${id}`;

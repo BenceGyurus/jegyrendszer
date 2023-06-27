@@ -20,7 +20,7 @@ const Checkbox = ({onChangeFunction, defaultChecked, title, className, id, param
         </label> 
         </div>: 
         <label className={`toggle-switch ${className}`}>
-        <input type="checkbox" onChange={ e => {!params ? onChangeFunction(e.target.checked) : onChangeFunction(e.target.checked, ...params)} } id = {id} defaultChecked={defaultChecked}/>
+        <input type="checkbox" onChange={ e => { !params ? onChangeFunction(e.target.checked) : onChangeFunction(e.target.checked, ...params)} } id = {idOfCheckBox} defaultChecked={defaultChecked}/>
         <span className="slider"></span>
         </label>
     )

@@ -1,4 +1,5 @@
 import "../../css/header.css";
+import { v4 as uuid } from 'uuid';
 
 type typeOfMenu = {
     title : string,
@@ -19,8 +20,8 @@ const header = ( {listOfNavMenu}:typeOfHeaderParams )=>{
   <ul className="nav">
               {listOfNavMenu ? listOfNavMenu.map((element:typeOfMenu, index)=>{
                 return (
-                  <li className="nav-item">
-                    <a className="nav-link" href={element.link}>{element.title}</a>
+                  <li className="nav-item" key = {uuid()}>
+                    <a key = {uuid()} className="nav-link" href={element.link}>{element.title}</a>
                   </li>
                 )
             }) : ""}

@@ -3,9 +3,9 @@ import InputText from "../../input/inputText.component";
 import Password from "../../input/password.component";
 import Button from "../../buttons/button.component";
 import "../../../css/registration.css"
-import Error from "../../natification/error.component";
+import Error from "../../notification/error.component";
 import { useState, useRef } from "react";
-import Success from "../../natification/success.component";
+import Success from "../../notification/success.component";
 import postData from "../../connection/request";
 const Registration = ()=>{
 
@@ -60,7 +60,6 @@ const Registration = ()=>{
             setPassword("");
             setRepassword("");
         }
-        console.log(errors);
     }
 
     return (

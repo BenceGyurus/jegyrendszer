@@ -47,7 +47,7 @@ const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,s
             <SetSizeOfSeats onChangeFunction={setSizeOfSeatsFunction} size = {sizeOfSeat}/>
             <h3>Ülőhelyek színe</h3>
             <ChangeColorOfSeats color = {colorOfSeat} setColorFunction = {changeColorOfSeats} />
-            <label>Ülőhely kinézete</label>
+            <span>Ülőhely kinézete:</span>
             <SetColorOfSeatComponent color = {colorOfSeat} size = {sizeOfSeat}/>
             <h2>Színpad helye</h2>
             <Stage size = {{width : widthOfArea, height : heightOfArea}} backgroundColor={colorOfBackground} selectedStage={selectedStage} setSelectedStage = {setSelectedStage} />
