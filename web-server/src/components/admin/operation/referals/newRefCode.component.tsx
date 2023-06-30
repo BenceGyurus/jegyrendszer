@@ -1,5 +1,5 @@
 import postData from "../../../connection/request";
-import ParseCookies from "../../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import { useState, useEffect } from "react";
 import EventList from "./ref-events-list.component";
 import Select from "../../../input/select.component";
@@ -63,7 +63,7 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
     }
 
     useEffect(()=>{
-        postData("/get-all-event", {token : ParseCookies("long_token")})
+        postData("/get-all-event", {token : ParseLocalStorage("long_token")})
         .then(response=>{
             if (response.events){
                 let pushEvents = [];
@@ -100,11 +100,11 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
             events : useEvents
         }
         if (eventId){
-            postData(`/edit-coupon/${eventId}`, {token: ParseCookies("long_token"), datas : sendData})
+            postData(`/edit-coupon/${eventId}`, {token: ParseLocalStorage("long_token"), datas : sendData})
             .then(response=> {if (response.error){};refresh();});
         }
         else{
-            postData("/new-coupon", {token: ParseCookies("long_token"), datas : sendData})
+            postData("/new-coupon", {token: ParseLocalStorage("long_token"), datas : sendData})
             .then(response=> {refresh()});
         }
 

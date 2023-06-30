@@ -1,5 +1,5 @@
 import EventList from "./components/eventList.component";
-import ParseCookies from "../../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import postData from "../../../connection/request";
 import { useEffect, useState } from "react";
 import AddNewButton from "../../../buttons/add_New.component";
@@ -40,7 +40,7 @@ const Show_Events_Main = ()=>{
     const [response, setResponse] = useState(false);
 
     const getEvets = ()=>{
-        postData("/events", {token : ParseCookies("long_token")}).then(
+        postData("/events", {token : ParseLocalStorage("long_token")}).then(
             async (datas)=>{
                 setResponse(true);
                 if (datas && !datas.datas && !datas.error){
@@ -61,7 +61,7 @@ const Show_Events_Main = ()=>{
 
     const deleteEvent = (id:string)=>{
         if (id){
-            postData(`/delete-event/${id}`, {token : ParseCookies("long_token")})
+            postData(`/delete-event/${id}`, {token : ParseLocalStorage("long_token")})
             .then(
                 (data)=>{
                     if (!data.error){

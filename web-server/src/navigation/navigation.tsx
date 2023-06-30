@@ -14,6 +14,7 @@ import Show_Events_Main from "../components/admin/operation/show-events/main";
 import EditProfileMain from "../components/admin/operation/profile/main";
 import BuyTicketMainPage from "../components/buy-ticket/buy-ticket-main-page.component";
 import ReferalMain from "../components/admin/operation/referals/main";
+import LocalSaleMain from "../components/admin/operation/local-sale/local-sale-main";
 
 
 
@@ -35,8 +36,9 @@ function Navigation() {
           <Route path = "/admin/rendezveny/*" element = {<Create_Event_Main />} />
           <Route path = "/admin/terem-szerkesztes/*" element = {<NewVenue />}/>
           <Route path = "/admin/rendezvenyek" element = {<AdminPage component = {<Show_Events_Main />} />} />
-          <Route path = "admin/kuponok" element = {<AdminPage component = {<ReferalMain />}/>} />
+          <Route path = "/admin/kuponok" element = {<AdminPage component = {<ReferalMain />}/>} />
           <Route path= "*" element = {<ErrorPage />} />
+          <Route path = "/admin/helyi-eladas" element = {<AdminPage component = {<LocalSaleMain />} />} />
         </Routes>
       </BrowserRouter>
     </div>

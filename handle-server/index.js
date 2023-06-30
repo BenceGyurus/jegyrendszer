@@ -46,7 +46,8 @@ app.get("/events", async (req,res) =>{
     let datas = await collection.find().toArray();
     let sendDatas = [];
     for (let i = 0; i < datas.length; i++){
-        console.log(datas[i].eventData.background);
+        console.log(datas[i].eventData.objectDateOfRelease.getTime(), new Date().getTime(), datas[i].eventData.objectDateOfEvent.getTime(), new Date().getTime())
+        console.log(datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime())
         if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
             sendDatas.push({
                 id : datas[i].eventData.readable_event_name,
@@ -56,7 +57,6 @@ app.get("/events", async (req,res) =>{
                 imageName : datas[i].eventData.background
             });
         }
-        console.log(sendDatas);
     }
     res.status(200).send({events : sendDatas});
 });
@@ -193,7 +193,6 @@ app.post("/add-new-user", async (req,res)=>{
         let token = Functions.genrateToken();
         let userAccess = [];
         let accesses = Functions.readJson("user/accesslist.json");
-        console.log(body.access, accesses);
         if (body.access && accesses){
             for (let i = 0; i < Object.keys(body.access).length; i++){
                 for (let j = 0; j < Object.keys(accesses).length; j++){
@@ -507,7 +506,23 @@ app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
-            console.log(req.body.datas);
+            if (req.body.datas && typeof req.body.datas == "object" && req.params.id){
+                let {collection} = new Database("admin");
+                let accesslist = Functions.readJson("user/accesslist.json");
+                let updateDatas = [];
+                if (accesslist){
+                    for (let i = 0; i < Object.keys(req.body.datas).length; i++){
+                        if (Object.keys(accesslist).includes(Object.keys(req.body.datas)[i]) && req.body.datas[Object.keys(req.body.datas)[i]]){
+                            updateDatas.push(Object.keys(req.body.datas)[i]);
+                        }
+                    }
+                }
+                !updateDatas.length ? updateDatas = ["profile"] : false;
+                console.log(updateDatas);
+                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {access : updateDatas}});
+                res.send({error : !result.modifiedCount})
+                //console.log(updateDatas);
+            }
         }
     }
 })
@@ -768,7 +783,7 @@ app.post("/new-coupon", async (req,res)=>{
         let access = await control_Token(body.token, req);
         if (access && access.includes("ref") && controlTypeOfCoupon(body.datas)){
             let {collection} = new Database("coupons");
-            let result = await collection.insertOne({
+            if ( (await collection.insertOne({
                 name : body.datas.name,
                 amount : body.datas.amount,
                 money : body.datas.money,
@@ -777,8 +792,7 @@ app.post("/new-coupon", async (req,res)=>{
                 events : body.datas.events,
                 usedTicket : 0,
                 type : body.datas.type
-            });
-            if (result.insertedId){
+            })).insertedId){
                 handleError("020", res);
             }
             else{

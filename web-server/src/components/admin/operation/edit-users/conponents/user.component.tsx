@@ -10,10 +10,11 @@ type typeOfUser = {
 type typeOfUserParams = {
     user : typeOfUser,
     deleteEvent : Function,
+    editEvent : Function
 }
 
 
-const User = ({ user,deleteEvent }:typeOfUserParams)=>{
+const User = ({ user,deleteEvent, editEvent }:typeOfUserParams)=>{
     return (
         <li key = {user.id}>
         <div className="user-info">
@@ -28,8 +29,8 @@ const User = ({ user,deleteEvent }:typeOfUserParams)=>{
             </ul>
             {!user.cantEdit ? 
             <div className="user-actions">
-            <button className="edit-button">Edit</button>
-            <button className="delete-button" onClick={()=>deleteEvent(user.id)} >Delete</button>
+            <button className="edit-button" onClick={e=>editEvent(user)}>Edit</button>
+            <button className="delete-button" onClick={e=>deleteEvent(user.id)} >Delete</button>
             </div> : ""
             }
             <span className="user-id">{user.id}</span>

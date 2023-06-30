@@ -17,7 +17,7 @@ const controlConnection = async ()=>{
         datas = await collection.findOne({role : "admin"});
 
         if (!datas){
-            collection.insertOne({username : "admin", password : Functions.encryption("admin"), readable_user_id : "admin", addedBy : {username : "system added"}, deleteable : false, access : get_Accesses(), role : "admin"})
+            collection.insertOne({username : "admin", password : Functions.encryption("admin"), readable_user_id : "admin", addedBy : {username : "system added"}, cantEdit : true, access : get_Accesses(), role : "admin"})
             console.log("Admin user is added to the database. username: admin, password: admin")
         }
         return true;

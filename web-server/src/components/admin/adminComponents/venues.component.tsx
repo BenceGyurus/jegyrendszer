@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import postData from "../../connection/request";
-import ParseCookies from "../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../cookies/ParseLocalStorage";
 import { useNavigate } from 'react-router-dom';
 import "../../../css/venues.css";
 import VenueList from "./venuesList.component";
@@ -12,7 +12,7 @@ const Venues = ()=>{
     const navigate = useNavigate();
 
     const load = ()=>{
-        let token = ParseCookies("long_token");
+        let token = ParseLocalStorage("long_token");
         if (token){
             postData("/venues", {token : token})
             .then((datas)=>{

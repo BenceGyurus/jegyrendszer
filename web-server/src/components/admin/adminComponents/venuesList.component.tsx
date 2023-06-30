@@ -1,7 +1,7 @@
 import "../../../css/venuesStyle.css";
 import SmallMap from "./smallMap.component"
 import postData from "../../connection/request";
-import ParseCookies from "../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../cookies/ParseLocalStorage";
 import Tooltip from "../../tooltip/tooltip.component";
 
 type typeOfVenueDatas = {
@@ -23,7 +23,7 @@ type typeOfVenueListParams = {
 const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
 
     const handleDeleteFunction = (id:string)=>{
-        postData(`/delete-venue/${id}`, {token : ParseCookies("long_token")})
+        postData(`/delete-venue/${id}`, {token : ParseLocalStorage("long_token")})
         .then((data)=>{
             newRequest();
         });

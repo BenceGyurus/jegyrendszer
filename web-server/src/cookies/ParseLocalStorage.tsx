@@ -8,7 +8,7 @@ const strip = (text:string):string=>{
     return newText;
 }
 
-const ParseCookies = (name:string):any=>{
+const ParseLocalStorage = (name:string):any=>{
     /*let cookiesInString = document.cookie;
     let cookiesInList = cookiesInString.split(";");
     let Cookies:any = [];
@@ -23,4 +23,4 @@ const ParseCookies = (name:string):any=>{
     return localStorage.getItem(name);
 }
 
-export default ParseCookies;
+export default ParseLocalStorage;

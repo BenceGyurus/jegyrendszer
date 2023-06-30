@@ -1,6 +1,6 @@
 import AccessList from "./accessList.component";
 import postData from "../connection/request";
-import ParseCookies from "../../cookies/parseCookies";
+import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "../../css/admin.css";
@@ -8,7 +8,7 @@ const Admin = (params:any)=>{
     const [access, setAccess] = useState(false);
     const navigate = useNavigate();
     useEffect(()=>{
-        let token = ParseCookies("long_token");
+        let token = ParseLocalStorage("long_token");
         if (token){
             postData("/get-access", {token : token})
             .then((data)=>{

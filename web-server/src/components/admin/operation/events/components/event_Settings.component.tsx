@@ -8,7 +8,7 @@ import SaveButton from "../../../../saveButton/saveButton.component";
 import AddTicket from "./addTicket.component";
 import Select from "../../../../input/select.component";
 import postData from "../../../../connection/request";
-import ParseCookies from "../../../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../../../cookies/ParseLocalStorage";
 import ImageUpload from "../../../../image-upload/imageUpload.component";
 import { v4 as uuid } from 'uuid';
 import TicketList from "./ticketList.component";
@@ -90,7 +90,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
 
     const getPlaceDatas = (id:string)=>{
         if (id){
-            postData(`/venue/${id}`, {token : ParseCookies("long_token")})
+            postData(`/venue/${id}`, {token : ParseLocalStorage("long_token")})
             .then((data)=>{
                 if (data){
                     for (let i = 0; i < data.seatsDatas.length; i++){
@@ -115,7 +115,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     }
 
     useEffect(()=>{
-        postData("/get-venues-in-array", {token : ParseCookies("long_token")})
+        postData("/get-venues-in-array", {token : ParseLocalStorage("long_token")})
         .then((datas)=>{
             if (datas.datas){
                 setVenues(datas.datas);
@@ -165,7 +165,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             venue : selectedVenue
         };
 
-        postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseCookies("long_token")})
+        postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
         .then(async (data)=>{
             if (data.datas){
                 <Error message={(await data.datas).message} />

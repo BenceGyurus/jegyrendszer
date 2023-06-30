@@ -20,15 +20,16 @@ type typeOfUser = {
 }
 type typeOfUsersParams = {
     users : Array<typeOfUser>,
-    deleteEvent : Function
+    deleteEvent : Function,
+    editEvent : Function
 }
 
-const Users = ({users,deleteEvent}:typeOfUsersParams)=>{
+const Users = ({users,deleteEvent, editEvent}:typeOfUsersParams)=>{
     return (
         <ul className = "user-list">
             {
                 users.map((element)=>{
-                    return element.status ? <User key={uuid()} deleteEvent={deleteEvent} user = {element} /> : <PeddingUser key = {uuid()} user = {element} />
+                    return element.status ? <User key={uuid()} deleteEvent={deleteEvent} user = {element} editEvent = {editEvent} /> : <PeddingUser key = {uuid()} user = {element} />
                 })
             }
         </ul>

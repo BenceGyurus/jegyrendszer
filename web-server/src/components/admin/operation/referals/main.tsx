@@ -2,7 +2,7 @@ import AddNewButton from "../../../buttons/add_New.component";
 import { useState, useEffect } from "react";
 import AddNewRefCode from "./newRefCode.component";
 import postData from "../../../connection/request";
-import ParseCookies from "../../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import RefCodeList from "./refCodeList.component";
 
 type typeOfCoupon = {
@@ -35,7 +35,7 @@ const ReferalMain = ()=>{
     }
 
     const deleteFunction = (id:string)=>{
-        postData(`/delete-coupon/${id}`, {token : ParseCookies("long_token")})
+        postData(`/delete-coupon/${id}`, {token : ParseLocalStorage("long_token")})
         .then(response=>{
             if (!response.error){
                 getCoupons();
@@ -45,7 +45,7 @@ const ReferalMain = ()=>{
 
 
     const getCoupons = ()=>{
-        postData("/get-coupons", {token : ParseCookies("long_token")})
+        postData("/get-coupons", {token : ParseLocalStorage("long_token")})
         .then(response=>{
             if (response.coupons){
                 setCoupons(response.coupons);

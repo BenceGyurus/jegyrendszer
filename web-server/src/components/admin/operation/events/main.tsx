@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import EventSettings from "./components/event_Settings.component";
-import ParseCookies from "../../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import postData from "../../../connection/request";
 
 
@@ -30,7 +30,7 @@ const Create_Event_Main = ()=>{
     useEffect(()=>{
         if (window.location.pathname.split("/")[1] === "admin" && window.location.pathname.split("/")[2] === "rendezveny" && window.location.pathname.split("/")[3]){
             let id = window.location.pathname.split("/")[3];
-            postData(`/get-event-data/${id}`, {token : ParseCookies("long_token")})
+            postData(`/get-event-data/${id}`, {token : ParseLocalStorage("long_token")})
             .then((d:any)=>{
                 if (d && !d.datas){
                     setDatas(d);

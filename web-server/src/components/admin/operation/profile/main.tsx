@@ -3,7 +3,7 @@ import InputText from "../../../input/inputText.component";
 import Button from "../../../buttons/button.component";
 import { useEffect, useState } from "react";
 import postData from "../../../connection/request";
-import ParseCookies from "../../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import Success from "../../../notification/success.component";
 import Error from "../../../notification/error.component";
 import Password from "../../../input/password.component";
@@ -19,7 +19,7 @@ const EditProfileMain = ()=>{
 
 
     useEffect(()=>{
-        postData("/get-user-data", {token : ParseCookies("long_token")})
+        postData("/get-user-data", {token : ParseLocalStorage("long_token")})
         .then(
             response=>{
                 if (response.username && response.id){
@@ -32,7 +32,7 @@ const EditProfileMain = ()=>{
 
     const changeUsername = ()=>{
         if (username && username != userData.username){
-            postData("/change-username", {token : ParseCookies("long_token"), datas : {username : username}})
+            postData("/change-username", {token : ParseLocalStorage("long_token"), datas : {username : username}})
             .then(async (response)=>{
                 if (!response.error && response.username){
                     setUsername(response.username);
@@ -47,7 +47,7 @@ const EditProfileMain = ()=>{
 
     const changePassword = ()=>{
         if (pass1 === pass2 && oldPass && pass1.length >= 5){
-            postData("/change-password", {token : ParseCookies("long_token"), datas : {oldPassword : oldPass, password : pass1}})
+            postData("/change-password", {token : ParseLocalStorage("long_token"), datas : {oldPassword : oldPass, password : pass1}})
             .then((response)=>{
                 if (response.update){
                     setEdit("A jelszó megváltoztatása sikeres!");

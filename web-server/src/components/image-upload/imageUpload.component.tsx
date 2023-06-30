@@ -1,6 +1,6 @@
 import "../../css/imageUpload.css";
 import axios from 'axios';
-import ParseCookies from "../../cookies/parseCookies";
+import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 import { useState } from "react";
 import Loader from "../loader/loader.component";
 
@@ -30,7 +30,7 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
         setUploading(true);
         const data = new FormData() ;
         data.append('file', event.target.files[event.target.files.length-1]);
-        axios.post(`/upload-image/${ParseCookies("long_token")}`, data)
+        axios.post(`/upload-image/${ParseLocalStorage("long_token")}`, data)
         .then(res => { // then print response status
             if (res.data.path){
                 onChangeFunction(res.data.path);

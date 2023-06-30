@@ -12,7 +12,7 @@ import VenueDatas from "./component/datasAboutVenue.component";
 import Auto_Addition from "./autoAddition";
 import SuggestNewGroups from "./component/newGroupSuggestion.component";
 import postData from "../../../connection/request";
-import ParseCookies from "../../../../cookies/parseCookies";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import BackButton from "../../../back/backbutton.component";
 import Error from "../../../notification/error.component";
 import Success from "../../../notification/success.component";
@@ -101,8 +101,8 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
             suggestedGroups : suggestedGroups,
             stage : stage
         }
-        if (ParseCookies("long_token")){
-            postData(`/upload-venue/${idOfVenue}`, {token : ParseCookies("long_token"), datas : datas})
+        if (ParseLocalStorage("long_token")){
+            postData(`/upload-venue/${idOfVenue}`, {token : ParseLocalStorage("long_token"), datas : datas})
             .then(async (datas)=>{
                 if (!datas.error && datas.id && !idOfVenue){
                     if (!id){
@@ -259,7 +259,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
     const uploadFile = (event:any)=>{
         const data = new FormData() ;
         data.append('file', event.target.files[0]);
-        axios.post(`/upload-image/${ParseCookies("long_token")}`, data)
+        axios.post(`/upload-image/${ParseLocalStorage("long_token")}`, data)
         .then(res => { // then print response status
             setBackground({isImage : true, name : res.data.path});
             if (res.data.width && res.data.height){
