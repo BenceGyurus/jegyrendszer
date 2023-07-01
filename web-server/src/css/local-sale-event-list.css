@@ -1,0 +1,16 @@
+.local-sale-event-div{
+    width: 300px;
+    display: inline-table;
+    box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.local-sale-image{
+    height: 200px;
+}
+
+.local-sale-event-title{
+    max-width: 100%;
+    text-align: center;
+}

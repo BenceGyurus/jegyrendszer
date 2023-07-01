@@ -11,7 +11,8 @@ type typeOfUser = {
     username : string,
     access : any,
     cantEdit : Boolean,
-    id : string
+    id : string,
+    pedding? : boolean
 }
 
 
@@ -20,7 +21,7 @@ type typeOfUserEditWindowParams = {
     closeFunction : Function,
     errorFunction : Function,
     updateFunction : Function,
-    succFunction : Function
+    succFunction : Function,
 }
 
 
@@ -37,7 +38,7 @@ const UserEditWindow = ({user, closeFunction, errorFunction, updateFunction, suc
             userAccesses.forEach((i:any)=>{
                 sendData[i[0]] = i[2];
             })
-            postData(`/edit-user/${user.id}`, {token : ParseLocalStorage("long_token"), datas : sendData})
+            postData(`/edit-${user.pedding ? "pedding-user" : "user"}/${user.id}`, {token : ParseLocalStorage("long_token"), datas : sendData})
             .then(response=>{
                 if (!response.error){
                     succFunction("Sikeres mentés")

@@ -20,6 +20,9 @@ async function otherData(req,token){
             userId : datas.userData.id,
             readableid : datas.readableUsername
         };
+        setTimeout(()=>{
+            database.close();
+        }, 10000);
     }
     return sendData;
 }

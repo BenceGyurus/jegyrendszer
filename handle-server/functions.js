@@ -68,6 +68,10 @@ class Functions{
         let regex = new RegExp("(?=.*[0-9])");
         return (json.username && json.username.length > 4 && json.password && json.password.length >= 8 && regex.test(json.password));
     }
+    static controlPassword(password){
+        let regex = new RegExp("(?=.*[0-9])");
+        return password.length >= 8 && regex.test(password);
+    }
     static control_Access(json){
         try {
             let returnAccess = [];

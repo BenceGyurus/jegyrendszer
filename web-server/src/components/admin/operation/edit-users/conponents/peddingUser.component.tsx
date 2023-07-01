@@ -12,11 +12,13 @@ type typeOfUser = {
 }
 
 type typeOfUserParams = {
-    user : typeOfUser
+    user : typeOfUser,
+    deleteFunction : Function,
+    editFunction : Function
 }
 
 
-const PeddingUser = ({ user }:typeOfUserParams)=>{
+const PeddingUser = ({ user, deleteFunction, editFunction }:typeOfUserParams)=>{
     return (
         <li key = {user.id}>
         <div className="user-info">
@@ -33,8 +35,8 @@ const PeddingUser = ({ user }:typeOfUserParams)=>{
                 ) : ""}
             </ul>
             <div className="user-actions">
-            <button className="edit-button">Edit</button>
-            <button className="delete-button">Delete</button>
+            <button className="edit-button" onClick={e=>editFunction(user)}>Edit</button>
+            <button className="delete-button" onClick = {e=>{deleteFunction(user.id)}}>Delete</button>
             </div>
             <span className="user-id">{user.id}</span>
         </div>

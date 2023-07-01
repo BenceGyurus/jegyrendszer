@@ -13,9 +13,11 @@ const get_Accesses = ()=>{
 
 const controlConnection = async ()=>{
     try{
-        let {collection} = new Database("admin")
+        let {collection, database} = new Database("admin")
         datas = await collection.findOne({role : "admin"});
-
+        setTimeout(()=>{
+            database.close()
+        },10000);
         if (!datas){
             collection.insertOne({username : "admin", password : Functions.encryption("admin"), readable_user_id : "admin", addedBy : {username : "system added"}, cantEdit : true, access : get_Accesses(), role : "admin"})
             console.log("Admin user is added to the database. username: admin, password: admin")

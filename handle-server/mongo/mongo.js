@@ -4,6 +4,7 @@ const Function = require("../functions.js");
 
 class Database{
   constructor(name){
+    console.log(name);
     let datas = Function.getNameOfDatabase(name);
     this.collectionName = datas.collection; this.databaseName = datas.database;
     this.mongoconfig = {};

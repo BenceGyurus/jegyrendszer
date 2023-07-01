@@ -15,6 +15,7 @@ import EditProfileMain from "../components/admin/operation/profile/main";
 import BuyTicketMainPage from "../components/buy-ticket/buy-ticket-main-page.component";
 import ReferalMain from "../components/admin/operation/referals/main";
 import LocalSaleMain from "../components/admin/operation/local-sale/local-sale-main";
+import Local_Sale_Event from "../components/admin/operation/local-sale/opend-event.component";
 
 
 
@@ -39,6 +40,7 @@ function Navigation() {
           <Route path = "/admin/kuponok" element = {<AdminPage component = {<ReferalMain />}/>} />
           <Route path= "*" element = {<ErrorPage />} />
           <Route path = "/admin/helyi-eladas" element = {<AdminPage component = {<LocalSaleMain />} />} />
+          <Route path = "/admin/eladas/*" element = {<AdminPage component = {<Local_Sale_Event />}/>} />
         </Routes>
       </BrowserRouter>
     </div>

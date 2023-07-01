@@ -10,13 +10,26 @@ import UserEditWindow from "./conponents/user-edit-window.component";
 import Notification from "../../../notification/notification.component";
 import Error from "../../../notification/error.component";
 import Success from "../../../notification/success.component";
+import PeddingUser from "./conponents/peddingUser.component";
 
 type typeOfRegisteredUser = {
     username : string,
     access : Object,
     cantEdit : Boolean,
     id : string,
-    status: true
+    status: true,
+    pedding? : boolean
+}
+
+type typeOfPeddingUser = {
+    id : string,
+    addedBy : string,
+    validTo : number,
+    created : number,
+    status: false,
+    access : Object,
+    url : string,
+    token : string
 }
 
 type typeOfUser = {
@@ -43,7 +56,7 @@ const Main = ()=>{
     const [users, setUsers] = useState(Array<typeOfUser>);
     const [openNewUser, setOpenNewUser] = useState(false);
     const [showUser, setShowUser] = useState({token : "", url : ""});
-    const [selectedUserToEdit, setSelectedUserToEdit]:[typeOfUser, Function] = useState({username : "", access : {}, cantEdit : false, id : "", status : true});
+    const [selectedUserToEdit, setSelectedUserToEdit]:[typeOfRegisteredUser, Function] = useState({username : "", access : {}, cantEdit : false, id : "", status : true});
 
     useEffect(()=>{
         updateUsers();
@@ -87,6 +100,27 @@ const Main = ()=>{
         }
     }
 
+    console.log(selectedUserToEdit);
+
+    const deletePeddingUser = (id:string)=>{
+        if (id){
+            postData(`/delete-pedding-user/${id}`, {token : ParseLocalStorage("long_token")})
+            .then(response=>{
+                response.error ? response.message ? setError(response.message) : setError("A törlés sikertelen") : setSuc("A törlés sikeres");
+            })
+        }else{
+            setError("Hiba történt a törlés közben")
+        }
+        updateUsers();
+    }
+
+    const selectPeddingUser = (user:typeOfPeddingUser)=>{
+        if (user.id){
+            setSelectedUserToEdit({username : "Pedding felhasználó", access : user.access, cantEdit : false, id : user.id, status : false, pedding : true})
+        }
+    }
+
+
 
     return (<div>
         <h1>Felhasználók szerkesztése</h1>
@@ -94,7 +128,7 @@ const Main = ()=>{
         {error ? <Notification element={<Error message={error} closeFunction={()=>{setError("")}} />} /> : ""}
         {suc ? <Notification element={<Success message={suc} closeFunction={()=>{setSuc("")}} />} /> : ""}
         {selectedUserToEdit.id ? <UserEditWindow closeFunction={()=>{setSelectedUserToEdit({username : "", access : {}, cantEdit : false, id : "", status : true})}} user={selectedUserToEdit} errorFunction={setError} updateFunction = {updateUsers} succFunction = {setSuc} /> : ""} 
-        {!users.length ? <Loader /> : <Users deleteEvent={delete_User} users = {users} editEvent={selectUser}/>}
+        {!users.length ? <Loader /> : <Users deleteEvent={delete_User} users = {users} editEvent={selectUser} peddingDelete = {deletePeddingUser} peddingEdit = {selectPeddingUser}/>}
         {openNewUser ? <NewUserWindow closeFunction = { ()=>{setOpenNewUser(false)}} readyState = {showAddedUser}/> : ""}
         {showUser.token && showUser.url ? <ShowToken token = {showUser.token} url = {showUser.url} closeFunction = {()=>{setShowUser({token : "", url : ""})}} /> : ""}
     </div>);

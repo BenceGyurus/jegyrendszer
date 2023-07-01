@@ -3,8 +3,8 @@ const  { ObjectId } = require('mongodb');
 
 const Control_Seats = async (list, ticketId, eventId)=>{
     let control = [false, true, true];
-    ticketsCollection = new Database("events").collection;
-    let allTickets = await ticketsCollection.find().toArray();
+    let {collection, database} = new Database("events");
+    let allTickets = await collection.find().toArray();
     let event;
     let price = 0;
     allTickets.forEach(element => {
@@ -27,6 +27,9 @@ const Control_Seats = async (list, ticketId, eventId)=>{
             }
         }
     })
+    setTimeout(()=>{
+        database.close();
+    },10000);
     /*for (let i = 0; i < list.length; i++){
     }*/
     return control[0] && control[1] && control[2];

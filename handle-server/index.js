@@ -20,6 +20,12 @@ const Control_Seats = require("./control-seats.js");
 const getTicketByReadableId = require("./getTicketByReadableId.js");
 const controlTypeOfCoupon = require("./typesOfDatas/coupons.js");
 
+const closeConnection = (database)=>{
+    setTimeout(()=>{
+        database.close();
+    },10000);
+}
+
 const parseBodyMiddleeware = (req, next)=>{
     req.body = Functions.parseBody(req.body);
     next();
@@ -42,7 +48,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
         //GET requests//
 
 app.get("/events", async (req,res) =>{
-    let {collection} = new Database("events");
+    let {collection, database} = new Database("events");
     let datas = await collection.find().toArray();
     let sendDatas = [];
     for (let i = 0; i < datas.length; i++){
@@ -58,13 +64,14 @@ app.get("/events", async (req,res) =>{
             });
         }
     }
+    closeConnection(database);
     res.status(200).send({events : sendDatas});
 });
 
 
 app.get("/event/:id", async (req,res)=>{
     let id = req.params.id;
-    let {collection} = new Database("events");
+    let {collection, database} = new Database("events");
     let events = await collection.find().toArray();
     let event = {};
     if (events){
@@ -75,10 +82,12 @@ app.get("/event/:id", async (req,res)=>{
         }
     }
     if (event){
-        let placeCollection = new Database("venue").collection;
+        let l = new Database("venue");
+        let placeCollection = l.collection;
         place = {};
         if (event.venue){
             place = await placeCollection.findOne({_id : new ObjectId(event.venue)});
+            closeConnection(l.database);
             if (place){
             placesOfEvent = [];
             place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
@@ -96,6 +105,7 @@ app.get("/event/:id", async (req,res)=>{
             
         }
         res.send({id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
+        closeConnection(database);
         return;
     }
 });
@@ -103,7 +113,7 @@ app.get("/event/:id", async (req,res)=>{
 
 app.get("/buy-ticket-details/:token", async (req,res)=>{
     if (req.params && req.params.token){
-        const {collection} = new Database("pre-buying");
+        const {collection, database} = new Database("pre-buying");
         let datas = await collection.findOne({token : req.params.token});
         if (datas.time + 1800000 >= new Date().getTime() && datas && datas.eventId){
             let eventDetails = await getTicketByReadableId(datas.eventId);
@@ -114,6 +124,7 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
         }
     }
     handleError("019", res);
+    closeConnection(database);
 });
 
         //POST requests//
@@ -135,14 +146,17 @@ app.post("/get-access", async (req,res)=>{
 app.post("/get-long-token", async (req,res, next) =>{
     let body = Functions.parseBody(req.body);
     if (body.token){
-        let {collection} = new Database("short-token");
+        let {collection, database} = new Database("short-token");
         let tokenDatas = await collection.findOne({token : body.token});
+        let database1 = database;
         if (tokenDatas && tokenDatas.datas.ip){
             if (tokenDatas.datas.ip == Functions.getIp(req) && tokenDatas.datas.timeInMil + 60000 > new Date().getTime()){
-                let {collection} = new Database("long-token");
+                let {collection, database} = new Database("long-token");
                 let token = Functions.genrateToken();
                 collection.insertOne(await Topology.longTokenData(token, tokenDatas.userData, req));
                 res.send({token : token, access : Functions.merge_Access(tokenDatas.userData.access), expires_in : 21600000});
+                closeConnection(database);
+                closeConnection(database1);
                 return 0;
             }
             else{
@@ -151,6 +165,7 @@ app.post("/get-long-token", async (req,res, next) =>{
                 return 0;
             }
         }
+        closeConnection(database1);
     }
     handleError("003", res);
     //res.send({error : true, errorCode : "003"});            //Nincs token
@@ -161,17 +176,19 @@ app.post("/get-long-token", async (req,res, next) =>{
 app.post("/login", async (req, res, next) =>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.username && body.password){
-        let {collection} = new Database("admin");
+        let {collection, database} = new Database("admin");
         user = await collection.findOne({username : body.username, password : Functions.encryption(body.password)});
+        closeConnection(database);
         if (user){
-            let {collection} = new Database("short-token");
+            let {collection, datebase} = new Database("short-token");
             let token = Functions.genrateToken();
             let datas = await otherData(req);
             let userData = Topology.newUserDatas(user);
             await collection.insertOne({token : token, datas : datas, userData : userData});
             res.send({
                 token : token
-            })
+            });
+            closeConnection(database);
         }
         else{
             handleError("006", res);//res.send({error : true,errorCode : "006"}) //Rossz felhasználónév vagy jelszó
@@ -189,7 +206,7 @@ app.post("/add-new-user", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token){
     let access = await  control_Token(body.token, req);
     if (access && access.includes("edit-users")){
-        let { collection } = new Database("new-user");
+        let { collection, database } = new Database("new-user");
         let token = Functions.genrateToken();
         let userAccess = [];
         let accesses = Functions.readJson("user/accesslist.json");
@@ -204,6 +221,7 @@ app.post("/add-new-user", async (req,res)=>{
         }
         collection.insertOne({token : token,access: userAccess ,datas : await otherData(req, body.token)});
         res.send({token : token, url : "/uj-profil/"});
+        closeConnection(database);
     }
     else{
         handleError("004", res);
@@ -219,16 +237,17 @@ app.post("/create-profile/:token", async (req,res)=>{
     let token = req.params.token;
     let body = Functions.parseBody(req.body);
     if (token){
-    let { collection } = new Database("new-user");
+    let { collection,database } = new Database("new-user");
     let datas = await collection.findOne({token : token});
     body.access = datas ? datas.access : false;
     let access = Functions.control_Access(body);
-    console.log(access);
-    console.log(datas && datas.datas.timeInMil + 259200000,new Date().getTime())
+    closeConnection(database);
+    //console.log(datas && datas.datas.timeInMil + 259200000,new Date().getTime())
     if (datas && datas.datas.timeInMil + 259200000 > new Date().getTime()){
         if (Functions.control_Password_And_Username(body) && access){
-            let { collection } = new Database("admin");
-            let pedding = new Database("new-user").collection;
+            let { collection,database } = new Database("admin");
+            let l = new Database("new-user");
+            let pedding = l.collection;
             if (!await collection.findOne({username : body.username})){
                 collection.insertOne({username : body.username, password : Functions.encryption(body.password), readable_user_id : Functions.sanitizeingId(body.username), addedBy : datas.datas.userData, datas : await otherData(req), deleteable : true, access : access});
                 res.send({error :  !(await pedding.deleteOne({token : token})).acknowledged});
@@ -237,6 +256,8 @@ app.post("/create-profile/:token", async (req,res)=>{
                 handleError("010", res);
                 //res.send({error : true, errorCode : "010"});        //Felhasználónév foglalt
             }
+            closeConnection(database);
+            closeConnection(l.database);
         }
         else{
             handleError("008", res);
@@ -255,21 +276,24 @@ app.post("/create-profile/:token", async (req,res)=>{
 app.post("/delete-user", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
-        console.log(body);
         let access = await control_Token(body.token, req);
-        console.log(access);
-        let usersCollection = new Database("admin").collection;
+        let l = new Database("admin");
+        let usersCollection = l.collection;
+        let userDatabase = l.database;
     if (access && access.includes("edit-users")){
         if (body.userId){
             let id = new ObjectId(body.userId);
             let user = await usersCollection.findOne({_id : id});
-            let deletedUsersCollection = new Database("deleted-users").collection;
+            let l = new Database("deleted-users");
+            let deletedUsersCollection = l.collection;
             if (user && user.deleteable){ 
                 usersCollection.deleteOne({_id : id}); 
                 await deletedUsersCollection.insertOne({ userData : user, deletedBy : await otherData(req, req.token) , datas : Functions.getBrowerDatas});
                 handleError("011", res);
+                closeConnection(l.databse);
                 return ;
             }
+            closeConnection(l.databse);
             handleError("013", res);
         }
         else{
@@ -279,6 +303,7 @@ app.post("/delete-user", async (req,res)=>{
         handleError("004", res);
         //res.send({error : true, errorCode : "004"});
     }
+    closeConnection(userDatabase);
     }
     else{
         handleError("004", res);
@@ -290,14 +315,14 @@ app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,as
     if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-rooms") && controlTypesOfVenues(req.body.datas)){
-            let { collection } = new Database("venue");
+            let { collection,database } = new Database("venue");
             let id = new ObjectId(req.params.id);
             let lastVersion = await collection.findOne({_id : id});
             if (lastVersion){
                 console.log(lastVersion.versions);
             lastVersion.versions.push({content : lastVersion.content, addedBy: lastVersion.addedBy, id : Functions.genrateToken})
             let updated = await collection.updateOne({_id : id}, {$set : {content : req.body.datas, addedBy : await otherData(req, req.body.token), versions : lastVersion.versions}});
-            console.log(updated);
+            closeConnection(database);
             if (updated.modifiedCount){
                 res.send({id : req.params.id});
                 return;
@@ -321,7 +346,7 @@ app.post("/upload-venue", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token){
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas)){
-        let { collection } = new Database("venue");
+        let { collection,database } = new Database("venue");
         let datas = await collection.insertOne({content : body.datas, addedBy : await otherData(req, body.token), versions : []});
         if (datas.insertedId){
         res.send({id : datas.insertedId});
@@ -329,6 +354,7 @@ app.post("/upload-venue", async (req,res)=>{
         else{
             handleError("000", res);
         }
+        closeConnection(database);
         return;
     }}
     handleError("004", res);
@@ -338,7 +364,7 @@ app.post("/new-long-token", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token){
     let access = await control_Token(body.token, req);
     if (access && access.includes("profile")){
-        let { collection } = new Database("long-token");
+        let { collection, database } = new Database("long-token");
         let datas = await collection.findOne({token : body.token});
         let usersCollection = new Database("admin").collection;
         let userData = await usersCollection.findOne({username : datas.userData.username, _id : mongodb.ObjectId(datas.userData.id)});
@@ -350,10 +376,12 @@ app.post("/new-long-token", async (req,res)=>{
                 result2 = (await collection.updateOne({token : body.token}, {$set : {status : false}})).acknowledged;
             }
             res.send(result && result2 ? {token : newToken} : {error : true, errorCode : "001"});
+            closeConnection(database);
             return;
         }
         else{
             handleError("009", res);
+            closeConnection(database);
             return;
             //res.send({error : true, errorCode : "009"});        //Felhasználó nem található
         }
@@ -400,7 +428,7 @@ app.post("/venues", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token){
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-rooms")){
-        let { collection } = new Database("venue");
+        let { collection, database } = new Database("venue");
         let datas = await collection.find().toArray();
         let sendDatas = [];
         for (let i = 0; i < datas.length; i++){
@@ -417,6 +445,7 @@ app.post("/venues", async (req,res)=>{
             });
         }
         res.send({venues : sendDatas});
+        closeConnection(database);
         return;
         }
     }
@@ -429,8 +458,9 @@ app.post("/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), async (
         if (access && access.includes("edit-rooms") && req.params.id){
                 if (req.params.id.length === 24){
                 id = new ObjectId(req.params.id);
-                let { collection } = new Database("venue");
+                let { collection, database } = new Database("venue");
                 datas = await collection.findOne({ _id : id });
+                closeConnection(database);
                 if (datas){
                     datas.content.id = datas._id;
                     res.send(datas.content);
@@ -448,7 +478,7 @@ app.post("/delete-venue/:id", async (req,res)=>{
     let access = await control_Token(body.token, req);
     if (access && access.includes("edit-rooms") && req.params.id){
         id = new ObjectId(req.params.id);
-        let { collection } = new Database("venue");
+        let { collection, database } = new Database("venue");
         let Ddatas = {}
         Ddatas.deletedContent = await collection.findOne({_id : id});
         let datas = await collection.deleteOne({_id : id});
@@ -456,6 +486,7 @@ app.post("/delete-venue/:id", async (req,res)=>{
         Ddatas.deletedBy = await otherData(req, body.token);
         deletedDb.insertOne(Ddatas);
         res.send(datas);
+        closeConnection(database);
         return;
     }
     }
@@ -466,7 +497,7 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
-            let { collection } = new Database("admin");
+            let { collection, database } = new Database("admin");
             let sendDatas = [];
             let datas = await collection.find().toArray();
             for (let i = 0; i < datas.length; i++){
@@ -478,7 +509,8 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
                     status : true
                 });
             }
-            let pedding = new Database("new-user").collection;
+            let l = new Database("new-user");
+            let pedding = l.collection;
             datas = await pedding.find().toArray();
             for (let i = 0; i < datas.length; i++){
                 if (datas[i].datas.timeInMil+259200000 > new Date().getTime()){
@@ -496,6 +528,8 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
                 }
             }
             res.send({users : sendDatas});
+            closeConnection(database);
+            closeConnection(l.database);
             return;
         }
     }
@@ -507,7 +541,7 @@ app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
             if (req.body.datas && typeof req.body.datas == "object" && req.params.id){
-                let {collection} = new Database("admin");
+                let {collection, database} = new Database("admin");
                 let accesslist = Functions.readJson("user/accesslist.json");
                 let updateDatas = [];
                 if (accesslist){
@@ -520,12 +554,55 @@ app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async
                 !updateDatas.length ? updateDatas = ["profile"] : false;
                 console.log(updateDatas);
                 let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {access : updateDatas}});
-                res.send({error : !result.modifiedCount})
-                //console.log(updateDatas);
+                res.send({error : !result.modifiedCount});
+                closeConnection(database);
             }
         }
     }
-})
+});
+
+
+app.post(`/delete-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        if (req.params.id){
+            let access = await control_Token(req.body.token, req);
+            if (access && access.includes("edit-users")){
+                let {collection, database} = new Database("new-user");
+                let result = await collection.deleteOne({_id : new ObjectId(req.params.id)});
+                res.send({error : !result.deletedCount});
+                closeConnection(database);
+                return;
+            }
+        }
+    }
+    handleError("", res);
+});
+
+app.post(`/edit-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        if (req.params.id && req.body.datas){
+            let access = await control_Token(req.body.token, req);
+            if (access && access.includes("edit-users")){
+                let {collection, database} = new Database("new-user");
+                let accesslist = Functions.readJson("user/accesslist.json");
+                let updateDatas = [];
+                if (accesslist){
+                    for (let i = 0; i < Object.keys(req.body.datas).length; i++){
+                        if (Object.keys(accesslist).includes(Object.keys(req.body.datas)[i]) && req.body.datas[Object.keys(req.body.datas)[i]]){
+                            updateDatas.push(Object.keys(req.body.datas)[i]);
+                        }
+                    }
+                }
+                !updateDatas.length ? updateDatas = ["profile"] : false;
+                let result = await collection.updateOne({_id : new ObjectId(req.params.id)}, {$set : {access : updateDatas}});
+                res.send({error : !result.modifiedCount});
+                closeConnection(database);
+                return ;
+            }
+        }
+    }
+    handleError("001", res);
+});
 
 app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
@@ -541,7 +618,7 @@ app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next),
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-events")){
-            let {collection} = new Database("venue")
+            let {collection, database} = new Database("venue")
             let datas = await collection.find().toArray();
             let sendArray = []
             if (datas){
@@ -550,6 +627,7 @@ app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next),
                 }
             }
             res.send({datas : sendArray});
+            closeConnection(database);
             return;
         }
     }
@@ -562,9 +640,10 @@ app.post("/add-event",async (req,res)=>{
     if (body && typeof body === TypeOfBody &&body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data)){
-            let {collection} = new Database("events");
+            let {collection, database} = new Database("events");
             let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name),objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)};
             let insert = await collection.insertOne({eventData : insertData, otherDatas : await otherData(req,body.token), versions : []});
+            closeConnection(database);
             if (insert.insertedId){
                 res.send({id : (await collection.findOne({_id : insert.insertedId}))._id});
                 return;
@@ -580,9 +659,10 @@ app.post("/get-event-data/:id", async (req,res)=>{
     if (body && typeof body === TypeOfBody &&body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events") && id && id != "undefined"){
-            let { collection } = new Database("events");
+            let { collection, database } = new Database("events");
             id = new ObjectId(id);
             let datas = await collection.findOne({_id : id});
+            closeConnection(database);
             if (datas && datas.eventData){
                 res.send(datas.eventData);
                 return;
@@ -598,15 +678,15 @@ app.post("/get-event-data/:id", async (req,res)=>{
 app.post("/add-event/:id",async (req,res)=>{
     let body = Functions.parseBody(req.body);
     let id = req.params.id;
-    console.log(id);
-    if (body && typeof body === TypeOfBody &&body.token){
+    if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data) && id){
-            let {collection} = new Database("events");
+            let {collection, database} = new Database("events");
             id = new ObjectId(id);
             let data = await collection.findOne({_id : id});
             body.data = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name)};
             l = await collection.updateOne({_id : id}, {$set : {eventData : {...body.data, objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)}, versions : [...data.versions, { eventData : data.eventData, otherDatas : data.otherDatas }], otherDatas : await otherData(req,body.token)}});
+            closeConnection(database);
             if (l.modifiedCount){
                 res.send({id : id});
                 return;
@@ -622,13 +702,14 @@ app.post("/events", async (req,res)=>{
     if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events")){
-            let {collection} = new Database("events");
+            let {collection,database} = new Database("events");
             let datas = await collection.find().toArray();
             let events = [];
             datas.forEach((element)=>{
                 events.push({eventData : element.eventData, addedBy : element.otherDatas.userData, id : element._id});
             })
             res.send(events);
+            closeConnection(database);
             return
         }
     }
@@ -641,13 +722,15 @@ app.post("/delete-event/:id", async (req,res)=>{
     if (body && typeof body === TypeOfBody && body.token && id){
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events")){
-            let {collection} = new Database("events");
+            let {collection, database} = new Database("events");
             id = ObjectId(id);
             let datas = await collection.findOne({_id : id});
             let deleted = await collection.deleteOne({_id : id});
+            closeConnection(database);
             if (deleted.deletedCount){
-                let deletedCollection = new Database("deleted-events").collection;
-                let insert = await deletedCollection.insertOne({eventData : datas.eventData, otherDatas : datas.otherDatas, versions : datas.versions});
+                let {collection, database} = new Database("deleted-events");
+                let insert = await collection.insertOne({eventData : datas.eventData, otherDatas : datas.otherDatas, versions : datas.versions});
+                closeConnection(database);
                 if (insert.insertedId){
                     return handleError("011",res);
                 }
@@ -666,11 +749,14 @@ app.post("/get-user-data", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("profile")){
-            let {collection} = new Database("long-token");
+            let {collection, database} = new Database("long-token");
             datas = await collection.findOne({token : body.token});
-            let usersCollection = new Database("admin").collection
+            let l = new Database("admin");
+            let usersCollection = l.collection;
             let username = (await usersCollection.findOne({_id : datas.userData.id})).username
             res.send({username : username, id : datas.userData.id});
+            closeConnection(database);
+            closeConnection(l.database);
             return;
         }
     }
@@ -683,12 +769,15 @@ app.post("/change-username", async (req,res) =>{
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("profile")){
-            let changeUsernameCollection = new Database("admin").collection;
+            let l = new Database("admin");
+            let changeUsernameCollection = l.collection;
             if (body.datas.username.length > 4 && !await changeUsernameCollection.findOne({username : body.datas.username})){
-            let {collection} = new Database("long-token");
+            let {collection, database} = new Database("long-token");
             datas = await collection.findOne({token : body.token});
             response = await changeUsernameCollection.updateOne({_id : datas.userData.id},{$set : {username : body.datas.username}});
             res.send({username : response.modifiedCount > 0 ? body.datas.username : (await changeUsernameCollection.findOne({_id : datas.userData.id})).username});
+            closeConnection(database);
+            closeConnection(l.database);
             }
             else{
                 body.datas.username.length <= 4 ? handleError("018", res) : handleError("010", res);
@@ -705,11 +794,19 @@ app.post("/change-password", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("profile")){
-            let {collection} = new Database("long-token");
-            datas = await collection.findOne({token : body.token});
-            let changeUsernameCollection = new Database("admin").collection;
-            response = await changeUsernameCollection.updateOne({_id : datas.userData.id, password : Functions.encryption(body.datas.oldPassword)}, {$set : {password : Functions.encryption(body.datas.password)}});
-            res.send({update : response.modifiedCount > 0});
+            if (Functions.controlPassword(body.datas.password)){
+                let {collection, database} = new Database("long-token");
+                datas = await collection.findOne({token : body.token});
+                let l = new Database("admin");
+                let changeUsernameCollection = l.collection;
+                response = await changeUsernameCollection.updateOne({_id : datas.userData.id, password : Functions.encryption(body.datas.oldPassword)}, {$set : {password : Functions.encryption(body.datas.password)}});
+                res.send({update : response.modifiedCount > 0});
+                closeConnection(database);
+                closeConnection(l.database);
+            }
+            else{
+                handleError("008",res);
+            }
             return;
         }
     }
@@ -749,9 +846,10 @@ app.post("/order-ticket", async (req,res)=>{
                 handleError("017", res);
             }
         }
-        let preBuyDatabaseCollection = new Database("pre-buying").collection;
-        preBuyDatabaseCollection.insertOne({...savingDatas, otherDatas : await otherData(req)});
-        res.send({error : false, token : savingDatas.token})
+        let {collection, database} = new Database("pre-buying");
+        collection.insertOne({...savingDatas, otherDatas : await otherData(req)});
+        res.send({error : false, token : savingDatas.token});
+        closeConnection(database);
         return
     }
     handleError("000", res);
@@ -763,15 +861,16 @@ app.post("/get-all-event", async (req,res)=>{
         let access = await control_Token(body.token, req);
         if (access && access.includes("ref")){
             let sendList = [];
-            let {collection} = new Database("events")
+            let {collection, database} = new Database("events")
             let all_Events = await collection.find().toArray();
             for (let i = 0; i < all_Events.length; i++){
-                console.log(all_Events[i].eventData.objectDateOfEvent.getTime());
                 if (all_Events[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
                     sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent})
                 }
             }
             res.send({events : sendList});
+            closeConnection(database);
+            return;
         }
     }
 });
@@ -782,7 +881,7 @@ app.post("/new-coupon", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token && body.datas){
         let access = await control_Token(body.token, req);
         if (access && access.includes("ref") && controlTypeOfCoupon(body.datas)){
-            let {collection} = new Database("coupons");
+            let {collection, database} = new Database("coupons");
             if ( (await collection.insertOne({
                 name : body.datas.name,
                 amount : body.datas.amount,
@@ -798,6 +897,7 @@ app.post("/new-coupon", async (req,res)=>{
             else{
                 handleError("001", res);
             }
+            closeConnection(database)
         }
         else{
             handleError("004", res);
@@ -814,13 +914,14 @@ app.post("/get-coupons", async (req,res)=>{
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("ref")){
-            let {collection} = new Database("coupons");
+            let {collection, database} = new Database("coupons");
             let sendDatas = [];
             let datas = await collection.find().toArray();
             datas.forEach(element=>{
                 new Date(element.validity).getTime() >= new Date().getTime() ? sendDatas.push(element) : false;
             });
             res.send({coupons : sendDatas});
+            closeConnection(database);
             return;
         }
     }
@@ -833,9 +934,10 @@ app.post("/delete-coupon/:id", async (req,res) =>{
         let access = await control_Token(body.token, req);
         if (access && access.includes("ref")){
             if (req.params.id){
-                let {collection} = new Database("coupons");
+                let {collection, database} = new Database("coupons");
                 d = await collection.deleteOne({_id : new ObjectId(req.params.id)});
                 res.send({error : d.deletedCount==0});
+                closeConnection(database);
                 return;
             }
         }
@@ -848,7 +950,7 @@ app.post("/edit-coupon/:id", async (req,res)=>{
         let access = await control_Token(body.token, req);
         if (req.params.id){
             if (access && access.includes("ref") && controlTypeOfCoupon(body.datas)){
-                let {collection} = new Database("coupons");
+                let {collection, database} = new Database("coupons");
                 let d = await collection.updateOne({_id : new ObjectId(req.params.id)} , { $set:{
                         name : body.datas.name,
                         amount : body.datas.amount,
@@ -859,6 +961,7 @@ app.post("/edit-coupon/:id", async (req,res)=>{
                 }
                 });
                 res.send({error : d.matchedCount==0})
+                closeConnection(database);
             }
     }
     }
@@ -867,8 +970,7 @@ app.post("/edit-coupon/:id", async (req,res)=>{
 app.post("/control-coupon-code", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.code && body.eventId){
-        let {collection} = new Database("coupons");
-        console.log(body.code, body.eventId);
+        let {collection, database} = new Database("coupons");
         let coupon = await collection.findOne({name : body.code});
         if (coupon){
             console.log(coupon);
@@ -892,6 +994,7 @@ app.post("/control-coupon-code", async (req,res)=>{
         else{
             res.send({used : false, message : "Nincs ilyen kupon"})
         }
+        closeConnection(database);
     }
 })
 

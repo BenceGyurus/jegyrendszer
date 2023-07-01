@@ -48,9 +48,19 @@ const EditProfileMain = ()=>{
     const changePassword = ()=>{
         if (pass1 === pass2 && oldPass && pass1.length >= 5){
             postData("/change-password", {token : ParseLocalStorage("long_token"), datas : {oldPassword : oldPass, password : pass1}})
-            .then((response)=>{
+            .then(async (response)=>{
+                console.log(response);
                 if (response.update){
                     setEdit("A jelszó megváltoztatása sikeres!");
+                }
+                else if (response.responseData){
+                    response = await response.responseData;
+                    if (response.error && response.message){
+                        setError(response.message)
+                    }
+                    else if (response.error){
+                        setError("Váratlan hiba történt");
+                    }
                 }
                 else{
                     setError("A jelszó megváltoztatása sikertelen!");
