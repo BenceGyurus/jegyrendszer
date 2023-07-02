@@ -20,7 +20,8 @@ type typeOfDatasParams = {
     dateOfEvent? : string,
     dateOfRelease? : string,
     venue? : string,
-    readable_event_name? : string
+    readable_event_name? : string,
+    media? : any
 }
 
 const Create_Event_Main = ()=>{
@@ -40,7 +41,7 @@ const Create_Event_Main = ()=>{
     }, []);
 
 
-    return (window.location.pathname.split("/")[3] ? Object.keys(datas).length > 9 ? <EventSettings name = {datas && datas.name ? datas.name : ""} description = {datas && datas.description ? datas.description : ""} tickets_ = {datas && datas.tickets ? datas.tickets : []} background = {datas && datas.background ? datas.background : ""} dOfEvent = {datas && datas.dateOfEvent ? datas.dateOfEvent : ""} dOfRelease = {datas && datas.dateOfRelease ? datas.dateOfRelease : ""} venue = {datas && datas.venue ? datas.venue : ""} /> : <div/>: <EventSettings />);
+    return (window.location.pathname.split("/")[3] ? Object.keys(datas).length > 9 ? <EventSettings mediaDatas={datas && datas.media ? datas.media : ""} name = {datas && datas.name ? datas.name : ""} description = {datas && datas.description ? datas.description : ""} tickets_ = {datas && datas.tickets ? datas.tickets : []} background = {datas && datas.background ? datas.background : ""} dOfEvent = {datas && datas.dateOfEvent ? datas.dateOfEvent : ""} dOfRelease = {datas && datas.dateOfRelease ? datas.dateOfRelease : ""} venue = {datas && datas.venue ? datas.venue : ""} /> : <div/>: <EventSettings />);
 }
 
 export default Create_Event_Main;

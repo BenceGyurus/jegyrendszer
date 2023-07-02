@@ -15,6 +15,7 @@ import TicketList from "./ticketList.component";
 import Calendar from "../../../../calendar/calendar.component";
 import Error from "../../../../notification/error.component";
 import BackButton from "../../../../back/backbutton.component";
+import AddMedia from "./add-media.component";
 
 type typeOfGroups = {
     id : string,
@@ -67,10 +68,19 @@ type typeOfEventSettingsParams = {
     background? : string,
     dOfEvent? : string,
     dOfRelease? : string,
-    venue? : string
+    venue? : string,
+    mediaDatas? : typeOfMedia
 }
 
-const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue }:typeOfEventSettingsParams )=>{
+type typeOfMedia = {
+    apple_music? : string,
+    spotify? : string,
+    youtube? : string,
+    facebook? : string,
+    instagram? : string
+}
+
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas  }:typeOfEventSettingsParams )=>{
 
     const [id, setId]:[string, Function] = useState(window.location.pathname.split("/")[3]);
     const [nameOfEvent, setNameOfEvent]:[string, Function] = useState(name ? name : "");
@@ -85,6 +95,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [dateOfEvent, setDateOfEvent]:[string, Function] = useState(dOfEvent ? dOfEvent : "");
     const [dateOfRelease, setDateOfRelease]:[string, Function] = useState(dOfRelease ? dOfRelease : "");
     const [editTicket, setEditTicket]:[any, Function] = useState(false);
+    const [media, setMedia]:[typeOfMedia, Function] = useState(mediaDatas ? mediaDatas : {apple_music : "", spotify : "", youtube : "", facebook : "", instagram : ""});
 
 
 
@@ -153,6 +164,20 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         return `${new Date().getFullYear()}-${new Date().getMonth()+1 < 10 ? `0${new Date().getMonth()+1}` : new Date().getMonth()+1}-${new Date().getUTCDate() < 10 ? `0${new Date().getUTCDate()}` : new Date().getUTCDate()}T${new Date().getHours() < 10 ? `0${new Date().getHours()}` : new Date().getHours()}:${new Date().getMinutes() < 10 ? `0${new Date().getMinutes()}` : new Date().getMinutes()}`;
     }
 
+    const prepareMedia = ()=>{
+        let sendMedia:any = {};
+        let l:any = {...media};
+        Object.keys(l).forEach((element:any)=>{
+            if (l[element]){
+                sendMedia[element] = l[element].replaceAll("&" , "!end!");
+                sendMedia[element] = sendMedia[element].replaceAll("=", "!equal!")
+                //sendMedia[element] = l[element].replace("}" , "!close!");
+                console.log(sendMedia);
+            }
+        })
+
+        return sendMedia
+    }
 
     const save = ()=>{
         let sendData = {
@@ -162,7 +187,8 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             background : backgroundImage,
             dateOfEvent : dateOfEvent,
             dateOfRelease : dateOfRelease ? dateOfRelease : getNowDate(),
-            venue : selectedVenue
+            venue : selectedVenue,
+            media : prepareMedia()
         };
 
         postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
@@ -209,6 +235,12 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         setAll_Selected(l);
     }
 
+    const valueOfMedia = (text:string, key:"apple_music"|"spotify"|"youtube"|"facebook"|"instagram")=>{
+        let l = {...media};
+        l[key] = text;
+        setMedia(l);
+    }
+
 
     return (
         <div>
@@ -220,6 +252,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" />
             <Calendar onChangeFunction={setDateOfRelease} value = {getNowDate()} title="Rendevény megjelenése az oldalon" />
             <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
+            <AddMedia media = {media} changeValueOfMedia={valueOfMedia} />
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }

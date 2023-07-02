@@ -7,7 +7,8 @@ const Datas = {
     background : "string",
     dateOfEvent : "string",
     dateOfRelease : "string",
-    venue : "string"
+    venue : "string",
+    media : "object"
 }
 
 const controlTypeOfEvents = (inputs)=>{

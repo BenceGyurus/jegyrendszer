@@ -104,7 +104,7 @@ app.get("/event/:id", async (req,res)=>{
             place.seatsDatas = placesOfEvent;
             
         }
-        res.send({id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
+        res.send({media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
         closeConnection(database);
         return;
     }
@@ -114,8 +114,8 @@ app.get("/event/:id", async (req,res)=>{
 app.get("/buy-ticket-details/:token", async (req,res)=>{
     if (req.params && req.params.token){
         const {collection, database} = new Database("pre-buying");
-        let datas = await collection.findOne({token : req.params.token});
-        if (datas.time + 1800000 >= new Date().getTime() && datas && datas.eventId){
+        let datas = await collection.findOne({_id : new ObjectId(req.params.token)});
+        if (datas && datas.time + 1800000 >= new Date().getTime() && datas.eventId){
             let eventDetails = await getTicketByReadableId(datas.eventId);
             if (eventDetails){
                 res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent});
@@ -637,8 +637,11 @@ app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next),
 
 app.post("/add-event",async (req,res)=>{
     let body = Functions.parseBody(req.body);
+    console.log(req.body)
     if (body && typeof body === TypeOfBody &&body.token){
         let access = await control_Token(body.token, req);
+        console.log(access);
+        console.log(controlTypeOfEvents(body.data))
         if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data)){
             let {collection, database} = new Database("events");
             let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name),objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)};
@@ -818,7 +821,7 @@ app.post("/order-ticket", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
         let eventDatas = await getTicketByReadableId(body.eventId);
-        let savingDatas = {eventId : body.eventId, tickets : [], token : Functions.genrateToken(), time : new Date().getTime(), fullPrice : 0, fullAmount : 0};
+        let savingDatas = {eventId : body.eventId, tickets : [], time : new Date().getTime(), fullPrice : 0, fullAmount : 0};
         for (let i = 0; i < body.datas.length; i++){
             if (body.datas[i].ticketId && body.datas[i].eventId && eventDatas){
                 let response = await Control_Seats(body.datas[i].places, body.datas[i].ticketId, body.datas[i].eventId);
@@ -847,8 +850,8 @@ app.post("/order-ticket", async (req,res)=>{
             }
         }
         let {collection, database} = new Database("pre-buying");
-        collection.insertOne({...savingDatas, otherDatas : await otherData(req)});
-        res.send({error : false, token : savingDatas.token});
+        let result = await collection.insertOne({...savingDatas, otherDatas : await otherData(req)});
+        res.send({error : false, token : result.insertedId});
         closeConnection(database);
         return
     }
