@@ -29,7 +29,7 @@ class QrCode:
                 logo_position = (logo_x_position, logo_y_position)
                 qr_code_image.paste(logo, logo_position)
 
-            qr_code_image.save('qrcodes/code1.png')
+            qr_code_image.save(f'qrcodes/{data}.png')
 
             
 
@@ -37,5 +37,3 @@ logo_file_name = "media/logo.png"
 data_to_encode = str(random.randint(10000000,99999999))
 
 
-
-print(QrCode().create("test"))

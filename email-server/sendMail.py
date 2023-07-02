@@ -1,22 +1,35 @@
-# Import smtplib for the actual sending function
 import smtplib
-
-# Import the email modules we'll need
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from email.message import EmailMessage
+from email.mime.image import MIMEImage
+import os
 
-# Open the plain text file whose name is in textfile for reading.
-with open(textfile) as fp:
-    # Create a text/plain message
-    msg = EmailMessage()
-    msg.set_content(fp.read())
+def sendMail(receiver_address, imagename):
+    # message = EmailMessage()
+    
+    message = MIMEMultipart('related')
+    message['From'] = os.getenv('PY_MAIL')
+    message['To'] = receiver_address
 
-# me == the sender's email address
-# you == the recipient's email address
-msg['Subject'] = f'The contents of {textfile}'
-msg['From'] = "agora.mail.server@gmail.com"
-msg['To'] = "gyurus.bence@gmail.com"
+    sender_pass = os.getenv('PY_PASS')
+    sender_pass = "nbdcecfzxgcbnzbe"
 
-# Send the message via our own SMTP server.
-s = smtplib.SMTP('localhost')
-s.send_message(msg)
-s.quit()
+
+    message['Subject'] = f'Jegy. It has an attachment.'  # TODO targy
+    mail_body = "ide majd irsz vmi fasza szoveget gyurus" # TODO body
+
+    message.attach(MIMEText(mail_body, 'plain'))
+
+    with open(f"./qrcodes/{imagename}.png", 'rb') as attachment:
+        part = MIMEImage(attachment.read(), name=f"{imagename}.png")
+        part.add_header('Content-Disposition', f'attachment; filename={imagename}.png')
+        message.attach(part)
+    
+
+    session = smtplib.SMTP('smtp.gmail.com', 587)
+    session.starttls()
+    session.login(message['From'], sender_pass)
+    text = message.as_string()
+    session.sendmail(message['From'], message['To'], text)
+    session.quit()
