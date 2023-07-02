@@ -5,6 +5,7 @@ import Notification from "../../../notification/notification.component";
 import EventDetails from "./event-details.component";
 import "../../../../css/local-sale-event.css"
 import Tickets from "../../../event-page/tickets.component";
+import Seats from "../../../event-page/seats.component";
 
 type typeOfSeat = {
     group : string,
@@ -66,6 +67,7 @@ const Local_Sale_Event = ()=>{
     const [error, setError] = useState("");
     const [amountTickets, setAmountTickets] = useState(genereateTicketAmout(eventDatas ? eventDatas.tickets : {}));
     const [selectedTickets, setSelectedTickets]:[Array<string>, Function] = useState([]);
+    const [largeMap, setLargeMap]:[boolean, Function] = useState(false);
 
     const incrementAmountOfTickets = (id:String)=>{
         let l = [...amountTickets];
@@ -76,6 +78,8 @@ const Local_Sale_Event = ()=>{
         }
         setAmountTickets(l);
     }
+
+    console.log(amountTickets);
 
     const decrementAmountOfTickets = (id:string) => {
         let l = [...amountTickets];
@@ -120,6 +124,31 @@ const Local_Sale_Event = ()=>{
         );
     }, []);
 
+    const selectSeat = (id:string)=>{
+        let lTicketAmount = [...amountTickets];
+        for (let i = 0; i < lTicketAmount.length; i++){
+            if (lTicketAmount[i].places.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
+                let l = [...selectedTickets, id];
+                setSelectedTickets(l);
+                lTicketAmount[i].selected++;
+            }
+            else if (selectedTickets.includes(id)){
+                if (lTicketAmount[i].selected > 0){
+                    lTicketAmount[i].selected--;
+                }
+                let l = [...selectedTickets];
+                let newList:Array<string> = [];
+                l.forEach((element:string)=>{
+                    if (element != id){
+                        newList.push(element)
+                    }
+                })
+                setSelectedTickets(newList);
+            }
+        }
+        setAmountTickets(lTicketAmount);
+    }
+
     console.log(amountTickets);
 
     return (
@@ -127,7 +156,7 @@ const Local_Sale_Event = ()=>{
                 {error ? <Notification element={<Error message={error} />} /> : ""}
                 {eventDatas ? <EventDetails title = {eventDatas.title} description={eventDatas.description} image = {eventDatas.background} /> : ""}
                 {eventDatas ? <Tickets tickets = {amountTickets} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets} /> : ""}
-
+                {eventDatas ? <Seats places = {eventDatas.places} tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
             </div>
         );
 }

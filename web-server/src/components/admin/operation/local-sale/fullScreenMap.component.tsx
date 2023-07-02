@@ -1,3 +1,7 @@
+type typeOfFullScreenMapParams = {
+
+};
+
 const FullScreenMap = ()=>{
 
 }
