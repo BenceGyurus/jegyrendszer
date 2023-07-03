@@ -5,15 +5,15 @@ import json
 
 
 class QrCode:
-    def __init__(self):
-        try:
-            self.config = json.loads(open("qrcodeconfig.json", "r", encoding = "utf8").read())
-            if self.config:
-                self.logo = self.config["logo"]
-        except:
-            pass
+    # def __init__(self):
+    #     try:
+    #         self.config = json.loads(open("qrcodeconfig.json", "r", encoding = "utf8").read())
+    #         if self.config:
+    #             self.logo = self.config["logo"]
+    #     except:
+    #         pass
 
-    def create(self,data):
+    def create(self,data,config):
         if data:
             logo_file_name = "media/logo.png"
             qr_code = qrcode.QRCode(
@@ -22,14 +22,13 @@ class QrCode:
             qr_code.add_data(data)
             qr_code.make()
             qr_code_image = qr_code.make_image().convert("RGB")
-            if self.logo:
-                logo = Image.open(self.logo)
-                logo_x_position = (qr_code_image.size[0] - logo.size[0]) // 2
-                logo_y_position = (qr_code_image.size[1] - logo.size[1]) // 2
-                logo_position = (logo_x_position, logo_y_position)
-                qr_code_image.paste(logo, logo_position)
+            logo = Image.open('./media/logo.png')
+            logo_x_position = (qr_code_image.size[0] - logo.size[0]) // 2
+            logo_y_position = (qr_code_image.size[1] - logo.size[1]) // 2
+            logo_position = (logo_x_position, logo_y_position)
+            qr_code_image.paste(logo, logo_position)
 
-            qr_code_image.save(f'qrcodes/{data}.png')
+            qr_code_image.save(f"{config['PY_DIR']}/qrcodes/{data}.png")
 
             
 
