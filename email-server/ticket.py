@@ -1,18 +1,21 @@
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 import textwrap
 
 
-def create_ticket(qr_code_data, customer_name, seat_number, show_title):
-    pdf = canvas.Canvas("ticket.pdf", pagesize=letter)
+def create_ticket(config, qr_code_id, customer_name, seat_number, show_title, location, start):
+    pdf = canvas.Canvas(f"{config['PY_DIR']}/pdfs/{qr_code_id}.pdf", pagesize=letter)
     width = 3
     height = 5
     y = height
     pdf.setPageSize((width*inch, height*inch))
 
     # Jegy fejléce
-    pdf.setFont("Helvetica-Bold", 16)
+    pdfmetrics.registerFont(TTFont('Tahoma', 'Tahoma.ttf'))
+    pdf.setFont("Tahoma", 12)
     titleLine = textwrap.wrap(show_title, width=(((width) * inch))/10)
     y -= 0.5
     for line in titleLine:
@@ -26,7 +29,7 @@ def create_ticket(qr_code_data, customer_name, seat_number, show_title):
     pdf.drawInlineImage(logo_path, (width/2)* inch-(logo_width/2) , 0, width=logo_width, height=logo_height)
 
     # QR-kód hozzáadása
-    qr_code_path = "qrcodes/code1.png"
+    qr_code_path = f"{config['PY_DIR']}/qrcodes/{qr_code_id}.png"
     qr_code_width = qr_code_height = 1.5 * inch
 
     # Jegy adatok elhelyezése
@@ -38,11 +41,11 @@ def create_ticket(qr_code_data, customer_name, seat_number, show_title):
     y-=0.5
     pdf.drawCentredString((width/2) * inch, y * inch, "Helyszín: ")
     y-=0.25
-    pdf.drawCentredString(width/2 * inch, y * inch, 'Agora Savaria')
+    pdf.drawCentredString(width/2 * inch, y * inch, location)
     y-=0.5
-    pdf.drawCentredString((width/2) * inch, y * inch, "Esemény kezdeze:")
+    pdf.drawCentredString((width/2) * inch, y * inch, "Esemény kezdete:")
     y-=0.25
-    pdf.drawCentredString((width/2) * inch, y * inch, "2023.06.12 18:00")
+    pdf.drawCentredString((width/2) * inch, y * inch, start)
     y-=((qr_code_height/inch)/2+1)
     pdf.drawInlineImage(qr_code_path, ((width/2)* inch)-(qr_code_width/2), y * inch, qr_code_width, qr_code_height)
 
@@ -50,8 +53,8 @@ def create_ticket(qr_code_data, customer_name, seat_number, show_title):
     pdf.save()
 
 # Jegy létrehozása
-qr_code_data = "QR-kód adatok"
-customer_name = "John Doe"
-seat_number = "A12"
-show_title = "Szerda esti akkusztik"
-create_ticket(qr_code_data, customer_name, seat_number, show_title)
+# qr_code_data = "QR-kód adatok"
+# customer_name = "John Doe"
+# seat_number = "A12"
+# show_title = "Szerda esti akkusztik"
+# create_ticket(qr_code_data, customer_name, seat_number, show_title)
