@@ -35,7 +35,8 @@ type typeOfPageParams = {
     date : string,
     id : string,
     tickets : Array<typeOfTicket>,
-    placeDatas : typeOfPlaces
+    placeDatas : typeOfPlaces,
+    media : typeOfMedia
 }
 type typeOfAmount = {
     id : string,
@@ -50,6 +51,14 @@ type typeOfSeat = {
     posY : number,
     title : string
 }
+type typeOfMedia = {
+    apple_music? : string,
+    spotify? : string,
+    youtube? : string,
+    facebook? : string,
+    instagram? : string
+
+}
 
 type typeOfPlaces = {
     background : {isImage : boolean, name : "string"},
@@ -61,7 +70,7 @@ type typeOfPlaces = {
     stage : number
 }
 
-const Page = ({title, background, description, date, id, tickets, placeDatas}:typeOfPageParams)=>{
+const Page = ({title, background, description, date, id, tickets, placeDatas, media}:typeOfPageParams)=>{
 
     const genereateTicketAmout = (tickets:Array<typeOfTicket>):Array<typeOfAmountTicket>=>{
         let newList:Array<typeOfAmountTicket> = [];
@@ -186,7 +195,7 @@ const Page = ({title, background, description, date, id, tickets, placeDatas}:ty
 
     return <div className="event-page-div">
         {errorNat ? <Notification element={<Error message={errorNat} closeFunction={()=>{setErrorNat("")}} />} /> : ""}
-        <TicketPageItems title = {title} image = {background} description={description} date = {date}/>
+        <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media}/>
         <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/>
         {placeDatas.seatsDatas.length ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
         <BuyButton onClickFunction={buy_Ticket} />

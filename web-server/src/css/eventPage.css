@@ -42,7 +42,7 @@
     padding: 0;
   }
 
-  @media screen and (min-width: 700px) {
+  @media screen and (min-width: 900px) {
         .event-page-title-div{
             position: absolute;
             top: 10%;
@@ -63,6 +63,9 @@
             position: absolute;
             bottom: 10px;
             height: max-content;
+        }
+        .buy-ticket-button{
+          top: 90% ! important;
         }
   }
 
@@ -123,4 +126,14 @@
     height: 100%;
     position: relative;
     bottom: 1rem;
+}
+
+.user-side-media{
+  display: inline-table;
+  width: 100%;
+}
+
+.user-side-media-elements{
+  width: 80%;
+  margin: 10px auto;
 }

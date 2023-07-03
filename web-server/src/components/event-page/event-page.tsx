@@ -43,6 +43,16 @@ const EventPage = (params:any)=>{
     const [eventDatas, setEventDatas]:[any, Function] = useState();
     const [responsed, setResponsed]:[boolean, Function] = useState(false)
 
+    const parseMedia = (media:any)=>{
+        Object.keys(media).forEach((key)=>{
+            if (media[key]){
+                media[key] = media[key].replaceAll("!equal!", "=");
+                media[key] = media[key].replaceAll("!end!", "&")
+            }
+        })
+        return media;
+    }
+
     useEffect(()=>{
         let idOfEvent = (window.location.pathname.split("/")[window.location.pathname.split("/").length-1]);
         fetch(`/event/${idOfEvent}`)
@@ -60,7 +70,7 @@ const EventPage = (params:any)=>{
    return (
     <div>
         {
-            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} tickets = {eventDatas.tickets} placeDatas = {eventDatas.places}/></div> : ""
+            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} tickets = {eventDatas.tickets} placeDatas = {eventDatas.places} media = {parseMedia(eventDatas.media)}/></div> : ""
         }
     </div>
 )

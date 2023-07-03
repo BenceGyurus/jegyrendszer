@@ -1,13 +1,25 @@
 import "../../css/eventPage.css";
+import Brand from "../brand/embed-brand.component";
+
+type typeOfMedia = {
+    apple_music? : string,
+    spotify? : string,
+    youtube? : string,
+    facebook? : string,
+    instagram? : string
+
+}
+
 type typeOfPageElemens = {
     title : string,
     description : string,
     date : string,
-    image : string
+    image : string,
+    media : typeOfMedia
 }
 
 
-const TicketPageItems = ({title, description, date, image}:typeOfPageElemens)=>{
+const TicketPageItems = ({title, description, date, image, media}:typeOfPageElemens)=>{
     return (
         <div>
             <div className = "event-page-title-div">
@@ -19,6 +31,25 @@ const TicketPageItems = ({title, description, date, image}:typeOfPageElemens)=>{
             </div>
             <a className = "buy-ticket-button" href = "#tickets">Jegyvásárlás</a>
             <p className = "event-page-description">{description}</p>
+            {media.apple_music || media.spotify || media.facebook || media.instagram || media.youtube ?  <div className = "user-side-media">
+                <div className = "user-side-media-elements">
+                {
+                    media.apple_music ? <Brand image = "/images/embed-link-logos/apple_music.svg" link={media.apple_music} brandName="Apple music link" /> : ""
+                }
+                {
+                    media.spotify ? <Brand image = "/images/embed-link-logos/spotify.png" link={media.spotify} brandName="Spotify link" /> : ""
+                }
+                {
+                    media.youtube ? <Brand image = "/images/embed-link-logos/youtube.png" link={media.youtube} brandName="Youtube link" /> : ""
+                }
+                {
+                    media.facebook ? <Brand image = "/images/embed-link-logos/facebook.png" link={media.facebook} brandName="Facebook link" /> : ""
+                }
+                {
+                    media.instagram ? <Brand image = "/images/embed-link-logos/instagram.png" link={media.instagram} brandName="Instagram link" /> : ""
+                }
+                </div>
+            </div> : ""}
         </div>
     )
 }

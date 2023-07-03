@@ -82,6 +82,16 @@ type typeOfMedia = {
 
 const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas  }:typeOfEventSettingsParams )=>{
 
+    const parse_Media_Datas = (mediaDatas:any)=>{
+        for (let i = 0; i < Object.keys(mediaDatas).length; i++){
+            if (mediaDatas[Object.keys(mediaDatas)[i]]){
+                mediaDatas[Object.keys(mediaDatas)[i]] = mediaDatas[Object.keys(mediaDatas)[i]].replaceAll("!equal!", "=")
+                mediaDatas[Object.keys(mediaDatas)[i]] = mediaDatas[Object.keys(mediaDatas)[i]].replaceAll("!end!" , "&");
+            }
+        }
+        return mediaDatas;
+    }
+
     const [id, setId]:[string, Function] = useState(window.location.pathname.split("/")[3]);
     const [nameOfEvent, setNameOfEvent]:[string, Function] = useState(name ? name : "");
     const [desciption, setDescription]:[string, Function] = useState(description ? description : "");
@@ -95,8 +105,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [dateOfEvent, setDateOfEvent]:[string, Function] = useState(dOfEvent ? dOfEvent : "");
     const [dateOfRelease, setDateOfRelease]:[string, Function] = useState(dOfRelease ? dOfRelease : "");
     const [editTicket, setEditTicket]:[any, Function] = useState(false);
-    const [media, setMedia]:[typeOfMedia, Function] = useState(mediaDatas ? mediaDatas : {apple_music : "", spotify : "", youtube : "", facebook : "", instagram : ""});
-
+    const [media, setMedia]:[typeOfMedia, Function] = useState(mediaDatas ? parse_Media_Datas(mediaDatas) : {apple_music : "", spotify : "", youtube : "", facebook : "", instagram : ""});
 
 
     const getPlaceDatas = (id:string)=>{
