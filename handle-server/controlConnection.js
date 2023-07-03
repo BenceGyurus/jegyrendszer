@@ -11,7 +11,7 @@ const get_Accesses = ()=>{
     }
 }
 
-const controlConnection = async ()=>{
+const controlConnection = async () => {
     try{
         let {collection, database} = new Database("admin")
         datas = await collection.findOne({role : "admin"});

@@ -19,6 +19,9 @@ const controlConnection = require("./controlConnection.js");
 const Control_Seats = require("./control-seats.js");
 const getTicketByReadableId = require("./getTicketByReadableId.js");
 const controlTypeOfCoupon = require("./typesOfDatas/coupons.js");
+const axios = require('axios').default;
+const fs = require("fs");
+const cron = require('node-cron');
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -38,10 +41,20 @@ const storage = multer.diskStorage({
     filename: (req, file, callBack) => {
         callBack(null, `${Functions.genrateToken()}.${file.mimetype.split("/")[1]}`)
     }
-  })
-
+})
 
 let upload = multer({ storage: storage })
+
+const readConfig = () => {
+    try {
+        let config = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`));
+        return config;
+    }catch(err){
+        console.log('failed to read config file, check env variables');
+    }
+}
+
+const config = readConfig();
 
 app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -1005,12 +1018,45 @@ app.post("/control-coupon-code", async (req,res)=>{
     console.log(req.files);
 })*/
 
-
+app.post("/create-ticket", async (req, res) => {
+    const ticketInfo = Functions.parseBody(req.body);
+    if(!ticketInfo) return handleError("030", res);
+    let axiosConfig = {
+        method: 'post',
+        url: `${config['EMAIL_SERVER']}/createCode`,
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data : ticketInfo
+    };
+    axios(axiosConfig)
+        .then((email_response) => {
+            res.send({'filename': email_response.data})
+            console.log(email_response.data);
+        })
+        .catch((err) => console.log(err));
+})
 
 if (controlConnection()){
-    console.log(`The connection is successfully, the app is listening on PORT${process.env.PORT || 3001}`)
+    console.log(`The connection is successfully, the app is listening on PORT ${process.env.PORT || 3001}`)
     app.listen(process.env.PORT || 3001);
 }
 else{
     console.log("Couldn't connect to the database")
 }
+
+// CRONS
+cron.schedule("0 3 * * *", async () => {
+    let {collection} = new Database("long-token");
+    collection.deleteMany();
+})
+cron.schedule("30 3 * * 6", async () => {
+    let {collection} = new Database("pre-buying");
+    collection.deleteMany();
+})
+cron.schedule("0 0 1 * *", async () => {
+    let {collection} = new Database("coupons");
+    let today = new Date()
+    coupons = collection.find({})
+    for(const j in coupons) if (new Date(coupons[j]['validity']) < today) coupons[j].delete();
+})
