@@ -19,8 +19,6 @@ const ControlDatas = (inputDatas, expectedDatas)=>{
         console.log(typeof inputDatas[Object.keys(expectedDatas)[i]], expectedDatas[Object.keys(expectedDatas)[i]])
         typeof inputDatas[Object.keys(expectedDatas)[i]] == expectedDatas[Object.keys(expectedDatas)[i]] ? true : control = false;
     }
-    console.log("control", control);
-    console.log(Object.keys(inputDatas), Object.keys(expectedDatas), Object.keys(inputDatas).length == Object.keys(expectedDatas).length);
     return control && Object.keys(inputDatas).length == Object.keys(expectedDatas).length;
 }
 

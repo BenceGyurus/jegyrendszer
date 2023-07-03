@@ -19,10 +19,17 @@ const controlConnection = require("./controlConnection.js");
 const Control_Seats = require("./control-seats.js");
 const getTicketByReadableId = require("./getTicketByReadableId.js");
 const controlTypeOfCoupon = require("./typesOfDatas/coupons.js");
+const controlTypeOfBillingAddress = require("./typesOfDatas/billingAddress.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
-        database.close();
+        try{
+            database.close();
+        }
+        catch{
+
+        }
+        throw
     },10000);
 }
 
@@ -1004,6 +1011,16 @@ app.post("/control-coupon-code", async (req,res)=>{
 /*app.post("/upload-backgroumd-image-to-venue", (req,res)=>{
     console.log(req.files);
 })*/
+
+
+app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
+    if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
+        console.log(controlTypeOfBillingAddress(req.body.datas.customerData));
+        if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData)){
+            new Database("pre-buying")
+        }
+    }
+})
 
 
 
