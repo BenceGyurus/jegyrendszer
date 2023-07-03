@@ -14,11 +14,15 @@ services:
       - 27017
 
 
-  handle-services:
+  handle-server:
     build: "./handle-server"
     image: bencegyurus/handle-server:latest
     ports:
       - 3001:3001
+    volumes:
+      - ./config.json:/config.json
+    environment:
+      - CONFIGDIR=/
     stdin_open: true
     tty: true
   
@@ -30,3 +34,11 @@ services:
       - 3000:3000
     extra_hosts:
     - "host.docker.internal:host-gateway"
+  
+  email-server:
+    build: "./email-server"
+    image: bencegyurus/email-server:latest
+    volumes:
+      - ./config.json:/config.json
+    environment:
+      - CONFIGDIR=/

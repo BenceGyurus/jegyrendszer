@@ -5,15 +5,14 @@ from email.message import EmailMessage
 from email.mime.image import MIMEImage
 import os
 
-def sendMail(receiver_address, imagename):
+def sendMail(receiver_address, imagename, config):
     # message = EmailMessage()
     
     message = MIMEMultipart('related')
-    message['From'] = os.getenv('PY_MAIL')
+    message['From'] = config['PY_MAIL']
     message['To'] = receiver_address
 
-    sender_pass = os.getenv('PY_PASS')
-    sender_pass = "nbdcecfzxgcbnzbe"
+    sender_pass = config['PY_PASS']
 
 
     message['Subject'] = f'Jegy. It has an attachment.'  # TODO targy

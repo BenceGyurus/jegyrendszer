@@ -42,5 +42,9 @@
     "coupons" : {
         "database" : "coupons",
          "collection" : "active" 
+    },
+    "buy" : {
+        "database" : "buying",
+        "collection" : "buying"
     }
 }

@@ -1,0 +1,6 @@
+{
+    "PY_PASS": "nbdcecfzxgcbnzbe",
+    "PY_MAIL": "agora.mail.service@gmail.com",
+    "EMAIL_SERVER": "http://localhost:5000",
+    "MONGO_URI": "mongodb://localhost:27017/"
+}

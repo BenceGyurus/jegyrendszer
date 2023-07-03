@@ -20,6 +20,9 @@ const Control_Seats = require("./control-seats.js");
 const getTicketByReadableId = require("./getTicketByReadableId.js");
 const controlTypeOfCoupon = require("./typesOfDatas/coupons.js");
 const controlTypeOfBillingAddress = require("./typesOfDatas/billingAddress.js");
+const axios = require('axios').default;
+const fs = require("fs");
+const cron = require('node-cron');
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -29,7 +32,6 @@ const closeConnection = (database)=>{
         catch{
 
         }
-        throw
     },10000);
 }
 
@@ -45,17 +47,29 @@ const storage = multer.diskStorage({
     filename: (req, file, callBack) => {
         callBack(null, `${Functions.genrateToken()}.${file.mimetype.split("/")[1]}`)
     }
-  })
-
+})
 
 let upload = multer({ storage: storage })
+
+const readConfig = () => {
+    try {
+        let config = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`));
+        return config;
+    }catch(err){
+        console.log('failed to read config file, check env variables');
+    }
+}
+
+const config = readConfig();
 
 app.use(bodyParser.urlencoded({ extended: false }))
 
         //GET requests//
 
 app.get("/events", async (req,res) =>{
+    console.log(new Database("events"));
     let {collection, database} = new Database("events");
+    console.log(collection);
     let datas = await collection.find().toArray();
     let sendDatas = [];
     for (let i = 0; i < datas.length; i++){
@@ -836,7 +850,7 @@ app.post("/order-ticket", async (req,res)=>{
                     for (let j = 0; j < eventDatas.tickets.length; j++){
                         if (eventDatas.tickets[j].id == body.datas[i].ticketId){
                             if (!body.datas[i].places || (body.datas[i].places.length == body.datas[i].amount)){
-                                savingDatas.tickets.push({places : body.datas[i].places, price : eventDatas.tickets[j].price*body.datas[i].amount, amount : body.datas[i].amount, name : eventDatas.tickets[j].name})
+                                savingDatas.tickets.push({ticketId : body.datas[i].ticketId ,places : body.datas[i].places, price : eventDatas.tickets[j].price*body.datas[i].amount, amount : body.datas[i].amount, name : eventDatas.tickets[j].name})
                                 savingDatas.fullPrice += eventDatas.tickets[j].price*body.datas[i].amount
                                 savingDatas.fullAmount += body.datas[i].amount;
                             }
@@ -1015,19 +1029,98 @@ app.post("/control-coupon-code", async (req,res)=>{
 
 app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
-        console.log(controlTypeOfBillingAddress(req.body.datas.customerData));
-        if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData)){
-            new Database("pre-buying")
+        if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
+            let {collection, database} = new Database("pre-buying");
+            let buyingDatas = await collection.findOne({_id : ObjectId(req.params.id)});
+            closeConnection(database);
+            if (buyingDatas){
+                let error = false;
+                for (let i = 0; i < buyingDatas.tickets.length; i++){
+                    Control_Seats(buyingDatas.tickets[i].places, buyingDatas.tickets[i].ticketId, buyingDatas.eventId) ? true : error = false;
+                }
+                let saveDatas = {};
+                if (!error){
+                    let {collection, database} = new Database("coupons");
+                    let coupon = await collection.findOne({name : req.body.datas.coupon});
+                    let price = buyingDatas.fullPrice
+                    if (coupon){
+                        if (coupon.events.includes(buyingDatas.eventId)){
+                            if (coupon.type == 0){
+                                price = coupon.money ? price > coupon.amount ? price-amount : 0 : price-price * (coupon.amount/100);
+                            }
+                            if (coupon.type == 1){
+                                if (!coupon.usedEvent.includes(buyingDatas.eventId)){
+                                    price = coupon.money ? price > coupon.amount ? price-amount : 0 : price-price * (coupon.amount/100);
+                                }
+                            }
+                            if (coupon.type == 2){
+                                if (!coupon.usedTicket){
+                                    price = coupon.money ? price > coupon.amount ? price-amount : 0 : price-price * (coupon.amount/100);
+                                }
+                            }
+                        }
+                    }
+                    saveDatas = {
+                        price : price,
+                        fullPrice : buyingDatas.fullPrice,
+                        customerDatas : req.body.datas.customerData,
+                        time : new Date().getTime,
+                        coupon : coupon.name,
+                        eventId : buyingDatas.eventId,
+                        tickets : buyingDatas.tickets,
+                        status : "pending"
+                    };
+                    let l = new Database("buy");
+                    result = await l.collection.insertOne(saveDatas);
+                    res.send({error : !result.acknowledged});
+                    closeConnection(database);
+                    closeConnection(l.database);
+                }
+            }
+
         }
     }
 })
 
-
+app.post("/create-ticket", async (req, res) => {
+    const ticketInfo = Functions.parseBody(req.body);
+    if(!ticketInfo) return handleError("030", res);
+    let axiosConfig = {
+        method: 'post',
+        url: `${config['EMAIL_SERVER']}/createCode`,
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data : ticketInfo
+    };
+    axios(axiosConfig)
+        .then((email_response) => {
+            res.send({'filename': email_response.data})
+            console.log(email_response.data);
+        })
+        .catch((err) => console.log(err));
+})
 
 if (controlConnection()){
-    console.log(`The connection is successfully, the app is listening on PORT${process.env.PORT || 3001}`)
+    console.log(`The connection is successfully, the app is listening on PORT ${process.env.PORT || 3001}`)
     app.listen(process.env.PORT || 3001);
 }
 else{
     console.log("Couldn't connect to the database")
 }
+
+// CRONS
+cron.schedule("0 3 * * *", async () => {
+    let {collection} = new Database("long-token");
+    collection.deleteMany();
+})
+cron.schedule("30 3 * * 6", async () => {
+    let {collection} = new Database("pre-buying");
+    collection.deleteMany();
+})
+cron.schedule("0 0 1 * *", async () => {
+    let {collection} = new Database("coupons");
+    let today = new Date()
+    coupons = collection.find({})
+    for(const j in coupons) if (new Date(coupons[j]['validity']) < today) coupons[j].delete();
+})

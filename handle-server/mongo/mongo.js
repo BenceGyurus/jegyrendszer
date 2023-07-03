@@ -8,8 +8,8 @@ class Database{
     let datas = Function.getNameOfDatabase(name);
     this.collectionName = datas.collection; this.databaseName = datas.database;
     this.mongoconfig = {};
-    try{this.mongoconfig = JSON.parse(fs.readFileSync(`${__dirname}/mongoconfig.json`))}catch{return {error: true, errorCode: "001"}};
-    this.client = new MongoClient(this.mongoconfig.uri);
+    try{this.mongoconfig = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`))}catch{return {error: true, errorCode: "001"}};
+    this.client = new MongoClient(this.mongoconfig['MONGO_URI']);
     this.Db();
     let db = this.client.db(this.databaseName);
     this.createCollection();
