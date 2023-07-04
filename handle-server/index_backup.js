@@ -88,6 +88,7 @@ app.get("/events", async (req,res) =>{
     res.status(200).send({events : sendDatas});
 });
 
+
 app.get("/event/:id", async (req,res)=>{
     let id = req.params.id;
     let {collection, database} = new Database("events");
@@ -147,11 +148,18 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
 });
 
 
-//ACCESS + LOGINS
+//access query
+
+
+app.use(express.static('uploads'));
+
 app.post("/get-access", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     res.send({access : Functions.merge_Access(await control_Token(body.token, req))});
 })
+
+
+//login begin
 
 app.post("/get-long-token", async (req,res, next) =>{
     let body = Functions.parseBody(req.body);
@@ -181,6 +189,8 @@ app.post("/get-long-token", async (req,res, next) =>{
     //res.send({error : true, errorCode : "003"});            //Nincs token
 });
 
+
+
 app.post("/login", async (req, res, next) =>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.username && body.password){
@@ -207,91 +217,7 @@ app.post("/login", async (req, res, next) =>{
     }       
 });
 
-app.post("/new-long-token", async (req,res)=>{
-    let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.token){
-    let access = await control_Token(body.token, req);
-    if (access && access.includes("profile")){
-        let { collection, database } = new Database("long-token");
-        let datas = await collection.findOne({token : body.token});
-        let usersCollection = new Database("admin").collection;
-        let userData = await usersCollection.findOne({username : datas.userData.username, _id : mongodb.ObjectId(datas.userData.id)});
-        let newToken = Functions.genrateToken();
-        if (userData){
-            let result = collection.insertOne(await Topology.longTokenData(newToken,Topology.newUserDatas(userData), req, body.token));
-            let result2;
-            if (result){
-                result2 = (await collection.updateOne({token : body.token}, {$set : {status : false}})).acknowledged;
-            }
-            res.send(result && result2 ? {token : newToken} : {error : true, errorCode : "001"});
-            closeConnection(database);
-            return;
-        }
-        else{
-            handleError("009", res);
-            closeConnection(database);
-            return;
-            //res.send({error : true, errorCode : "009"});        //Felhasználó nem található
-        }
-    }
-    }
-    handleError("004", res);
-})
-
-app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    if (req.body && typeof req.body == TypeOfBody && req.body.token){
-        let access = await control_Token(req.body.token, req);
-        if (access && access.includes("edit-users")){
-            res.send(Functions.readJson("user/accesslist.json"));
-        }
-    }
-});
-
-
-
-//USERS
-app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
-    if (req.body && typeof req.body == TypeOfBody && req.body.token){
-        let access = await control_Token(req.body.token, req);
-        if (access && access.includes("edit-users")){
-            let { collection, database } = new Database("admin");
-            let sendDatas = [];
-            let datas = await collection.find().toArray();
-            for (let i = 0; i < datas.length; i++){
-                sendDatas.push({
-                    id : datas[i]._id,
-                    username : datas[i].username,
-                    access : Functions.merge_Access(datas[i].access),
-                    cantEdit : datas[i].cantEdit,
-                    status : true
-                });
-            }
-            let l = new Database("new-user");
-            let pending = l.collection;
-            datas = await pending.find().toArray();
-            for (let i = 0; i < datas.length; i++){
-                if (datas[i].datas.timeInMil+259200000 > new Date().getTime()){
-                    console.log(datas[i].access);
-                sendDatas.push({
-                    id : datas[i]._id,
-                    addedBy : datas[i].datas.userData.username,
-                    validTo : datas[i].datas.timeInMil+259200000,
-                    created : datas[i].datas.timeInMil,
-                    status: false,
-                    access : Functions.merge_Access(datas[i].access),
-                    token : datas[i].token,
-                    url : "/uj-profil/"
-                })
-                }
-            }
-            res.send({users : sendDatas});
-            closeConnection(database);
-            closeConnection(l.database);
-            return;
-        }
-    }
-    handleError("004", res);
-});
+//login end
 
 app.post("/add-new-user", async (req,res)=>{
     let body = Functions.parseBody(req.body);
@@ -402,141 +328,6 @@ app.post("/delete-user", async (req,res)=>{
     }
 });
 
-app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    if (req.body && typeof req.body == TypeOfBody && req.body.token){
-        let access = await control_Token(req.body.token, req);
-        if (access && access.includes("edit-users")){
-            if (req.body.datas && typeof req.body.datas == "object" && req.params.id){
-                let {collection, database} = new Database("admin");
-                let accesslist = Functions.readJson("user/accesslist.json");
-                let updateDatas = [];
-                if (accesslist){
-                    for (let i = 0; i < Object.keys(req.body.datas).length; i++){
-                        if (Object.keys(accesslist).includes(Object.keys(req.body.datas)[i]) && req.body.datas[Object.keys(req.body.datas)[i]]){
-                            updateDatas.push(Object.keys(req.body.datas)[i]);
-                        }
-                    }
-                }
-                !updateDatas.length ? updateDatas = ["profile"] : false;
-                console.log(updateDatas);
-                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {access : updateDatas}});
-                res.send({error : !result.modifiedCount});
-                closeConnection(database);
-            }
-        }
-    }
-});
-
-app.post(`/delete-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    if (req.body && typeof req.body == TypeOfBody && req.body.token){
-        if (req.params.id){
-            let access = await control_Token(req.body.token, req);
-            if (access && access.includes("edit-users")){
-                let {collection, database} = new Database("new-user");
-                let result = await collection.deleteOne({_id : new ObjectId(req.params.id)});
-                res.send({error : !result.deletedCount});
-                closeConnection(database);
-                return;
-            }
-        }
-    }
-    handleError("", res);
-});
-
-app.post(`/edit-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    if (req.body && typeof req.body == TypeOfBody && req.body.token){
-        if (req.params.id && req.body.datas){
-            let access = await control_Token(req.body.token, req);
-            if (access && access.includes("edit-users")){
-                let {collection, database} = new Database("new-user");
-                let accesslist = Functions.readJson("user/accesslist.json");
-                let updateDatas = [];
-                if (accesslist){
-                    for (let i = 0; i < Object.keys(req.body.datas).length; i++){
-                        if (Object.keys(accesslist).includes(Object.keys(req.body.datas)[i]) && req.body.datas[Object.keys(req.body.datas)[i]]){
-                            updateDatas.push(Object.keys(req.body.datas)[i]);
-                        }
-                    }
-                }
-                !updateDatas.length ? updateDatas = ["profile"] : false;
-                let result = await collection.updateOne({_id : new ObjectId(req.params.id)}, {$set : {access : updateDatas}});
-                res.send({error : !result.modifiedCount});
-                closeConnection(database);
-                return ;
-            }
-        }
-    }
-    handleError("001", res);
-});
-
-app.post("/get-user-data", async (req,res)=>{
-    let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.token){
-        let access = await control_Token(body.token, req);
-        if (access && access.includes("profile")){
-            let {collection, database} = new Database("long-token");
-            datas = await collection.findOne({token : body.token});
-            let l = new Database("admin");
-            let usersCollection = l.collection;
-            let username = (await usersCollection.findOne({_id : datas.userData.id})).username
-            res.send({username : username, id : datas.userData.id});
-            closeConnection(database);
-            closeConnection(l.database);
-            return;
-        }
-    }
-    handleError("003", res)
-})
-
-app.post("/change-username", async (req,res) =>{
-    let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.token){
-        let access = await control_Token(body.token, req);
-        if (access && access.includes("profile")){
-            let l = new Database("admin");
-            let changeUsernameCollection = l.collection;
-            if (body.datas.username.length > 4 && !await changeUsernameCollection.findOne({username : body.datas.username})){
-                let {collection, database} = new Database("long-token");
-                datas = await collection.findOne({token : body.token});
-                response = await changeUsernameCollection.updateOne({_id : datas.userData.id},{$set : {username : body.datas.username}});
-                res.send({username : response.modifiedCount > 0 ? body.datas.username : (await changeUsernameCollection.findOne({_id : datas.userData.id})).username});
-                closeConnection(database);
-                closeConnection(l.database);
-            }
-            else{
-                body.datas.username.length <= 4 ? handleError("018", res) : handleError("010", res);
-            }
-            return
-        }
-    }
-    handleError("003", res)
-})
-
-app.post("/change-password", async (req,res)=>{
-    let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.token){
-        let access = await control_Token(body.token, req);
-        if (access && access.includes("profile")){
-            if (Functions.controlPassword(body.datas.password)){
-                let {collection, database} = new Database("long-token");
-                datas = await collection.findOne({token : body.token});
-                let l = new Database("admin");
-                let changeUsernameCollection = l.collection;
-                response = await changeUsernameCollection.updateOne({_id : datas.userData.id, password : Functions.encryption(body.datas.oldPassword)}, {$set : {password : Functions.encryption(body.datas.password)}});
-                res.send({update : response.modifiedCount > 0});
-                closeConnection(database);
-                closeConnection(l.database);
-            }
-            else{
-                handleError("008",res);
-            }
-            return;
-        }
-    }
-    handleError("003", res)
-});
-
-
 //VENUES
 app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
     if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
@@ -568,6 +359,7 @@ app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,as
     handleError("004", res);
 });
 
+
 app.post("/upload-venue", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
@@ -586,6 +378,69 @@ app.post("/upload-venue", async (req,res)=>{
     }}
     handleError("004", res);
 })
+
+app.post("/new-long-token", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+    let access = await control_Token(body.token, req);
+    if (access && access.includes("profile")){
+        let { collection, database } = new Database("long-token");
+        let datas = await collection.findOne({token : body.token});
+        let usersCollection = new Database("admin").collection;
+        let userData = await usersCollection.findOne({username : datas.userData.username, _id : mongodb.ObjectId(datas.userData.id)});
+        let newToken = Functions.genrateToken();
+        if (userData){
+            let result = collection.insertOne(await Topology.longTokenData(newToken,Topology.newUserDatas(userData), req, body.token));
+            let result2;
+            if (result){
+                result2 = (await collection.updateOne({token : body.token}, {$set : {status : false}})).acknowledged;
+            }
+            res.send(result && result2 ? {token : newToken} : {error : true, errorCode : "001"});
+            closeConnection(database);
+            return;
+        }
+        else{
+            handleError("009", res);
+            closeConnection(database);
+            return;
+            //res.send({error : true, errorCode : "009"});        //Felhasználó nem található
+        }
+    }
+    }
+    handleError("004", res);
+})
+
+app.post('/upload-image/:token', upload.single('file'), async (req, res, next) => {
+    const token = req.params.token;
+    if (token){
+        let access = await control_Token(token, req);
+        if (access && (access.includes("edit-events") || access.includes("edit-rooms"))){
+            const file = req.file;
+            if (!file) {
+                const error = new Error('No File')
+                error.httpStatusCode = 400
+                return next(error)
+            }
+            let newFilePath = "";
+            for (let i = 1; i < file.path.split("/").length; i++){
+                newFilePath += "/"+ file.path.split("/")[i];
+            }
+            let width = 0;
+            let height = 0;
+            try{
+                let jimage = await Jimp.read(`${__dirname}/${file.path}`);
+                width = jimage.bitmap.width;
+                height = jimage.bitmap.height;
+            }catch{
+
+            }
+            res.send({path : `${newFilePath}`, width: width,height : height});
+        }
+    }
+    else{
+        handleError("004", res);
+    }
+  });
 
 app.post("/venues", async (req,res)=>{
     let body = Functions.parseBody(req.body);
@@ -657,6 +512,127 @@ app.post("/delete-venue/:id", async (req,res)=>{
     handleError("004", res);
 });
 
+//USERS
+app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-users")){
+            let { collection, database } = new Database("admin");
+            let sendDatas = [];
+            let datas = await collection.find().toArray();
+            for (let i = 0; i < datas.length; i++){
+                sendDatas.push({
+                    id : datas[i]._id,
+                    username : datas[i].username,
+                    access : Functions.merge_Access(datas[i].access),
+                    cantEdit : datas[i].cantEdit,
+                    status : true
+                });
+            }
+            let l = new Database("new-user");
+            let pending = l.collection;
+            datas = await pending.find().toArray();
+            for (let i = 0; i < datas.length; i++){
+                if (datas[i].datas.timeInMil+259200000 > new Date().getTime()){
+                    console.log(datas[i].access);
+                sendDatas.push({
+                    id : datas[i]._id,
+                    addedBy : datas[i].datas.userData.username,
+                    validTo : datas[i].datas.timeInMil+259200000,
+                    created : datas[i].datas.timeInMil,
+                    status: false,
+                    access : Functions.merge_Access(datas[i].access),
+                    token : datas[i].token,
+                    url : "/uj-profil/"
+                })
+                }
+            }
+            res.send({users : sendDatas});
+            closeConnection(database);
+            closeConnection(l.database);
+            return;
+        }
+    }
+    handleError("004", res);
+});
+
+app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-users")){
+            if (req.body.datas && typeof req.body.datas == "object" && req.params.id){
+                let {collection, database} = new Database("admin");
+                let accesslist = Functions.readJson("user/accesslist.json");
+                let updateDatas = [];
+                if (accesslist){
+                    for (let i = 0; i < Object.keys(req.body.datas).length; i++){
+                        if (Object.keys(accesslist).includes(Object.keys(req.body.datas)[i]) && req.body.datas[Object.keys(req.body.datas)[i]]){
+                            updateDatas.push(Object.keys(req.body.datas)[i]);
+                        }
+                    }
+                }
+                !updateDatas.length ? updateDatas = ["profile"] : false;
+                console.log(updateDatas);
+                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {access : updateDatas}});
+                res.send({error : !result.modifiedCount});
+                closeConnection(database);
+            }
+        }
+    }
+});
+
+
+app.post(`/delete-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        if (req.params.id){
+            let access = await control_Token(req.body.token, req);
+            if (access && access.includes("edit-users")){
+                let {collection, database} = new Database("new-user");
+                let result = await collection.deleteOne({_id : new ObjectId(req.params.id)});
+                res.send({error : !result.deletedCount});
+                closeConnection(database);
+                return;
+            }
+        }
+    }
+    handleError("", res);
+});
+
+app.post(`/edit-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        if (req.params.id && req.body.datas){
+            let access = await control_Token(req.body.token, req);
+            if (access && access.includes("edit-users")){
+                let {collection, database} = new Database("new-user");
+                let accesslist = Functions.readJson("user/accesslist.json");
+                let updateDatas = [];
+                if (accesslist){
+                    for (let i = 0; i < Object.keys(req.body.datas).length; i++){
+                        if (Object.keys(accesslist).includes(Object.keys(req.body.datas)[i]) && req.body.datas[Object.keys(req.body.datas)[i]]){
+                            updateDatas.push(Object.keys(req.body.datas)[i]);
+                        }
+                    }
+                }
+                !updateDatas.length ? updateDatas = ["profile"] : false;
+                let result = await collection.updateOne({_id : new ObjectId(req.params.id)}, {$set : {access : updateDatas}});
+                res.send({error : !result.modifiedCount});
+                closeConnection(database);
+                return ;
+            }
+        }
+    }
+    handleError("001", res);
+});
+
+app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-users")){
+            res.send(Functions.readJson("user/accesslist.json"));
+        }
+    }
+});
+
 app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     console.log(req.body);
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
@@ -679,7 +655,6 @@ app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next),
 })
 
 
-//EVENTS
 app.post("/add-event",async (req,res)=>{
     let body = Functions.parseBody(req.body);
     console.log(req.body)
@@ -791,28 +766,77 @@ app.post("/delete-event/:id", async (req,res)=>{
     handleError("003", res);
 });
 
-app.post("/get-all-event", async (req,res)=>{
-    const body = Functions.parseBody(req.body);
-    if (body && typeof body === TypeOfBody && body.token){
+//USERS
+app.post("/get-user-data", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
-        if (access && access.includes("ref")){
-            let sendList = [];
-            let {collection, database} = new Database("events")
-            let all_Events = await collection.find().toArray();
-            for (let i = 0; i < all_Events.length; i++){
-                if (all_Events[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
-                    sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent})
-                }
-            }
-            res.send({events : sendList});
+        if (access && access.includes("profile")){
+            let {collection, database} = new Database("long-token");
+            datas = await collection.findOne({token : body.token});
+            let l = new Database("admin");
+            let usersCollection = l.collection;
+            let username = (await usersCollection.findOne({_id : datas.userData.id})).username
+            res.send({username : username, id : datas.userData.id});
             closeConnection(database);
+            closeConnection(l.database);
             return;
         }
     }
+    handleError("003", res)
+})
+
+
+app.post("/change-username", async (req,res) =>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("profile")){
+            let l = new Database("admin");
+            let changeUsernameCollection = l.collection;
+            if (body.datas.username.length > 4 && !await changeUsernameCollection.findOne({username : body.datas.username})){
+                let {collection, database} = new Database("long-token");
+                datas = await collection.findOne({token : body.token});
+                response = await changeUsernameCollection.updateOne({_id : datas.userData.id},{$set : {username : body.datas.username}});
+                res.send({username : response.modifiedCount > 0 ? body.datas.username : (await changeUsernameCollection.findOne({_id : datas.userData.id})).username});
+                closeConnection(database);
+                closeConnection(l.database);
+            }
+            else{
+                body.datas.username.length <= 4 ? handleError("018", res) : handleError("010", res);
+            }
+            return
+        }
+    }
+    handleError("003", res)
+})
+
+
+app.post("/change-password", async (req,res)=>{
+    let body = Functions.parseBody(req.body);
+    if (body && typeof body == TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("profile")){
+            if (Functions.controlPassword(body.datas.password)){
+                let {collection, database} = new Database("long-token");
+                datas = await collection.findOne({token : body.token});
+                let l = new Database("admin");
+                let changeUsernameCollection = l.collection;
+                response = await changeUsernameCollection.updateOne({_id : datas.userData.id, password : Functions.encryption(body.datas.oldPassword)}, {$set : {password : Functions.encryption(body.datas.password)}});
+                res.send({update : response.modifiedCount > 0});
+                closeConnection(database);
+                closeConnection(l.database);
+            }
+            else{
+                handleError("008",res);
+            }
+            return;
+        }
+    }
+    handleError("003", res)
 });
 
 
-//TICKETS
 app.post("/order-ticket", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
@@ -854,22 +878,26 @@ app.post("/order-ticket", async (req,res)=>{
     handleError("000", res);
 });
 
-app.post("/create-ticket", async (req, res) => {
-    const ticketInfo = Functions.parseBody(req.body);
-    if(!ticketInfo) return handleError("030", res);
-    let axiosConfig = {
-        method: 'post',
-        url: `${config['EMAIL_SERVER']}/createCode`,
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        data : ticketInfo
-    };
-    axios(axiosConfig)
-        .then((email_response) => res.send({'filename': email_response.data}))
-        .catch((err) => console.log(err));
-})
-
+//EVENTS
+app.post("/get-all-event", async (req,res)=>{
+    const body = Functions.parseBody(req.body);
+    if (body && typeof body === TypeOfBody && body.token){
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("ref")){
+            let sendList = [];
+            let {collection, database} = new Database("events")
+            let all_Events = await collection.find().toArray();
+            for (let i = 0; i < all_Events.length; i++){
+                if (all_Events[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
+                    sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent})
+                }
+            }
+            res.send({events : sendList});
+            closeConnection(database);
+            return;
+        }
+    }
+});
 
 //COUPONS
 app.post("/new-coupon", async (req,res)=>{
@@ -904,6 +932,7 @@ app.post("/new-coupon", async (req,res)=>{
     }
 })
 
+
 app.post("/get-coupons", async (req,res)=>{
     const body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
@@ -921,6 +950,7 @@ app.post("/get-coupons", async (req,res)=>{
         }
     }
 });
+
 
 app.post("/delete-coupon/:id", async (req,res) =>{
     const body = Functions.parseBody(req.body);
@@ -997,7 +1027,6 @@ app.post("/control-coupon-code", async (req,res)=>{
 })*/
 
 
-//PAYMENT
 app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
@@ -1053,42 +1082,21 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
     }
 })
 
-
-//OTHER
-app.post('/upload-image/:token', upload.single('file'), async (req, res, next) => {
-    const token = req.params.token;
-    if (token){
-        let access = await control_Token(token, req);
-        if (access && (access.includes("edit-events") || access.includes("edit-rooms"))){
-            const file = req.file;
-            if (!file) {
-                const error = new Error('No File')
-                error.httpStatusCode = 400
-                return next(error)
-            }
-            let newFilePath = "";
-            for (let i = 1; i < file.path.split("/").length; i++){
-                newFilePath += "/"+ file.path.split("/")[i];
-            }
-            let width = 0;
-            let height = 0;
-            try{
-                let jimage = await Jimp.read(`${__dirname}/${file.path}`);
-                width = jimage.bitmap.width;
-                height = jimage.bitmap.height;
-            }catch{
-
-            }
-            res.send({path : `${newFilePath}`, width: width,height : height});
-        }
-    }
-    else{
-        handleError("004", res);
-    }
-  });
-
-
-app.use(express.static('uploads'));
+app.post("/create-ticket", async (req, res) => {
+    const ticketInfo = Functions.parseBody(req.body);
+    if(!ticketInfo) return handleError("030", res);
+    let axiosConfig = {
+        method: 'post',
+        url: `${config['EMAIL_SERVER']}/createCode`,
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        data : ticketInfo
+    };
+    axios(axiosConfig)
+        .then((email_response) => res.send({'filename': email_response.data}))
+        .catch((err) => console.log(err));
+})
 
 if (controlConnection()){
     console.log(`The connection is successfully, the app is listening on PORT ${process.env.PORT || 3001}`)
