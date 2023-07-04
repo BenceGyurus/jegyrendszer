@@ -23,6 +23,7 @@ const controlTypeOfBillingAddress = require("./typesOfDatas/billingAddress.js");
 const axios = require('axios').default;
 const fs = require("fs");
 const cron = require('node-cron');
+const controlCoupon = require("./controlCoupon.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -964,7 +965,7 @@ app.post("/edit-coupon/:id", async (req,res)=>{
 app.post("/control-coupon-code", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.code && body.eventId){
-        let {collection, database} = new Database("coupons");
+        /*let {collection, database} = new Database("coupons");
         let coupon = await collection.findOne({name : body.code});
         if (coupon){
             console.log(coupon);
@@ -988,7 +989,8 @@ app.post("/control-coupon-code", async (req,res)=>{
         else{
             res.send({used : false, message : "Nincs ilyen kupon"})
         }
-        closeConnection(database);
+        closeConnection(database);*/
+        res.send(await controlCoupon(body.code, body.eventId, 0));
     }
 })
 
@@ -1011,10 +1013,10 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
                 }
                 let saveDatas = {};
                 if (!error){
-                    let {collection, database} = new Database("coupons");
-                    let coupon = await collection.findOne({name : req.body.datas.coupon});
-                    let price = buyingDatas.fullPrice;
-                    if (coupon){
+                    //let {collection, database} = new Database("coupons");
+                    //let coupon = await collection.findOne({name : req.body.datas.coupon});
+                    //let price = buyingDatas.fullPrice;
+                    /*if (coupon){
                         if (coupon.events.includes(buyingDatas.eventId)){
                             if (coupon.type == 0){
                                 price = coupon.money ? price > coupon.amount ? price-amount : 0 : price-price * (coupon.amount/100);
@@ -1030,13 +1032,15 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
                                 }
                             }
                         }
-                    }
+                    }*/
+                    console.log(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice);
+                    let {price, error,name} = (await controlCoupon(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice));
                     saveDatas = {
                         price : price,
                         fullPrice : buyingDatas.fullPrice,
                         customerDatas : req.body.datas.customerData,
                         time : new Date().getTime,
-                        coupon : coupon.name,
+                        coupon : !error ? name : false,
                         eventId : buyingDatas.eventId,
                         tickets : buyingDatas.tickets,
                         status : "pending"
