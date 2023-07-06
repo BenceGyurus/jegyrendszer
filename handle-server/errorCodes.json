@@ -2,27 +2,27 @@
     "000" : {
         "message" : "Váratlan hiba történt kérjük próbálja megkésőbb",
         "type" : "error",
-        "responseCode" : 400
+        "responseCode" : 500
     },
     "001" : {
         "message" : "Hiba történt az adatbázis betöltése közben, kérjük próbálja újra később.",
         "type" : "error",
-        "responseCode" : 400
+        "responseCode" : 500
     },
     "002" : {
         "message" : "Megváltozott az IP cím a bejelentkezés közben vagy időtúllépés történt",
         "type" : "error",
-        "responseCode" : 400
+        "responseCode" : 407
     },
     "003": {
         "message" : "Ehhez a művelethez speciális jogosultságra van szükség",
         "type" : "error",
-        "responseCode" : 400
+        "responseCode" : 403
     },
     "004" : {
         "message" : "Nincs hozzáférése az adott művelet elvégzésére",
         "type" : "error",
-        "responseCode" : 400
+        "responseCode" : 401
     },
     "005" : {
         "message" : "",
@@ -77,10 +77,10 @@
     "014" : {
         "message" : "Nem található az esemény",
         "type" : "error",
-        "responseCode" : 400
+        "responseCode" : 404
     },
     "015" : {
-        "message" : "A hely nem már nem érhető el vagy az esemény nem létet",
+        "message" : "A hely nem már nem érhető el vagy az esemény nem létezik",
         "type" : "error",
         "responseCode": 400
     },
@@ -108,5 +108,15 @@
         "message" : "Hibás adatok",
         "type" : "error",
         "responseCode" : 400
+    },
+    "400": {
+        "message" : "Hibás kérés",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "500": {
+        "message" : "Belső hiba",
+        "type" : "error",
+        "responseCode" : 500
     }
 }

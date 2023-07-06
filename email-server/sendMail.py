@@ -14,7 +14,7 @@ def sendMail(receiver_address, imagename, email_subject, email_body, config):
     message['From'] = config['PY_MAIL']
     message['To'] = receiver_address
 
-    sender_pass = config['PY_PASS']
+    sender_pass = os.getenv('PY_PASS')
 
 
     message['Subject'] = f'Jegy - {email_subject}'

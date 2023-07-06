@@ -3,5 +3,6 @@
     "PY_MAIL": "agora.mail.service@gmail.com",
     "PY_DIR": "../data/email",
     "EMAIL_SERVER": "http://localhost:5000",
-    "MONGO_URI": "mongodb://localhost:27017/"
+    "MONGO_URI": "mongodb://localhost:27017/",
+    "SLACK_TOKEN": "xoxp-3311554582775-3326149485602-5558132480816-b99feeab07cc6134360f9e4800c9d18b"
 }
