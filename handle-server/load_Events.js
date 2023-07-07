@@ -15,7 +15,3 @@ function load_Events(events){
         }
     }
 }
-
-function save_Image(){
-    return "images/tesla.jpeg";
-}

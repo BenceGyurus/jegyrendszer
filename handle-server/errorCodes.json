@@ -118,5 +118,10 @@
         "message" : "Belső hiba",
         "type" : "error",
         "responseCode" : 500
+    },
+    "031" : {
+        "message" : "Ez a jegy már elfogyott vagy nem kapható",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

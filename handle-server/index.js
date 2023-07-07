@@ -25,6 +25,7 @@ const fs = require("fs");
 const cron = require('node-cron');
 const controlCoupon = require("./controlCoupon.js");
 const Logger = require('./slack-logger');
+const controlEvent = require("./controlEvent.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -873,10 +874,16 @@ app.post("/order-ticket", async (req,res)=>{
                 handleError(logger, "017", res);
             }
         }
-        let {collection, database} = new Database("pre-buying");
-        let result = await collection.insertOne({...savingDatas, otherDatas : await otherData(req)});
-        res.send({error : false, token : result.insertedId});
-        closeConnection(database);
+        let response = await controlEvent(body.eventId, savingDatas.tickets, "");
+        if (!response.error){
+            let {collection, database} = new Database("pre-buying");
+            let result = await collection.insertOne({...savingDatas, otherDatas : await otherData(req)});
+            res.send({error : false, token : result.insertedId});
+            closeConnection(database);
+        }
+        else{
+            handleError(logger, response.errorCode, res);
+        }
         return
     }
     handleError(logger, "000", res);
@@ -902,6 +909,7 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
     if (req.params && req.params.token){
         const {collection, database} = new Database("pre-buying");
         let datas = await collection.findOne({_id : new ObjectId(req.params.token)});
+        closeConnection(database);
         if (datas && datas.time + 1800000 >= new Date().getTime() && datas.eventId){
             let eventDetails = await getTicketByReadableId(datas.eventId);
             if (eventDetails){
@@ -911,7 +919,6 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
         }
     }
     handleError(logger, "019", res);
-    closeConnection(database);
 });
 
 
@@ -1048,6 +1055,7 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
             let {collection, database} = new Database("pre-buying");
             let buyingDatas = await collection.findOne({_id : ObjectId(req.params.id)});
+            console.loog(buyingDatas);
             closeConnection(database);
             if (buyingDatas){
                 let error = false;
@@ -1055,6 +1063,7 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
                     Control_Seats(buyingDatas.tickets[i].places, buyingDatas.tickets[i].ticketId, buyingDatas.eventId) ? true : error = false;
                 }
                 let saveDatas = {};
+                console.log("error:", error);
                 if (!error){
                     //let {collection, database} = new Database("coupons");
                     //let coupon = await collection.findOne({name : req.body.datas.coupon});
@@ -1091,6 +1100,7 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
                     let l = new Database("buy");
                     result = await l.collection.insertOne(saveDatas);
                     res.send({error : !result.acknowledged});
+                    console.log(await controlEvent(buyingDatas.eventId,buyingDatas.tickets, buyingDatas._id));
                     closeConnection(database);
                     closeConnection(l.database);
                 }

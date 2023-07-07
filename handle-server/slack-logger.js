@@ -2,7 +2,8 @@ const {WebClient} = require('@slack/web-api')
 
 class Logger {
     constructor(){
-        this.client = new WebClient(process.env.SLACK_API)
+        console.log(process.env);
+        this.client = new WebClient(process.env.SLACK_TOKEN)
     }
     sendMessage = async (message) => {
         await this.client.chat.postMessage({
