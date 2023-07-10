@@ -558,10 +558,14 @@ app.post("/change-password", async (req,res)=>{
         if (access && access.includes("profile")){
             if (Functions.controlPassword(body.datas.password)){
                 let {collection, database} = new Database("long-token");
-                datas = await collection.findOne({token : body.token});
+                let datas = await collection.findOne({token : body.token});
+                if(datas == undefined){
+                    logger.warn(`Long-token not found in db: ${body.token}`);
+                    handleError(logger, "500", res);
+                }
                 let l = new Database("admin");
                 let changeUsernameCollection = l.collection;
-                response = await changeUsernameCollection.updateOne({_id : datas.userData.id, password : Functions.encryption(body.datas.oldPassword)}, {$set : {password : Functions.encryption(body.datas.password)}});
+                let response = await changeUsernameCollection.updateOne({_id : datas.userData.id, password : Functions.encryption(body.datas.oldPassword)}, {$set : {password : Functions.encryption(body.datas.password)}});
                 res.send({update : response.modifiedCount > 0});
                 closeConnection(database);
                 closeConnection(l.database);
@@ -569,137 +573,126 @@ app.post("/change-password", async (req,res)=>{
             else{
                 handleError(logger, "008",res);
             }
-            return;
-        }
+        }else return handleError(logger, "", res);
     }
     handleError(logger, "003", res)
 });
 
 
 //VENUES
-app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-rooms") && controlTypesOfVenues(req.body.datas)){
-            let { collection,database } = new Database("venue");
+            let { collection, database } = new Database("venue");
             let id = new ObjectId(req.params.id);
             let lastVersion = await collection.findOne({_id : id});
             if (lastVersion){
-                console.log(lastVersion.versions);
-                lastVersion.versions.push({content : lastVersion.content, addedBy: lastVersion.addedBy, id : Functions.genrateToken})
+                // console.log(lastVersion.versions);
+                lastVersion.versions.push({content : lastVersion.content, addedBy: lastVersion.addedBy, id : Functions.genrateToken});
                 let updated = await collection.updateOne({_id : id}, {$set : {content : req.body.datas, addedBy : await otherData(req, req.body.token), versions : lastVersion.versions}});
                 closeConnection(database);
                 if (updated.modifiedCount){
                     res.send({id : req.params.id});
                     return;
                 }
-                else{
-                    handleError(logger, "000", res);
-                    return;
-                }
+                else return handleError(logger, "000", res);
             }
-            else{
-                closeConnection(database);
-                handleError(logger, "000", res);
-                return;
-            }
-        }
-    }
-    handleError(logger, "004", res);
+            else return handleError(logger, "000", res);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/upload-venue", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
-    let access = await control_Token(body.token, req);
-    if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas)){
-        let { collection,database } = new Database("venue");
-        let datas = await collection.insertOne({content : body.datas, addedBy : await otherData(req, body.token), versions : []});
-        if (datas.insertedId){
-        res.send({id : datas.insertedId});
-        }
-        else{
-            handleError(logger, "000", res);
-        }
-        closeConnection(database);
-        return;
-    }}
-    handleError(logger, "004", res);
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas)){
+            let { collection,database } = new Database("venue");
+            let datas = await collection.insertOne({content : body.datas, addedBy : await otherData(req, body.token), versions : []});
+            if (datas?.insertedId) res.send({id : datas.insertedId});
+            else handleError(logger, "000", res);
+            closeConnection(database);
+            return;
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 })
 
 app.post("/venues", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
-    let access = await control_Token(body.token, req);
-    if (access && access.includes("edit-rooms")){
-        let { collection, database } = new Database("venue");
-        let datas = await collection.find().toArray();
-        let sendDatas = [];
-        for (let i = 0; i < datas.length; i++){
-            sendDatas.push({
-                name : datas[i].content.name,
-                places : datas[i].content.places,
-                seatsDatas : datas[i].content.seatsDatas,
-                colorOfBackGround : datas[i].content.colorOfBackGround,
-                id : datas[i]._id,
-                sizeOfSeat : datas[i].content.sizeOfSeat,
-                colorOfSeat : datas[i].content.colorOfSeat,
-                sizeOfArea : datas[i].content.sizeOfArea,
-                addedBy: datas[i].addedBy.userData.username
-            });
-        }
-        res.send({venues : sendDatas});
-        closeConnection(database);
-        return;
-        }
-    }
-    handleError(logger, "004", res);
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-rooms")){
+            let { collection, database } = new Database("venue");
+            let datas = await collection.find().toArray();
+            if(datas == undefined){
+                logger.warn(`Venue information not found`);
+                return handleError(logger, "500", res);
+            }
+            let sendDatas = [];
+            for (let i = 0; i < datas.length; i++){
+                sendDatas.push({
+                    name : datas[i].content.name,
+                    places : datas[i].content.places,
+                    seatsDatas : datas[i].content.seatsDatas,
+                    colorOfBackGround : datas[i].content.colorOfBackGround,
+                    id : datas[i]._id,
+                    sizeOfSeat : datas[i].content.sizeOfSeat,
+                    colorOfSeat : datas[i].content.colorOfSeat,
+                    sizeOfArea : datas[i].content.sizeOfArea,
+                    addedBy: datas[i].addedBy.userData.username
+                });
+            }
+            res.send({venues : sendDatas});
+            return closeConnection(database);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), async (req,res)=> {
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-rooms") && req.params.id){
-                if (req.params.id.length === 24){
-                id = new ObjectId(req.params.id);
+            if (req.params.id.length === 24){
+                let id = new ObjectId(req.params.id);
                 let { collection, database } = new Database("venue");
-                datas = await collection.findOne({ _id : id });
+                let datas = await collection.findOne({ _id : id });
                 closeConnection(database);
                 if (datas){
                     datas.content.id = datas._id;
                     res.send(datas.content);
                     return;
-            }
-            }
-        }
-    }
-    handleError(logger, "004", res);
+                } else {
+                    logger.err(`Venue id failed to read id ${id}`)
+                    return handleError(logger, "500", res);
+                }
+            } else return handleError(logger, "404", res);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 })
 
 app.post("/delete-venue/:id", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
-    let access = await control_Token(body.token, req);
-    if (access && access.includes("edit-rooms") && req.params.id){
-        id = new ObjectId(req.params.id);
-        let { collection, database } = new Database("venue");
-        let Ddatas = {}
-        Ddatas.deletedContent = await collection.findOne({_id : id});
-        let datas = await collection.deleteOne({_id : id});
-        let deletedDb = new Database("deleted-venues");
-        Ddatas.deletedBy = await otherData(req, body.token);
-        deletedDb.collection.insertOne(Ddatas);
-        res.send(datas);
-        closeConnection(database);
-        closeConnection(deletedDb.database);
-        return;
-    }
-    }
-    handleError(logger, "004", res);
+        let access = await control_Token(body.token, req);
+        if (access && access.includes("edit-rooms") && req.params.id){
+            let id = new ObjectId(req.params.id);
+            let { collection, database } = new Database("venue");
+            let Ddatas = {}
+            Ddatas.deletedContent = await collection.findOne({_id : id});
+            let datas = await collection.deleteOne({_id : id});
+            let deletedDb = new Database("deleted-venues").collection;
+            Ddatas.deletedBy = await otherData(req, body.token);
+            deletedDb.insertOne(Ddatas);
+            res.send(datas);
+            closeConnection(database);
+            return;
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    console.log(req.body);
+    // console.log(req.body);
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-events")){
@@ -710,24 +703,26 @@ app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next),
                 for (let i = 0; i < datas.length; i++){
                     sendArray.push({title : datas[i].content.name, value : datas[i]._id});
                 }
+            }else{
+                logger.err(`Venue db failed to read`)
+                return handleError(logger, "500", res);
             }
             res.send({datas : sendArray});
             closeConnection(database);
             return;
-        }
-    }
-    handleError(logger, "004", res);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 })
 
 
 //EVENTS
 app.post("/add-event",async (req,res)=>{
     let body = Functions.parseBody(req.body);
-    console.log(req.body)
+    // console.log(req.body)
     if (body && typeof body === TypeOfBody &&body.token){
         let access = await control_Token(body.token, req);
-        console.log(access);
-        console.log(controlTypeOfEvents(body.data))
+        // console.log(access);
+        // console.log(controlTypeOfEvents(body.data))
         if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data)){
             let {collection, database} = new Database("events");
             let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name),objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)};
@@ -736,10 +731,10 @@ app.post("/add-event",async (req,res)=>{
             if (insert.insertedId){
                 res.send({id : (await collection.findOne({_id : insert.insertedId}))._id});
                 return;
-            }
-        }
-    }
-    return handleError(logger, "004", res);
+            }else return handleError(logger, "500", res);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
+    
 });
 
 app.post("/get-event-data/:id", async (req,res)=>{
@@ -752,16 +747,16 @@ app.post("/get-event-data/:id", async (req,res)=>{
             id = new ObjectId(id);
             let datas = await collection.findOne({_id : id});
             closeConnection(database);
-            if (datas && datas.eventData){
+            if (datas && datas?.eventData){
                 res.send(datas.eventData);
                 return;
             }
             else{
-
+                logger.err(`Event not found with id ${id}`);
+                return handleError(logger, "500", res);
             }
-        }
-    }
-    handleError(logger, "004", res);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/add-event/:id",async (req,res)=>{
@@ -774,16 +769,15 @@ app.post("/add-event/:id",async (req,res)=>{
             id = new ObjectId(id);
             let data = await collection.findOne({_id : id});
             body.data = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name)};
-            l = await collection.updateOne({_id : id}, {$set : {eventData : {...body.data, objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)}, versions : [...data.versions, { eventData : data.eventData, otherDatas : data.otherDatas }], otherDatas : await otherData(req,body.token)}});
+            let l = await collection.updateOne({_id : id}, {$set : {eventData : {...body.data, objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)}, versions : [...data.versions, { eventData : data.eventData, otherDatas : data.otherDatas }], otherDatas : await otherData(req,body.token)}});
             closeConnection(database);
             if (l.modifiedCount){
                 res.send({id : id});
                 return;
-            }
-            return handleError(logger, "000", res)
-        }
-    }
-    return handleError(logger, "004", res);
+            }else return handleError(logger, "000", res);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
+    
 });
 
 app.post("/events", async (req,res)=>{
@@ -793,16 +787,17 @@ app.post("/events", async (req,res)=>{
         if (access && access.includes("edit-events")){
             let {collection,database} = new Database("events");
             let datas = await collection.find().toArray();
+            if (!datas) {
+                logger.err(`Failed to read db edit-events`);
+                return handleError(logger, "500", res);
+            }
             let events = [];
-            datas.forEach((element)=>{
-                events.push({eventData : element.eventData, addedBy : element.otherDatas.userData, id : element._id});
-            })
+            datas.forEach((element)=> events.push({eventData : element.eventData, addedBy : element.otherDatas.userData, id : element._id}) )
             res.send(events);
             closeConnection(database);
-            return
-        }
-    }
-    return handleError(logger, "004", res);
+            return;
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/delete-event/:id", async (req,res)=>{
@@ -816,20 +811,14 @@ app.post("/delete-event/:id", async (req,res)=>{
             let datas = await collection.findOne({_id : id});
             let deleted = await collection.deleteOne({_id : id});
             closeConnection(database);
-            if (deleted.deletedCount){
+            if (deleted?.deletedCount){
                 let {collection, database} = new Database("deleted-events");
                 let insert = await collection.insertOne({eventData : datas.eventData, otherDatas : datas.otherDatas, versions : datas.versions});
                 closeConnection(database);
-                if (insert.insertedId){
-                    return handleError(logger, "011",res);
-                }
-            } 
-            else{
-                return handleError(logger, "014", res);
-            }
-        }
-    }
-    handleError(logger, "003", res);
+                if (insert.insertedId) return handleError(logger, "011",res);
+            } else return handleError(logger, "014", res);
+        } else return handleError(logger, "003", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/get-all-event", async (req,res)=>{
@@ -841,22 +830,25 @@ app.post("/get-all-event", async (req,res)=>{
             let {collection, database} = new Database("events")
             let all_Events = await collection.find().toArray();
             for (let i = 0; i < all_Events.length; i++){
-                if (all_Events[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
+                if (all_Events[i]?.eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
                     sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent})
+                } else {
+                    logger.err(`Failed to read db events`);
+                    return handleError(logger, "500", res);
                 }
             }
             res.send({events : sendList});
             closeConnection(database);
             return;
-        }
-    }
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 
 //TICKETS
 app.post("/order-ticket", async (req,res)=>{
     let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
+    if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
         let eventDatas = await getTicketByReadableId(body.eventId);
         let savingDatas = {eventId : body.eventId, tickets : [], time : new Date().getTime(), fullPrice : 0, fullAmount : 0};
         for (let i = 0; i < body.datas.length; i++){
@@ -870,21 +862,13 @@ app.post("/order-ticket", async (req,res)=>{
                                 savingDatas.fullPrice += eventDatas.tickets[j].price*body.datas[i].amount
                                 savingDatas.fullAmount += body.datas[i].amount;
                             }
-                            else{
-                                handleError(logger, "016", res);
-                                return;
-                            }
-                        }
+                            else return handleError(logger, "016", res);
+                        } else return handleError(logger, "500", res);
                     }
                 }
-                else{
-                    handleError(logger, "015", res);
-                    return;
-                }
+                else return handleError(logger, "015", res);
             }
-            else{
-                handleError(logger, "017", res);
-            }
+            else return handleError(logger, "017", res);
         }
         let response = await controlEvent(body.eventId, savingDatas.tickets, "");
         if (!response.error){
@@ -894,12 +878,9 @@ app.post("/order-ticket", async (req,res)=>{
             res.send({error : false, token : result.insertedId});
             closeConnection(database);
         }
-        else{
-            handleError(logger, response.errorCode, res);
-        }
-        return
-    }
-    handleError(logger, "000", res);
+        else return handleError(logger, response.errorCode, res);
+        return;
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/create-ticket", async (req, res) => {
@@ -915,7 +896,7 @@ app.post("/create-ticket", async (req, res) => {
     };
     axios(axiosConfig)
         .then((email_response) => res.send({'filename': email_response.data}))
-        .catch((err) => console.log(err));
+        .catch((err) => logger.err(`Failed ticket creation with ${ticketInfo}`));
 })
 
 app.get("/buy-ticket-details/:token", async (req,res)=>{
@@ -925,13 +906,14 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
         closeConnection(database);
         if (datas && datas.time + 1800000 >= new Date().getTime() && datas.eventId){
             let eventDetails = await getTicketByReadableId(datas.eventId);
-            if (eventDetails){
-                res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent});
+            if (eventDetails) res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent});
+            else {
+                logger.err(`Failed to get event details`);
+                return handleError(logger, "500", res);
             }
             return;
-        }
-    }
-    handleError(logger, "019", res);
+        } else return handleError(logger, "500", res);
+    } else return handleError(logger, "019", res);
 });
 
 
@@ -954,18 +936,11 @@ app.post("/new-coupon", async (req,res)=>{
             })).insertedId){
                 handleError(logger, "020", res);
             }
-            else{
-                handleError(logger, "001", res);
-            }
+            else handleError(logger, "001", res);
             closeConnection(database);
-        }
-        else{
-            handleError(logger, "004", res);
-        }
-    }
-    else{
-        handleError(logger, "030", res);
-    }
+            return;
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "030", res);
 })
 
 app.post("/get-coupons", async (req,res)=>{
@@ -976,14 +951,17 @@ app.post("/get-coupons", async (req,res)=>{
             let {collection, database} = new Database("coupons");
             let sendDatas = [];
             let datas = await collection.find().toArray();
-            datas.forEach(element=>{
-                new Date(element.validity).getTime() >= new Date().getTime() ? sendDatas.push(element) : false;
-            });
+            if(!datas){
+                logger.err(`Failed to read db coupons`);
+                closeConnection(database);
+                return handleError(logger, "500", res);
+            }
+            datas.forEach(element => new Date(element.validity).getTime() >= new Date().getTime() ? sendDatas.push(element) : false);
             res.send({coupons : sendDatas});
             closeConnection(database);
             return;
-        }
-    }
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/delete-coupon/:id", async (req,res) =>{
@@ -993,20 +971,20 @@ app.post("/delete-coupon/:id", async (req,res) =>{
         if (access && access.includes("ref")){
             if (req.params.id){
                 let {collection, database} = new Database("coupons");
-                d = await collection.deleteOne({_id : new ObjectId(req.params.id)});
-                res.send({error : d.deletedCount==0});
+                let d = await collection.deleteOne({_id : new ObjectId(req.params.id)});
+                res.send({error : d.deletedCount == 0});
                 closeConnection(database);
                 return;
-            }
-        }
-    }
+            }else return handleError(logger, "500", res);
+        } else return handleError(logger, "004", res);
+    } else return handleError(logger, "400", res);
 });
 
 app.post("/edit-coupon/:id", async (req,res)=>{
     const body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token && body.datas){
         let access = await control_Token(body.token, req);
-        if (req.params.id){
+        if (req?.params?.id){
             if (access && access.includes("ref") && controlTypeOfCoupon(body.datas)){
                 let {collection, database} = new Database("coupons");
                 let d = await collection.updateOne({_id : new ObjectId(req.params.id)} , { $set:{
@@ -1016,18 +994,19 @@ app.post("/edit-coupon/:id", async (req,res)=>{
                         validity : body.datas.validity,
                         events : body.datas.events,
                         type : body.datas.type
-                }
+                    }
                 });
                 res.send({error : d.matchedCount==0})
                 closeConnection(database);
-            }
-    }
-    }
+            }else return handleError(logger, "004", res);
+        } else return handleError(logger, "400", res);
+    } else return handleError(logger, "400", res);
 })
 
+//TODO error handling
 app.post("/control-coupon-code", async (req,res)=>{
     let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.code && body.eventId){
+    if (body && typeof body == TypeOfBody && body.code && body.eventId){
         /*let {collection, database} = new Database("coupons");
         let coupon = await collection.findOne({name : body.code});
         if (coupon){
@@ -1063,6 +1042,7 @@ app.post("/control-coupon-code", async (req,res)=>{
 
 
 //PAYMENT
+//TODO error handling
 app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
@@ -1151,12 +1131,10 @@ app.post('/upload-image/:token', upload.single('file'), async (req, res, next) =
 
             }
             res.send({path : `${newFilePath}`, width: width,height : height});
-        }
+        } else return handleError(logger, "500", res);
     }
-    else{
-        handleError(logger, "004", res);
-    }
-  });
+    else return handleError(logger, "004", res);
+});
 
 
 app.use(express.static('uploads'));

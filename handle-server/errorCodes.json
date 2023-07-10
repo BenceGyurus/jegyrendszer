@@ -114,6 +114,11 @@
         "type" : "error",
         "responseCode" : 400
     },
+    "404": {
+        "message" : "Az oldal nem található",
+        "type" : "error",
+        "responseCode" : 404
+    },
     "500": {
         "message" : "Belső hiba",
         "type" : "error",
