@@ -15,6 +15,8 @@ type typeOfTicket = {
     price : number,
     name : string,
     ticketId : string,
+    pendingPlaces : Array<string>,
+    numberOfFreeTickets : number
 }
 
 type typeOfAmountTicket = {
@@ -25,7 +27,9 @@ type typeOfAmountTicket = {
     name : string,
     ticketId : string,
     amount : number,
-    selected : number
+    selected : number,
+    pendingPlaces : Array<string>,
+    numberOfFreeTickets : number
 }
 
 type typeOfPageParams = {
@@ -87,7 +91,8 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
     const incrementAmountOfTickets = (id:String)=>{
         let l = [...ticketsAmount];
         for (let i = 0; i < l.length; i++){
-            if (l[i].id === id && l[i].amount < l[i].numberOfTicket){
+            console.log(l[i].numberOfFreeTickets, l[i].amount);
+            if (l[i].id === id && l[i].numberOfFreeTickets > l[i].amount){
                 l[i].amount++;
             }
         }
@@ -177,8 +182,10 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
         }
         if (!error.length){
             postData("/order-ticket", {datas : sendData, eventId : id})
-            .then(response=>{
-                if (response.error && response.message){
+            .then(async (response)=>{
+                console.log(response)
+                if (response.responseData){
+                    response = await response.responseData
                     setErrorNat(response.message);
                 }
                 else if (!response.error && response.token){

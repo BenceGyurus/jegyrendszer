@@ -55,3 +55,8 @@
   background-color: #028fed !important;
   cursor: pointer;
 }
+
+.user-pending{
+  background-color: yellow !important;
+  cursor: not-allowed !important;
+}

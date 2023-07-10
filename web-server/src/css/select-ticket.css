@@ -87,3 +87,13 @@
 .summed-price-box-space{
   height: 50px;
 }
+
+.outOfTickets{
+  background-color: red;
+  color: white;
+  padding: 5px;
+  text-align: center;
+  width: max-content;
+  display: block;
+  margin: 5px auto;
+}

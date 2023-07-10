@@ -104,7 +104,9 @@ class Functions{
                     places : places[i].seats,
                     id : places[i].id,
                     numberOfTicket : places[i].numberOfTicket,
-                    name : places[i].name
+                    name : places[i].name,
+                    pendingPlaces : places[i].pendingPlaces,
+                    numberOfFreeTickets : places[i].numberOfFreeTickets
                 }
             );
         }

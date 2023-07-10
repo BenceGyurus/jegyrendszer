@@ -26,6 +26,7 @@ const cron = require('node-cron');
 const controlCoupon = require("./controlCoupon.js");
 const Logger = require('./slack-logger');
 const controlEvent = require("./controlEvent.js");
+const getEventDatas = require("./getEventDatas.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -93,9 +94,9 @@ app.get("/events", async (req,res) =>{
 
 app.get("/event/:id", async (req,res)=>{
     let id = req?.params?.id;
-    if(id == undefined) return handleError(logger, "400", res)
-    let {collection, database} = new Database("events");
-    let events = await collection.find().toArray();
+    if(id == undefined) return handleError(logger, "400", res);
+    //let {collection, database} = new Database("events");
+    /*let events = await collection.find().toArray();
     let event = {};
     if (events){
         for (let i = 0; i < events.length; i++){
@@ -103,14 +104,15 @@ app.get("/event/:id", async (req,res)=>{
                 event = events[i].eventData;
             }
         }
-    }
+    }*/
+    let event = await getEventDatas(id);
     if (event){
         let l = new Database("venue");
         let placeCollection = l.collection;
         place = {};
+        closeConnection(l.database);
         if (event.venue){
             place = await placeCollection.findOne({_id : new ObjectId(event.venue)});
-            closeConnection(l.database);
             if (place){
                 placesOfEvent = [];
                 place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
@@ -127,10 +129,10 @@ app.get("/event/:id", async (req,res)=>{
             place.seatsDatas = placesOfEvent;
             
         }
-        res.send({media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
-        closeConnection(database);
+        res.send({allPendingPlaces : event.allPendingPlaces, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
         return;
     }
+    //closeConnection(database);
 });
 
 
@@ -145,15 +147,14 @@ app.post("/get-long-token", async (req,res, next) =>{
     if (body.token){
         let {collection, database} = new Database("short-token");
         let tokenDatas = await collection.findOne({token : body.token});
-        let database1 = database;
+        closeConnection(database);
         if (tokenDatas && tokenDatas.datas.ip){
             if (tokenDatas.datas.ip == Functions.getIp(req) && tokenDatas.datas.timeInMil + 60000 > new Date().getTime()){
-                let {collection, database} = new Database("long-token");
+                let longTokenDatabase = new Database("long-token");
                 let token = Functions.genrateToken();
-                collection.insertOne(await Topology.longTokenData(token, tokenDatas.userData, req));
+                longTokenDatabase.collection.insertOne(await Topology.longTokenData(token, tokenDatas.userData, req));
                 res.send({token : token, access : Functions.merge_Access(tokenDatas.userData.access), expires_in : 21600000});
-                closeConnection(database);
-                closeConnection(database1);
+                closeConnection(longTokenDatabase.database);
                 return 0;
             }
             else{
@@ -162,7 +163,7 @@ app.post("/get-long-token", async (req,res, next) =>{
                 return 0;
             }
         }else logger.warn(`Tokendatas database entry not found with by token ${body.token}`)
-        closeConnection(database1);
+        //closeConnection(database1);
     }
     handleError(logger, "003", res);
     //res.send({error : true, errorCode : "003"});            //Nincs token
@@ -175,15 +176,15 @@ app.post("/login", async (req, res, next) =>{
         let user = await collection.findOne({username : body.username, password : Functions.encryption(body.password)});
         closeConnection(database);
         if (user){
-            let {collection} = new Database("short-token");
+            let shortTokenDatabase = new Database("short-token");
             let token = Functions.genrateToken();
             let datas = await otherData(req);
             let userData = Topology.newUserDatas(user);
-            await collection.insertOne({token : token, datas : datas, userData : userData});
+            await shortTokenDatabase.collection.insertOne({token : token, datas : datas, userData : userData});
             res.send({
                 token : token
             });
-            closeConnection(database);
+            closeConnection(shortTokenDatabase.database);
         }
         else{
             handleError(logger, "006", res);//res.send({error : true,errorCode : "006"}) //Rossz felhasználónév vagy jelszó
@@ -202,8 +203,9 @@ app.post("/new-long-token", async (req,res)=>{
             let { collection, database } = new Database("long-token");
             let datas = await collection.findOne({token : body.token});
             if (!datas) return logger.error(`Long-token entry not found with token ${body.token}`);
-            let usersCollection = new Database("admin").collection;
-            let userData = await usersCollection.findOne({username : datas.userData.username, _id : mongodb.ObjectId(datas.userData.id)});
+            let usersDatabase = new Database("admin");
+            let userData = await usersDatabase.collection.findOne({username : datas.userData.username, _id : mongodb.ObjectId(datas.userData.id)});
+            closeConnection(usersDatabase.database);
             let newToken = Functions.genrateToken();
             if (userData){
                 let result = collection.insertOne(await Topology.longTokenData(newToken,Topology.newUserDatas(userData), req, body.token));
@@ -254,6 +256,8 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
             if(datas == undefined) {
                 handleError(logger, "500", res);
                 logger.error(`Admin db cant be read`);
+                closeConnection(l.database);
+                closeConnection(database);
                 return;
             }
             for (let i = 0; i < datas.length; i++){
@@ -271,6 +275,8 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
             if(datas == undefined) {
                 handleError(logger, "500", res);
                 logger.error(`New-user db cant be read`);
+                closeConnection(l.database);
+                closeConnection(database);
                 return;
             }
             for (let i = 0; i < datas.length; i++){
@@ -294,6 +300,11 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
             return;
         }
     }
+    try{
+    closeConnection(l.database);
+    closeConnection(database);
+    }
+    catch{}
     handleError(logger, "004", res);
 });
 
@@ -347,18 +358,18 @@ app.post("/create-profile/:token", async (req,res)=>{
         //console.log(datas && datas.datas.timeInMil + 259200000,new Date().getTime())
         if (datas && datas.datas.timeInMil + 259200000 > new Date().getTime()){
             if (Functions.control_Password_And_Username(body) && access){
-                let { collection,database } = new Database("admin");
+                let adminDatabase = new Database("admin");
                 let l = new Database("new-user");
                 let pedding = l.collection;
-                if (!(await collection.findOne({username : body.username}))){
-                    collection.insertOne({username : body.username, password : Functions.encryption(body.password), readable_user_id : Functions.sanitizeingId(body.username), addedBy : datas.datas.userData, datas : await otherData(req), deleteable : true, access : access});
+                if (!(await adminDatabase.collection.findOne({username : body.username}))){
+                    await adminDatabase.collection.insertOne({username : body.username, password : Functions.encryption(body.password), readable_user_id : Functions.sanitizeingId(body.username), addedBy : datas.datas.userData, datas : await otherData(req), deleteable : true, access : access});
                     res.send({error : !(await pedding.deleteOne({token : token})).acknowledged});
                 }
                 else{
                     handleError(logger, "010", res);
                     //res.send({error : true, errorCode : "010"});        //Felhasználónév foglalt
                 }
-                closeConnection(database);
+                closeConnection(adminDatabase.database);
                 closeConnection(l.database);
             }
             else{
@@ -381,7 +392,6 @@ app.post("/delete-user", async (req,res)=>{
         let access = await control_Token(body.token, req);
         let l = new Database("admin");
         let usersCollection = l.collection;
-        let userDatabase = l.database;
         if (access && access.includes("edit-users")){
             if (body.userId){
                 let id = new ObjectId(body.userId);
@@ -406,7 +416,7 @@ app.post("/delete-user", async (req,res)=>{
             handleError(logger, "004", res);
             //res.send({error : true, errorCode : "004"});
         }
-        closeConnection(userDatabase);
+        closeConnection(l.database);
     }
     else{
         handleError(logger, "004", res);
@@ -589,6 +599,7 @@ app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,as
                 }
             }
             else{
+                closeConnection(database);
                 handleError(logger, "000", res);
                 return;
             }
@@ -675,11 +686,12 @@ app.post("/delete-venue/:id", async (req,res)=>{
         let Ddatas = {}
         Ddatas.deletedContent = await collection.findOne({_id : id});
         let datas = await collection.deleteOne({_id : id});
-        let deletedDb = new Database("deleted-venues").collection;
+        let deletedDb = new Database("deleted-venues");
         Ddatas.deletedBy = await otherData(req, body.token);
-        deletedDb.insertOne(Ddatas);
+        deletedDb.collection.insertOne(Ddatas);
         res.send(datas);
         closeConnection(database);
+        closeConnection(deletedDb.database);
         return;
     }
     }
@@ -876,6 +888,7 @@ app.post("/order-ticket", async (req,res)=>{
         }
         let response = await controlEvent(body.eventId, savingDatas.tickets, "");
         if (!response.error){
+            console.log(getEventDatas(body.eventId));
             let {collection, database} = new Database("pre-buying");
             let result = await collection.insertOne({...savingDatas, otherDatas : await otherData(req)});
             res.send({error : false, token : result.insertedId});
@@ -944,7 +957,7 @@ app.post("/new-coupon", async (req,res)=>{
             else{
                 handleError(logger, "001", res);
             }
-            closeConnection(database)
+            closeConnection(database);
         }
         else{
             handleError(logger, "004", res);
@@ -1055,7 +1068,7 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
             let {collection, database} = new Database("pre-buying");
             let buyingDatas = await collection.findOne({_id : ObjectId(req.params.id)});
-            console.loog(buyingDatas);
+            console.log(buyingDatas);
             closeConnection(database);
             if (buyingDatas){
                 let error = false;
@@ -1095,13 +1108,14 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
                         coupon : !error ? name : false,
                         eventId : buyingDatas.eventId,
                         tickets : buyingDatas.tickets,
-                        status : "pending"
+                        pending : true,
+                        status : false
                     };
                     let l = new Database("buy");
                     result = await l.collection.insertOne(saveDatas);
                     res.send({error : !result.acknowledged});
                     console.log(await controlEvent(buyingDatas.eventId,buyingDatas.tickets, buyingDatas._id));
-                    closeConnection(database);
+                    //closeConnection(database);
                     closeConnection(l.database);
                 }
             }

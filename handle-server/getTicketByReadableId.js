@@ -4,6 +4,9 @@ const getTicketByReadableId = async (id)=>{
     if (id){
         let {collection, database} = new Database("events");
         let tickets = await collection.find().toArray();
+        setTimeout(()=>{
+            database.close()
+        },10000);
         if (tickets.length){
             for (let i = 0; i < tickets.length; i++){
                 if (tickets[i].eventData && tickets[i].eventData.readable_event_name == id){
@@ -11,9 +14,6 @@ const getTicketByReadableId = async (id)=>{
                 }
             }
         }
-        setTimeout(()=>{
-            database.close()
-        },10000);
     }
 
 }

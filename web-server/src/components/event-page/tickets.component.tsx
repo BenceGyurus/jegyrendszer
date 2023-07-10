@@ -8,7 +8,8 @@ type typeOfTicket = {
     name : string,
     ticketId : string,
     amount : number,
-    selected : number
+    selected : number,
+    numberOfFreeTickets : number
 }
 
 type typeOfTicketsParams = {
@@ -31,7 +32,8 @@ const Tickets = ({tickets, incrementFunction, decrementFunction}:typeOfTicketsPa
         <div className="user-page-ticket" id = "tickets">
             <h2 className = "tickets-title">Jegyek:</h2>
       {tickets.map((ticket)=>{
-                return <Ticket name = {ticket.name} price = {ticket.price} amount = {ticket.amount} id = {ticket.id} incrementFunction={incrementFunction} decrementFunction={decrementFunction} key = {ticket.id}/>
+            console.log(ticket.numberOfFreeTickets);
+                return <Ticket name = {ticket.name} price = {ticket.price} amount = {ticket.amount} id = {ticket.id} incrementFunction={incrementFunction} decrementFunction={decrementFunction} key = {ticket.id} free = {ticket.numberOfFreeTickets} />
                 })
             }
             {getPriceOfAllSelected(tickets) ? <div className = "summend-price-box">

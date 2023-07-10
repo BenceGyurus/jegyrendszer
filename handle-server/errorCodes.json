@@ -120,7 +120,17 @@
         "responseCode" : 500
     },
     "031" : {
-        "message" : "Ez a jegy már elfogyott vagy nem kapható",
+        "message" : "A jegy a megadott mennyiségben vagy a megadott helyre már nem kapható",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "032" : {
+        "message" : "Ez a rendezvény már nem érhető el",
+        "type" : "error",
+        "responseCode" : 400
+    },
+    "033" : {
+        "message" : "Ez a hely már foglalat, kérjük válasszon másikat",
         "type" : "error",
         "responseCode" : 400
     }

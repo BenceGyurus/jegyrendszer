@@ -15,13 +15,12 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
             let pendingPlaces = [];
             let ticketAmount = {};
             for (let i = 0; i < preBuyingDatas.length; i++){
-                ticketAmount[preBuyingDatas[i].eventId] = ticketAmount[preBuyingDatas[i].eventId] ? ticketAmount[preBuyingDatas[i].eventId] : {};
                 if (preBuyingDatas[i].time+1800000 > new Date().getTime() && String(preBuyingDatas[i]._id) != String(thisEventId)){            //config prebuying active time
+                    ticketAmount[preBuyingDatas[i].eventId] = ticketAmount[preBuyingDatas[i].eventId] ? ticketAmount[preBuyingDatas[i].eventId] : {amount : 0};
                     for (let k = 0; k < preBuyingDatas[i].tickets.length; k++){
                         if (preBuyingDatas[i].tickets[k].places){
                             pendingPlaces.push(...preBuyingDatas[i].tickets[k].places)
                         }
-                        console.log(preBuyingDatas[i].tickets[k].ticketId);
                         ticketAmount[preBuyingDatas[i].eventId][preBuyingDatas[i].tickets[k].ticketId] = ticketAmount[preBuyingDatas[i].eventId][preBuyingDatas[i].tickets[k].ticketId]  ? ticketAmount[preBuyingDatas[i].eventId][preBuyingDatas[i].tickets[k].ticketId] + preBuyingDatas[i].tickets[k].amount : preBuyingDatas[i].tickets[k].amount;
                     }
                 }
@@ -36,7 +35,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
                                         console.log("OK!")
                                     }
                                     else{
-                                        return {error : true, errorCode : "001"}       //Ez a hely már foglalt
+                                        return {error : true, errorCode : "033"}       //Ez a hely már foglalt
                                     }
                                 }
                                 else{
@@ -49,7 +48,9 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
                             console.log("OK!")
                         }
                         else{
-                            return {error : true, errorCode : "031"}       //Erre a helyre már nem kapható jegy
+                            if (preBuyingDatas.length && ticketAmount[eventDatas.readable_event_name] && Object.keys(ticketAmount[eventDatas.readable_event_name]).includes([eventDatas.tickets[i].id])){
+                                return {error : true, errorCode : "031"}       //Erre a helyre már nem kapható jegy
+                            }
                         }
                     }
                 }
@@ -57,7 +58,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
             return {error : false, errorCode : "elv ok"};
         }
         else{
-            return {error: true, errorCode : "001"}            //Az eseményre már nem, lehet jegyet vásárolni :c
+            return {error: true, errorCode : "032"}            //Az eseményre már nem, lehet jegyet vásárolni :c
         }
     }
     else{

@@ -50,7 +50,9 @@ type typeOfAmountTicket = {
     name : string,
     ticketId : string,
     amount : number,
-    selected : number
+    selected : number,
+    pendingPlaces : Array<string>,
+    numberOfFreeTickets : number
 }
 
 const Local_Sale_Event = ()=>{
@@ -149,14 +151,13 @@ const Local_Sale_Event = ()=>{
         setAmountTickets(lTicketAmount);
     }
 
-    console.log(amountTickets);
 
     return (
             <div>
                 {error ? <Notification element={<Error message={error} />} /> : ""}
                 {eventDatas ? <EventDetails title = {eventDatas.title} description={eventDatas.description} image = {eventDatas.background} /> : ""}
                 {eventDatas ? <Tickets tickets = {amountTickets} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets} /> : ""}
-                {eventDatas ? <Seats places = {eventDatas.places} tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
+                {eventDatas ? <Seats places = {eventDatas.places}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
             </div>
         );
 }
