@@ -106,7 +106,8 @@ class Functions{
                     numberOfTicket : places[i].numberOfTicket,
                     name : places[i].name,
                     pendingPlaces : places[i].pendingPlaces,
-                    numberOfFreeTickets : places[i].numberOfFreeTickets
+                    numberOfFreeTickets : places[i].numberOfFreeTickets,
+                    boughtPlaces : places[i].boughtPlaces
                 }
             );
         }

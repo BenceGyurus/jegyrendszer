@@ -1,13 +1,36 @@
 .event-stat-image{
-    height: 300px;
+    max-height: 300px;
+    width: 30%;
+    margin: 20px;
+    border-radius: 10px;
 }
 
 .event-stat-main-div{
-    width: 45%;
-    margin: 2%;
-    display: inline-table;
+    margin: 10px auto;
+    display: block;
 }
 
 .progress{
-    margin-top: 20px;
+    width: max-content;
+    margin: 20px auto;
+}
+
+.event-stat-details{
+    width: 53%;
+    display: inline-block;
+    margin: 30px;
+}
+
+.event-stat-main-div{
+    width: 80%;
+    margin: 50px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+@media screen and (width > 1000px) {
+    .event-stat-image{
+        float: right;
+    }
 }

@@ -27,6 +27,7 @@ const controlCoupon = require("./controlCoupon.js");
 const Logger = require('./slack-logger');
 const controlEvent = require("./controlEvent.js");
 const getEventDatas = require("./getEventDatas.js");
+const getStatsOfEvents = require("./getStatsOfEvents.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -856,6 +857,7 @@ app.post("/order-ticket", async (req,res)=>{
                 let response = await Control_Seats(body.datas[i].places, body.datas[i].ticketId, body.datas[i].eventId);
                 if (response){
                     for (let j = 0; j < eventDatas.tickets.length; j++){
+                        console.log(eventDatas.tickets[j].id,body.datas[i].ticketId);
                         if (eventDatas.tickets[j].id == body.datas[i].ticketId){
                             if (!body.datas[i].places || (body.datas[i].places.length == body.datas[i].amount)){
                                 savingDatas.tickets.push({ticketId : body.datas[i].ticketId ,places : body.datas[i].places, price : eventDatas.tickets[j].price*body.datas[i].amount, amount : body.datas[i].amount, name : eventDatas.tickets[j].name})
@@ -863,7 +865,7 @@ app.post("/order-ticket", async (req,res)=>{
                                 savingDatas.fullAmount += body.datas[i].amount;
                             }
                             else return handleError(logger, "016", res);
-                        } else return handleError(logger, "500", res);
+                        }// else return handleError(logger, "500", res);
                     }
                 }
                 else return handleError(logger, "015", res);
@@ -917,6 +919,14 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
 });
 
 
+app.post("/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("ticket-sells")){
+            res.send(await getStatsOfEvents());
+        }
+    }
+});
 //COUPONS
 app.post("/new-coupon", async (req,res)=>{
     const body = Functions.parseBody(req.body);
@@ -1048,56 +1058,40 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
             let {collection, database} = new Database("pre-buying");
             let buyingDatas = await collection.findOne({_id : ObjectId(req.params.id)});
-            console.log(buyingDatas);
+            collection.deleteOne({_id : ObjectId(req.params.id)});
             closeConnection(database);
             if (buyingDatas){
                 let error = false;
-                for (let i = 0; i < buyingDatas.tickets.length; i++){
+                /*for (let i = 0; i < buyingDatas.tickets.length; i++){
                     Control_Seats(buyingDatas.tickets[i].places, buyingDatas.tickets[i].ticketId, buyingDatas.eventId) ? true : error = false;
-                }
-                let saveDatas = {};
-                console.log("error:", error);
-                if (!error){
-                    //let {collection, database} = new Database("coupons");
-                    //let coupon = await collection.findOne({name : req.body.datas.coupon});
-                    //let price = buyingDatas.fullPrice;
-                    /*if (coupon){
-                        if (coupon.events.includes(buyingDatas.eventId)){
-                            if (coupon.type == 0){
-                                price = coupon.money ? price > coupon.amount ? price-amount : 0 : price-price * (coupon.amount/100);
-                            }
-                            if (coupon.type == 1){
-                                if (!coupon.usedEvent.includes(buyingDatas.eventId)){
-                                    price = coupon.money ? price > coupon.amount ? price-amount : 0 : price-price * (coupon.amount/100);
-                                }
-                            }
-                            if (coupon.type == 2){
-                                if (!coupon.usedTicket){
-                                    price = coupon.money ? price > coupon.amount ? price-amount : 0 : price-price * (coupon.amount/100);
-                                }
-                            }
-                        }
-                    }*/
-                    console.log(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice);
-                    let {price, error,name} = (await controlCoupon(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice));
-                    saveDatas = {
-                        price : price,
-                        fullPrice : buyingDatas.fullPrice,
-                        customerDatas : req.body.datas.customerData,
-                        time : new Date().getTime,
-                        coupon : !error ? name : false,
-                        eventId : buyingDatas.eventId,
-                        tickets : buyingDatas.tickets,
-                        pending : true,
-                        status : false
-                    };
+                }*/
+                let result = await controlEvent(buyingDatas.eventId,buyingDatas.tickets, buyingDatas._id);
+                if (!result.error){
+                    let saveDatas = {};
+                    if (!error){
+                        let {price, error,name} = (await controlCoupon(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice));
+                        saveDatas = {
+                            price : price,
+                            fullPrice : buyingDatas.fullPrice,
+                            customerDatas : req.body.datas.customerData,
+                            time : new Date().getTime(),
+                            coupon : !error ? name : false,
+                            eventId : buyingDatas.eventId,
+                            tickets : buyingDatas.tickets,
+                            pending : true,
+                            status : false,
+                            bought : false
+                        };
                     let l = new Database("buy");
                     result = await l.collection.insertOne(saveDatas);
                     res.send({error : !result.acknowledged});
-                    console.log(await controlEvent(buyingDatas.eventId,buyingDatas.tickets, buyingDatas._id));
                     //closeConnection(database);
-                    closeConnection(l.database);
+                    }
                 }
+                else{
+                    handleError(logger, result.errorCode ? result.errorCode : "001" ,res)
+                }
+                //closeConnection(l.database);
             }
 
         }
@@ -1155,7 +1149,9 @@ cron.schedule("0 3 * * *", async () => {
 })
 cron.schedule("30 3 * * 6", async () => {
     let {collection, database} = new Database("pre-buying");
-    collection.deleteMany();
+    //collection.deleteMany();
+    let preBuying = collection.find({});
+    for(const j in preBuying) if (new Date(coupons[j].time)+1800000 < new Date().getTime()) preBuying[j].delete();     //config
     closeConnection(database);
 })
 cron.schedule("0 0 1 * *", async () => {

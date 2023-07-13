@@ -1,12 +1,17 @@
 .progress-bar {
   background-color: lightgray;
   border: none;
-  margin: 10px;
-  }
+  margin: 10px auto;
+  border-radius: 3px;
+  overflow: none;
+  outline: none;
+  
+}
 .progress-bar-fill {
   height: 100%;
   transition: width 0.3s ease-in-out;
   display: inline-table;
+  border-radius: 3px;
 }
 
 .label-of-bar{
@@ -23,4 +28,5 @@
   height: 10px;
   display: inline-block;
   margin-left: 5px;
+  border-radius: 2px;
   }

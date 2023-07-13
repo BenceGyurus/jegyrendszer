@@ -1,6 +1,7 @@
 import ProgressBar from "../../../progress/progress.component";
 import { useState } from "react";
 import "../../../../css/ticket-stats.css";
+import TicketRatio from "./ticket-ratio.component";
 
 type typeOfTicket = {
     amount : number,
@@ -33,6 +34,8 @@ type typeOfTicketStatsParams = {
 const TicketStats = ({datas}:typeOfTicketStatsParams)=>{
 
     const [colors, setColors] = useState(["#ff3d3d", "#a8ff75", "#75c8ff", "#df7dfa", "#fa7d9a", "#f8ffa8", "#a8f6ff"]);
+
+    console.log(datas);
 
     const calcDatas = (datas:Array<typeOfDatas>)=>{
         let amountOfPendingTickets = 0;
@@ -77,12 +80,18 @@ const TicketStats = ({datas}:typeOfTicketStatsParams)=>{
                 return (
                     <div className = "event-stat-main-div">
                         <img className = "event-stat-image" src={element.image} alt={`${element.eventName} esemény borítóképe`} />
+                        <div className = "event-stat-details">
                         <h2>{element.eventName}</h2>
                         <h3>Eddigi összes bevétel: {statistics.fullIncome}</h3>
                         <h3>Összes eladott jegy száma: {statistics.sold}</h3>
                         <h3>Függőben lévő jegyek száma: {statistics.pending}</h3>
-                        <div className = "progress"><ProgressBar full={element.numberOfTickets} listOfBars={[{name: "Eladaott jegyek", amount:statistics.sold, backgroundColor:"green", id : `sold-bar-${index+1}`},{name : "Jelenleg foglalt jegyek" ,amount:statistics.pending, backgroundColor:"yellow", id : `pending-bar-${index+1}`}]}/></div>
-                        <div className = "progress"><ProgressBar full={statistics.sold} listOfBars={getArrayToProgressBar(element.datas)} width={200} /></div>
+                        <h3>Megvásárolható jegyek száma: {element.numberOfTickets-statistics.pending-statistics.sold}</h3>
+                        </div>
+                        <h3></h3>
+                        <div className = "progress"><ProgressBar full={element.numberOfTickets} listOfBars={[{name: "Eladaott jegyek", amount:statistics.sold, backgroundColor:"green", id : `sold-bar-${index+1}`},{name : "Jelenleg foglalt jegyek" ,amount:statistics.pending, backgroundColor:"yellow", id : `pending-bar-${index+1}`}]} width={300}/></div>
+                        <h3>Eladott jegyek aránya:</h3>
+                        <div className = "progress"><ProgressBar full={statistics.sold} listOfBars={getArrayToProgressBar(element.datas)} width={300} /></div>
+                        <TicketRatio datas={getArrayToProgressBar(element.datas)} />
                     </div>
                 );
             })}
