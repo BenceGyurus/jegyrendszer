@@ -1,0 +1,26 @@
+.progress-bar {
+  background-color: lightgray;
+  border: none;
+  margin: 10px;
+  }
+.progress-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  display: inline-table;
+}
+
+.label-of-bar{
+  width: 80%;
+}
+
+.label-of-bar{
+  display: inline;
+  margin: 10px;
+}
+
+.bar-color{
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  margin-left: 5px;
+  }

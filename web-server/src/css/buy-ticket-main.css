@@ -3,12 +3,19 @@
         width: 45%;
         display: inline-table;
     }
+    .payingButton{
+        float: right;
+        display: inline !important;
+        margin: 10px !important;
+    }
 }
 
 .payingButton{
-    margin: 10px;
-    float: right;
+    font-size: 15px;
+    margin: 10px auto;
     padding: 5px;
     outline: none;
     border: none;
+    display:  block;
+    cursor: pointer;
 }

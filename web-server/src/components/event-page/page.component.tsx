@@ -16,7 +16,8 @@ type typeOfTicket = {
     name : string,
     ticketId : string,
     pendingPlaces : Array<string>,
-    numberOfFreeTickets : number
+    numberOfFreeTickets : number,
+    boughtPlaces : Array<string>
 }
 
 type typeOfAmountTicket = {
@@ -29,7 +30,8 @@ type typeOfAmountTicket = {
     amount : number,
     selected : number,
     pendingPlaces : Array<string>,
-    numberOfFreeTickets : number
+    numberOfFreeTickets : number,
+    boughtPlaces : Array<string>
 }
 
 type typeOfPageParams = {

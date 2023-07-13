@@ -30,7 +30,8 @@ type typeOfAmountTicket = {
     ticketId : string,
     amount : number,
     selected : number,
-    pendingPlaces : Array<string>
+    pendingPlaces : Array<string>,
+    boughtPlaces : Array<string>
 }
 
 type typeOfSeatsParams = {
@@ -50,7 +51,7 @@ const Seats = ({places, tickets, seleted,onClickFunction}:typeOfSeatsParams)=>{
                 return ticket.places.map((place:string)=>{
                     return places.seatsDatas.map((seat:typeOfSeat)=>{
                         console.log(ticket.pendingPlaces);
-                        return place === seat.id ? <Seat color={places.colorOfSeat} seat={seat} size = {places.sizeOfSeat} classname = {!ticket.pendingPlaces.includes(seat.id) ? ticket.amount > 0 ? seleted.includes(seat.id) ? "user-selected"  : ticket.selected >= ticket.amount ? "user-disabled" : "user-allowed" : "user-disabled" : "user-pending"} onClickFunction = {onClickFunction} /> : "";
+                        return place === seat.id ? <Seat color={places.colorOfSeat} seat={seat} size = {places.sizeOfSeat} classname = {!ticket.boughtPlaces.includes(seat.id) ? !ticket.pendingPlaces.includes(seat.id) ? ticket.amount > 0 ? seleted.includes(seat.id) ? "user-selected"  : ticket.selected >= ticket.amount ? "user-disabled" : "user-allowed" : "user-disabled" : "user-pending" : "user-bought"} onClickFunction = {onClickFunction} /> : "";
                     })
                 })
             })

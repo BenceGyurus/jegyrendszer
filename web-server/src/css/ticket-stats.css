@@ -1,0 +1,13 @@
+.event-stat-image{
+    height: 300px;
+}
+
+.event-stat-main-div{
+    width: 45%;
+    margin: 2%;
+    display: inline-table;
+}
+
+.progress{
+    margin-top: 20px;
+}

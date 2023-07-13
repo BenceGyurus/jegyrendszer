@@ -16,7 +16,8 @@ type typeOfTicketDatas = {
     id : string,
     eventName : string,
     image : string,
-    datas : Array<typeOfDatas>
+    datas : Array<typeOfDatas>,
+    numberOfTickets : number
 }
 
 const TicketSalesMain = ()=>{

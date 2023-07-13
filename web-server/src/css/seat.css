@@ -60,3 +60,8 @@
   background-color: yellow !important;
   cursor: not-allowed !important;
 }
+
+.user-bought{
+  background-color: red !important;
+  cursor: not-allowed;
+}

@@ -52,7 +52,8 @@ type typeOfAmountTicket = {
     amount : number,
     selected : number,
     pendingPlaces : Array<string>,
-    numberOfFreeTickets : number
+    numberOfFreeTickets : number,
+    boughtPlaces : Array<string>
 }
 
 const Local_Sale_Event = ()=>{
