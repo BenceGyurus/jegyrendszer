@@ -1,131 +1,76 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useEffect, useState } from 'react';
-import type {PropsWithChildren} from 'react';
-import Header from './component/header/header.component';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
   View,
-  Image
 } from 'react-native';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import getLocalStorage from './storage/getStorage';
+import LoginPage from './component/loginPage/loginPage.component';
+import LoadEvents from './component/loadEvents/loadEvents.component';
+import postData from './requests/post';
+import Loader from './component/loader/loader.component';
+import BasicStyle from './defaultStyles/style';
 
-import {
-  Colors,
-  DebugInstructions,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-
-type typeOfEvents = {
-  id : string,
-  date : Date,
-  title : string,
-  description : string,
-  imageName : string
-}
-
-function Section({children, title}: SectionProps): JSX.Element {
+function App(){
   const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  const [events, setEvents] = useState(Array<typeOfEvents>);
-  const [basicUrl, setBasicUrl] = useState("http://127.0.0.1:3000")
+  const [basicUrl, setBasicUrl] = useState("http://192.168.1.216:3000");
+  const [isTokenValid, setIsTokenValid] = useState(false);
+  const [token, setToken] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  useEffect(()=>{
-    fetch(`${basicUrl}/events`)
-    .then(response => response.json())
-    .then(datas  => setEvents(datas.events))
-    .catch(
+  const controlToken = ()=>{
+    getLocalStorage("long_token").then(long_token=>{
+      if (long_token){
+        postData(`${basicUrl}/get-access`, {token : long_token})
+        .then(response=>{
+          if (response.access){
+            setToken(long_token);
+          }
+          else{
+            setToken("");
+          }
+        })
+      }
+    })
+  }
 
-    )
-  }, []);
+  useEffect(()=>{
+    controlToken();
+  },[]);
+
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-            {events.length ? events.map((element)=>{
-              return <View key = {element.id}>
-                        <Text style = {{color : "white", fontSize : 50}}>{element.title}</Text>
-                        <Image style = {{width : 100, height : 100}} source = {{uri : `${basicUrl}${element.imageName}`}} />
-              </View>
-            }) : <View><Text style = {{color : "red"}}>Jelenleg nincs esemény</Text></View>}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+     <SafeAreaView style = {{backgroundColor : isDarkMode ? BasicStyle.dark.backgroundColor : BasicStyle.light.backgroundColor}}>
+      {!token ? <LoginPage isDark = {isDarkMode} defaultUrl={basicUrl} reloadEvent = {controlToken} loaderFunction = {setLoader} /> : <LoadEvents controlTokenFunction={controlToken} isDark = {isDarkMode} basicUrl={basicUrl} />}
+      {loader ? <Loader /> : ""}
+     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
 export default App;
+
+
+/* <SafeAreaView style={backgroundStyle}>
+      {isTokenValid ? <></> : <LoginPage isDark={isDarkMode} />}
+    </SafeAreaView>*/
+
+//<LoginPage isDark = {isDarkMode} defaultUrl={basicUrl} />
+/*
+<Header />
+      <FullHeightScroll
+      isDark = {isDarkMode}
+      children={
+        <View
+          style={{
+            backgroundColor: isDarkMode ? Colors.black : Colors.white
+          }}>
+            {events.length ? <MainEventList eventDatas={events} basicUrl={basicUrl} isDark = {isDarkMode} /> : <View><Text style = {{color : "red"}}>Jelenleg nincs esemény</Text></View>}</View> }/>
+            */

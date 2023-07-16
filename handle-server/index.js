@@ -28,6 +28,7 @@ const Logger = require('./slack-logger');
 const controlEvent = require("./controlEvent.js");
 const getEventDatas = require("./getEventDatas.js");
 const getStatsOfEvents = require("./getStatsOfEvents.js");
+const getPriceOfTicket = require("./dynamic-ticket-price.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -129,6 +130,9 @@ app.get("/event/:id", async (req,res)=>{
             }else logger.warn(`Place not found with id ${event.venue}`)
             place.seatsDatas = placesOfEvent;
             
+        }
+        for (let i = 0; i < event.tickets.length; i++){
+            getPriceOfTicket(event.readable_event_name, event.tickets[i].id);
         }
         res.send({allPendingPlaces : event.allPendingPlaces, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
         return;
