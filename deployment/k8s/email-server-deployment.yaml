@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-server
+  labels:
+    app: email-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: email-server
+  template:
+    metadata:
+      labels:
+        app: email-server
+    spec:
+      volumes:
+      - name: tickets_folder
+        persistentVolumeClaim:
+        claimName: handle-server-pvc-tickets
+      containers:
+      - name: email-server
+        image: nginx
+        ports:
+        - containerPort: 5000
+      envFrom:
+      - configMapRef:
+          name: email-server-configmap
+      - secretRef:
+          name: email-server-secretmap
+      volumeMounts:
+      - name: tickets_folder
+        mountPath: /tickets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: email-server-service
+spec:
+  selector:
+    app: email-server
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: email-server-configmap
+data:
+  PY_MAIL: agora.mail.service@gmail.com
+  PY_DIR: ../data/email
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: email-server-secretmap
+type: Opaque
+data:
+  PYPASS: bmJkY2VjZnp4Z2NibnpiZQo=

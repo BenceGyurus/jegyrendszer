@@ -29,6 +29,7 @@ const controlEvent = require("./controlEvent.js");
 const getEventDatas = require("./getEventDatas.js");
 const getStatsOfEvents = require("./getStatsOfEvents.js");
 const getPriceOfTicket = require("./dynamic-ticket-price.js");
+const { PKPass } = require('passkit-generator');
 const ControlLoginRequest = require("./loginConrtol.js");
 
 const closeConnection = (database)=>{
@@ -902,6 +903,43 @@ app.post("/api/v1/create-ticket", async (req, res) => {
         },
         data : ticketInfo
     };
+
+    let {collection, database} = new Database("events");
+    let eventInDb = await collection.findOne({_id : new ObjectId(req.body.event_id)});
+    if(!eventInDb) return handleError(logger, "500", res);
+
+    await PKPass.from({
+        model: './ticket_model/generic.pkpass', //! change to actual
+        certificates: {
+            wwdr: fs.readFileSync("./certs/wdr.pem"), 
+            signerCert: fs.readFileSync("./certs/signerCert.pem"),
+            signerKey: fs.readFileSync("./certs/signerKey.pem"),
+            signerKeyPassphrase: "test" //!change
+        },
+    }, {
+            description: eventInDb.description, //?
+            logoText: "",
+            serialNumber: "",
+            authenticationToken: process.env.APPLE_PASS_IDENTIFIER,
+        }.then(async (newPass) => {
+            newPass.primaryFiels.push({
+                key: "primary",
+                label: "eventname",
+                value: eventInDb.name, //?
+            });
+            newPass.secondaryFields.push({
+                key: "secondary",
+                label: "eventdate",
+                value: req.body.start, //?
+            });
+            newPass.auxiliaryFields.push({
+                key: "auxiliary",
+                label: "eventdescription",
+                value: eventInDb.description
+            });
+            // newPass.setBarcodes()
+        })
+    )
     axios(axiosConfig)
         .then((email_response) => res.send({'filename': email_response.data}))
         .catch((err) => logger.err(`Failed ticket creation with ${ticketInfo}`));

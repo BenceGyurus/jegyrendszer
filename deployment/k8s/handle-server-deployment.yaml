@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: handle-server
+  labels:
+    app: handle-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: handle-server
+  template:
+    metadata:
+      labels:
+        app: handle-server
+    spec:
+      volumes:
+      - name: uploads_folder
+        persistentVolumeClaim:
+          claimName: handle-server-pvc-uploads
+      - name: tickets_folder
+        persistentVolumeClaim:
+          claimName: handle-server-pvc-tickets
+      containers:
+      - name: handle-server
+        image: nginx
+        resources:
+        ports:
+        - containerPort: 3001
+          name: backend-open
+        envFrom:
+        - configMapRef:
+            name: handle-server-configmap
+        - secretRef:
+            name: handle-server-secretmap
+        volumeMounts:
+        - name: uploads_folder
+          mountPath: /uploads
+        - name: tickets_folder
+          mountPath: /tickets
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: handle-server-service
+spec:
+  selector:
+    app: handle-server
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: backend-open
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: handle-server-configmap
+data:
+  EMAIL_SERVER: http://localhost:5000
+  MONGO_URI: mongodb://localhost:27017/
+  CONFIGDIR: /
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: handle-server-secretmap
+type: Opaque
+data:
+  SLACK_TOKEN: eG94cC0zMzExNTU0NTgyNzc1LTMzMjYxNDk0ODU2MDItNTU1ODEzMjQ4MDgxNi1iOTlmZWVhYjA3Y2M2MTM0MzYwZjllNDgwMGM5ZDE4Ygo=
+  APPLE_PASS_IDENTIFIER: ###
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: handle-server-pvc-uploads
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  storageClassName: backend-uploads
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: handle-server-pvc-tickets
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  storageClassName: backend-tickets
+  accessModes:
+    - ReadWriteOnce

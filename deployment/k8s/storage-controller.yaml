@@ -1,0 +1,45 @@
+#TODO switch to google cloud storage
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: backend-uploads
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: backend-uploads
+  local:
+    path: /Users/bencetoth/Documents/Development/Projects/jegyrendszer/
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: backend-tickets
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: backend-tickets
+  local:
+    path: /Users/bencetoth/Documents/Development/Projects/jegyrendszer/
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-data
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: mongo-data
+  local:
+    path: /Users/bencetoth/Documents/Development/Projects/jegyrendszer/
