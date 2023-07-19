@@ -2,7 +2,6 @@ const {WebClient} = require('@slack/web-api')
 
 class Logger {
     constructor(){
-        console.log(process.env);
         this.client = new WebClient(process.env.SLACK_TOKEN)
     }
     sendMessage = async (message) => {
@@ -88,10 +87,10 @@ class Logger {
         })
     }
     log = async (message) => {
-        await this.client.chat.postMessage({
-            channel: "jegyrendszer-logs",
-            text: `LOG - ${message}`,
-        })
+            await this.client.chat.postMessage({
+                channel: "jegyrendszer-logs",
+                text: `LOG - ${message}`,
+            })
     }
 
 }

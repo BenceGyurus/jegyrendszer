@@ -53,12 +53,6 @@
             height: 25%;
             z-index: 1;
         }
-        .event-page-description{
-            position: absolute;
-            bottom: 120px;
-            margin: 10px;
-            color: white;
-        }
         .buy-ticket-button{
             position: absolute;
             bottom: 10px;
@@ -66,6 +60,12 @@
         }
         .buy-ticket-button{
           top: 90% ! important;
+        }
+        .user-side-media{
+          width: 100% !important;
+        }
+        .user-side-media-elements{
+          width : max-content !important;
         }
   }
 
@@ -130,10 +130,15 @@
 
 .user-side-media{
   display: inline-table;
-  width: 100%;
 }
 
 .user-side-media-elements{
   width: 80%;
   margin: 10px auto;
+}
+
+.event-page-description{
+  width: 90%;
+  margin: 20px auto;
+  text-align: justify;
 }

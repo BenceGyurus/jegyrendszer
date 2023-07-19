@@ -1,5 +1,6 @@
 import Event from "../event/event.component";
 import { v4 as uuid } from 'uuid';
+import GoogleSchemaEvents from "./googleSchema.component";
 
 const EventList = (events:any)=>{
 
@@ -16,19 +17,23 @@ const EventList = (events:any)=>{
     }
 
     return (
-        events.events.map((event:any)=>{
-            return (
-                <Event
-                    id = {event.id}
-                    imageName = {event.imageName}
-                    date = {event.date}
-                    description = {description_Control(event.description)}
-                    title = {event.title}
-                    key = {event.id}
-                    />
-                )
-    })
-    );
+        <div>
+            <GoogleSchemaEvents events={events.events} />
+            {
+            events.events.map((event:any)=>{
+                return (
+                    <Event
+                        id = {event.id}
+                        imageName = {event.imageName}
+                        date = {event.date}
+                        description = {description_Control(event.description)}
+                        title = {event.title}
+                        key = {event.id}
+                        />
+                    )
+        })}
+    </div>
+    )
 }
 
 export default EventList;

@@ -113,7 +113,7 @@ const Local_Sale_Event = ()=>{
 
     useEffect(()=>{
         let id = window.location.pathname.split("/")[3]
-        fetch(`/event/${id}`)
+        fetch(`/api/v1/event/${id}`)
         .then(
             async (response:any)=>{
                response = await response.json();

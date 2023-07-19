@@ -9,7 +9,7 @@ const App = ()=>{
 
     useEffect(
         ()=>{
-            fetch("/events")
+            fetch("/api/v1/events")
             .then(async (response:any)=>{response =  await response.json();response.status === 404 ? setTimeout(()=>{setIsItLoad(true)}, 2500) : response.error ? setIsItLoad(true) : setTimeout(()=>{setEvents(response.events); setIsItLoad(true)}, 2500);});
         },[]
     );

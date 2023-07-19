@@ -1,6 +1,6 @@
 async function postData(url = '', data = {}) {
     // Default options are marked with *
-    const response = await fetch(url, {
+    const response = await fetch(`/api/v1${url}`, {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',

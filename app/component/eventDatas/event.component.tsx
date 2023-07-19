@@ -14,7 +14,7 @@ const Event = ({id, closeFunction, basicUrl}:typeOfEventParams)=>{
     
     const getEventDatas = ()=>{
         if (id){
-            fetch(`${basicUrl}/event/${id}`)
+            fetch(`/api/v1/${basicUrl}/event/${id}`)
             .then(async (response:any)=>{
                 response = await response.json();
                 if (!response.error){

@@ -18,7 +18,7 @@ import LocalSaleMain from "../components/admin/operation/local-sale/local-sale-m
 import Local_Sale_Event from "../components/admin/operation/local-sale/opend-event.component";
 import TicketSalesMain from "../components/admin/operation/ticket-sales/main";
 import Aszf from "../components/aszf/aszf.component";
-
+import CompaniesMain from "../components/admin/operation/companies/companiesMain";
 
 
 function Navigation() {
@@ -45,6 +45,7 @@ function Navigation() {
           <Route path = "/admin/eladas/*" element = {<AdminPage component = {<Local_Sale_Event />}/>} />
           <Route path = "/admin/jegy-eladasok" element={<AdminPage component = {<TicketSalesMain />} />} />
           <Route path = "/aszf" element={<Aszf />} />
+          <Route path = "/admin/cegek" element = {<AdminPage component ={<CompaniesMain />} />} />
         </Routes>
       </BrowserRouter>
     </div>

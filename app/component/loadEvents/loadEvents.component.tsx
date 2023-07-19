@@ -26,7 +26,7 @@ const LoadEvents = ({isDark, basicUrl, controlTokenFunction}:typeOfLoadEventsPar
 
     const loadEvents = ()=>{
         controlTokenFunction();
-        fetch(`${basicUrl}/events`)
+        fetch(`/api/v1/${basicUrl}/events`)
         .then(async (response:any)=>{
             response = await response.json();
             if (!response.error){

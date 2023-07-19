@@ -46,5 +46,17 @@
     "buy" : {
         "database" : "buying",
         "collection" : "buying"
+    },
+    "companies" : {
+        "database" : "users",
+        "collection" : "companies"
+    },
+    "login-tried" : {
+        "database" : "users",
+        "collection" : "try"
+    },
+    "banned" : {
+        "database" : "users",
+        "collection" : "banned"
     }
 }

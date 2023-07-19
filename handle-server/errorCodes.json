@@ -138,5 +138,10 @@
         "message" : "Ez a hely már foglalat, kérjük válasszon másikat",
         "type" : "error",
         "responseCode" : 400
+    },
+    "034" : {
+        "message" : "A következő bejelentkezésig várnia kell 5 percet",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

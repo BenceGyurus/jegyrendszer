@@ -29,6 +29,7 @@ const controlEvent = require("./controlEvent.js");
 const getEventDatas = require("./getEventDatas.js");
 const getStatsOfEvents = require("./getStatsOfEvents.js");
 const getPriceOfTicket = require("./dynamic-ticket-price.js");
+const ControlLoginRequest = require("./loginConrtol.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -73,7 +74,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 //EVENTS
-app.get("/events", async (req,res) =>{
+app.get("/api/v1/events", async (req,res) =>{
     let {collection, database} = new Database("events");
     let datas = await collection.find().toArray();
     let sendDatas = [];
@@ -94,7 +95,7 @@ app.get("/events", async (req,res) =>{
     res.status(200).send({events : sendDatas});
 });
 
-app.get("/event/:id", async (req,res)=>{
+app.get("/api/v1/event/:id", async (req,res)=>{
     let id = req?.params?.id;
     if(id == undefined) return handleError(logger, "400", res);
     //let {collection, database} = new Database("events");
@@ -142,12 +143,12 @@ app.get("/event/:id", async (req,res)=>{
 
 
 //ACCESS + LOGINS
-app.post("/get-access", async (req,res)=>{
+app.post("/api/v1/get-access", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     res.send({access : Functions.merge_Access(await control_Token(body.token, req))});
 })
 
-app.post("/get-long-token", async (req,res, next) =>{
+app.post("/api/v1/get-long-token", async (req,res, next) =>{
     let body = Functions.parseBody(req.body);
     if (body.token){
         let {collection, database} = new Database("short-token");
@@ -174,7 +175,7 @@ app.post("/get-long-token", async (req,res, next) =>{
     //res.send({error : true, errorCode : "003"});            //Nincs token
 });
 
-app.post("/login", async (req, res, next) =>{
+app.post("/api/v1/login", async (req, res, next) =>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.username && body.password){
         let {collection, database} = new Database("admin");
@@ -192,15 +193,16 @@ app.post("/login", async (req, res, next) =>{
             closeConnection(shortTokenDatabase.database);
         }
         else{
+            if (!await ControlLoginRequest(req,res)){return}
             handleError(logger, "006", res);//res.send({error : true,errorCode : "006"}) //Rossz felhasználónév vagy jelszó
         }
         }
     else{
         handleError(logger, "006", res);
-    }       
+    }
 });
 
-app.post("/new-long-token", async (req,res)=>{
+app.post("/api/v1/new-long-token", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -234,7 +236,7 @@ app.post("/new-long-token", async (req,res)=>{
     handleError(logger, "004", res);
 })
 
-app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+app.post("/api/v1/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
@@ -251,7 +253,7 @@ app.post("/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next), asyn
 
 
 //USERS
-app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+app.post("/api/v1/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
@@ -313,7 +315,7 @@ app.post("/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async (req,r
     handleError(logger, "004", res);
 });
 
-app.post("/add-new-user", async (req,res)=>{
+app.post("/api/v1/add-new-user", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -350,7 +352,7 @@ app.post("/add-new-user", async (req,res)=>{
     }
 });
 
-app.post("/create-profile/:token", async (req,res)=>{
+app.post("/api/v1/create-profile/:token", async (req,res)=>{
     let token = req?.params?.token;
     if(token == undefined) return handleError(logger, "400", res);
     let body = Functions.parseBody(req.body);
@@ -391,7 +393,7 @@ app.post("/create-profile/:token", async (req,res)=>{
     }
 });
 
-app.post("/delete-user", async (req,res)=>{
+app.post("/api/v1/delete-user", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -428,7 +430,7 @@ app.post("/delete-user", async (req,res)=>{
     }
 });
 
-app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+app.post("/api/v1/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
@@ -457,7 +459,7 @@ app.post("/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async
     }else handleError(logger, "400", res);
 });
 
-app.post(`/delete-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+app.post(`/api/v1/delete-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         if (req?.params?.id){
             let access = await control_Token(req.body.token, req);
@@ -474,7 +476,7 @@ app.post(`/delete-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,ne
     }else handleError(logger, "400", res);
 });
 
-app.post(`/edit-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+app.post(`/api/v1/edit-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         if (req.params.id && req.body.datas){
             let access = await control_Token(req.body.token, req);
@@ -503,7 +505,7 @@ app.post(`/edit-pedding-user/:id`, (req,res,next)=>parseBodyMiddleeware(req,next
     } else handleError(logger, "001", res);
 });
 
-app.post("/get-user-data", async (req,res)=>{
+app.post("/api/v1/get-user-data", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -529,7 +531,7 @@ app.post("/get-user-data", async (req,res)=>{
     }else handleError(logger, "003", res);
 })
 
-app.post("/change-username", async (req,res) =>{
+app.post("/api/v1/change-username", async (req,res) =>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -556,7 +558,7 @@ app.post("/change-username", async (req,res) =>{
     }else handleError(logger, "003", res);
 })
 
-app.post("/change-password", async (req,res)=>{
+app.post("/api/v1/change-password", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -585,7 +587,7 @@ app.post("/change-password", async (req,res)=>{
 
 
 //VENUES
-app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+app.post("/api/v1/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-rooms") && controlTypesOfVenues(req.body.datas)){
@@ -608,7 +610,7 @@ app.post("/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), as
     } else return handleError(logger, "400", res);
 });
 
-app.post("/upload-venue", async (req,res)=>{
+app.post("/api/v1/upload-venue", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -623,7 +625,7 @@ app.post("/upload-venue", async (req,res)=>{
     } else return handleError(logger, "400", res);
 })
 
-app.post("/venues", async (req,res)=>{
+app.post("/api/v1/venues", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -654,7 +656,7 @@ app.post("/venues", async (req,res)=>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), async (req,res)=> {
+app.post("/api/v1/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), async (req,res)=> {
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-rooms") && req.params.id){
@@ -676,7 +678,7 @@ app.post("/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), async (
     } else return handleError(logger, "400", res);
 })
 
-app.post("/delete-venue/:id", async (req,res)=>{
+app.post("/api/v1/delete-venue/:id", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -696,7 +698,7 @@ app.post("/delete-venue/:id", async (req,res)=>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+app.post("/api/v1/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     // console.log(req.body);
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
@@ -721,7 +723,7 @@ app.post("/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req,next),
 
 
 //EVENTS
-app.post("/add-event",async (req,res)=>{
+app.post("/api/v1/add-event",async (req,res)=>{
     let body = Functions.parseBody(req.body);
     // console.log(req.body)
     if (body && typeof body === TypeOfBody &&body.token){
@@ -742,7 +744,7 @@ app.post("/add-event",async (req,res)=>{
     
 });
 
-app.post("/get-event-data/:id", async (req,res)=>{
+app.post("/api/v1/get-event-data/:id", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     let id = req.params.id;
     if (body && typeof body === TypeOfBody &&body.token){
@@ -764,7 +766,7 @@ app.post("/get-event-data/:id", async (req,res)=>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/add-event/:id",async (req,res)=>{
+app.post("/api/v1/add-event/:id",async (req,res)=>{
     let body = Functions.parseBody(req.body);
     let id = req.params.id;
     if (body && typeof body === TypeOfBody && body.token){
@@ -785,7 +787,7 @@ app.post("/add-event/:id",async (req,res)=>{
     
 });
 
-app.post("/events", async (req,res)=>{
+app.post("/api/v1/events", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -805,7 +807,7 @@ app.post("/events", async (req,res)=>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/delete-event/:id", async (req,res)=>{
+app.post("/api/v1/delete-event/:id", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     let id = req.params.id;
     if (body && typeof body === TypeOfBody && body.token && id){
@@ -826,7 +828,7 @@ app.post("/delete-event/:id", async (req,res)=>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/get-all-event", async (req,res)=>{
+app.post("/api/v1/get-all-event", async (req,res)=>{
     const body = Functions.parseBody(req.body);
     if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -851,7 +853,7 @@ app.post("/get-all-event", async (req,res)=>{
 
 
 //TICKETS
-app.post("/order-ticket", async (req,res)=>{
+app.post("/api/v1/order-ticket", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
         let eventDatas = await getTicketByReadableId(body.eventId);
@@ -889,7 +891,7 @@ app.post("/order-ticket", async (req,res)=>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/create-ticket", async (req, res) => {
+app.post("/api/v1/create-ticket", async (req, res) => {
     const ticketInfo = Functions.parseBody(req.body);
     if(!ticketInfo) return handleError(logger, "030", res);
     let axiosConfig = {
@@ -905,7 +907,7 @@ app.post("/create-ticket", async (req, res) => {
         .catch((err) => logger.err(`Failed ticket creation with ${ticketInfo}`));
 })
 
-app.get("/buy-ticket-details/:token", async (req,res)=>{
+app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
     if (req.params && req.params.token){
         const {collection, database} = new Database("pre-buying");
         let datas = await collection.findOne({_id : new ObjectId(req.params.token)});
@@ -923,7 +925,7 @@ app.get("/buy-ticket-details/:token", async (req,res)=>{
 });
 
 
-app.post("/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+app.post("/api/v1/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("ticket-sells")){
@@ -932,7 +934,7 @@ app.post("/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next), async 
     }
 });
 //COUPONS
-app.post("/new-coupon", async (req,res)=>{
+app.post("/api/v1/new-coupon", async (req,res)=>{
     const body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token && body.datas){
         let access = await control_Token(body.token, req);
@@ -957,7 +959,7 @@ app.post("/new-coupon", async (req,res)=>{
     } else return handleError(logger, "030", res);
 })
 
-app.post("/get-coupons", async (req,res)=>{
+app.post("/api/v1/get-coupons", async (req,res)=>{
     const body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -978,7 +980,7 @@ app.post("/get-coupons", async (req,res)=>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/delete-coupon/:id", async (req,res) =>{
+app.post("/api/v1/delete-coupon/:id", async (req,res) =>{
     const body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -994,7 +996,7 @@ app.post("/delete-coupon/:id", async (req,res) =>{
     } else return handleError(logger, "400", res);
 });
 
-app.post("/edit-coupon/:id", async (req,res)=>{
+app.post("/api/v1/edit-coupon/:id", async (req,res)=>{
     const body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.token && body.datas){
         let access = await control_Token(body.token, req);
@@ -1018,7 +1020,7 @@ app.post("/edit-coupon/:id", async (req,res)=>{
 })
 
 //TODO error handling
-app.post("/control-coupon-code", async (req,res)=>{
+app.post("/api/v1/control-coupon-code", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.code && body.eventId){
         /*let {collection, database} = new Database("coupons");
@@ -1057,7 +1059,7 @@ app.post("/control-coupon-code", async (req,res)=>{
 
 //PAYMENT
 //TODO error handling
-app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
+app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
             let {collection, database} = new Database("pre-buying");
@@ -1103,8 +1105,66 @@ app.post("/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async 
 })
 
 
+//COMPANIES
+app.post("/api/v1/new-company", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && req.body.token && typeof req.body == TypeOfBody && typeof req.body.datas == "object"){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("companies")){
+            const {collection, database} = new Database("companies");
+            if (req.body.datas.name && req.body.datas.taxNumber){
+                let result = await collection.insertOne({name : req.body.datas.name, tax : req.body.datas.taxNumber, otherDatas : await otherData(req, req.body.token)});
+                res.send({error : result.insertedId > 0});
+            }
+            closeConnection(database);
+        }
+    }
+});
+
+app.post("/api/v1/get-companies", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token,req);
+        if (access && access.includes("companies")){
+            const {collection, database} = new Database("companies");
+            datas = await collection.find().toArray();
+            let sendDatas = [];
+            for (let i = 0; i < datas.length; i++){
+                sendDatas.push({name : datas[i].name, tax : datas[i].tax, _id : datas[i]._id});
+            }
+            res.send({datas : sendDatas});
+            closeConnection(database);
+        }
+    }
+});
+
+app.post("/api/v1/delete-company/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("companies")){
+            const {collection, database} = new Database("companies");
+            let result = await collection.deleteOne({_id : ObjectId(req.params.id)});
+            res.send({error : result.deletedCount == 0});
+            closeConnection(database);
+        }
+    }
+});
+
+app.post("/api/v1/edit-company/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.params.id && req.body.datas){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("companies")){
+            console.log(req.body.datas);
+            if (req.body.datas.name && req.body.datas.taxNumber){
+                const {collection, database} = new Database("companies");
+                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {name : req.body.datas.name, tax : req.body.datas.taxNumber}});
+                res.send({error : result.matchedCount == 0});
+                closeConnection(database);
+            }
+        }
+    }
+});
+
 //OTHER
-app.post('/upload-image/:token', upload.single('file'), async (req, res, next) => {
+app.post('/api/v1/upload-image/:token', upload.single('file'), async (req, res, next) => {
     const token = req.params.token;
     if (token){
         let access = await control_Token(token, req);

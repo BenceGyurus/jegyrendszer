@@ -1,0 +1,15 @@
+.add-company-window{
+    width: 40%;
+    position: fixed;
+    left: 40%;
+    height: 300px;
+    background-color: rgba(255, 255, 255, 1);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    z-index: 10;
+    top: 23%;
+}
+
+.add-company-window-data{
+    margin: 30px;
+}

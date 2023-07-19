@@ -17,7 +17,7 @@ const LocalSaleMain = ()=>{
     const [events, setEvents]:[Array<typeOfEvent>, Function] = useState([]);
 
     useState(()=>{
-        fetch("/events")
+        fetch("/api/v1/events")
         .then(async (response)=>{setEvents((await response.json()).events)});
     });
 

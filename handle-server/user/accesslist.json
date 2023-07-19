@@ -6,5 +6,8 @@
     "profile" : ["Profil" , "admin/profil"],
     "ticket-sells" : ["Jegy eladások", "admin/jegy-eladasok"],
     "ref" : ["Kuponok", "admin/kuponok"],
-    "local-sale" : ["Helyi eladás", "admin/helyi-eladas"]
+    "local-sale" : ["Helyi eladás", "admin/helyi-eladas"],
+    "companies" : ["Cégek szerkesztése", "admin/cegek"],
+    "edit-aszf" : ["ÁSZF szerkesztése", "/edit/aszf"],
+    "edit-letter" : ["Email szerkesztése", "/edit/email"]
 }

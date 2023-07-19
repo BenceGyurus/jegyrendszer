@@ -55,7 +55,7 @@ const EventPage = (params:any)=>{
 
     useEffect(()=>{
         let idOfEvent = (window.location.pathname.split("/")[window.location.pathname.split("/").length-1]);
-        fetch(`/event/${idOfEvent}`)
+        fetch(`/api/v1/event/${idOfEvent}`)
         .then(async (response:any)=>{
             let datas = await response.json();
             setResponsed(true)

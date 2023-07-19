@@ -106,7 +106,7 @@ const BuyTicketMainPage = ()=>{
 
     useEffect(()=>{
         let token = window.location.pathname.split("/")[2];
-        fetch(`/buy-ticket-details/${token}`)
+        fetch(`/api/v1/buy-ticket-details/${token}`)
         .then(response=>response.json())
         .then(data=>setTicketDatas(data));
     }, []);
@@ -114,7 +114,7 @@ const BuyTicketMainPage = ()=>{
     return <div>
         {error ? <Notification element={<Error message={error} closeFunction={()=>{setError("")}} />} /> : ""}
         <h1>Adatok megadása</h1>
-        <DatasOfCustomer setFirstName={setFirstname} setLastName={setLastname} setPostalCode={setPostCode} setCity={setCity} setAddress={setAddress} setAddress2={setAddress2} setMail={setMail} setPhone={setPhone} setTaxNumber={setTaxNumber} />
+        <DatasOfCustomer setFirstName={setFirstname} setLastName={setLastname} setPostalCode={setPostCode} setCity={setCity} setAddress={setAddress} setAddress2={setAddress2} setMail={setMail} setPhone={setPhone} setTaxNumber={setTaxNumber} city = {city} />
         <div className = "deitals">
         {ticketDatas.eventId ? <Details tickets = {ticketDatas.tickets} fullPrice={ticketDatas.fullPrice} nameOfEvent={ticketDatas.eventName} coupon={usedCoupon} /> : <Loader />}
         <Coupon onClickFunction={useRefCode} changeReferalCode={setReferalCode} value = {referalCode} />
