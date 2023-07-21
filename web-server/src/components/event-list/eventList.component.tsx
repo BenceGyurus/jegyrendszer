@@ -17,7 +17,7 @@ const EventList = (events:any)=>{
     }
 
     return (
-        <div>
+        <div className = "event-list-div">
             <GoogleSchemaEvents events={events.events} />
             {
             events.events.map((event:any)=>{

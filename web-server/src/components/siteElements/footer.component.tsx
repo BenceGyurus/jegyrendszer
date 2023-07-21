@@ -1,6 +1,8 @@
 import "../../css/footer.css";
-const footer = ()=>{
-    return (
+import Map from "../map/map.component";
+const Footer = ()=>{
+
+return (
 <footer>
 <div className="footer-container">
   <div className="row">
@@ -19,22 +21,14 @@ const footer = ()=>{
         <li><i className="fab fa-facebook-square"></i><a href="https://www.facebook.com/agora.savaria">Facebook</a></li>
       </ul>
     </div>
-    <div className="col-md-6">
-      <h3>Fejlesztőknek</h3>
-      <ul className="list-unstyled">
-        <li><i className="fas fa-code"></i><a href="#">API Documentation</a></li>
-        <li><a href="#">Bug Tracker</a></li>
-      </ul>
-    </div>
   </div>
 </div>
+<Map zoomLevel={15} center={{lat : 47.2367, lng : 16.621456}} title = "Március 15 Tér 5." className = "footer-map" />
 <div className="footer-bottom">
   <p id = "copyright">Copyright © 2013-2023 Agora Savaria</p>
   </div>
-</footer>
-
-
-    );
+</footer>)
 }
 
-export default footer;
+
+export default Footer;

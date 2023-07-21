@@ -1,5 +1,6 @@
 import "../../css/eventPage.css";
 import Brand from "../brand/embed-brand.component";
+import Map from "../map/map.component";
 
 type typeOfMedia = {
     apple_music? : string,
@@ -7,7 +8,12 @@ type typeOfMedia = {
     youtube? : string,
     facebook? : string,
     instagram? : string
+}
 
+
+type typeOfCenter = {
+    lat : number,
+    lng : number
 }
 
 type typeOfPageElemens = {
@@ -15,11 +21,13 @@ type typeOfPageElemens = {
     description : string,
     date : string,
     image : string,
-    media : typeOfMedia
+    media : typeOfMedia,
+    position : typeOfCenter,
+    location : string
 }
 
 
-const TicketPageItems = ({title, description, date, image, media}:typeOfPageElemens)=>{
+const TicketPageItems = ({title, description, date, image, media, location, position}:typeOfPageElemens)=>{
     return (
         <div>
             <div className = "event-page-title-div">
@@ -50,6 +58,7 @@ const TicketPageItems = ({title, description, date, image, media}:typeOfPageElem
                 }
                 </div>
             </div> : ""}
+            <Map center={position} title = {location} zoomLevel={15} className = "event-map" />
         </div>
     )
 }

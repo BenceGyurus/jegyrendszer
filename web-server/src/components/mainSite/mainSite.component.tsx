@@ -18,7 +18,7 @@ const App = ()=>{
     if (!events.length && !isItLoad){
         return <LoadingAnimation />;
     }
-    return events.length && isItLoad ? (<div className = "event-list-div"><EventList events = {events} /></div>) : (<NoEvent />);
+    return events.length && isItLoad ? (<EventList events = {events} />) : (<NoEvent />);
 }
 
 export default App;

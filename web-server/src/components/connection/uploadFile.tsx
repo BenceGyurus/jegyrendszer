@@ -1,7 +1,7 @@
 async function postData(url = '', file:any) {
     const formData = new FormData();
     formData.append('File', file);
-    const response = await fetch(url, {
+    const response = await fetch(`/api/v1${url}`, {
       method: 'POST',
       body: file
     });

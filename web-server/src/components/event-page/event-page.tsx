@@ -34,7 +34,14 @@ type typeOfEventDatas = {
     description : string,
     places : Array<typeOfPlaces>,
     tickets : Array<typeOfTicket>,
-    title : string
+    title : string,
+    position : typeOfCenter,
+    location : string
+}
+
+type typeOfCenter = {
+    lat : number,
+    lng : number
 }
 
 const EventPage = (params:any)=>{
@@ -70,7 +77,7 @@ const EventPage = (params:any)=>{
    return (
     <div>
         {
-            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} tickets = {eventDatas.tickets} placeDatas = {eventDatas.places} media = {parseMedia(eventDatas.media)}/></div> : ""
+            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} tickets = {eventDatas.tickets} placeDatas = {eventDatas.places} media = {parseMedia(eventDatas.media)} position = {eventDatas.position} location ={eventDatas.location}/></div> : ""
         }
     </div>
 )

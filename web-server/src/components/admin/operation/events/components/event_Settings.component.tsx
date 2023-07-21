@@ -16,6 +16,7 @@ import Calendar from "../../../../calendar/calendar.component";
 import Error from "../../../../notification/error.component";
 import BackButton from "../../../../back/backbutton.component";
 import AddMedia from "./add-media.component";
+import MarkerMap from "../../../../map/create-marker-map.component";
 
 type typeOfGroups = {
     id : string,
@@ -69,7 +70,10 @@ type typeOfEventSettingsParams = {
     dOfEvent? : string,
     dOfRelease? : string,
     venue? : string,
-    mediaDatas? : typeOfMedia
+    mediaDatas? : typeOfMedia,
+    location? : string,
+    company? : string,
+    markerPosition? : typeOfCenter
 }
 
 type typeOfMedia = {
@@ -80,7 +84,16 @@ type typeOfMedia = {
     instagram? : string
 }
 
-const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas  }:typeOfEventSettingsParams )=>{
+type typeOfCompanyList = {
+    title : string,
+    value : string
+}
+
+type typeOfCenter = {
+    lat : number,
+    lng : number
+}
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition  }:typeOfEventSettingsParams )=>{
 
     const parse_Media_Datas = (mediaDatas:any)=>{
         for (let i = 0; i < Object.keys(mediaDatas).length; i++){
@@ -106,6 +119,10 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [dateOfRelease, setDateOfRelease]:[string, Function] = useState(dOfRelease ? dOfRelease : "");
     const [editTicket, setEditTicket]:[any, Function] = useState(false);
     const [media, setMedia]:[typeOfMedia, Function] = useState(mediaDatas ? parse_Media_Datas(mediaDatas) : {apple_music : "", spotify : "", youtube : "", facebook : "", instagram : ""});
+    const [locationOfEvent, setLocationOfEvent]:[string, Function] = useState(location ? location : "");
+    const [companyList, setCompanyList]:[Array<typeOfCompanyList>, Function] = useState([]);
+    const [selectedCompany, setSelectedCompany]:[string, Function] = useState(company ? company : "");
+    const [position, setPostion]:[typeOfCenter, Function] = useState(markerPosition ? markerPosition : {lat : 47.2367, lng : 16.621456})
 
 
     const getPlaceDatas = (id:string)=>{
@@ -147,6 +164,16 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         if (selectedVenue){
             getPlaceDatas(selectedVenue);
         }
+        postData("/get-companies-in-array", {token : ParseLocalStorage("long_token")})
+        .then(response=>{
+            if (!response.error && !response.resposeData){
+                let list = [];
+                for (let i = 0; i < response.companies.length; i++){
+                    list.push({value : response.companies[i]._id, title : response.companies[i].name});
+                }
+                setCompanyList(list);
+            }
+        });
     }, []);
 
     const changeSelectedVenue = (d:string)=>{
@@ -197,7 +224,10 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             dateOfEvent : dateOfEvent,
             dateOfRelease : dateOfRelease ? dateOfRelease : getNowDate(),
             venue : selectedVenue,
-            media : prepareMedia()
+            media : prepareMedia(),
+            location : locationOfEvent,
+            company : selectedCompany,
+            position: position
         };
 
         postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
@@ -250,17 +280,21 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         setMedia(l);
     }
 
+    console.log(position);
 
     return (
         <div>
         <BackButton url="/admin/rendezvenyek" className = "create-event-back-button" />
         <div className = "create-Event-Settings-Main">
             <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} />
+            <InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} />
+            <MarkerMap zoomLevel={14} center={position} title = {locationOfEvent} setPosition={setPostion} />
             <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} />
             <AddNewButton onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
             <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" />
             <Calendar onChangeFunction={setDateOfRelease} value = {getNowDate()} title="Rendevény megjelenése az oldalon" />
             <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
+            <Select title = "Vállalt kiválasztása" options = {companyList} onChangeFunction={setSelectedCompany} value={selectedCompany} />
             <AddMedia media = {media} changeValueOfMedia={valueOfMedia} />
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}

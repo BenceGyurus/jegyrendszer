@@ -136,7 +136,7 @@ app.get("/api/v1/event/:id", async (req,res)=>{
         for (let i = 0; i < event.tickets.length; i++){
             getPriceOfTicket(event.readable_event_name, event.tickets[i].id);
         }
-        res.send({allPendingPlaces : event.allPendingPlaces, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place});
+        res.send({allPendingPlaces : event.allPendingPlaces, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place, location : event.location, position: event.position});
         return;
     }
     //closeConnection(database);
@@ -1226,14 +1226,39 @@ app.post('/api/v1/upload-image/:token', upload.single('file'), async (req, res, 
             }catch{
 
             }
-            res.send({path : `${newFilePath}`, width: width,height : height});
+            res.send({path : `/api/v1${newFilePath}`, width: width,height : height});
         } else return handleError(logger, "500", res);
     }
     else return handleError(logger, "004", res);
 });
 
+app.post("/api/v1/get-companies-in-array", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-events")){
+            let {collection, database} = new Database("companies")
+            let companies =  await collection.find().toArray();
+            res.send({companies : companies});
+            closeConnection(database);
+            return;
+        }
+    }
+    handleError("003", res);
+});
 
-app.use(express.static('uploads'));
+
+app.use((req, res)=>{
+    if (req.method === "GET"){
+    imageName = req.url.split("/")[req.url.split("/").length-1];
+    console.log(imageName);
+    try{
+        res.sendFile(`${__dirname}/uploads/${imageName}`);
+    }
+    catch{
+        res.send({error : true})
+    }
+    }
+});
 
 if (controlConnection()){
     console.log(`The connection is successfully, the app is listening on PORT ${process.env.PORT || 3001}`)

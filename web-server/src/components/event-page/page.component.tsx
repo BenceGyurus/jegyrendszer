@@ -42,7 +42,9 @@ type typeOfPageParams = {
     id : string,
     tickets : Array<typeOfTicket>,
     placeDatas : typeOfPlaces,
-    media : typeOfMedia
+    media : typeOfMedia,
+    location : string,
+    position : typeOfCenter
 }
 type typeOfAmount = {
     id : string,
@@ -75,8 +77,12 @@ type typeOfPlaces = {
     sizeOfSeat : number,
     stage : number
 }
+type typeOfCenter = {
+    lat : number,
+    lng : number
+}
 
-const Page = ({title, background, description, date, id, tickets, placeDatas, media}:typeOfPageParams)=>{
+const Page = ({title, background, description, date, id, tickets, placeDatas, media, position, location}:typeOfPageParams)=>{
 
     const genereateTicketAmout = (tickets:Array<typeOfTicket>):Array<typeOfAmountTicket>=>{
         let newList:Array<typeOfAmountTicket> = [];
@@ -204,7 +210,7 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
 
     return <div className="event-page-div">
         {errorNat ? <Notification element={<Error message={errorNat} closeFunction={()=>{setErrorNat("")}} />} /> : ""}
-        <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media}/>
+        <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media} position={position} location={location}/>
         <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/>
         {placeDatas.seatsDatas.length ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
         <BuyButton onClickFunction={buy_Ticket} />

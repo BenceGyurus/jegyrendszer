@@ -87,3 +87,9 @@ footer .row {
   margin-bottom: 2px;
   color: #333;
 }
+
+.footer-map{
+  margin: 10px auto;
+  width: 80%;
+  height: 150px
+}

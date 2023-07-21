@@ -8,7 +8,10 @@ const Datas = {
     dateOfEvent : "string",
     dateOfRelease : "string",
     venue : "string",
-    media : "object"
+    media : "object",
+    location : "string",
+    company : "string",
+    position: "object"
 }
 
 const controlTypeOfEvents = (inputs)=>{

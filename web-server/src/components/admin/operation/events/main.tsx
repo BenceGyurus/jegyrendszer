@@ -11,6 +11,10 @@ type typeOfTickets = {
     maxPrice : number,
     seats : Array<string>
 }
+type typeOfCenter = {
+    lat : number,
+    lng : number
+}
 
 type typeOfDatasParams = {
     name? : string,
@@ -21,7 +25,10 @@ type typeOfDatasParams = {
     dateOfRelease? : string,
     venue? : string,
     readable_event_name? : string,
-    media? : any
+    media? : any,
+    location? : string,
+    company? : string,
+    position? : typeOfCenter
 }
 
 const Create_Event_Main = ()=>{
@@ -41,7 +48,7 @@ const Create_Event_Main = ()=>{
     }, []);
 
 
-    return (window.location.pathname.split("/")[3] ? Object.keys(datas).length > 9 ? <EventSettings mediaDatas={datas && datas.media ? datas.media : ""} name = {datas && datas.name ? datas.name : ""} description = {datas && datas.description ? datas.description : ""} tickets_ = {datas && datas.tickets ? datas.tickets : []} background = {datas && datas.background ? datas.background : ""} dOfEvent = {datas && datas.dateOfEvent ? datas.dateOfEvent : ""} dOfRelease = {datas && datas.dateOfRelease ? datas.dateOfRelease : ""} venue = {datas && datas.venue ? datas.venue : ""} /> : <div/>: <EventSettings />);
+    return (window.location.pathname.split("/")[3] ? Object.keys(datas).length > 9 ? <EventSettings mediaDatas={datas && datas.media ? datas.media : ""} name = {datas && datas.name ? datas.name : ""} description = {datas && datas.description ? datas.description : ""} tickets_ = {datas && datas.tickets ? datas.tickets : []} background = {datas && datas.background ? datas.background : ""} dOfEvent = {datas && datas.dateOfEvent ? datas.dateOfEvent : ""} dOfRelease = {datas && datas.dateOfRelease ? datas.dateOfRelease : ""} venue = {datas && datas.venue ? datas.venue : ""} location = {datas && datas.location ? datas.location : ""} company={datas && datas.company ? datas.company : ""} markerPosition={datas && datas.position ? datas.position : {lat : 47.2367, lng : 16.621456}} /> : <div/>: <EventSettings />);
 }
 
 export default Create_Event_Main;
