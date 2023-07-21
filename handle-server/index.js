@@ -914,10 +914,9 @@ app.post("/api/v1/create-ticket", async (req, res) => {
             wwdr: fs.readFileSync("./certs/wdr.pem"), 
             signerCert: fs.readFileSync("./certs/signerCert.pem"),
             signerKey: fs.readFileSync("./certs/signerKey.pem"),
-            signerKeyPassphrase: "test" //!change
+            signerKeyPassphrase: "test" //! change
         },
     }, {
-            description: eventInDb.description, //?
             logoText: "",
             serialNumber: "",
             authenticationToken: process.env.APPLE_PASS_IDENTIFIER,
@@ -930,12 +929,7 @@ app.post("/api/v1/create-ticket", async (req, res) => {
             newPass.secondaryFields.push({
                 key: "secondary",
                 label: "eventdate",
-                value: req.body.start, //?
-            });
-            newPass.auxiliaryFields.push({
-                key: "auxiliary",
-                label: "eventdescription",
-                value: eventInDb.description
+                value: req.body.start,
             });
             // newPass.setBarcodes()
         })
