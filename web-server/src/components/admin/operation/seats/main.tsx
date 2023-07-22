@@ -238,11 +238,13 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         setSeats(newData);
     }
 
-    const newPositionToSeat = (index:number ,posX:number, posY:number)=>{
+    const newPositionToSeat = (index:number ,posX:number, posY:number, event:any, data:any)=>{
         let {detectedGroups, recommendedGroups} = Auto_Addition(seats, sizeOfSeat);
         setSuggestedGroups(recommendedGroups);
         let newData = [...seats];
-        newData[index] = ({posX : newData[index].posX + posX, posY : newData[index].posY + posY, name : newData[index].name, title : newData[index].title, id : newData[index].id, group: newData[index].group});
+        if (newData[index].posX + posX + positionOfTheAreaFromLeft + (sizeOfSeat-5) <= positionOfTheAreaFromLeft + sizeOfArea.width && newData[index].posX + posX + positionOfTheAreaFromLeft > positionOfTheAreaFromLeft && positionOfTheAreaFromTop < (posY + newData[index].posY + positionOfTheAreaFromTop) && newData[index].posY + posY + positionOfTheAreaFromTop + (sizeOfSeat-5) <= positionOfTheAreaFromTop + sizeOfArea.height){
+            newData[index] = ({posX : newData[index].posX + posX, posY : newData[index].posY + posY, name : newData[index].name, title : newData[index].title, id : newData[index].id, group: newData[index].group});
+        }
         setSeats(newData); 
     }
 
@@ -256,8 +258,8 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         setShowAllSeats(status);
     }
 
-    const uploadFile = (event:any)=>{
-        const data = new FormData() ;
+    const uploadFile = (name:string, width:number, height:number)=>{
+        /*const data = new FormData() ;
         data.append('file', event.target.files[0]);
         axios.post(`/upload-image/${ParseLocalStorage("long_token")}`, data)
         .then(res => { // then print response status
@@ -265,7 +267,9 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
             if (res.data.width && res.data.height){
                 setSizeOfArea({width : res.data.width, height : res.data.height});
             }
-    })
+    })*/
+    setBackground({isImage : true, name : name});
+    setSizeOfArea({width : width, height : height});
 
     }
 

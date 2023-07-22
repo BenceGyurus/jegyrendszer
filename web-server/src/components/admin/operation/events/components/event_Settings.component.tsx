@@ -128,7 +128,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const getPlaceDatas = (id:string)=>{
         if (id){
             postData(`/venue/${id}`, {token : ParseLocalStorage("long_token")})
-            .then((data)=>{
+            .then((data:any)=>{
                 if (data){
                     for (let i = 0; i < data.seatsDatas.length; i++){
                         data.seatsDatas[i].colorOfSeat = data.colorOfSeat;
@@ -279,8 +279,6 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         l[key] = text;
         setMedia(l);
     }
-
-    console.log(position);
 
     return (
         <div>

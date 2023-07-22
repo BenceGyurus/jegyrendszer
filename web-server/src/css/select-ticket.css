@@ -6,27 +6,27 @@
 
 .user-page-ticket{
   background-color: rgba(255,255,255, 0.9);
-  border-radius: 8px;
+  border-radius: 20px;
   padding: 16px;
-  margin: 75px auto;
+  margin: 3px auto;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   top: 20%;
   position: relative;
   z-index: 1000;
   padding: 30px;
-  width: 300px;
+  max-width: 500px;
+  width: 80%;
 }
 
 .ticket-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .ticket-title {
   font-size: 18px;
-  margin: 0;
 }
 
 .ticket-price {
@@ -46,9 +46,15 @@
   color: #555;
   width: 32px;
   height: 32px;
-  font-size: 16px;
+  font-size: 13px;
   cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+  align-content: center;
   transition: background-color 0.3s ease;
+  box-shadow: .5px .5px 3px rgba(0,0,0,0.2);
+  font-weight: 100;
+  margin: 5px;
 }
 
 .quantity-button:hover {

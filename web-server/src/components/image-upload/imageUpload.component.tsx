@@ -33,7 +33,7 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
         axios.post(`/api/v1/upload-image/${ParseLocalStorage("long_token")}`, data)
         .then(res => { // then print response status
             if (res.data.path){
-                onChangeFunction(res.data.path);
+                onChangeFunction(res.data.path, res.data.width, res.data.height);
                 setImage({path : res.data.path});
                 setUploading(false);
             }

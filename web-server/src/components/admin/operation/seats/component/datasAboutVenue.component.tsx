@@ -17,7 +17,6 @@ const VenueDatas = ({nameOfVenue, seatsStatus, onChangeFunction, numberOfPlaces,
             <WindowHeader title = "Terem Adatok"/>
             <div className = "getDatasDiv">
             <InputText title = "Helyszín neve" onChangeFunction={changeName} value = {nameOfVenue ? nameOfVenue : ""}/>
-            <InputNumber title="Maximum férőhely" onChangeFunction={changeNumberOfPlaces} value = {numberOfPlaces ? numberOfPlaces : ""} />
             <Checkbox onChangeFunction={onChangeFunction} defaultChecked = {seatsStatus} title = "Ülőhelyek"/>
             </div>
         </div>

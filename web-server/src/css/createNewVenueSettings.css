@@ -59,13 +59,12 @@
     margin-bottom: 20px;
   }
   
-  .opendSettings label,
-  .opendSettings span {
+  /*.opendSettings label {
     display: block;
     font-size: 16px;
     margin-bottom: 5px;
     margin-top: 10px;
-  }
+  }*/
   
   /*.opendSettings input[type="number"],
   .opendSettings input[type="text"],

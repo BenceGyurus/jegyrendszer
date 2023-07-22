@@ -42,10 +42,11 @@ type typeOfSeatsParams = {
 }
 const Seats = ({places, tickets, seleted,onClickFunction}:typeOfSeatsParams)=>{
     return (<div className = "select-ticket-main-div">
-        {places.stage == 1 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-top-stage"]} /> : ""}
+        
         <div style = {{display: "flex", alignItems : "center", justifyContent : "center"}}>
-        {places.stage == 2 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-left-stage"]} isVertical = {true} /> : ""}
         <div className = "selectTickets" style={{height : places.sizeOfArea.height, background: places.colorOfBackground, maxWidth:places.sizeOfArea.width}}>
+        {places.stage == 1 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-top-stage"]} /> : ""}
+        {places.stage == 2 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-left-stage"]} isVertical = {true} /> : ""}
         {
             tickets.map((ticket:typeOfAmountTicket)=>{
                 return ticket.places.map((place:string)=>{
@@ -56,11 +57,10 @@ const Seats = ({places, tickets, seleted,onClickFunction}:typeOfSeatsParams)=>{
                 })
             })
         }
-
+         {places.stage == 3 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-right-stage"]} isVertical = {true} /> : ""}
+         {places.stage == 4 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-bottom-stage"]} /> : "" }
     </div>
-    {places.stage == 3 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-right-stage"]} isVertical = {true} /> : ""}
     </div>
-    {places.stage == 4 ? <Stage sizeOfArena={places.sizeOfArea} classNameList={["user-side-bottom-stage"]} /> : "" }
     </div>);
 }
 
