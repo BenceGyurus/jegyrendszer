@@ -31,6 +31,8 @@ const getStatsOfEvents = require("./getStatsOfEvents.js");
 const getPriceOfTicket = require("./dynamic-ticket-price.js");
 const { PKPass } = require('passkit-generator');
 const ControlLoginRequest = require("./loginConrtol.js");
+const cryptoJs = require("crypto-js");
+const {ShortUniqueId} = require('short-unique-id')
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -1088,9 +1090,17 @@ app.post("/api/v1/control-coupon-code", async (req,res)=>{
     console.log(req.files);
 })*/
 
+app.get("/test", async (req, res) => {
+    let data = {"salt":"c1ca1d0e9fc2323b3dda7cf145e36f5e","merchant":"PUBLICTESTHUF","orderRef":"101010516348 232058105","currency":"HUF","customerEmail":"sdk_test@otpmobil.com","language":"HU","sdkVersio n":"SimplePayV2.1_Payment_PHP_SDK_2.0.7_190701:dd236896400d7463677a82a47f53e36e","methods":["C ARD"],"total":"25","timeout":"2021-10-30T12:30:11+00:00","url":"https:\/\/sdk.simplepay.hu\/ba ck.php"}
+    let dataJSON = JSON.stringify(data);
+    let sign = cryptoJs.HmacSHA384(dataJSON, 'FxDa5w314kLlNseq2sKuVwaqZshZT5d6');
+    sign = cryptoJs.enc.Base64.stringify(sign);
+    console.log(sign)
+})
+
+// const simplesign = (data) => cryptoJs.enc.Base64.stringify(cryptoJs.HmacSHA384(JSON.stringify(data), process.env.MERCHANT));
 
 //PAYMENT
-//TODO error handling
 app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
@@ -1103,11 +1113,13 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                 /*for (let i = 0; i < buyingDatas.tickets.length; i++){
                     Control_Seats(buyingDatas.tickets[i].places, buyingDatas.tickets[i].ticketId, buyingDatas.eventId) ? true : error = false;
                 }*/
-                let result = await controlEvent(buyingDatas.eventId,buyingDatas.tickets, buyingDatas._id);
+                let result = await controlEvent(buyingDatas.eventId, buyingDatas.tickets, buyingDatas._id);
                 if (!result.error){
                     let saveDatas = {};
                     if (!error){
                         let {price, error,name} = (await controlCoupon(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice));
+                        const uid = new ShortUniqueId({length: 32});
+                        const uuid = uid();
                         saveDatas = {
                             price : price,
                             fullPrice : buyingDatas.fullPrice,
@@ -1118,20 +1130,61 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                             tickets : buyingDatas.tickets,
                             pending : true,
                             status : false,
-                            bought : false
+                            bought : false,
+                            salt: uuid
                         };
                     let l = new Database("buy");
                     result = await l.collection.insertOne(saveDatas);
-                    res.send({error : !result.acknowledged});
-                    //closeConnection(database);
+
+                    let body = {
+                        salt: uuid,
+                        merchant: process.env.MERCHANT,
+                        orderRef: result.insertedId,
+                        currency: 'HUF',
+                        customerEmail: req.body.datas.customerData.mail,
+                        language: 'HU',
+                        sdkVersion: 'SimplePayV2.1_Payment_PHP_SDK_2.0.7_190701:dd236896400d7463677a82a47f53e36e',
+                        methods:[
+                            "CARD"
+                        ],
+                        total: price,
+                        timeout: new Date(new Date().getTime() + 15 * 60000).toISOString(),
+                        url: 'pornhub.com',
+                        invoice: {
+                            name: `${req.body.datas.customerData.firstName} ${req.body.datas.customerData.lastName}`,
+                            company: 'hu',
+                            // state: ,
+                            city: req.body.datas.customerData.city,
+                            zip: req.body.datas.customerData.postalCode,
+                            address: req.body.datas.customerData.address,
+                            address2: req.body.datas.customerData.address2 == 'null' ? null : req.body.datas.customerData.address2,
+                            phone: req.body.datas.customerData.phone
+                        },
+                        items: [
+                            buyingDatas.tickets.map(x => {
+                                return {
+                                    ref: x.ticketId,
+                                    title: x.name,
+                                    desc: '',
+                                    amount: x.amount,
+                                    price: x.price / x.amount
+                                }
+                            })
+                        ]
+                    }
+                    await axios.post('https://sandbox.simplepay.hu/payment/v2/start', body, {headers: {
+                        'Content-type': 'application/json',
+                        'Signature': simplesign(body),
+                    }}).then((simple_res) => {
+                        res.send({error : !result.acknowledged, paymentUrl: simple_res.body.paymentUrl});
+                    })
+                    closeConnection(l.database);
                     }
                 }
                 else{
                     handleError(logger, result.errorCode ? result.errorCode : "001" ,res)
                 }
-                //closeConnection(l.database);
             }
-
         }
     }
 })
@@ -1139,7 +1192,7 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
 
 //COMPANIES
 app.post("/api/v1/new-company", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    if (req.body && req.body.token && typeof req.body == TypeOfBody && typeof req.body.datas == "object"){
+    if (req.body && req.body.token && typeof req.body == TypeOfBody && typeof req.body.datas == "object"){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("companies")){
             const {collection, database} = new Database("companies");
