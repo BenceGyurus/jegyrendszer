@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-function TextEditor() {
-  const [value, setValue] = useState('<h1>Általános szerződési feltételek<h1/>');
+type typeOfEditTextEditorParams = {
+    value : string,
+    onChangeFunction : any
+};
 
-  console.log(value);
+function TextEditor({value, onChangeFunction}:typeOfEditTextEditorParams) {
 
-  return <ReactQuill style={{height : "70vh"}} theme="snow" value={value} onChange={setValue} />;
+
+  return (<ReactQuill style={{height : 300, width : "80%", marginLeft : "auto", marginRight : "auto", marginTop : 20}} theme="snow" value={value} onChange={onChangeFunction} />);
 }
 
 

@@ -1,9 +1,28 @@
 import "../../css/aszf.css";
+import { useEffect, useState } from "react";
 
 const Aszf = ()=>{
+
+    const [text, setText] = useState("");
+
+
+    const parseText = (text:string)=>{
+        return text.replaceAll("!equal!", "=");
+    }
+
+    useEffect(()=>{
+        fetch("/api/v1/aszf")
+        .then(async (response:any)=>{
+            response = await response.json();
+            if (response && !response.error){
+                setText(parseText(response.aszf));
+            }
+        });
+    });
+
     return (
         <div className = "aszf-body">
-            <h1>AGORA SAVARIA KULTURÁLIS ÉS MÉDIIAKÖZPONT NONPROFIT KFT JEGYVÁSÁRLÁSI TÁJÉKOZTATÓ</h1>
+            <div dangerouslySetInnerHTML={{__html: text}} />
         </div>
     )
 }

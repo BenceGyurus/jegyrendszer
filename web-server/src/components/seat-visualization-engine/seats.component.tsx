@@ -130,7 +130,7 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
 
   React.useEffect(() => {
     render();
-  }, [selectedSeats, ]);
+  }, [selectedSeats, tickets]);
 
 
   const handleSeatClick = (x:number, y:number) => {

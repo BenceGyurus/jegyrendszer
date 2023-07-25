@@ -52,10 +52,14 @@ const parseBodyMiddleeware = (req, next)=>{
 
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        callBack(null, 'uploads')
+        if (file.mimetype.split("/")[1].toUpperCase() == "PNG" || file.mimetype.split("/")[1].toUpperCase() == "JPG" || file.mimetype.split("/")[1].toUpperCase() == "JPEG"){
+            callBack(null, 'uploads')
+        }
     },
     filename: (req, file, callBack) => {
-        callBack(null, `${Functions.genrateToken()}.${file.mimetype.split("/")[1]}`)
+        if (file.mimetype.split("/")[1].toUpperCase() == "PNG" || file.mimetype.split("/")[1].toUpperCase() == "JPG" || file.mimetype.split("/")[1].toUpperCase() == "JPEG"){
+            callBack(null, `${Functions.genrateToken()}.${file.mimetype.split("/")[1]}`)
+        }
     }
 })
 
@@ -1149,7 +1153,7 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                         ],
                         total: price,
                         timeout: new Date(new Date().getTime() + 15 * 60000).toISOString(),
-                        url: 'pornhub.com',
+                        url: '',
                         invoice: {
                             name: `${req.body.datas.customerData.firstName} ${req.body.datas.customerData.lastName}`,
                             company: 'hu',
@@ -1172,21 +1176,22 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                             })
                         ]
                     }
-                    await axios.post('https://sandbox.simplepay.hu/payment/v2/start', body, {headers: {
+                    /*await axios.post('https://sandbox.simplepay.hu/payment/v2/start', body, {headers: {
                         'Content-type': 'application/json',
                         'Signature': simplesign(body),
                     }}).then((simple_res) => {
-                        res.send({error : !result.acknowledged, paymentUrl: simple_res.body.paymentUrl});
-                    })
+                        return res.send({error : !result.acknowledged, paymentUrl: simple_res.body.paymentUrl});
+                    })*/
                     closeConnection(l.database);
                     }
                 }
                 else{
-                    handleError(logger, result.errorCode ? result.errorCode : "001" ,res)
+                    return handleError(logger, result.errorCode ? result.errorCode : "001" ,res)
                 }
             }
         }
     }
+    handleError(logger, "400", res);
 })
 
 
@@ -1198,11 +1203,12 @@ app.post("/api/v1/new-company", (req,res,next)=>parseBodyMiddleeware(req,next), 
             const {collection, database} = new Database("companies");
             if (req.body.datas.name && req.body.datas.taxNumber){
                 let result = await collection.insertOne({name : req.body.datas.name, tax : req.body.datas.taxNumber, otherDatas : await otherData(req, req.body.token)});
-                res.send({error : result.insertedId > 0});
+                return res.send({error : result.insertedId > 0});
             }
             closeConnection(database);
         }
     }
+    handleError(logger, "004", res);
 });
 
 app.post("/api/v1/get-companies", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
@@ -1290,9 +1296,96 @@ app.post("/api/v1/get-companies-in-array", (req,res,next)=>parseBodyMiddleeware(
             return;
         }
     }
-    handleError("003", res);
+    handleError(logger, "003", res);
 });
 
+
+app.post("/api/v1/get-aszf",(req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-aszf")){
+            try{
+            let aszf = fs.readFileSync(`${__dirname}/local/aszf.html`);
+            return res.send({error : false, aszf : aszf.toString()});
+            }
+            catch{
+                return handleError(logger,"000",res);
+            }
+        }
+    }
+        handleError(logger, "004", res);
+
+});
+
+
+app.post("/api/v1/edit-aszf", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-aszf")){
+            try{
+                if (req.body.datas && req.body.datas.aszf){
+                    fs.writeFileSync(`${__dirname}/local/aszf.html`, req.body.datas.aszf);
+                    return res.send({error : false});
+                }
+                else{
+                    return res.send({error : true});
+                }
+            }
+            catch{
+                return handleError(logger, "000",res);
+            }
+        }
+    }   
+    handleError(logger, "004", res);
+});
+
+
+app.get("/api/v1/aszf", async (req,res)=>{
+    try{
+        let aszf = fs.readFileSync(`${__dirname}/local/aszf.html`)
+        return res.send({error : false, aszf : aszf.toString()});
+    }catch{
+        handleError(logger, "000", res);
+    }
+});
+
+app.post("/api/v1/get-mail",(req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-letter")){
+            try{
+            let mail = fs.readFileSync(`${__dirname}/local/mail.html`);
+            return res.send({error : false, mail : mail.toString()});
+            }
+            catch{
+                return handleError(logger,"000",res);
+            }
+        }
+    }
+    handleError(logger, "004", res);
+
+})
+
+app.post("/api/v1/edit-mail", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("edit-letter")){
+            try{
+                if (req.body.datas && req.body.datas.mail){
+                    fs.writeFileSync(`${__dirname}/local/mail.html`, req.body.datas.mail);
+                    return res.send({error : false});
+                }
+                else{
+                    return res.send({error : true});
+                }
+            }
+            catch{
+                return handleError(logger, "000",res);
+            }
+        }
+    }   
+    handleError(logger, "004", res);
+});
 
 app.use((req, res)=>{
     if (req.method === "GET"){
