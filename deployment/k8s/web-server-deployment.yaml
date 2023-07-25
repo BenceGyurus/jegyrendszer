@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-server
+  name: web-server-deployment
   labels:
     app: web-server
 spec:
@@ -25,27 +25,9 @@ kind: Service
 metadata:
   name: web-server-service
 spec:
+  type: LoadBalancer
   selector:
     app: web-server
   ports:
   - port: 8000
     targetPort: 3000
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: web-server-ingress
-  labels:
-    name: web-server-ingress
-spec:
-  rules:
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: web-server-service
-            port: 
-              number: 8000
-

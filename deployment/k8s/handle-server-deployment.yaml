@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: handle-server
+  name: handle-server-deployment
   labels:
     app: handle-server
 spec:
@@ -15,12 +15,9 @@ spec:
         app: handle-server
     spec:
       volumes:
-      - name: uploads_folder
+      - name: handle-server-volume
         persistentVolumeClaim:
-          claimName: handle-server-pvc-uploads
-      - name: tickets_folder
-        persistentVolumeClaim:
-          claimName: handle-server-pvc-tickets
+          claimName: backend-uploads-pvc
       containers:
       - name: handle-server
         image: nginx
@@ -34,11 +31,8 @@ spec:
         - secretRef:
             name: handle-server-secretmap
         volumeMounts:
-        - name: uploads_folder
+        - name: handle-server-volume
           mountPath: /uploads
-        - name: tickets_folder
-          mountPath: /tickets
-        
 ---
 apiVersion: v1
 kind: Service
@@ -57,8 +51,8 @@ kind: ConfigMap
 metadata:
   name: handle-server-configmap
 data:
-  EMAIL_SERVER: http://localhost:5000
-  MONGO_URI: mongodb://localhost:27017/
+  EMAIL_SERVER: http://email-server-service.default.svc.cluster.local:5000
+  MONGO_URI: mongodb://mongo-service.default.svc.cluster.local:27017/
   CONFIGDIR: /
 ---
 apiVersion: v1
@@ -68,31 +62,19 @@ metadata:
 type: Opaque
 data:
   SLACK_TOKEN: eG94cC0zMzExNTU0NTgyNzc1LTMzMjYxNDk0ODU2MDItNTU1ODEzMjQ4MDgxNi1iOTlmZWVhYjA3Y2M2MTM0MzYwZjllNDgwMGM5ZDE4Ygo=
-  APPLE_PASS_IDENTIFIER: ###
-  MERCHANT: 
+  APPLE_PASS_IDENTIFIER: ""
+  MERCHANT: ""
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: handle-server-pvc-uploads
+  name: backend-uploads-pvc
 spec:
+  storageClassName: standard
+  volumeMode: Filesystem
+  volumeName: backend-uploads
   resources:
     requests:
       storage: 10Gi
-  volumeMode: Filesystem
-  storageClassName: backend-uploads
   accessModes:
-    - ReadWriteOnce
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: handle-server-pvc-tickets
-spec:
-  resources:
-    requests:
-      storage: 10Gi
-  volumeMode: Filesystem
-  storageClassName: backend-tickets
-  accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany

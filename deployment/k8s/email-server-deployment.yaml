@@ -15,9 +15,9 @@ spec:
         app: email-server
     spec:
       volumes:
-      - name: tickets_folder
+      - name: email-server-volume
         persistentVolumeClaim:
-        claimName: handle-server-pvc-tickets
+          claimName: backend-uploads-pvc
       containers:
       - name: email-server
         image: nginx
@@ -29,8 +29,8 @@ spec:
       - secretRef:
           name: email-server-secretmap
       volumeMounts:
-      - name: tickets_folder
-        mountPath: /tickets
+      - name: email-server-volume
+        mountPath: /uploads
 ---
 apiVersion: v1
 kind: Service
