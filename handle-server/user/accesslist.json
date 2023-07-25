@@ -8,6 +8,6 @@
     "ref" : ["Kuponok", "admin/kuponok"],
     "local-sale" : ["Helyi eladás", "admin/helyi-eladas"],
     "companies" : ["Cégek szerkesztése", "admin/cegek"],
-    "edit-aszf" : ["ÁSZF szerkesztése", "/edit/aszf"],
-    "edit-letter" : ["Email szerkesztése", "/edit/email"]
+    "edit-aszf" : ["ÁSZF szerkesztése", "admin/edit-aszf"],
+    "edit-letter" : ["Email szerkesztése", "admin/edit-email"]
 }
