@@ -1102,7 +1102,7 @@ app.get("/test", async (req, res) => {
     console.log(sign)
 })
 
-// const simplesign = (data) => cryptoJs.enc.Base64.stringify(cryptoJs.HmacSHA384(JSON.stringify(data), process.env.MERCHANT));
+const simplesign = (data) => cryptoJs.enc.Base64.stringify(cryptoJs.HmacSHA384(JSON.stringify(data).replace(/\//g, "\\\/"), process.env.MERCHANT));
 
 //PAYMENT
 app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{

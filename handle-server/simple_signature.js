@@ -3,15 +3,12 @@ const crypto = require('crypto');
 
 const key = "FxDa5w314kLlNseq2sKuVwaqZshZT5d6"
 
-const signWithCryptoJS = (data) =>  {
-    let hash = cryptoJs.HmacSHA384(JSON.stringify(data), key)
-    return cryptoJs.enc.Base64.stringify(hash);
-}
+const signWithCryptoJS = (data) => cryptoJs.enc.Base64.stringify(cryptoJs.HmacSHA384(JSON.stringify(data).replace(/\//g, "\\\/"), key))
 const signWithCrypto = (data) =>  {
     let othersignautre = crypto.createHmac('sha384', key)
-        .update(JSON.stringify(body))
-        .digest('hex');
-    return othersignautre.toString('base64')
+        .update(JSON.stringify(body).replace(/\//g, "\\\/"))
+        .digest('base64');
+    return othersignautre
 }
 
 let body = {
