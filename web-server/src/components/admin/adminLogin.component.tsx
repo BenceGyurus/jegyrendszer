@@ -3,41 +3,60 @@ import postData from "../connection/request";
 import "../../css/login.css";
 import insertCookie from "../../cookies/insertCookie";
 import { useNavigate } from 'react-router-dom';
+import Notification from "../notification/notification.component";
+import Error from "../notification/error.component";
 const Admin = ()=>{
     const [username, setUsername] = useState("");
     const [password, setpassword] = useState("");
     const navigate = useNavigate();
+    const [error, setError] = useState("");
 
     const login = ()=>{
         postData('/login', { username: username, password: password })
-        .then((data) => {
+        .then(async (data) => {
+            console.log(data);
             if (data.error || !data.token){
-                return Promise.reject(data);
+                data = await data.responseData ? await data.responseData : data;
+                data.message ? setError(data.message) : setError("Hiba történt a bejelentkezés során");
             }
             else{
                 return postData("/get-long-token", {token : data.token});
             }
         })
-        .then((data)=>{
+        .then(async (data)=>{
             if (data.token){
                 insertCookie("long_token", String(data.token), new Date(new Date().setTime(new Date().getTime())+(data.expires_in)),"/");
                 navigate('/admin');
             }
+            else if (data.responseData){
+                data = await data.responseData;
+            }
         })
-        .catch((err)=>{});
+        .catch((err)=>{
+            setError("Hiba történet a bejelentkezés során");
+        });
     }
     const changePassword = (event:any)=>{setpassword(event.target.value);};
     const changeUsername = (event:any)=>{setUsername(event.target.value);};
     return (
-        <div className = "loginContainer" >
-            <h1 className = "loginTitle" >Bejelentkezés</h1>
-            <div className = "loginPanel" >
-                <label htmlFor="username" className = "loginLabel">Felhasználó név</label>
-                <input type="text" className = "loginInput" id = "username" onChange={event => changeUsername(event)}/>
-                <label htmlFor="password" className = "loginLabel">Jelszó</label>
-                <input type="password" id="password" className = "loginInput" onChange={event => changePassword(event)}/>
-                <input type="button" value="Bejelentkezés" className = "loginInput" onClick={login} />
-            </div>
+        <div>
+        {error ? <Notification element={<Error message = {error} title="Sikertelen bejelentkezés" closeFunction={()=>{setError("")}} />} /> : ""}
+    <div className="login-container">
+    <h2>Admin bejelentkezés</h2>
+    <form>
+      <div className="login-form-group">
+        <label htmlFor="username">Felhasználónév</label>
+        <input type="text" id="username" name="username" required onChange={event => changeUsername(event)}  />
+      </div>
+      <div className="login-form-group">
+        <label htmlFor="password">Jelszó</label>
+        <input type="password" id="password" name="password" required onChange={event => changePassword(event)} />
+      </div>
+      <div className="login-form-group">
+        <input type="button" value="Bejelentkezés" onClick={login} />
+      </div>
+    </form>
+  </div>
         </div>
     )
 }

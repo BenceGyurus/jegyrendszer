@@ -5,18 +5,13 @@
 }
 
 .user-page-ticket{
-  background-color: rgba(255,255,255, 0.9);
-  border-radius: 20px;
-  padding: 16px;
-  margin: 3px auto;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  top: 20%;
-  position: relative;
-  z-index: 1000;
-  padding: 30px;
   max-width: 500px;
+  display: block;
+  margin: 20px auto;
   width: 80%;
 }
+
+/*
 
 .ticket-header {
   display: flex;
@@ -102,4 +97,121 @@
   width: max-content;
   display: block;
   margin: 5px auto;
+}*/
+
+
+.ticket-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  border-radius: 15px;
+  background-color: #fff;
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.ticket-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+.ticket-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.ticket-price {
+  font-size: 16px;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  margin: 0 5px;
+  transition: background-color 0.2s ease;
+}
+
+.quantity-btn:hover {
+  background-color: #0056b3;
+}
+
+.ticket-quantity {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #f7f7f7;
+  border: 2px solid #007bff;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.ticket-quantity.animate {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  transform: scale(1.1);
+  animation: pulse 0.3s ease-in-out;
+}
+
+.ticket-sold-out {
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: #e74c3c;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 5px;
+  opacity: 1;
+  transform: rotateZ(8deg);
+  position: relative;
+  right: 10px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.total-price {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+  text-align: right;
+  width: 100%;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

@@ -150,6 +150,23 @@ app.get("/api/v1/event/:id", async (req,res)=>{
 
 
 //ACCESS + LOGINS
+
+app.post("/api/v1/get-user-data", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    console.log(req.body);
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        try{
+            const loginedUsersDatabase = new Database("long-token");
+            let loginedUserDatas = await loginedUsersDatabase.collection.findOne({token : req.body.token});
+            const usersDatabase = new Database("admin");
+            userDatas = await usersDatabase.collection.findOne({_id : ObjectId(loginedUserDatas.userData.id)}, { projection : {username : 1, _id : 0} });
+            closeConnection(loginedUsersDatabase.database);
+            closeConnection(usersDatabase.database);
+            return res.send(userDatas);
+        }catch{}
+    }
+    handleError(logger, "400", res);
+});
+
 app.post("/api/v1/get-access", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     res.send({access : Functions.merge_Access(await control_Token(body.token, req))});
@@ -909,11 +926,11 @@ app.post("/api/v1/create-ticket", async (req, res) => {
         },
         data : ticketInfo
     };
-
+    console.log(req.body.event_id);
     let {collection, database} = new Database("events");
     let eventInDb = await collection.findOne({_id : new ObjectId(req.body.event_id)});
     if(!eventInDb) return handleError(logger, "500", res);
-
+    closeConnection(database);
     await PKPass.from({
         model: './ticket_model/generic.pkpass', //! change to actual
         certificates: {
@@ -940,9 +957,10 @@ app.post("/api/v1/create-ticket", async (req, res) => {
             // newPass.setBarcodes()
         })
     )
+    console.log(ticketInfo)
     axios(axiosConfig)
         .then((email_response) => res.send({'filename': email_response.data}))
-        .catch((err) => logger.err(`Failed ticket creation with ${ticketInfo}`));
+        .catch((err) => {logger.err(`Failed ticket creation with`); console.log(err)});
 })
 
 app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
@@ -995,7 +1013,7 @@ app.post("/api/v1/new-coupon", async (req,res)=>{
             return;
         } else return handleError(logger, "004", res);
     } else return handleError(logger, "030", res);
-})
+});
 
 app.post("/api/v1/get-coupons", async (req,res)=>{
     const body = Functions.parseBody(req.body);
@@ -1055,7 +1073,70 @@ app.post("/api/v1/edit-coupon/:id", async (req,res)=>{
             }else return handleError(logger, "004", res);
         } else return handleError(logger, "400", res);
     } else return handleError(logger, "400", res);
+});
+
+app.post("/api/v1/save-local-discount", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token && req.body.datas){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("local-discount")){
+            if (req.body.datas.name && req.body.datas.amount){
+                const {collection, database} = new Database("local-discount");
+                let result = await collection.insertOne({name : req.body.datas.name, amount : req.body.datas.amount, money : req.body.datas.type, datas : await otherData(req,req.body.token)});
+                closeConnection(database);
+                return res.send({error : !result.insertedId});
+            }
+        }
+        return handleError(logger, "004", res);
+    }
+    handleError(logger, "400",res);
+});
+
+app.post("/api/v1/save-local-discount/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token && req.body.datas && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("local-discount")){
+            if (req.body.datas.name && req.body.datas.amount){
+                const {collection, database} = new Database("local-discount");
+                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {name : req.body.datas.name, amount : req.body.datas.amount, money : req.body.datas.type, datas : await otherData(req,req.body.token)}});
+                closeConnection(database);
+                return res.send({error : !result.acknowledged});
+            }
+        }
+        return handleError(logger, "004", res);
+    }
+    handleError(logger, "400",res);
+});
+
+
+app.post("/api/v1/get-local-discounts", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && (access.includes("local-discount") || access.includes("local-sale"))){
+            const {collection, database} = new Database("local-discount");
+            let result = await collection.find({}, { projection: { name: 1, amount: 1, money : 1, _id : 1 } }).toArray();
+            closeConnection(database);
+            return res.send({datas : result});
+        }
+        return handleError(logger, "004", res);
+    }
+    handleError(logger, "400",res);
+});
+
+app.post("/api/v1/delete-local-discount/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("local-discount")){
+            console.log(req.params.id);
+            const {collection, database} = new Database("local-discount");
+            let result = await collection.deleteOne({_id : ObjectId(req.params.id)})
+            closeConnection(database);
+            return res.send({datas : result.deletedCount});
+        }
+        return handleError(logger, "004", res);
+    }
+    handleError(logger, "400",res);
 })
+
 
 //TODO error handling
 app.post("/api/v1/control-coupon-code", async (req,res)=>{

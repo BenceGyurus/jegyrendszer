@@ -38,6 +38,8 @@ services:
   email-server:
     build: "./email-server"
     image: bencegyurus/email-server:latest
+    ports:
+      - 5000:5000
     volumes:
       - ./config.json:/config.json
     environment:

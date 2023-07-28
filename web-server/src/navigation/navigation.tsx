@@ -21,6 +21,7 @@ import Aszf from "../components/aszf/aszf.component";
 import CompaniesMain from "../components/admin/operation/companies/companiesMain";
 import EditAszf from "../components/admin/operation/edit-aszf/edit-aszf.component";
 import EditMail from "../components/admin/operation/edit-mail/edit-mail.component";
+import LocalDiscountMain from "../components/admin/operation/local-discount/local-discount-main.component";
 
 
 function Navigation() {
@@ -50,6 +51,7 @@ function Navigation() {
           <Route path = "/admin/edit-aszf" element ={<AdminPage component={<EditAszf />} />} />
           <Route path = "/admin/cegek" element = {<AdminPage component ={<CompaniesMain />} />} />
           <Route path = "/admin/edit-email" element = {<AdminPage component = {<EditMail />} />} />
+          <Route path = "/admin/helyi-kedvezmenyek" element = {<AdminPage component = {<LocalDiscountMain />} />} />
         </Routes>
       </BrowserRouter>
     </div>

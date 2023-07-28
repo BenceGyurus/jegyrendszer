@@ -9,20 +9,25 @@ const EditMail = ()=>{
 
     const [value, setValue] = useState("");
 
-    useEffect(()=>{
+    const getMail = ()=>{
         postData("/get-mail", {token : ParseLocalStorage("long_token")})
         .then(response=>{
             if (!response.error){
                 setValue(parseMail(response.mail));
             }
         })
+    }
+
+    useEffect(()=>{
+        getMail();
     }, []);
 
     const save = ()=>{
         postData("/edit-mail", {token : ParseLocalStorage("long_token"), datas : {mail : codeMail(value)}})
         .then(response=>{
             if (!response.error){
-                setValue(response.mail);
+                //setValue(response.mail);
+                getMail();
             }
         })
     }

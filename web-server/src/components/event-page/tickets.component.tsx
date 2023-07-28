@@ -30,16 +30,16 @@ const Tickets = ({tickets, incrementFunction, decrementFunction}:typeOfTicketsPa
 
     return (
         <div className="user-page-ticket" id = "tickets">
-            <h2 className = "tickets-title">Jegyek:</h2>
+            <div className = "ticket-selector">
       {tickets.map((ticket)=>{
             console.log(ticket.numberOfFreeTickets);
                 return <Ticket name = {ticket.name} price = {ticket.price} amount = {ticket.amount} id = {ticket.id} incrementFunction={incrementFunction} decrementFunction={decrementFunction} key = {ticket.id} free = {ticket.numberOfFreeTickets} />
                 })
             }
-            {getPriceOfAllSelected(tickets) ? <div className = "summend-price-box">
-                <span className = "summend-price-title">Összesen:</span>
-                <span className = "summend-price">{getPriceOfAllSelected(tickets)}Ft</span>
-            </div> : <div className = "summed-price-box-space"></div>}
+            <div className="total-price" id="total-price">
+                Összesen: {getPriceOfAllSelected(tickets)}Ft
+            </div>
+            </div>
         </div>
     )
 }

@@ -62,10 +62,11 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
                 <div className = "event-location-and-date">
                 <div className="event-location-name">
                     <span>
-                        {new Date(date).getFullYear()}.{new Date(date).getMonth()+1 < 10 ? `0${new Date(date).getMonth()+1}` : new Date(date).getMonth()+1}.{new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()}. {new Date(date).getHours() < 10 ? `0${new Date(date).getHours()}` : new Date(date).getHours()}:{new Date(date).getMinutes() < 10 ? `0${new Date(date).getMinutes()}` : new Date(date).getMinutes()}
+                    {new Date(date).getFullYear()}.{new Date(date).getMonth()+1 < 10 ? `0${new Date(date).getMonth()+1}` : new Date(date).getMonth()+1}.{new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()}. {new Date(date).getHours() < 10 ? `0${new Date(date).getHours()}` : new Date(date).getHours()}:{new Date(date).getMinutes() < 10 ? `0${new Date(date).getMinutes()}` : new Date(date).getMinutes()}
                     </span>
                     <p>
-                        {location}
+                    <span className = "location-icon"><i style={{fontSize : 25}} className="fas fa-map-marker-alt"></i></span>
+                        <span className = "event-location-name-span">{location}</span>
                     </p>
                 </div>
                 </div>

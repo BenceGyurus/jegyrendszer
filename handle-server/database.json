@@ -58,5 +58,9 @@
     "banned" : {
         "database" : "users",
         "collection" : "banned"
+    },
+    "local-discount" : {
+        "database" : "coupons",
+        "collection" : "local" 
     }
 }

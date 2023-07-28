@@ -1,0 +1,21 @@
+.buy-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  
+  /* Modern buy button styles */
+  .buy-btn {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease;
+  }
+  
+  .buy-btn:hover {
+    background-color: #0056b3;
+  }
+  

@@ -9,5 +9,6 @@
     "local-sale" : ["Helyi eladás", "admin/helyi-eladas"],
     "companies" : ["Cégek szerkesztése", "admin/cegek"],
     "edit-aszf" : ["ÁSZF szerkesztése", "admin/edit-aszf"],
-    "edit-letter" : ["Email szerkesztése", "admin/edit-email"]
+    "edit-letter" : ["Email szerkesztése", "admin/edit-email"],
+    "local-discount" : ["Helyi kedvezmények", "admin/helyi-kedvezmenyek"]
 }

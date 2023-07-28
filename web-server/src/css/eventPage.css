@@ -13,43 +13,50 @@
   width: 100%;
   height: 100%;
   border-radius: 20px;
-  float: right;
 }
 
 .event-map-border-radius{
-  width: 45%;
+  width: 90%;
   height: 200px;
   overflow: hidden;
   border-radius: 0px;
-  height: 150px;
-  margin-top: 25px;
+  margin: 5px auto 20px auto;
   justify-content: center;
   border-radius: 20px;
 }
 
-.event-location-and-date{
-  width: 50%;
+.location-icon{
+  width: 10%;
+  margin-right: 5px;
+  display: inline-table !important;
+  height: 30px;
 }
 
+.event-location-and-date{
+  width: 100%;
+}
 .event-location-name span{
   font-size: 13px;
+  display: block;
 }
 
+.event-location-name-span{
+  width: 85%;
+  display: inline !important;
+  font-size: 18px !important;
+  text-align: left !important;
+}
+
+
 .event-location-name{
-  flex-wrap: wrap;
-  display: flex;
   width: 100%;
-  align-items: center;
-  justify-items: center;
-  height: 200px;
   padding: 20px;
-  float: left;
-  align-content: center;
 }
 
 .event-location-name p{
-  display: inline;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  width: 100%;
   text-align: center;
   font-weight: 600;
 }
@@ -59,7 +66,7 @@
   max-width: 500px;
   display: block;
   margin: 10px auto;
-  height: 200px;
+  height: max-content;
   background-color: white;
   border-radius: 20px;
   overflow: hidden;

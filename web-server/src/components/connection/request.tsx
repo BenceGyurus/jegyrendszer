@@ -1,5 +1,4 @@
 async function postData(url = '', data = {}) {
-    // Default options are marked with *
     const response = await fetch(`/api/v1${url}`, {
       method: 'POST',
       mode: 'cors',
@@ -19,6 +18,7 @@ async function postData(url = '', data = {}) {
     catch{
       responseData = response; 
     }
+    console.log(responseData);
     if (response.status >= 200 && response.status < 300){
       return responseData;
     }

@@ -4,6 +4,7 @@ import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "../../css/admin.css";
+import AdminUserComponent from "./user.component";
 const Admin = (params:any)=>{
     const [access, setAccess] = useState(false);
     const navigate = useNavigate();
@@ -24,8 +25,9 @@ const Admin = (params:any)=>{
 
     return (
         <div className = "admin">
-            <div className = "admin-menu">
-            <ul className="accessListUl">
+            <div className="admin-menu">
+            <ul className = "accessListUl">
+                <AdminUserComponent />
                 <AccessList access = {access}/>
             </ul>
             </div>
@@ -35,5 +37,16 @@ const Admin = (params:any)=>{
         </div>
     );
 }
+
+
+/*
+
+  <ul>
+    <li><a href="#" class="active">Dashboard</a></li>
+    <li><a href="#">Users</a></li>
+    <li><a href="#">Posts</a></li>
+    <li><a href="#">Settings</a></li>
+  </ul>
+</nav>*/
 
 export default Admin;

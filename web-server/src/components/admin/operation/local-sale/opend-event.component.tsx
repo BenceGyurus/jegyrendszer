@@ -6,6 +6,9 @@ import EventDetails from "./event-details.component";
 import "../../../../css/local-sale-event.css"
 import Tickets from "../../../event-page/tickets.component";
 import Seats from "../../../event-page/seats.component";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
+import DiscountList from "./discountList.component";
+import BuyButton from "../../../buy-button/buy-button.component";
 
 type typeOfSeat = {
     group : string,
@@ -56,6 +59,13 @@ type typeOfAmountTicket = {
     boughtPlaces : Array<string>
 }
 
+type typeOfDiscount = {
+    name : string,
+    amount : number,
+    money : boolean,
+    _id : string
+}
+
 const Local_Sale_Event = ()=>{
 
     const genereateTicketAmout = (tickets:any):Array<typeOfAmountTicket>=>{
@@ -71,6 +81,18 @@ const Local_Sale_Event = ()=>{
     const [amountTickets, setAmountTickets] = useState(genereateTicketAmout(eventDatas ? eventDatas.tickets : {}));
     const [selectedTickets, setSelectedTickets]:[Array<string>, Function] = useState([]);
     const [largeMap, setLargeMap]:[boolean, Function] = useState(false);
+    const [discounts, setDiscounts]:[Array<typeOfDiscount>, Function] = useState([]);
+    const [selectedDiscount,setSelectedDiscount]:[string, Function] = useState("");
+    const [fullPrice, setPrice] = useState(0);
+
+    const selectDiscount = (id:string)=>{
+        if (selectedDiscount == id){
+            setSelectedDiscount("");
+        }
+        else{
+            setSelectedDiscount(id);
+        }
+    }
 
     const incrementAmountOfTickets = (id:String)=>{
         let l = [...amountTickets];
@@ -79,6 +101,11 @@ const Local_Sale_Event = ()=>{
                 l[i].amount++;
             }
         }
+        let summ = 0;
+        for (let i = 0; i < l.length; i++){
+            summ += l[i].amount*l[i].price;
+        }
+        setPrice(summ);
         setAmountTickets(l);
     }
 
@@ -108,7 +135,24 @@ const Local_Sale_Event = ()=>{
                 }
             }
         }
+        let summ = 0;
+        for (let i = 0; i < l.length; i++){
+            summ += l[i].amount*l[i].price;
+        }
+        setPrice(summ);
         setAmountTickets(l);
+    }
+
+    const getDiscounts = ()=>{
+        postData("/get-local-discounts", {token : ParseLocalStorage("long_token")})
+        .then(response=>{
+            if (response.datas){
+                setDiscounts(response.datas);
+            }
+            else{
+                setError("Nem sikerült betölteni a kedvezményeket")
+            }
+        });
     }
 
     useEffect(()=>{
@@ -121,10 +165,11 @@ const Local_Sale_Event = ()=>{
                 setEventDatas(response);
                 setAmountTickets(genereateTicketAmout(response.tickets));
                }else{
-
+                setError(response.message ? response.message : "Nem sikerült betölteni az eseményt");
                }
             }
         );
+        getDiscounts();
     }, []);
 
     const selectSeat = (id:string)=>{
@@ -152,13 +197,30 @@ const Local_Sale_Event = ()=>{
         setAmountTickets(lTicketAmount);
     }
 
+    const buy = ()=>{
+        
+    }
+
+    const getPrice = ()=>{
+        for (let i = 0; i < discounts.length;i++){
+            if (discounts[i]._id === selectedDiscount){
+                return discounts[i].money ? fullPrice > discounts[i].amount ? fullPrice-discounts[i].amount : 0 : fullPrice-fullPrice*(discounts[i].amount/100);
+            }
+        }
+        return fullPrice;
+    }
+
+    console.log(selectedDiscount);
 
     return (
             <div>
                 {error ? <Notification element={<Error message={error} />} /> : ""}
                 {eventDatas ? <EventDetails title = {eventDatas.title} description={eventDatas.description} image = {eventDatas.background} /> : ""}
                 {eventDatas ? <Tickets tickets = {amountTickets} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets} /> : ""}
-                {eventDatas ? <Seats places = {eventDatas.places}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
+                {eventDatas && eventDatas.places && eventDatas.places.seatsDatas.length ? <Seats places = {eventDatas.places}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
+                {discounts.length ? <DiscountList discounts={discounts} onClikcFunction={selectDiscount} selectedDiscount={selectedDiscount} /> : ""}
+                <div>Végösszeg: {getPrice()}Ft</div>
+                <div className = "buy-btn-div"><BuyButton onClickFunction={buy} /></div>
             </div>
         );
 }

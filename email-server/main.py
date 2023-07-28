@@ -13,7 +13,8 @@ def hello():
 
 @app.route('/createCode', methods=['POST'])
 async def createCode():
-    request_data = request.get_json() 
+    request_data = request.get_json()
+    print(request_data)
     qr = QrCode()
     qr.create(request_data['id'], config)
     print(f"creating ticket for {request_data['id']} with email {request_data['email']}")

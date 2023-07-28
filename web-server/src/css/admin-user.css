@@ -1,0 +1,59 @@
+.admin-user-element{
+    flex-wrap: wrap;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-radius: 20px;
+    width: 170px;
+    text-align: center;
+    margin-bottom: 10px;
+    z-index: 20;
+    overflow: none;
+    background-color: white;
+    font-size: 14px;
+}
+.admin-user-element span{
+    margin: 3px;
+}
+
+.admin-user-element .admin-username{
+    display: inline-block;
+    width: 150px;
+}
+
+#user-icon{
+    font-size: 60px;
+    padding-top: 18px;
+    display: block;
+    margin: 3px auto;
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+    text-align: center;
+    background-color: #e6e6e6;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    outline: none;
+}
+
+.admin-operation-button{
+    font-size: 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    background-color: #e6e6e6;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 0;
+}
+
+.admin-operation-buttons-div{
+    width: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

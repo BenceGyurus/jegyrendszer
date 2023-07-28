@@ -21,3 +21,8 @@
     overflow-y: auto;
     overflow-x: none;
 }
+
+.buy-btn-div{
+    width: max-content;
+    margin: 20px auto;
+}
