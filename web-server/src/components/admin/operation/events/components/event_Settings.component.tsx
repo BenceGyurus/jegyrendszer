@@ -17,6 +17,8 @@ import Error from "../../../../notification/error.component";
 import BackButton from "../../../../back/backbutton.component";
 import AddMedia from "./add-media.component";
 import MarkerMap from "../../../../map/create-marker-map.component";
+import Checkbox from "../../../../checkbox/checkbox.component";
+import UsersList from "./usersList .component";
 
 type typeOfGroups = {
     id : string,
@@ -49,7 +51,7 @@ type typeOfVenues = {
     selecttedGroup : string,
     sizeOfArea : {width : number, height : number},
     sizeOfSeat : number,
-    suggestedGroups : Array<string>,
+    suggestedGroups : Array<string>
 
 }
 
@@ -73,7 +75,9 @@ type typeOfEventSettingsParams = {
     mediaDatas? : typeOfMedia,
     location? : string,
     company? : string,
-    markerPosition? : typeOfCenter
+    markerPosition? : typeOfCenter,
+    localD? : boolean,
+    usersList? : Array<string>
 }
 
 type typeOfMedia = {
@@ -93,7 +97,12 @@ type typeOfCenter = {
     lat : number,
     lng : number
 }
-const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition  }:typeOfEventSettingsParams )=>{
+
+type typeOfUsers = {
+    username : string,
+    _id : string
+}
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList}:typeOfEventSettingsParams )=>{
 
     const parse_Media_Datas = (mediaDatas:any)=>{
         for (let i = 0; i < Object.keys(mediaDatas).length; i++){
@@ -103,6 +112,10 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             }
         }
         return mediaDatas;
+    }
+
+    const getNowDate = ()=>{
+        return `${new Date().getFullYear()}-${new Date().getMonth()+1 < 10 ? `0${new Date().getMonth()+1}` : new Date().getMonth()+1}-${new Date().getUTCDate() < 10 ? `0${new Date().getUTCDate()}` : new Date().getUTCDate()}T${new Date().getHours() < 10 ? `0${new Date().getHours()}` : new Date().getHours()}:${new Date().getMinutes() < 10 ? `0${new Date().getMinutes()}` : new Date().getMinutes()}`;
     }
 
     const [id, setId]:[string, Function] = useState(window.location.pathname.split("/")[3]);
@@ -116,14 +129,26 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [venueDatas, setVenueDatas]:any = useState();
     const [all_Selected, setAll_Selected]:[Array<string>, Function] = useState([]);
     const [dateOfEvent, setDateOfEvent]:[string, Function] = useState(dOfEvent ? dOfEvent : "");
-    const [dateOfRelease, setDateOfRelease]:[string, Function] = useState(dOfRelease ? dOfRelease : "");
+    const [dateOfRelease, setDateOfRelease]:[string, Function] = useState(dOfRelease ? dOfRelease : getNowDate());
     const [editTicket, setEditTicket]:[any, Function] = useState(false);
     const [media, setMedia]:[typeOfMedia, Function] = useState(mediaDatas ? parse_Media_Datas(mediaDatas) : {apple_music : "", spotify : "", youtube : "", facebook : "", instagram : ""});
     const [locationOfEvent, setLocationOfEvent]:[string, Function] = useState(location ? location : "");
     const [companyList, setCompanyList]:[Array<typeOfCompanyList>, Function] = useState([]);
     const [selectedCompany, setSelectedCompany]:[string, Function] = useState(company ? company : "");
-    const [position, setPostion]:[typeOfCenter, Function] = useState(markerPosition ? markerPosition : {lat : 47.2367, lng : 16.621456})
+    const [position, setPostion]:[typeOfCenter, Function] = useState(markerPosition ? markerPosition : {lat : 47.2367, lng : 16.621456});
+    const [localDiscounts, setLocalDiscounts]:[boolean, Function] = useState(localD ? localD : false);
+    const [users, setUsers]:[Array<typeOfUsers>, Function] = useState([]);
+    const [selectedUsers, setSelectedUsers]:[Array<string>, Function] = useState(usersList ? usersList : []);
 
+
+    const getUsers = ()=>{
+        postData("/users-id-name", {token : ParseLocalStorage("long_token")})
+        .then(response=>{
+            if (response.users){
+                setUsers(response.users);
+            }
+        })
+    }
 
     const getPlaceDatas = (id:string)=>{
         if (id){
@@ -138,6 +163,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             });
         }
     }
+
 
     const appendToAllSelected = (t:Array<any>)=>{
         let l:Array<string> = [];
@@ -174,6 +200,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
                 setCompanyList(list);
             }
         });
+        getUsers();
     }, []);
 
     const changeSelectedVenue = (d:string)=>{
@@ -195,10 +222,6 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         appendToAllSelected(newDatas);
     }
 
-
-    const getNowDate = ()=>{
-        return `${new Date().getFullYear()}-${new Date().getMonth()+1 < 10 ? `0${new Date().getMonth()+1}` : new Date().getMonth()+1}-${new Date().getUTCDate() < 10 ? `0${new Date().getUTCDate()}` : new Date().getUTCDate()}T${new Date().getHours() < 10 ? `0${new Date().getHours()}` : new Date().getHours()}:${new Date().getMinutes() < 10 ? `0${new Date().getMinutes()}` : new Date().getMinutes()}`;
-    }
 
     const prepareMedia = ()=>{
         let sendMedia:any = {};
@@ -227,7 +250,9 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             media : prepareMedia(),
             location : locationOfEvent,
             company : selectedCompany,
-            position: position
+            position: position,
+            localDiscounts : localDiscounts,
+            users : selectedUsers
         };
 
         postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
@@ -280,6 +305,20 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         setMedia(l);
     }
 
+    const changeSelectedUsers = (id:string, status:boolean)=>{
+        if (selectedUsers.includes(id) && !status){
+            let l = [...selectedUsers];
+            const index = l.indexOf(id);
+            l.splice(index, 1);
+            setSelectedUsers(l);
+        }
+        else if (status && !selectedUsers.includes(id)){
+            let l = [...selectedUsers];
+            setSelectedUsers([...l, id]);
+        }
+    }
+
+
     return (
         <div>
         <BackButton url="/admin/rendezvenyek" className = "create-event-back-button" />
@@ -290,13 +329,16 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} />
             <AddNewButton onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
             <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" />
-            <Calendar onChangeFunction={setDateOfRelease} value = {getNowDate()} title="Rendevény megjelenése az oldalon" />
+            <Calendar onChangeFunction={setDateOfRelease} value = {dateOfRelease} title="Rendevény megjelenése az oldalon" />
             <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
             <Select title = "Vállalt kiválasztása" options = {companyList} onChangeFunction={setSelectedCompany} value={selectedCompany} />
+            <Checkbox title = "Helyi kedvezmények" onChangeFunction={setLocalDiscounts} defaultChecked={localDiscounts} />
             <AddMedia media = {media} changeValueOfMedia={valueOfMedia} />
+            {users.length ? <UsersList selectedUsers={selectedUsers} userDatas={users} onChangeFunction={changeSelectedUsers} /> : ""}
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
+
             <SaveButton onClickFunction={save} />
         </div>
         </div>

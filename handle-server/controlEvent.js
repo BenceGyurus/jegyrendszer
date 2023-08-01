@@ -1,6 +1,7 @@
 const Functions = require("./functions.js");
 const Database = require("./mongo/mongo.js");
 const getTicketId = require("./getTicketByReadableId.js");
+const getTime = require("./getTime.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -18,7 +19,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
             let pendingPlaces = [];
             let ticketAmount = {};
             for (let i = 0; i < preBuyingDatas.length; i++){
-                if (preBuyingDatas[i].time+1800000 > new Date().getTime() && String(preBuyingDatas[i]._id) != String(thisEventId)){            //config prebuying active time
+                if (preBuyingDatas[i].time+getTime("RESERVATION_TIME") > new Date().getTime() && String(preBuyingDatas[i]._id) != String(thisEventId)){            //config prebuying active time
                     ticketAmount[preBuyingDatas[i].eventId] = ticketAmount[preBuyingDatas[i].eventId] ? ticketAmount[preBuyingDatas[i].eventId] : {};
                     for (let k = 0; k < preBuyingDatas[i].tickets.length; k++){
                         if (preBuyingDatas[i].tickets[k].places){
@@ -32,7 +33,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
             let boughtDatas = await boughtDatabase.collection.find().toArray();
             closeConnection(boughtDatabase.database)
             for (let i = 0; i < boughtDatas.length; i++){
-                if ((boughtDatas[i].pending && boughtDatas[i].time+1800000 > new Date().getTime()) || boughtDatas[i].bought){
+                if ((boughtDatas[i].pending && boughtDatas[i].time+getTime("RESERVATION_TIME") > new Date().getTime()) || boughtDatas[i].bought){
                     ticketAmount[boughtDatas[i].eventId] = ticketAmount[boughtDatas[i].eventId] ? ticketAmount[boughtDatas[i].eventId] : {};
                     for (let j = 0; j < boughtDatas[i].tickets.length; j++){
                         if (boughtDatas[i].tickets[j].places){

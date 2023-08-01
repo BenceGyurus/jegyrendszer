@@ -1,3 +1,4 @@
+const getTime = require("./getTime.js");
 const Database = require("./mongo/mongo.js");
 
 
@@ -23,7 +24,7 @@ const getStatOfEvent = async (id)=>{
         closeConnection(database);
         let datas = [];
         for (let i = 0; i < eventStats.length; i++){
-            if (eventStats[i].time + 1800000 > new Date().getTime()){          //config prebuying active time
+            if (eventStats[i].time + getTime("RESERVATION_TIME") > new Date().getTime()){          //config prebuying active time
                 datas.push({
                     date : new Date(eventStats[i].time),
                     fullPrice : eventStats[i].fullPrice,
@@ -36,7 +37,7 @@ const getStatOfEvent = async (id)=>{
         let buyingDatabase = new Database("buy");
         let boughtDatas = await buyingDatabase.collection.find({eventId : id}).toArray();
         for (let i = 0; i < boughtDatas.length; i++){
-            if ((boughtDatas[i].pending && boughtDatas[i].time + 1800000 > new Date().getTime()) || (boughtDatas[i].bought))            //config prebuying active time
+            if ((boughtDatas[i].pending && boughtDatas[i].time + getTime("RESERVATION_TIME") > new Date().getTime()) || (boughtDatas[i].bought))            //config prebuying active time
             datas.push({
                 date : new Date(boughtDatas[i].time),
                 fullPrice : boughtDatas[i].fullPrice,
@@ -55,7 +56,6 @@ const getFullNumberOfTickets = (tickets)=>{
         let numberOfTickets = 0;
         tickets.forEach(element => {
             numberOfTickets+=element.numberOfTicket;
-            console.log(element);
         });
         return numberOfTickets;
     }

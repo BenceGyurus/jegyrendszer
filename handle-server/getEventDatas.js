@@ -1,4 +1,5 @@
 const getTicketByReadableId = require("./getTicketByReadableId.js");
+const getTime = require("./getTime.js");
 const Database = require("./mongo/mongo.js");
 
 const closeConnection = (database)=>{
@@ -23,14 +24,12 @@ const getEventDatas = async (eventId)=>{
         eventDatas.tickets[i].boughtPlaces = [];
         eventDatas.tickets[i].numberOfFreeTickets = eventDatas.tickets[i].numberOfTicket;
     }
-    eventDatas.allPendingPlaces = [];
     for (let i = 0; i < preBuyingDatas.length; i++){
-        if (preBuyingDatas[i].time+1800000 > new Date().getTime()){     //config prebuying active time
+        if (preBuyingDatas[i].time+getTime("RESERVATION_TIME") > new Date().getTime()){     //config prebuying active time
             for (let j = 0; j < preBuyingDatas[i].tickets.length;j++){
                 for (let k = 0; k < eventDatas.tickets.length; k++){
                     if (preBuyingDatas[i].tickets[j].ticketId == eventDatas.tickets[k].id && eventDatas.tickets[k].seats.length){
                         eventDatas.tickets[k].pendingPlaces.push(...preBuyingDatas[i].tickets[j].places);
-                        eventDatas.allPendingPlaces.push(...preBuyingDatas[i].tickets[j].places);
                     }
                     if (preBuyingDatas[i].tickets[j].ticketId == eventDatas.tickets[k].id){
                         eventDatas.tickets[k].numberOfFreeTickets-=preBuyingDatas[i].tickets[j].amount
@@ -43,7 +42,7 @@ const getEventDatas = async (eventId)=>{
     let boughtDatas = await boughtDatabase.collection.find({eventId : eventId}).toArray();
     closeConnection(boughtDatabase.database)
     for (let i = 0; i < boughtDatas.length; i++){
-        if ((boughtDatas[i].pending && boughtDatas[i].time + 1800000 > new Date().getTime()) || boughtDatas[i].bought){       //config prebuying active time
+        if ((boughtDatas[i].pending && boughtDatas[i].time + getTime("RESERVATION_TIME") > new Date().getTime()) || boughtDatas[i].bought){       //config prebuying active time
             for (let j = 0; j < boughtDatas[i].tickets.length; j++){
                 for (let k = 0; k < eventDatas.tickets.length; k++){
                     if (eventDatas.tickets[k].id == boughtDatas[i].tickets[j].ticketId && eventDatas.tickets[k].seats.length){

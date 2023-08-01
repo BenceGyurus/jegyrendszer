@@ -2,7 +2,7 @@ import "../../css/dateOfTheEvent.css";
 
 const Calendar = (params:any)=>{
 
-    const months = ["Jan", "Feb", "Mar", "Apr", "Máj", "Jún", "Júl", "Aug", "Szept", "Nov", "Dec"]
+    const months = ["Jan", "Feb", "Mar", "Apr", "Máj", "Jún", "Júl", "Aug", "Szept","Okt","Nov", "Dec"]
 
     return (
         <div className = "event-date">

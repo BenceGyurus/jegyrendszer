@@ -32,7 +32,7 @@ class QrCode:
 
             
 
-logo_file_name = "media/logo.png"
+logo_file_name = "media/logo.png
 data_to_encode = str(random.randint(10000000,99999999))
 
 

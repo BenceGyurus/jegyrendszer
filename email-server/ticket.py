@@ -6,7 +6,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 import textwrap
 
 
-def create_ticket(config, qr_code_id, customer_name, seat_number, show_title, location, start):
+def create_ticket(config, qr_code_id, customer_name, seat_number, show_title, location, start, price, seatName):
     pdf = canvas.Canvas(f"{config['PY_DIR']}/pdfs/{qr_code_id}.pdf", pagesize=letter)
     width = 3
     height = 5
@@ -53,8 +53,9 @@ def create_ticket(config, qr_code_id, customer_name, seat_number, show_title, lo
     pdf.save()
 
 # Jegy létrehozása
-# qr_code_data = "QR-kód adatok"
-# customer_name = "John Doe"
-# seat_number = "A12"
-# show_title = "Szerda esti akkusztik"
-# create_ticket(qr_code_data, customer_name, seat_number, show_title)
+qr_code_data = "QR-kód adatok"
+customer_name = "John Doe"
+seat_number = "A12"
+show_title = "Szerda esti akkusztik"
+create_ticket(qr_code_data, customer_name, seat_number, show_title, "", "", "")
+

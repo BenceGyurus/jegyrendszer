@@ -86,10 +86,14 @@
     border-radius: 0 5px 5px 5px;
     height: 300px;
     overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+
   }
   
   .form-container {
-    max-width: 500px;
+    width: 500px;
     margin: 0 auto;
   }
   

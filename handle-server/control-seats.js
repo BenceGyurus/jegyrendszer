@@ -12,6 +12,7 @@ const Control_Seats = async (list, ticketId, eventId)=>{
             event = element.eventData;
         }
     });
+    if (event){
     event.tickets.forEach((element)=>{
         if (element.id == ticketId){
             control[0] = true;
@@ -26,7 +27,8 @@ const Control_Seats = async (list, ticketId, eventId)=>{
                 control[0] = false;
             }
         }
-    })
+    });
+    }
     setTimeout(()=>{
         database.close();
     },10000);

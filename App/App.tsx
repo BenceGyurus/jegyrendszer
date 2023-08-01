@@ -17,7 +17,7 @@ import BasicStyle from './defaultStyles/style';
 
 function App(){
   const isDarkMode = useColorScheme() === 'dark';
-  const [basicUrl, setBasicUrl] = useState("http://192.168.1.27:3000");
+  const [basicUrl, setBasicUrl] = useState("http://192.168.1.78:3000");
   const [isTokenValid, setIsTokenValid] = useState(false);
   const [token, setToken] = useState("");
   const [loader, setLoader] = useState(false);

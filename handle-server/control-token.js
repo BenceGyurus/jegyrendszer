@@ -1,5 +1,6 @@
 const Database = require("./mongo/mongo.js");
 const Functions = require("./functions.js");
+const getTime = require("./getTime.js");
 
 async function control_Token(token, req){
     if (token){
@@ -8,7 +9,7 @@ async function control_Token(token, req){
     setTimeout(()=>{
         database.close();
     }, 10000);
-        if (datas && Functions.getIp(req) == datas.datas.ip && datas.datas.timeInMil + 28800000 > new Date().getTime() && datas.status){
+        if (datas && Functions.getIp(req) == datas.datas.ip && datas.datas.timeInMil + getTime("TOKEN_SESSION_TIME") > new Date().getTime() && datas.status){
             let {collection, database} = new Database("admin");
             user = await collection.findOne({_id : datas.userData.id});
             setTimeout(()=>{

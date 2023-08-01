@@ -1,0 +1,42 @@
+.checkmark__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: #f00c00;
+  }
+  .checkmark {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: #fff;
+    stroke-miterlimit: 10;
+    margin: 10% auto;
+    box-shadow: inset 0px 0px 0px #f00c00;
+    background-color: #f00c00;
+  }
+  .checkmark__check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 70;
+    stroke-dashoffset: 70;
+    stroke-width: 5px;
+  }
+
+  #line-1{
+    animation: stroke 1s 0s forwards;
+  }
+  #line-2{
+    animation: stroke 1s .5s forwards;
+  }
+  @keyframes stroke {
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes fill {
+    100% {
+      box-shadow: inset 0px 0px 0px 30px #f00c00;
+    }
+  }

@@ -11,7 +11,9 @@ const Datas = {
     media : "object",
     location : "string",
     company : "string",
-    position: "object"
+    position: "object",
+    localDiscounts : "boolean",
+    users : "object"
 }
 
 const controlTypeOfEvents = (inputs)=>{

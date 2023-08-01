@@ -14,26 +14,24 @@ const Admin = ()=>{
     const login = ()=>{
         postData('/login', { username: username, password: password })
         .then(async (data) => {
-            console.log(data);
             if (data.error || !data.token){
-                data = await data.responseData ? await data.responseData : data;
-                data.message ? setError(data.message) : setError("Hiba történt a bejelentkezés során");
+                data = data.responseData ? await data.responseData : data;
+                return data.message ? setError(data.message) : setError("Hiba történt a bejelentkezés során");
             }
             else{
-                return postData("/get-long-token", {token : data.token});
+                return postData("/get-long-token", {token : data.token}).then(async (data)=>{
+                    if (data.token){
+                        insertCookie("long_token", String(data.token), new Date(new Date().setTime(new Date().getTime())+(data.expires_in)),"/");
+                        navigate('/admin');
+                    }
+                    else if (data && data.responseData){
+                        data = await data.responseData;
+                    }
+                })
+                .catch(async (err)=>{
+                    //setError("Hiba történet a bejelentkezés során");
+                });;
             }
-        })
-        .then(async (data)=>{
-            if (data.token){
-                insertCookie("long_token", String(data.token), new Date(new Date().setTime(new Date().getTime())+(data.expires_in)),"/");
-                navigate('/admin');
-            }
-            else if (data.responseData){
-                data = await data.responseData;
-            }
-        })
-        .catch((err)=>{
-            setError("Hiba történet a bejelentkezés során");
         });
     }
     const changePassword = (event:any)=>{setpassword(event.target.value);};

@@ -157,19 +157,20 @@ const Local_Sale_Event = ()=>{
 
     useEffect(()=>{
         let id = window.location.pathname.split("/")[3]
-        fetch(`/api/v1/event/${id}`)
-        .then(
-            async (response:any)=>{
-               response = await response.json();
-               if (!response.error){
+        postData(`/event-datas/${id}`, {token : ParseLocalStorage("long_token")})
+        .then(async (response)=>{
+            if (!response.error){
                 setEventDatas(response);
                 setAmountTickets(genereateTicketAmout(response.tickets));
-               }else{
-                setError(response.message ? response.message : "Nem sikerült betölteni az eseményt");
-               }
+                if (response.localDiscounts){
+                    getDiscounts();
+                }
             }
-        );
-        getDiscounts();
+            else{
+                response = response.responseDatas ? await response.responseDatas : response;
+                response.message ? setError(response.message) : setError("Váratlan hiba történet az esemény betöltése közben")
+            }
+        })
     }, []);
 
     const selectSeat = (id:string)=>{
@@ -197,8 +198,35 @@ const Local_Sale_Event = ()=>{
         setAmountTickets(lTicketAmount);
     }
 
+    const getPlacesOfTicket = (places:Array<string>)=>{
+        let selectedPlaces = [];
+        for (let i = 0; i < places.length; i++){
+            if (selectedTickets.includes(places[i])) selectedPlaces.push(places[i]);
+        }
+        return selectedPlaces.length ? selectedPlaces : false;
+    }
+
     const buy = ()=>{
-        
+        let sendTickets = [];
+        for (let i = 0; i < amountTickets.length; i++){
+            if (amountTickets[i].amount > 0){
+                sendTickets.push({amount : amountTickets[i].amount, name : amountTickets[i].name, ticketId : amountTickets[i].id, places : getPlacesOfTicket(amountTickets[i].places)});
+            }
+        }
+        postData("/buy-local", {token : ParseLocalStorage("long_token"), datas : {
+            eventId : window.location.pathname.split("/")[3],
+            discount : selectedDiscount,
+            tickets : sendTickets,
+        }})
+        .then(async (response) => {
+            if (response.error){
+                response = response.responseData ? await response.responseData : response;
+                setError(response.message ? response.message : "Váratlan hiba történt a vásárlás közben");
+            }
+            else if (!response.error && response.id){
+                window.location.pathname = `/vasarlas/${response.id}`
+            }
+        });
     }
 
     const getPrice = ()=>{
@@ -210,7 +238,7 @@ const Local_Sale_Event = ()=>{
         return fullPrice;
     }
 
-    console.log(selectedDiscount);
+    console.log(amountTickets);
 
     return (
             <div>

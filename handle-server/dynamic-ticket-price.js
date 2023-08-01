@@ -37,7 +37,6 @@ const getPriceOfTicket = async (eventId, ticketId)=>{
                     }
                 }
             }
-            console.log(numberOfTickets, dateOfTickets);
         }
 }
 }
