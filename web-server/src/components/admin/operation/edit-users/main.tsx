@@ -124,11 +124,10 @@ const Main = ()=>{
 
     return (<div>
         <h1>Felhasználók szerkesztése</h1>
-        <AddNewButton onClick={()=>{setOpenNewUser(true)}}/>
         {error ? <Notification element={<Error message={error} closeFunction={()=>{setError("")}} />} /> : ""}
         {suc ? <Notification element={<Success message={suc} closeFunction={()=>{setSuc("")}} />} /> : ""}
         {selectedUserToEdit.id ? <UserEditWindow closeFunction={()=>{setSelectedUserToEdit({username : "", access : {}, cantEdit : false, id : "", status : true})}} user={selectedUserToEdit} errorFunction={setError} updateFunction = {updateUsers} succFunction = {setSuc} /> : ""} 
-        {!users.length ? <Loader /> : <Users deleteEvent={delete_User} users = {users} editEvent={selectUser} peddingDelete = {deletePeddingUser} peddingEdit = {selectPeddingUser}/>}
+        {!users.length ? <Loader /> : <Users addNewFunction={()=>{setOpenNewUser(true)}} deleteEvent={delete_User} users = {users} editEvent={selectUser} peddingDelete = {deletePeddingUser} peddingEdit = {selectPeddingUser}/>}
         {openNewUser ? <NewUserWindow closeFunction = { ()=>{setOpenNewUser(false)}} readyState = {showAddedUser}/> : ""}
         {showUser.token && showUser.url ? <ShowToken token = {showUser.token} url = {showUser.url} closeFunction = {()=>{setShowUser({token : "", url : ""})}} /> : ""}
     </div>);

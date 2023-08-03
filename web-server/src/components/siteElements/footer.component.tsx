@@ -23,7 +23,6 @@ return (
     </div>
   </div>
 </div>
-<Map zoomLevel={15} center={{lat : 47.2367, lng : 16.621456}} title = "Március 15 Tér 5." className = "footer-map" />
 <div className="footer-bottom">
   <p id = "copyright">Copyright © 2013-2023 Agora Savaria</p>
   </div>

@@ -74,27 +74,12 @@ const TicketStats = ({datas}:typeOfTicketStatsParams)=>{
 
     return (
         <div>
-            {datas.map((element, index)=>{
-                //console.log(getArrayToProgressBar(element.datas));
-                let statistics = calcDatas(element.datas);
-                return (
-                    <div className = "event-stat-main-div">
-                        <img className = "event-stat-image" src={element.image} alt={`${element.eventName} esemény borítóképe`} />
-                        <div className = "event-stat-details">
-                        <h2>{element.eventName}</h2>
-                        <h3>Eddigi összes bevétel: {statistics.fullIncome}</h3>
-                        <h3>Összes eladott jegy száma: {statistics.sold}</h3>
-                        <h3>Függőben lévő jegyek száma: {statistics.pending}</h3>
-                        <h3>Megvásárolható jegyek száma: {element.numberOfTickets-statistics.pending-statistics.sold}</h3>
-                        </div>
-                        <h3></h3>
-                        <div className = "progress"><ProgressBar full={element.numberOfTickets} listOfBars={[{name: "Eladaott jegyek", amount:statistics.sold, backgroundColor:"green", id : `sold-bar-${index+1}`},{name : "Jelenleg foglalt jegyek" ,amount:statistics.pending, backgroundColor:"yellow", id : `pending-bar-${index+1}`}]} width={300}/></div>
-                        <h3>Eladott jegyek aránya:</h3>
-                        <div className = "progress"><ProgressBar full={statistics.sold} listOfBars={getArrayToProgressBar(element.datas)} width={300} /></div>
-                        <TicketRatio datas={getArrayToProgressBar(element.datas)} />
-                    </div>
-                );
-            })}
+            {
+                datas.map((data)=>{
+                    return <p>{data.eventName}, {data.id}, {data.image}, {data.numberOfTickets}</p>
+                    }
+                )
+            }
         </div>
     );
 }

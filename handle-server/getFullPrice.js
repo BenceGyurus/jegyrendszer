@@ -10,9 +10,9 @@ const GetFullPrice = async (ticketsList, eventId)=>{           //ticketsList : [
         if (ticketDatas){
             for (let i = 0; i < ticketsList.length; i++){
                 if (ticketsList[i].amount && ticketDatas.tickets.length){
-                    amountList.push({price : ticketsList[i].amount * ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).price, unitPrice : ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).price, ...ticketsList[i]});
+                    amountList.push({name: ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).name, price : ticketsList[i].amount * ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).price, unitPrice : ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).price, ...ticketsList[i]});
                     fullAmount += ticketsList[i].amount;
-                    fullPrice = ticketsList[i].amount*ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).price;
+                    fullPrice += ticketsList[i].amount*ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).price;
                 }
                 else{
                     return {

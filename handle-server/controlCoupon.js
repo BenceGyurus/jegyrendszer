@@ -9,8 +9,10 @@ const error = ()=>{
 }
 
 const ControlCoupon = async (couponName, eventId, fullPrice)=>{
+    console.log(fullPrice)
     const {collection, database} = new Database("coupons");
     let coupon = await collection.findOne({name : couponName});
+    console.log(coupon);
     setTimeout(
         ()=>{
             database.close();
@@ -29,8 +31,11 @@ const ControlCoupon = async (couponName, eventId, fullPrice)=>{
                 return {...getPrice(coupon.money, fullPrice, coupon.amount), name : coupon.name};
             }
             else{
-                return error()
+                return error();
             }
+        }
+        else{
+            return {error : true, message : "Ez kupon már nem használható fel"};
         }
     }
     else{

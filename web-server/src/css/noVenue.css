@@ -1,13 +1,4 @@
 /* Global styles */
-body {
-    background-color: #f2f2f2;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    color: #333;
-    margin: 0;
-    padding: 0;
-  }
-  
 .no-venue-container {
     max-width: 800px;
     margin: 0 auto;

@@ -38,6 +38,7 @@ const GetUserDatas = require("./getUserDatas.js");
 const GetFullPrice = require("./getFullPrice.js");
 const controlLocalDiscount = require("./controlLocalDiscount.js");
 const getTime = require("./getTime.js");
+const Sales = require("./get-sales.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -966,17 +967,11 @@ app.post("/api/v1/order-ticket", async (req,res)=>{
             if (body.datas[i].ticketId && body.datas[i].eventId && eventDatas){
                 let response = await Control_Seats(body.datas[i].places, body.datas[i].ticketId, body.datas[i].eventId);
                 if (response){
-                    for (let j = 0; j < eventDatas.tickets.length; j++){
-                         //console.log(eventDatas.tickets[j].id,;
-                        if (eventDatas.tickets[j].id == body.datas[i].ticketId){
-                            if (!body.datas[i].places || (body.datas[i].places.length == body.datas[i].amount)){
-                                savingDatas.tickets.push({ticketId : body.datas[i].ticketId ,places : body.datas[i].places, price : eventDatas.tickets[j].price*body.datas[i].amount, amount : body.datas[i].amount, name : eventDatas.tickets[j].name})
-                                savingDatas.fullPrice += eventDatas.tickets[j].price*body.datas[i].amount
-                                savingDatas.fullAmount += body.datas[i].amount;
-                            }
-                            else return handleError(logger, "016", res);
-                        }// else return handleError(logger, "500", res);
-                    }
+                    let fullPrices = await GetFullPrice(body.datas, body.eventId);
+                    if (fullPrices.error) return handleError(logger, fullPrices.errorCode, res);
+                    savingDatas.tickets = fullPrices.tickets;
+                    savingDatas.fullPrice = fullPrices.fullPrice;
+                    savingDatas.fullAmount = fullPrices.fullAmount;
                 }
                 else return handleError(logger, "015", res);
             }
@@ -1065,7 +1060,9 @@ app.post("/api/v1/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next),
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("ticket-sells")){
-            res.send(await getStatsOfEvents());
+            let userId = String((await GetUserDatas(req.body.token))._id);
+            Sales(userId);
+            res.send(await Sales(userId));
         }
     }
 });
@@ -1288,11 +1285,12 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                     let saveDatas = {};
                     if (!error){
                         let {price, error,name} = (await controlCoupon(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice));
+                        let fullPrice = await GetFullPrice(buyingDatas.tickets, buyingDatas.eventId);
                         const uid = new ShortUniqueId({length: 32});
                         const uuid = uid();
                         saveDatas = {
-                            price : price,
-                            fullPrice : buyingDatas.fullPrice,
+                            price : price ? price : buyingDatas.fullPrice,
+                            fullPrice : fullPrice.fullPrice,
                             customerDatas : req.body.datas.customerData,
                             time : new Date().getTime(),
                             coupon : !error ? name : false,

@@ -31,10 +31,14 @@
     height: 80px;
     border-radius: 100%;
     text-align: center;
-    background-color: #e6e6e6;
+    background-color: #007bff;
     overflow-y: hidden;
     overflow-x: hidden;
     outline: none;
+}
+
+#user-icon path {
+    fill: white !important;
 }
 
 .admin-operation-button{
@@ -42,7 +46,7 @@
     width: 30px;
     height: 30px;
     border-radius: 100%;
-    background-color: #e6e6e6;
+    background-color: #007bff;
     display: flex;
     align-items: center;
     text-align: center;
@@ -56,4 +60,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.admin-operation-buttons-div path{
+    fill: white !important;
 }

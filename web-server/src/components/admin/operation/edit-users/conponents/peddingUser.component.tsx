@@ -19,12 +19,19 @@ type typeOfUserParams = {
 
 
 const PeddingUser = ({ user, deleteFunction, editFunction }:typeOfUserParams)=>{
+
+    const getDate = (date:number)=>{
+        let d = new Date(date);
+        return `${d.getFullYear()} ${d.getMonth()+1 < 10 ? `0${d.getMonth()+1}` : d.getMonth()+1}. ${d.getDate() < 10 ? `0${d.getDate()}` : d.getDate()}. ${d.getHours() < 10 ? `0${d.getHours()}` : d.getHours()}:${d.getMinutes() < 10 ? `0${d.getMinutes()}` : d.getMinutes()}`;
+    }
+
+
     return (
-        <li key = {user.id}>
+        <li key = {user.id} className = "user-list-element">
         <div className="user-info">
             <span className="username">Hozzáadta: {user.addedBy}</span>
             <span className = "status pedding">Pedding</span>
-            <span className = "vaild">{`Érvényes: ${new Date(user.validTo)}`}</span>
+            <span className = "vaild">{`Érvényes: ${getDate(user.validTo)}`}</span>
             <br />
             <span className = "url">Regisztrációs link: <span className = "link">{window.location.origin}{user.url}{user.token}</span></span>
             <ul className="access-list">
@@ -35,10 +42,9 @@ const PeddingUser = ({ user, deleteFunction, editFunction }:typeOfUserParams)=>{
                 ) : ""}
             </ul>
             <div className="user-actions">
-            <button className="edit-button" onClick={e=>editFunction(user)}>Edit</button>
-            <button className="delete-button" onClick = {e=>{deleteFunction(user.id)}}>Delete</button>
+                <span onClick={e=>{editFunction(user)}}><i className="fas fa-pen"></i></span>
+                <span onClick={e=>{deleteFunction(user.id)}}><i className="fas fa-trash"></i></span>
             </div>
-            <span className="user-id">{user.id}</span>
         </div>
         </li>
     );

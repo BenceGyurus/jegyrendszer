@@ -23,18 +23,38 @@ type typeOfUsersParams = {
     deleteEvent : Function,
     editEvent : Function,
     peddingDelete : Function,
-    peddingEdit : Function
+    peddingEdit : Function,
+    addNewFunction: Function
 }
 
-const Users = ({users,deleteEvent, editEvent,peddingDelete, peddingEdit}:typeOfUsersParams)=>{
+const Users = ({users,deleteEvent, editEvent,peddingDelete, peddingEdit, addNewFunction}:typeOfUsersParams)=>{
     return (
+        <div className = "users-grid-div">
+        <div className = "users-grid-div-header">
+            <div className = "edit-users-header-title"><h3>Regisztrált felhasználók </h3><span className = "number-of-registred-users">{users.filter(user=>user.status).length} felhasználó</span></div>
+            <span className = "add-new-user-button" onClick={e=>{addNewFunction()}}><span className = "plus-icon">+</span>Hozzáadás</span>
+        </div>
         <ul className = "user-list">
             {
                 users.map((element)=>{
-                    return element.status ? <User key={uuid()} deleteEvent={deleteEvent} user = {element} editEvent = {editEvent} /> : <PeddingUser editFunction = {peddingEdit} deleteFunction = {peddingDelete} key = {uuid()} user = {element} />
+                    return element.status ? <User key={uuid()} deleteEvent={deleteEvent} user = {element} editEvent = {editEvent} /> : "";
                 })
             }
         </ul>
+
+        {users.filter(user=>!user.status).length ? <div className = "users-grid-div-header top-border">
+            <div className = "edit-users-header-title"><h3>Függőben lévő regisztrációk</h3><span className = "number-of-registred-users">{users.filter(user=>!user.status).length} felhasználó</span></div>
+        </div> : ""
+        }
+        <ul>
+            {
+                users.map((element:any)=>{
+                    return !element.status ? <PeddingUser editFunction = {peddingEdit} deleteFunction = {peddingDelete} key = {uuid()} user = {element} /> : "";
+                })
+            }
+        </ul>
+
+        </div>
     );
 }
 

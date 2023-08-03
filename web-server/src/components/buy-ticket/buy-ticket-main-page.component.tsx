@@ -66,6 +66,7 @@ const BuyTicketMainPage = ()=>{
 
 
     const useRefCode = ()=>{
+        console.log(referalCode);
         if (referalCode){
             postData("/control-coupon-code", {code : referalCode, eventId : ticketDatas.eventId})
             .then(response=>{
