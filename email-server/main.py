@@ -24,4 +24,4 @@ async def createCode():
     if request_data['local'] is False: sendMail(request_data['email'], request_data['id'], request_data['title'], request_data['email_body'], config)
     return f"{request_data['id']}.pdf"
         
-app.run(debug=True, port=5000, host = "192.168.1.76")
+app.run(port=5000, host = "0.0.0.0")

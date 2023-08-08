@@ -94,9 +94,10 @@ app.get("/api/v1/events", async (req,res) =>{
     let {collection, database} = new Database("events");
     let datas = await collection.find().toArray();
     let sendDatas = [];
+    console.log(datas);
     for (let i = 0; i < datas.length; i++){
-        // console.log(datas[i].eventData.objectDateOfRelease.getTime(), new Date().getTime(), datas[i].eventData.objectDateOfEvent.getTime(), new Date().getTime())
-        // console.log(datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime())
+        console.log(datas[i].eventData.objectDateOfRelease.getTime(), new Date().getTime(), datas[i].eventData.objectDateOfEvent.getTime(), new Date().getTime())
+        console.log(datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime())
         if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
             sendDatas.push({
                 id : datas[i].eventData.readable_event_name,

@@ -27,7 +27,6 @@ const GenerateTicket = async (ticketsIds)=>{
     let pdfs = [];
     for (let i = 0; i < ticketsIds.length; i++){
       ticketData = await ticketsDatabase.collection.findOne({_id : ObjectId(ticketsIds[i])});
-      console.log(ticketData);
       if (ticketData){
         eventData = await getTicketByReadableId(ticketData.eventId);
         customerData = !eventData.local ? await saleDatabase.collection.findOne({_id : ObjectId(ticketData.orderId)}) : false;

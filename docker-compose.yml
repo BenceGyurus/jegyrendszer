@@ -20,9 +20,12 @@ services:
       - 3001:3001
     volumes:
       - ./config.json:/config.json
+      - ./data:/data
+      - ./handle-server/uploads:/uploads
     environment:
       - CONFIGDIR=/
       - SLACK_TOKEN=xoxp-3311554582775-3326149485602-5558132480816-b99feeab07cc6134360f9e4800c9d18b
+      - TZ=Europe/Budapest
     stdin_open: true
     tty: true
   
@@ -42,6 +45,7 @@ services:
       - 5000:5000
     volumes:
       - ./config.json:/config.json
+      - ./data:/data
     environment:
       - CONFIGDIR=/
       - PYPASS=nbdcecfzxgcbnzbe
