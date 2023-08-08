@@ -9,6 +9,8 @@ import Seats from "../../../event-page/seats.component";
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import DiscountList from "./discountList.component";
 import BuyButton from "../../../buy-button/buy-button.component";
+import postFile from "../../../connection/file";
+import Success from "../../../notification/success.component";
 
 type typeOfSeat = {
     group : string,
@@ -84,6 +86,7 @@ const Local_Sale_Event = ()=>{
     const [discounts, setDiscounts]:[Array<typeOfDiscount>, Function] = useState([]);
     const [selectedDiscount,setSelectedDiscount]:[string, Function] = useState("");
     const [fullPrice, setPrice] = useState(0);
+    const [succesfull, setSuccessfull]:[string, Function] = useState("");
 
     const selectDiscount = (id:string)=>{
         if (selectedDiscount == id){
@@ -206,27 +209,26 @@ const Local_Sale_Event = ()=>{
         return selectedPlaces.length ? selectedPlaces : false;
     }
 
-    const buy = ()=>{
+    const buy = async ()=>{
         let sendTickets = [];
         for (let i = 0; i < amountTickets.length; i++){
             if (amountTickets[i].amount > 0){
                 sendTickets.push({amount : amountTickets[i].amount, name : amountTickets[i].name, ticketId : amountTickets[i].id, places : getPlacesOfTicket(amountTickets[i].places)});
             }
         }
-        postData("/buy-local", {token : ParseLocalStorage("long_token"), datas : {
+        postFile("/buy-local", {token : ParseLocalStorage("long_token"), datas : {
             eventId : window.location.pathname.split("/")[3],
             discount : selectedDiscount,
             tickets : sendTickets,
-        }})
-        .then(async (response) => {
+        }}, "/admin/helyi-eladas")
+        .then((response:any)=>{
             if (response.error){
-                response = response.responseData ? await response.responseData : response;
-                setError(response.message ? response.message : "Váratlan hiba történt a vásárlás közben");
+                setError(response.message);
             }
-            else if (!response.error && response.id){
-                window.location.pathname = `/vasarlas/${response.id}`
+            else{
+                setSuccessfull(response.message);
             }
-        });
+        })
     }
 
     const getPrice = ()=>{
@@ -243,6 +245,7 @@ const Local_Sale_Event = ()=>{
     return (
             <div>
                 {error ? <Notification element={<Error message={error} />} /> : ""}
+                {succesfull ? <Notification element={<Success message={succesfull} />}/> : ""}
                 {eventDatas ? <EventDetails title = {eventDatas.title} description={eventDatas.description} image = {eventDatas.background} /> : ""}
                 {eventDatas ? <Tickets tickets = {amountTickets} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets} /> : ""}
                 {eventDatas && eventDatas.places && eventDatas.places.seatsDatas.length ? <Seats places = {eventDatas.places}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}

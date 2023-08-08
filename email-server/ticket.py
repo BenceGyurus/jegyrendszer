@@ -1,61 +1,62 @@
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import portrait
 from reportlab.lib.units import inch
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-import textwrap
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.platypus.tables import Table, TableStyle
+import random
+from datetime import datetime
+import json
+import os
+from PIL import Image as PILImage
 
 
-def create_ticket(config, qr_code_id, customer_name, seat_number, show_title, location, start, price, seatName):
-    pdf = canvas.Canvas(f"{config['PY_DIR']}/pdfs/{qr_code_id}.pdf", pagesize=letter)
-    width = 3
-    height = 5
-    y = height
-    pdf.setPageSize((width*inch, height*inch))
+def create_ticket(config, qr_code_id, seat_number, show_title, location, start, price):
+    config = json.loads(open(f"{os.getenv('CONFIGDIR')}/config.json", "r", encoding = "utf8").read())
+    if (config):
+        page_width = config["SEND_PDF_WIDTH"]
+        page_height = config["SEND_PDF_HEIGHT"]
+        left_margin = config["PDF_LEFT_MARGIN"]
+        right_margin = config["PDF_RIGHT_MARGIN"]
+        top_margin = config["PDF_TOP_MARGIN"]
+        bottom_margin = config["PDF_BOTTOM_MARGIN"]
+        doc = SimpleDocTemplate(f"{config['PY_DIR']}/pdfs/{qr_code_id}.pdf", pagesize=(page_width, page_height),
+                            leftMargin=left_margin,
+                            rightMargin=right_margin,
+                            topMargin=top_margin,
+                            bottomMargin=bottom_margin)
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.pdfbase import pdfmetrics
+        lato_font_path = config["PDF_FONT_FAMILY"] #"media/fonts/Rubik/static/Rubik-Regular.ttf"  # Replace "path_to_lato_font" with the actual path
+        pdfmetrics.registerFont(TTFont('Lato', lato_font_path))
+        normal_style = ParagraphStyle('NormalStyle', fontSize=14, textColor=colors.black, leading=18, alignment=0, fontName='Lato')
+        normal_style_title = ParagraphStyle('NormalStyle', fontSize=10, textColor=colors.grey, leading=18, alignment=0, fontName='Lato')
+        title_color = colors.HexColor(config["PDF_TITLE_COLOR"])
+        body_color = colors.HexColor(config["PDF_BODY_COLOR"])
+        ticket_content = [
+        # Title
+        Image(f"{config['PY_DIR']}/qrcodes/{qr_code_id}.png", width=config["QR_CODE_SIZE"], height=config["QR_CODE_SIZE"]),
 
-    # Jegy fejléce
-    pdfmetrics.registerFont(TTFont('Tahoma', 'Tahoma.ttf'))
-    pdf.setFont("Tahoma", 12)
-    titleLine = textwrap.wrap(show_title, width=(((width) * inch))/10)
-    y -= 0.5
-    for line in titleLine:
-        pdf.drawCentredString((width/2) * inch, y * inch, line)
-        y -= 0.25
+        # Event details
+        Paragraph("Esemény:".upper(), normal_style_title),
+        Paragraph(show_title.upper(), normal_style),
+        Spacer(1, 0.1 * inch),
+        Paragraph("Esemény helye:".upper(), normal_style_title),
+        Paragraph(location.upper(), normal_style),
+        Spacer(1, 0.1 * inch),
+        Paragraph("Kezdés:".upper(), normal_style_title),
+        Paragraph(start.upper(), normal_style),
+        Spacer(1, 0.1 * inch),
+        Paragraph("Jegy ára:".upper(), normal_style_title),
+        Paragraph(f"{price}Ft".upper(), normal_style),
+        Spacer(1, 0.1 * inch),
+        ]
+        if (seat_number):
+            ticket_content.append(Paragraph("Ülőhely:".upper(), normal_style_title))
+            ticket_content.append(Paragraph(seat_number.upper(), normal_style))
 
-    # Logó hozzáadása
-    logo_path = "media/fulllogo.png"
-    logo_width = 0.8 * inch
-    logo_height = 0.5 * inch
-    pdf.drawInlineImage(logo_path, (width/2)* inch-(logo_width/2) , 0, width=logo_width, height=logo_height)
+        doc.build(ticket_content)
+        return f"{config['PY_DIR']}/pdfs/{qr_code_id}.pdf"
+    return False
 
-    # QR-kód hozzáadása
-    qr_code_path = f"{config['PY_DIR']}/qrcodes/{qr_code_id}.png"
-    qr_code_width = qr_code_height = 1.5 * inch
-
-    # Jegy adatok elhelyezése
-    data_x = (width/2-0.75) * inch
-    data_y = (height-(4.5)) * inch
-
-    # Jegy adatok
-    pdf.setFont("Helvetica", 11)
-    y-=0.5
-    pdf.drawCentredString((width/2) * inch, y * inch, "Helyszín: ")
-    y-=0.25
-    pdf.drawCentredString(width/2 * inch, y * inch, location)
-    y-=0.5
-    pdf.drawCentredString((width/2) * inch, y * inch, "Esemény kezdete:")
-    y-=0.25
-    pdf.drawCentredString((width/2) * inch, y * inch, start)
-    y-=((qr_code_height/inch)/2+1)
-    pdf.drawInlineImage(qr_code_path, ((width/2)* inch)-(qr_code_width/2), y * inch, qr_code_width, qr_code_height)
-
-    pdf.showPage()
-    pdf.save()
-
-# Jegy létrehozása
-qr_code_data = "QR-kód adatok"
-customer_name = "John Doe"
-seat_number = "A12"
-show_title = "Szerda esti akkusztik"
-create_ticket(qr_code_data, customer_name, seat_number, show_title, "", "", "")
 

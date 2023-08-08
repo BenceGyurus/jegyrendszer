@@ -39,6 +39,9 @@ const GetFullPrice = require("./getFullPrice.js");
 const controlLocalDiscount = require("./controlLocalDiscount.js");
 const getTime = require("./getTime.js");
 const Sales = require("./get-sales.js");
+const GenerateTicket = require("./genrate_ticket.js");
+const Tickets = require("./tickets.js");
+const createZip = require("./createZip.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -1061,7 +1064,6 @@ app.post("/api/v1/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next),
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("ticket-sells")){
             let userId = String((await GetUserDatas(req.body.token))._id);
-            Sales(userId);
             res.send(await Sales(userId));
         }
     }
@@ -1232,8 +1234,10 @@ const simplesign = (data) => cryptoJs.enc.Base64.stringify(cryptoJs.HmacSHA384(J
 //PAYMENT
 
 app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
+    if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object" && req.body.token){
         let error = false;
+        let access = await control_Token(req.body.token, req);
+        if (access.includes("local-sale")){
         result = await controlEvent(req.body.datas.eventId, req.body.datas.tickets);
         if (result.error) return handleError(logger, result.errorCode, res);
         price = await GetFullPrice(req.body.datas.tickets, req.body.datas.eventId);
@@ -1254,16 +1258,34 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
                     price : await controlLocalDiscount(req.body.datas.discount, price.fullPrice, req.body.datas.eventId),
                     localCoupon : req.body.datas.discount ? req.body.datas.discount : false,
                     coupon : false,
-                    eventId : req.body.datas.eventId
+                    eventId : req.body.datas.eventId,
+                    fullAmount : price.fullAmount
             }
             //console.log(saveDatas);
             const {collection, database} = new Database("buy");
             let result = await collection.insertOne(saveDatas);
+            let eventDatas = await getTicketByReadableId(req.body.datas.eventId);
+            let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.venue, req.body.datas.eventId, true);
             closeConnection(database);
-            res.send({error : !result.insertedId, id : saveDatas.salt});
+            console.log(tickets);
+            let files = await  GenerateTicket(tickets);
+            let sysConfig = await readConfig()
+            for (let i = 0; i < files.length; i++){
+                files[i] = sysConfig["PY_DIR"] + `/pdfs/${files[i]}`;
+            }
+            //console.log(files);
+            zip = await createZip(files, `${result.insertedId}.zip`);
+            res.writeHead(200, {
+                'Content-Disposition': `attachment; filename="${result.insertedId}.zip"`,
+                'Content-Type': "application/zip",
+              })
+            return res.end(zip); //fs.readFileSync(`${__dirname}/${sysConfig["ZIP_DIR"]}/${result.insertedId}.zip`)
+            //return res.send({error : !result.insertedId, id : saveDatas.salt});
         
         }
+    }
         }
+    return handleError(logger, "004", res);
         
 });
 
@@ -1299,7 +1321,8 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                             pending : true,
                             status : false,
                             bought : false,
-                            salt: uuid
+                            salt: uuid,
+                            fullAmount : buyingDatas.fullAmount
                         };
                     let l = new Database("buy");
                     result = await l.collection.insertOne(saveDatas);
@@ -1575,7 +1598,10 @@ else{
 // CRONS
 cron.schedule("0 3 * * *", async () => {
     let {collection, database} = new Database("long-token");
+    let loginTokenDatabase = new Database("short-token");
+    loginTokenDatabase.collection.deleteMany();
     collection.deleteMany();
+    closeConnection(loginTokenDatabase.database);
     closeConnection(database);
 })
 cron.schedule("30 3 * * 6", async () => {
@@ -1585,10 +1611,19 @@ cron.schedule("30 3 * * 6", async () => {
     for(const j in preBuying) if (new Date(coupons[j].time)+1800000 < new Date().getTime()) preBuying[j].delete();     //config
     closeConnection(database);
 })
-cron.schedule("0 0 1 * *", async () => {
+cron.schedule("0 3 * * *", async () => {
     let {collection, database} = new Database("coupons");
     let today = new Date()
     coupons = collection.find({})
-    for(const j in coupons) if (new Date(coupons[j]['validity']) < today) coupons[j].delete();
+    //for(let j in coupons) if (new Date(coupons[j]['validity']) < today) collection.deleteOne({_id : ObjectId(coupons[j]._id)});
+    let eventsDatabase = new Database("events");
+    let events = await eventsDatabase.collection.find({}).toArray();
+    let addition = getTime("DELETABLE_EVENT");
+    if (addition > 0) for (let i = 0; i < events.length; i++){ 
+        if (new Date(events[i].eventData.dateOfEvent).getTime() + addition < new Date().getTime()) eventsDatabase.collection.deleteOne({_id : ObjectId(events[i]._id)})
+    }
+    console.log("Autómatikus törlés lefutott");
     closeConnection(database);
+    closeConnection(eventsDatabase.database);
+    //let orders = DELETABLE_ORDERS
 })

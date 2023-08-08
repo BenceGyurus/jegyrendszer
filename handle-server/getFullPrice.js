@@ -1,4 +1,4 @@
-const getTicketByReadableId = require("./getTicketByReadableId")
+const getTicketByReadableId = require("./getTicketByReadableId");
 
 
 const GetFullPrice = async (ticketsList, eventId)=>{           //ticketsList : [{ticketId : string, amount : number ...}...]

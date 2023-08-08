@@ -1,0 +1,126 @@
+.table{
+    width: 100%;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 5px;
+    border-collapse: collapse;
+    background-color: white;
+    font-size: 13px;
+}
+
+.table-header-row{
+    height: 70px;
+}
+
+.table-header{
+    padding: 4px;
+    border-bottom: 2px solid rgba(0, 0,0, 0.05);
+}
+
+.table-header input{
+    width: 100px;
+    border: none;
+    border-radius: 5px;
+    padding: 7px 2px;
+    margin: 2px;
+    outline: none;
+    background-color: rgba(0, 0,0, 0.01);
+}
+
+.table-header i{
+    margin-left: 4px;
+}
+
+.table-header span{
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.table-data-row .print{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    height: 80px;
+    width: 50px;
+}
+
+.table-data-row .print i {
+    cursor: pointer;
+}
+
+.ticket-table{
+    width: 80%;
+    text-align: center;
+    margin: 10px auto;
+}
+
+.table-header .not-displayed-i{
+    margin-right: 17px;
+}
+
+.table-data-row{
+    height: 80px;
+    padding: 5px;
+}
+
+.table-data-row:not(:last-child) .table-data{
+    text-align: center;
+    margin:0;
+    border-left: none;
+    border-right: none;
+}
+
+.table-data-row:nth-child(even){
+    background-color: rgba(0, 0,0, 0.05);
+}
+
+.table-data{
+    text-align: center;
+    margin:0;
+    border-left: none;
+    border-right: none;
+}
+
+.table-paginator{
+    padding: 5px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 2px;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    text-align: center;
+    background-color: white;
+    border: 1px solid #007bff;
+    color:#007bff;
+}
+
+.table-current-page{
+    background-color: #007bff;
+    color: white;
+}
+
+.table-pages{
+    width: max-content;
+    max-width: 70%;
+    margin: 10px auto;
+}
+
+.select-calendar-div{
+
+    padding: 10px;
+    height: 35px;
+    text-align: center;
+}
+
+
+.select-calendar-div .Calendar{
+    display: none;
+}
+
+.select-calendar-div:hover .Calendar{
+    display: block;
+    position: absolute;
+}

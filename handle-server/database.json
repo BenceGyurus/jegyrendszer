@@ -62,5 +62,9 @@
     "local-discount" : {
         "database" : "coupons",
         "collection" : "local" 
+    },
+    "tickets" : {
+        "database" : "event",
+        "collection" : "tickets"
     }
 }

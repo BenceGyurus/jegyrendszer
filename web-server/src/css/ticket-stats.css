@@ -1,36 +1,31 @@
-.event-stat-image{
-    max-height: 300px;
-    width: 30%;
-    margin: 20px;
+.table-top{
+    width: 100%;
+    margin: 10px auto;
+    padding: 20px;
+    background-color: white;
+}
+
+.table-div{
+    width: 80%;
+    margin: 10px auto;
+    background-color: white;
+    border: 1px solid #b3b3b3;
     border-radius: 10px;
 }
 
-.event-stat-main-div{
-    margin: 10px auto;
-    display: block;
+.table-grid{
+    width: 100%;
+    overflow-y: auto;
 }
 
-.progress{
-    width: max-content;
-    margin: 20px auto;
+.table-top{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.event-stat-details{
-    width: 53%;
-    display: inline-block;
-    margin: 30px;
-}
+.download-icon{
+    padding: 5px;
 
-.event-stat-main-div{
-    width: 80%;
-    margin: 50px auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 20px;
-}
-
-@media screen and (width > 1000px) {
-    .event-stat-image{
-        float: right;
-    }
 }

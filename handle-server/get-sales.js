@@ -1,6 +1,7 @@
 const { ObjectId } = require("mongodb");
 const Database = require("./mongo/mongo");
 const getTicketByReadableId = require("./getTicketByReadableId");
+const getTime = require("./getTime");
 
 const closeConnection = (database)=>{
     setTimeout(
@@ -46,7 +47,7 @@ const Sales = async (userId)=>{
             else{
                 coupon = sale.coupon ? sale.coupon : "";
             }
-            sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : eventsOfUser.find(event=>event.readable_event_name == sale.eventId).name, eventId : sale.eventId});
+            if (sale.bought) sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : eventsOfUser.find(event=>event.readable_event_name == sale.eventId).name, eventId : sale.eventId, fullAmount : sale.fullAmount, buyId : sale._id, custormerName : sale.customerDatas ? `${sale.customerDatas.fistname} ${sale.customerDatas.lastname}` : "", cusotmerEmail : sale.customerDatas ? `${sale.customerDatas.mail}` : ""});
         };
     }
     closeConnection(ticketsDatabase.database);

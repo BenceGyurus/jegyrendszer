@@ -4,25 +4,32 @@ import { useEffect, useState } from "react";
 import TicketStats from "./tickets.component";
 import Loader from "../../../loader/loader.component";
 
-type typeOfDatas = {
-    date : number,
-    fullPrice : number,
+type typeOfTicket = {
+    name : string,
+    price : number,
+    unitPrice : number,
     amount : number,
-    bought : boolean,
-    tickets : Array<any>
+    ticketId : string,
+    places : Array<string>,
+    eventId : string
 }
 
-type typeOfTicketDatas = {
-    id : string,
-    eventName : string,
-    image : string,
-    datas : Array<typeOfDatas>,
-    numberOfTickets : number
+
+type typeOfDatas = {
+    user : string, 
+    coupon : string, 
+    price : number, 
+    local : boolean, 
+    tickets : Array<typeOfTicket>,
+    date : string, 
+    fullPrice : number, 
+    eventName : string, 
+    eventId : string
 }
 
 const TicketSalesMain = ()=>{
 
-    const [ticketDatas, setTicketDatas]:[Array<typeOfTicketDatas> , Function] =  useState([]);
+    const [ticketDatas, setTicketDatas]:[Array<typeOfDatas> , Function] =  useState([]);
 
     useEffect(()=>{
         postData("/ticket-sales", {token : ParseLocalStorage("long_token")})
@@ -49,4 +56,4 @@ const TicketSalesMain = ()=>{
     )
 }
 
-export default TicketSalesMain
+export default TicketSalesMain;

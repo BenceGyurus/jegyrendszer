@@ -19,10 +19,11 @@ class QrCode:
             qr_code = qrcode.QRCode(
                 error_correction=qrcode.constants.ERROR_CORRECT_H
             )
+            print(qr_code)
             qr_code.add_data(data)
             qr_code.make()
             qr_code_image = qr_code.make_image().convert("RGB")
-            logo = Image.open('./media/logo.png')
+            logo = Image.open(logo_file_name)
             logo_x_position = (qr_code_image.size[0] - logo.size[0]) // 2
             logo_y_position = (qr_code_image.size[1] - logo.size[1]) // 2
             logo_position = (logo_x_position, logo_y_position)
@@ -32,7 +33,7 @@ class QrCode:
 
             
 
-logo_file_name = "media/logo.png
-data_to_encode = str(random.randint(10000000,99999999))
+#logo_file_name = "media/logo.png
+#data_to_encode = str(random.randint(10000000,99999999))
 
 
