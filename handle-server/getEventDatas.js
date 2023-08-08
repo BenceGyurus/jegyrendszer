@@ -4,13 +4,8 @@ const Database = require("./mongo/mongo.js");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
-        try{
-            database.close();
-        }
-        catch{
-    
-        }
-    },10000);
+        database.close();
+    },5000);
 }
 
 

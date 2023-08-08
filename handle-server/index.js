@@ -130,7 +130,6 @@ app.get("/api/v1/event/:id", async (req,res)=>{
         let l = new Database("venue");
         let placeCollection = l.collection;
         place = {};
-        closeConnection(l.database);
         if (event.venue){
             place = await placeCollection.findOne({_id : new ObjectId(event.venue)});
             if (place){
@@ -152,6 +151,7 @@ app.get("/api/v1/event/:id", async (req,res)=>{
         for (let i = 0; i < event.tickets.length; i++){
             getPriceOfTicket(event.readable_event_name, event.tickets[i].id);
         }
+        closeConnection(l.database);
         res.send({allPendingPlaces : event.allPendingPlaces, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place, location : event.location, position: event.position});
         return;
     }
@@ -167,7 +167,6 @@ app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,nex
             if (event.venue){
                 let l = new Database("venue");
                 place = {};
-                closeConnection(l.database);
                 place = await l.collection.findOne({_id : new ObjectId(event.venue)});
                 if (place){
                     placesOfEvent = [];

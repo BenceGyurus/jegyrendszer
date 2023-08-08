@@ -69,7 +69,6 @@ const getStatsOfEvents = async (userId)=>{
     let eventDatas = await collection.find().toArray();
     let sendDatas = [];
     for (let i = 0; i < eventDatas.length; i++){
-        console.log(eventDatas[i].eventData.users, userId)
         if (eventDatas[i].eventData && eventDatas[i].eventData.users && eventDatas[i].eventData.users.includes(userId)){
             sendDatas.push({numberOfTickets : getFullNumberOfTickets(eventDatas[i].eventData.tickets) ,id : eventDatas[i].eventData.readable_event_name ,eventName : eventDatas[i].eventData.name, image : eventDatas[i].eventData.background, datas : await getStatOfEvent(eventDatas[i].eventData.readable_event_name)});
         }

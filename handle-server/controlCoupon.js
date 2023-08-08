@@ -9,10 +9,8 @@ const error = ()=>{
 }
 
 const ControlCoupon = async (couponName, eventId, fullPrice)=>{
-    console.log(fullPrice)
     const {collection, database} = new Database("coupons");
     let coupon = await collection.findOne({name : couponName});
-    console.log(coupon);
     setTimeout(
         ()=>{
             database.close();

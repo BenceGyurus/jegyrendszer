@@ -18,7 +18,6 @@ const closeConnection = (database)=>{
 }
 
 const getPriceOfTicket = async (eventId, ticketId)=>{
-    console.log("getPriceOfTicket", eventId, ticketId);
     if (eventId){
         let eventDatas = await getEventDatas(eventId);
         if (eventDatas){
@@ -37,6 +36,7 @@ const getPriceOfTicket = async (eventId, ticketId)=>{
                     }
                 }
             }
+            closeConnection(boughtDatabase.database);
         }
 }
 }
