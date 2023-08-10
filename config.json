@@ -1,14 +1,9 @@
 {
     "PY_MAIL": "agora.mail.service@gmail.com",
     "PY_DIR": "../data/email",
-<<<<<<< Updated upstream
-    "EMAIL_SERVER": "http://localhost:5000",
-    "MONGO_URI": "mongodb://localhost:27017/",
-=======
     "NODE_SHARE": "/share",
     "EMAIL_SERVER": "http://email-server:5000",
     "MONGO_URI": "mongodb://mongo:27017/",
->>>>>>> Stashed changes
     "SLACK_TOKEN": "xoxp-3311554582775-3326149485602-5558132480816-b99feeab07cc6134360f9e4800c9d18b",
     "TIMES" : "./times.json",
     "PDF_FONT_FAMILY" : "media/fonts/Rubik/static/Rubik-Regular.ttf",
