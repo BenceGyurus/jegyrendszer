@@ -20,8 +20,8 @@ spec:
           name: backend-configmap
       containers:
       - name: email-server
-        image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/email-server:latest
-        imagePullPolicy: Always
+        image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/email-server:1.2
+        # imagePullPolicy: Always
         resources:
           limits:
             cpu: 200m
@@ -31,17 +31,22 @@ spec:
             memory: 1Gi
         ports:
         - containerPort: 5000
-      envFrom:
-      - secretRef:
-          name: email-server-secretmap
-      volumeMounts:
-      - name: email-server-config
-        mountPath: /
+        envFrom:
+        - secretRef:
+            name: email-server-secretmap
+        env:
+        - name: CONFIGDIR
+          value: "/etc/config"
+        - name: FLASK_APP
+          value: "main.py"
+        volumeMounts:
+        - name: email-server-config
+          mountPath: /etc/config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: email-server-service
+  name: email-server-svc
 spec:
   selector:
     app: email-server

@@ -1,4 +1,4 @@
-FROM python:3-slim-buster
+FROM python:3.9-slim-buster
 
 WORKDIR /app
 
@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "main.py"]
+CMD [ "waitress-serve", "--port=5000", "--call", "main:create_app"]

@@ -28,5 +28,11 @@ async def createCode():
     if request_data['local'] is False: sendMail(request_data['email'], request_data['id'], request_data['title'], request_data['email_body'], config)
     # return f"{request_data['id']}.pdf"
     return send_file(f"{config['PY_DIR']}/{request_data['id']}.pdf", as_attachment=True)
-        
-app.run(port=5000, host = "0.0.0.0")
+
+if __name__ == "__main__":      
+    # app.run(port=5000, host = "0.0.0.0")
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=5000)
+
+def create_app():
+   return app

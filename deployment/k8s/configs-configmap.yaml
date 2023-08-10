@@ -5,10 +5,10 @@ metadata:
 data:
   config.json: |
     {
-      "PY_DIR": "/share",
+      "PY_DIR": "/tmp",
       "ZIP_DIR" : "../data/zips",
       "PY_MAIL": "agora.mail.service@gmail.com",
-      "EMAIL_SERVER": "email-service.default.svc.cluster.local:5000",
+      "EMAIL_SERVER": "email-server-svc.default.svc.cluster.local:5000",
       "MONGO_URI": "mongodb://mongo-service.default.svc.cluster.local:27017/",
       "TIMES" : "/times.json",
       "PDF_FONT_FAMILY" : "media/fonts/Rubik/static/Rubik-Regular.ttf",
