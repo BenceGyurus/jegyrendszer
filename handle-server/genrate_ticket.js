@@ -49,9 +49,21 @@ const GenerateTicket = async (ticketsIds)=>{
           headers: { 
               'Content-Type': 'application/json'
           },
-          data : data
+          data : data,
+          responseType: 'stream'
         };
-        pdfs.push((await axios.request(config)).data);
+        await axios.request(config)
+          .then((response) => {
+            const fileStream = fs.createWriteStream(`${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`);
+            response.data.pipe(fileStream);
+            fileStream.on('finish', () => {
+              console.log('File downloaded successfully');
+            });
+            fileStream.on('error', err => {
+              console.error('Error saving file:', err.message);
+            });        
+        })
+        pdfs.push(`${String(ticketData._id)}.pdf`);
       }
     }
 

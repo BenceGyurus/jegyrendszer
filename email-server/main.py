@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, request
+from flask import Flask, redirect, url_for, request, send_file
 from qrCode import *
 from sendMail import *
 from ticket import *
@@ -13,6 +13,10 @@ config = json.loads(open(f"{os.getenv('CONFIGDIR')}/config.json", "r", encoding 
 def hello(): 
     return 'hello world'
 
+@app.route('/health', methods=['GET'])
+def health(): 
+    return 'working'
+
 @app.route('/createCode', methods=['POST'])
 async def createCode():
     request_data = request.get_json()
@@ -22,6 +26,7 @@ async def createCode():
     create_ticket(config, request_data['id'], request_data['seat'], request_data['title'], request_data['location'], request_data['start'], request_data["price"])
     #time.sleep(10)
     if request_data['local'] is False: sendMail(request_data['email'], request_data['id'], request_data['title'], request_data['email_body'], config)
-    return f"{request_data['id']}.pdf"
+    # return f"{request_data['id']}.pdf"
+    return send_file(f"{config['PY_DIR']}/{request_data['id']}.pdf", as_attachment=True)
         
 app.run(port=5000, host = "0.0.0.0")

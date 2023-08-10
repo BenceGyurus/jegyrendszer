@@ -20,7 +20,7 @@ def create_ticket(config, qr_code_id, seat_number, show_title, location, start, 
         right_margin = config["PDF_RIGHT_MARGIN"]
         top_margin = config["PDF_TOP_MARGIN"]
         bottom_margin = config["PDF_BOTTOM_MARGIN"]
-        doc = SimpleDocTemplate(f"{config['PY_DIR']}/pdfs/{qr_code_id}.pdf", pagesize=(page_width, page_height),
+        doc = SimpleDocTemplate(f"{config['PY_DIR']}/{qr_code_id}.pdf", pagesize=(page_width, page_height),
                             leftMargin=left_margin,
                             rightMargin=right_margin,
                             topMargin=top_margin,
@@ -35,7 +35,7 @@ def create_ticket(config, qr_code_id, seat_number, show_title, location, start, 
         body_color = colors.HexColor(config["PDF_BODY_COLOR"])
         ticket_content = [
         # Title
-        Image(f"{config['PY_DIR']}/qrcodes/{qr_code_id}.png", width=config["QR_CODE_SIZE"], height=config["QR_CODE_SIZE"]),
+        Image(f"{config['PY_DIR']}/{qr_code_id}.png", width=config["QR_CODE_SIZE"], height=config["QR_CODE_SIZE"]),
 
         # Event details
         Paragraph("Esemény:".upper(), normal_style_title),
@@ -56,7 +56,7 @@ def create_ticket(config, qr_code_id, seat_number, show_title, location, start, 
             ticket_content.append(Paragraph(seat_number.upper(), normal_style))
 
         doc.build(ticket_content)
-        return f"{config['PY_DIR']}/pdfs/{qr_code_id}.pdf"
+        return f"{config['PY_DIR']}/{qr_code_id}.pdf"
     return False
 
 

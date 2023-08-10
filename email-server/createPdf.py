@@ -26,4 +26,4 @@ def create_ticket(config, qr_code_id, customer_name, seat_number, show_title):
     print("A jegy sikeresen létrejött.")
 
 # Jegy létrehozása
-create_ticket({"PY_DIR":"../data/email"}, qr_code_data, customer_name, seat_number, show_title)
+# create_ticket({"PY_DIR":"../data/email"}, qr_code_data, customer_name, seat_number, show_title)
