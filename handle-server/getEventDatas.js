@@ -14,10 +14,12 @@ const getEventDatas = async (eventId)=>{
     let preBuyingDatabase = new Database("pre-buying");
     let preBuyingDatas = await preBuyingDatabase.collection.find({eventId : eventId}).toArray();
     closeConnection(preBuyingDatabase.database);
-    for (let i = 0; i < eventDatas.tickets.length; i++){
-        eventDatas.tickets[i].pendingPlaces = [];
-        eventDatas.tickets[i].boughtPlaces = [];
-        eventDatas.tickets[i].numberOfFreeTickets = eventDatas.tickets[i].numberOfTicket;
+    if (eventDatas){
+        for (let i = 0; i < eventDatas.tickets.length; i++){
+            eventDatas.tickets[i].pendingPlaces = [];
+            eventDatas.tickets[i].boughtPlaces = [];
+            eventDatas.tickets[i].numberOfFreeTickets = eventDatas.tickets[i].numberOfTicket;
+        }
     }
     for (let i = 0; i < preBuyingDatas.length; i++){
         if (preBuyingDatas[i].time+getTime("RESERVATION_TIME") > new Date().getTime()){     //config prebuying active time

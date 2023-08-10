@@ -42,6 +42,9 @@ const Sales = require("./get-sales.js");
 const GenerateTicket = require("./genrate_ticket.js");
 const Tickets = require("./tickets.js");
 const createZip = require("./createZip.js");
+const NodeCache = require('node-cache');
+
+const Cache = new NodeCache();
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -91,13 +94,16 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 //EVENTS
 app.get("/api/v1/events", async (req,res) =>{
+    const cachedData = Cache.get('events');
+  if (cachedData) {
+    return res.send({events : cachedData});
+  } else {
     let {collection, database} = new Database("events");
     let datas = await collection.find().toArray();
     let sendDatas = [];
-    console.log(datas);
+    let cache = true;
+    let cacheTime = getTime("CACHE_TIME")
     for (let i = 0; i < datas.length; i++){
-        console.log(datas[i].eventData.objectDateOfRelease.getTime(), new Date().getTime(), datas[i].eventData.objectDateOfEvent.getTime(), new Date().getTime())
-        console.log(datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime())
         if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
             sendDatas.push({
                 id : datas[i].eventData.readable_event_name,
@@ -106,10 +112,19 @@ app.get("/api/v1/events", async (req,res) =>{
                 description : datas[i].eventData.description,
                 imageName : datas[i].eventData.background
             });
+            datas[i].eventData.objectDateOfEvent.getTime()+cacheTime <= new Date().getTime() ? cache = false : false;
+            
         }
+        else if (datas[i].eventData.objectDateOfRelease.getTime() >= new Date().getTime()+cacheTime){
+            cache = false;
+        }
+    }
+    if (cache){
+        Cache.set('events', sendDatas, cacheTime/1000);
     }
     closeConnection(database);
     res.status(200).send({events : sendDatas});
+    }
 });
 
 app.get("/api/v1/event/:id", async (req,res)=>{

@@ -3,11 +3,13 @@ import BasicStyle from "../../defaultStyles/style"
 import { View } from "react-native"
 
 type typeOfEvents = {
-    id : string,
-    date : Date,
-    title : string,
-    description : string,
-    imageName : string
+    eventData : {
+        date : Date,
+        name : string,
+        description : string,
+        background : string
+    },
+    id : string
   }
 
 type typeOfMainEventListParams = {
@@ -22,7 +24,7 @@ const MainEventList = ({eventDatas, isDark, basicUrl, onPressFunction}:typeOfMai
     return (
         <View style = {{backgroundColor : isDark ? BasicStyle.dark.backgroundColor : BasicStyle.light.backgroundColor}}>
             {eventDatas.map((element)=>{
-                return <MainEvent title = {element.title} id = {element.id} image = {element.imageName} isDark = {isDark} onPressFunction={onPressFunction} basicUrl={basicUrl} date = {element.date} />
+                return <MainEvent title = {element.eventData.name} id = {element.id} image = {element.eventData.background} isDark = {isDark} onPressFunction={onPressFunction} basicUrl={basicUrl} date = {element.eventData.date} />
             })} 
         </View>
     );

@@ -17,7 +17,7 @@ import BasicStyle from './defaultStyles/style';
 
 function App(){
   const isDarkMode = useColorScheme() === 'dark';
-  const [basicUrl, setBasicUrl] = useState("http://192.168.1.78:3000");
+  const [basicUrl, setBasicUrl] = useState("http://192.168.1.72:3000/api/v1");
   const [isTokenValid, setIsTokenValid] = useState(false);
   const [token, setToken] = useState("");
   const [loader, setLoader] = useState(false);
@@ -31,7 +31,7 @@ function App(){
       if (long_token){
         postData(`${basicUrl}/get-access`, {token : long_token})
         .then(response=>{
-          if (response.access){
+          if (response.access && !response.error){
             setToken(long_token);
           }
           else{

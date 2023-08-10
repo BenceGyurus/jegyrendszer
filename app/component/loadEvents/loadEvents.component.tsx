@@ -5,12 +5,16 @@ import FullHeightScroll from "../scrollView/scroll-view.component";
 import Header from "../header/header.component";
 import BasicStyle from "../../defaultStyles/style";
 import Event from "../eventDatas/event.component";
+import postData from "../../requests/post";
+import getLocalStorage from "../../storage/getStorage";
 type typeOfEvents = {
-    id : string,
-    date : Date,
-    title : string,
-    description : string,
-    imageName : string
+    eventData : {
+        date : Date,
+        name : string,
+        description : string,
+        background : string
+    },
+    id : string
   }
 type typeOfLoadEventsParams = {
     isDark? : boolean,
@@ -26,26 +30,32 @@ const LoadEvents = ({isDark, basicUrl, controlTokenFunction}:typeOfLoadEventsPar
 
     const loadEvents = ()=>{
         controlTokenFunction();
-        fetch(`/api/v1/${basicUrl}/events`)
-        .then(async (response:any)=>{
-            response = await response.json();
-            if (!response.error){
-                setEvents(response.events);
+        getLocalStorage("long_token")
+        .then(
+            longToken=>{
+                if (longToken){
+                    postData(`${basicUrl}/events`, {token : longToken})
+                    .then(response=>{
+                        console.log(response);
+                        if (!response.error){
+                            setEvents(response);
+                        }
+                    });
+                }
             }
-        })
+        );
     }
 
     useEffect(()=>{
         loadEvents();
     }, []);
 
+    console.log(selectedEvent);
 
-    console.log(events);
 
     return (
         <View style = {{backgroundColor : isDark ? BasicStyle.dark.backgroundColor : BasicStyle.light.backgroundColor}} >
-        <Header/>
-        {events.length ? selectedEvent ? <Event id = {selectedEvent} basicUrl={basicUrl} closeFunction={()=>{setSelectedEvent("")}} /> : <FullHeightScroll isDark = {isDark} onRefreshFunction={loadEvents} children={<MainEventList onPressFunction={setSelectedEvent} basicUrl={basicUrl} isDark = {isDark} eventDatas={events} />}/> : <Text>Jelenleg nincs egy rendezvény sem</Text>}
+        {events.length ? selectedEvent ? <Event id = {selectedEvent} basicUrl={basicUrl} closeFunction={()=>{setSelectedEvent("")}} isDark = {isDark} /> : <FullHeightScroll onRefreshFunction={loadEvents} children={<MainEventList isDark = {isDark} onPressFunction={setSelectedEvent} basicUrl={basicUrl} eventDatas={events} />}/> : <Text>Jelenleg nincs egy rendezvény sem</Text>}
         </View>
     )
 
