@@ -26,7 +26,7 @@ def sendMail(receiver_address, imagename, email_subject, email_body, config):
     #     part = MIMEImage(attachment.read(), name=f"{imagename}.png")
     #     part.add_header('Content-Disposition', f'attachment; filename={imagename}.png')
     #     message.attach(part)
-    with open(f"{config['PY_DIR']}/pdfs/{imagename}.pdf", 'rb') as attachment:
+    with open(f"{config['PY_DIR']}/{imagename}.pdf", 'rb') as attachment:
         part = MIMEBase('application', 'pdf')
         part.set_payload(attachment.read())
         encoders.encode_base64(part)

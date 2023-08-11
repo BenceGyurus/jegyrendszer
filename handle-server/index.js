@@ -1012,7 +1012,7 @@ app.post("/api/v1/order-ticket", async (req,res)=>{
 
 app.post("/api/v1/create-ticket", async (req, res) => {
     const ticketInfo = Functions.parseBody(req.body);
-    if(!ticketInfo) return handleError(logger, "030", res);
+    if( !ticketInfo ) return handleError(logger, "030", res);
     let axiosConfig = {
         method: 'post',
         url: `${config['EMAIL_SERVER']}/createCode`,
@@ -1021,7 +1021,6 @@ app.post("/api/v1/create-ticket", async (req, res) => {
         },
         data : ticketInfo
     };
-    console.log(req.body.event_id);
     let {collection, database} = new Database("events");
     let eventInDb = await collection.findOne({_id : new ObjectId(req.body.event_id)});
     if(!eventInDb) return handleError(logger, "500", res);
@@ -1287,7 +1286,7 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
             let files = await  GenerateTicket(tickets);
             let sysConfig = readConfig()
             for (let i = 0; i < files.length; i++){
-                files[i] = sysConfig["PY_DIR"] + `/pdfs/${files[i]}`;
+                files[i] = sysConfig["NODE_SHARE"] + `/${files[i]}`;
             }
             //console.log(files);
             zip = await createZip(files, `${result.insertedId}.zip`);

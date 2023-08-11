@@ -49,10 +49,8 @@ spec:
     - metadata:
         name: kuma-data
       spec:
-        accessModes: ["ReadWriteMany"]
-        volumeMode: Filesystem
-        volumeName: uptime-kuma-pv
-        storageClassName: standard
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard-rwo
         resources:
           requests:
             storage: 1Gi

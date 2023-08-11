@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: email-server
+  name: email-server-deployment
   labels:
     app: email-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: email-server
@@ -15,27 +15,38 @@ spec:
         app: email-server
     spec:
       volumes:
-      - name: email-server-volume
-        persistentVolumeClaim:
-          claimName: backend-uploads-pvc
+      - name: email-server-config
+        configMap:
+          name: backend-configmap
       containers:
       - name: email-server
-        image: nginx
+        image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/email-server:1.2
+        # imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 1Gi
         ports:
         - containerPort: 5000
-      envFrom:
-      - configMapRef:
-          name: email-server-configmap
-      - secretRef:
-          name: email-server-secretmap
-      volumeMounts:
-      - name: email-server-volume
-        mountPath: /uploads
+        envFrom:
+        - secretRef:
+            name: email-server-secretmap
+        env:
+        - name: CONFIGDIR
+          value: "/etc/config"
+        - name: FLASK_APP
+          value: "main.py"
+        volumeMounts:
+        - name: email-server-config
+          mountPath: /etc/config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: email-server-service
+  name: email-server-svc
 spec:
   selector:
     app: email-server
@@ -43,14 +54,6 @@ spec:
   - protocol: TCP
     port: 5000
     targetPort: 5000
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: email-server-configmap
-data:
-  PY_MAIL: agora.mail.service@gmail.com
-  PY_DIR: ../data/email
 ---
 apiVersion: v1
 kind: Secret

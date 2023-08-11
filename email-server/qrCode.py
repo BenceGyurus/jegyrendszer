@@ -29,7 +29,7 @@ class QrCode:
             logo_position = (logo_x_position, logo_y_position)
             qr_code_image.paste(logo, logo_position)
 
-            qr_code_image.save(f"{config['PY_DIR']}/qrcodes/{data}.png")
+            qr_code_image.save(f"{config['PY_DIR']}/{data}.png")
 
             
 
