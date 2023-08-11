@@ -32,7 +32,7 @@ async def createCode():
 if __name__ == "__main__":      
     # app.run(port=5000, host = "0.0.0.0")
     from waitress import serve
-    serve(app, host="0.0.0.0", port=5000)
+    serve(app, host="192.168.22.248", port=5000)
 
 def create_app():
    return app

@@ -43,6 +43,7 @@ const GenerateTicket = require("./genrate_ticket.js");
 const Tickets = require("./tickets.js");
 const createZip = require("./createZip.js");
 const NodeCache = require('node-cache');
+const { type } = require("os");
 
 const Cache = new NodeCache();
 
@@ -62,17 +63,18 @@ const parseBodyMiddleeware = (req, next)=>{
     next();
 }
 
-const readConfig = async () => {
+const readConfig = () => {
     try {
         let config = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`));
         return config;
     }catch(err){
-        throw 'failed to read config file, check env variables';
+        console.log('failed to read config file, check env variables');
+        return false;
     }
 }
 
-const config = readConfig().catch(err => console.log(err));
-
+const config = readConfig();
+console.log(config);
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
         if (config["ACCEPTED_IMAGE_EXTENSIONS"].includes(file.mimetype.split("/")[1].toUpperCase())){
@@ -97,9 +99,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 //EVENTS
 app.get("/api/v1/events", async (req,res) =>{
     const cachedData = Cache.get('events');
-  if (cachedData) {
-    return res.send({events : cachedData});
-  } else {
+    if (cachedData) {
+        return res.send({events : cachedData});
+    } else {
+    try{
     let {collection, database} = new Database("events");
     let datas = await collection.find().toArray();
     let sendDatas = [];
@@ -127,6 +130,10 @@ app.get("/api/v1/events", async (req,res) =>{
     closeConnection(database);
     res.status(200).send({events : sendDatas});
     }
+    catch{
+        handleError(logger, "500", res);
+    }
+    }
 });
 
 app.get("/api/v1/event/:id", async (req,res)=>{
@@ -148,8 +155,8 @@ app.get("/api/v1/event/:id", async (req,res)=>{
         let placeCollection = l.collection;
         place = {};
         if (event.venue){
-            place = await placeCollection.findOne({_id : new ObjectId(event.venue)});
-            if (place){
+            place = await placeCollection.findOne({_id : new ObjectId(event.venue)}, {projection : {content : 1}});
+            if (Object.keys(place).length){
                 placesOfEvent = [];
                 place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
                 for (let i = 0; i < event.tickets.length; i++){
@@ -172,8 +179,33 @@ app.get("/api/v1/event/:id", async (req,res)=>{
         res.send({allPendingPlaces : event.allPendingPlaces, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place, location : event.location, position: event.position});
         return;
     }
+    return handleError(logger, "014", res);
     //closeConnection(database);
 });
+
+app.post("/api/v1/events-to-sale", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body === TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("local-sale")){
+            const { collection, database } = new Database("events");
+            let events = await collection.find({}, { projection : { eventData : 1 } }).toArray();
+            let sendEvents = [];
+            const userId = String((await GetUserDatas(req.body.token))._id);
+            console.log(userId);
+            for (let i = 0; i < events.length; i++){
+                if (events[i].eventData.users && events[i].eventData.users.includes(userId)){
+                    sendEvents.push({title : events[i].eventData.name, description : events[i].eventData.description, imageName : events[i].eventData.background, date : events[i].eventData.dateOfEvent, id : events[i].eventData.readable_event_name})
+                }
+            }
+            closeConnection(database);
+            return res.send({events : sendEvents});
+        }
+        else{
+            return handleError(logger, "004", res);
+        }
+    }
+    return handleError(logger, "400", res);
+})
 
 
 app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
@@ -182,6 +214,9 @@ app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,nex
         if (access && access.includes("local-sale")){
             let event = await getEventDatas(req.params.id);
             if (event.venue){
+                let userId = String((await GetUserDatas(req.body.token))._id);
+                if (!userId)return handleError("004");
+                if (event.users.includes(userId)){
                 let l = new Database("venue");
                 place = {};
                 place = await l.collection.findOne({_id : new ObjectId(event.venue)});
@@ -201,14 +236,24 @@ app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,nex
                 closeConnection(l.database);
                 place.seatsDatas = placesOfEvent;
                 
-            }
             for (let i = 0; i < event.tickets.length; i++){
                 getPriceOfTicket(event.readable_event_name, event.tickets[i].id);
             }
             return res.send({media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place, location : event.location, position: event.position, localDiscounts : event.localDiscounts})
+            }
+            else{
+                return handleError(logger, "004", res);
+            }
+            }
+            else{
+                return handleError(logger, "000", res);
+            }
+        }
+        else{
+            return handleError(logger, "004", res);
         }
     }
-    handleError(logger, "400", res);
+    return handleError(logger, "400", res);
 });
 
 
@@ -1253,7 +1298,11 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object" && req.body.token){
         let error = false;
         let access = await control_Token(req.body.token, req);
-        if (access.includes("local-sale")){
+        if (access && access.includes("local-sale")){
+        const eventDatas = await getTicketByReadableId(req.body.datas.eventId);
+        const userId = String((await GetUserDatas(req.body.token))._id);
+        if (!userId) return handleError(logger, "004", res);
+        if (eventDatas && eventDatas.users && eventDatas.users.includes(userId)){
         result = await controlEvent(req.body.datas.eventId, req.body.datas.tickets);
         if (result.error) return handleError(logger, result.errorCode, res);
         price = await GetFullPrice(req.body.datas.tickets, req.body.datas.eventId);
@@ -1280,7 +1329,6 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
             //console.log(saveDatas);
             const {collection, database} = new Database("buy");
             let result = await collection.insertOne(saveDatas);
-            let eventDatas = await getTicketByReadableId(req.body.datas.eventId);
             let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.venue, req.body.datas.eventId, true);
             closeConnection(database);
             let files = await  GenerateTicket(tickets);
@@ -1297,8 +1345,9 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
             return res.end(zip); //fs.readFileSync(`${__dirname}/${sysConfig["ZIP_DIR"]}/${result.insertedId}.zip`)
             //return res.send({error : !result.insertedId, id : saveDatas.salt});
         
+            }
+            }
         }
-    }
         }
     return handleError(logger, "004", res);
         
@@ -1452,6 +1501,33 @@ app.post("/api/v1/edit-company/:id", (req,res,next)=>parseBodyMiddleeware(req,ne
                 res.send({error : result.matchedCount == 0});
                 closeConnection(database);
             }
+        }
+    }
+});
+
+
+app.post("/api/v1/print-ticket/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && req.body.token && req.params.id && typeof req.body === TypeOfBody){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("local-sale")){
+            let objectId = ObjectId(req.params.id);
+            const {collection, database} = new Database("tickets");
+            let tickets = await collection.find({orderId : objectId}).toArray();
+            console.log(tickets);
+            let ticketIds = [];
+            tickets.forEach(ticket=>ticketIds.push(ticket._id));
+            files = await GenerateTicket(ticketIds);
+            let sysConfig = readConfig()
+            for (let i = 0; i < files.length; i++){
+                files[i] = sysConfig["NODE_SHARE"] + `/${files[i]}`;
+            }
+            zip = await createZip(files, `${String(objectId)}.zip`);
+            res.writeHead(200, {
+                'Content-Disposition': `attachment; filename="${String(objectId)}.zip"`,
+                'Content-Type': "application/zip",
+            })
+            closeConnection(database);
+            return res.end(zip);
         }
     }
 });

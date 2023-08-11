@@ -75,7 +75,7 @@
         "responseCode" : 200
     },
     "014" : {
-        "message" : "Nem található az esemény",
+        "message" : "Ez az esemény nem található",
         "type" : "error",
         "responseCode" : 404
     },

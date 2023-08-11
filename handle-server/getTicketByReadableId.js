@@ -15,6 +15,7 @@ const getTicketByReadableId = async (id)=>{
             }
         }
     }
+    return false;
 
 }
 

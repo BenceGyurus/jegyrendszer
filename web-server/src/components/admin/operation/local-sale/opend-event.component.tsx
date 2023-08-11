@@ -240,7 +240,6 @@ const Local_Sale_Event = ()=>{
         return fullPrice;
     }
 
-    console.log(amountTickets);
 
     return (
             <div>

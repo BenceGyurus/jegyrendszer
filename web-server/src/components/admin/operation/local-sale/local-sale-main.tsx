@@ -3,6 +3,7 @@ import postData from "../../../connection/request";
 import LocalSaleEventList from "./local-sale-event-list.component";
 import Loader from "../../../loader/loader.component";
 import "../../../../css/local-sale-main.css";
+import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 
 type typeOfEvent = {
     date : string,
@@ -16,10 +17,12 @@ const LocalSaleMain = ()=>{
 
     const [events, setEvents]:[Array<typeOfEvent>, Function] = useState([]);
 
-    useState(()=>{
-        fetch("/api/v1/events")
-        .then(async (response)=>{setEvents((await response.json()).events)});
-    });
+    useEffect(()=>{
+        postData("/events-to-sale", {token : ParseLocalStorage("long_token")})
+        .then((response)=>{setEvents(response.events)});
+    }, []);
+
+    console.log(events);
 
     return (
         <div>

@@ -11,6 +11,7 @@ const closeConnection = (database)=>{
 
 const getEventDatas = async (eventId)=>{
     let eventDatas = await getTicketByReadableId(eventId);
+    if (eventDatas){
     let preBuyingDatabase = new Database("pre-buying");
     let preBuyingDatas = await preBuyingDatabase.collection.find({eventId : eventId}).toArray();
     closeConnection(preBuyingDatabase.database);
@@ -52,7 +53,8 @@ const getEventDatas = async (eventId)=>{
             }
         }
     }
-    return eventDatas;
+    return eventDatas;}
+    return false;
 }
 
 

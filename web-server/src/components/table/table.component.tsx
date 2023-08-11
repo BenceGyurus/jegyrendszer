@@ -12,10 +12,11 @@ type typeOfTableParams = {
     reverse : boolean,
     selectedId : string,
     selectFunction : Function,
-    filter : any
+    filter : any,
+    printFunction : Function
 }
 
-const Table = ({datas, columns, sortFunction, reverseFunction, onChangeFunction, sortedBy, reverse, selectedId, selectFunction, filter}:typeOfTableParams)=>{
+const Table = ({datas, columns, sortFunction, reverseFunction, onChangeFunction, sortedBy, reverse, selectedId, selectFunction, filter, printFunction}:typeOfTableParams)=>{
 
     const [page, setPage] = useState(1);
     const [numberOnPage, setNumberOnPage] = useState(30);
@@ -27,6 +28,8 @@ const Table = ({datas, columns, sortFunction, reverseFunction, onChangeFunction,
         }
         return array;
     }
+
+    console.log(datas);
 
     const getDate = (d:string)=>{
         let date = new Date(d);
@@ -61,7 +64,7 @@ const Table = ({datas, columns, sortFunction, reverseFunction, onChangeFunction,
                                 </td>
                         )})
                     }
-                    <td className = "print">
+                    <td className = "print" onClick={e=>{printFunction(data.buyId)}} >
                         {data.local ? <i className="fas fa-print"></i> : <i>-</i>}
                     </td>
                     </tr>
