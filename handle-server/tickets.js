@@ -12,7 +12,6 @@ const Tickets = async (orderId, tickets, venue, eventId, local)=>{
     const {collection, database} = new Database("tickets");
     let ticketIds = [];
     for (let i = 0; i < tickets.length; i++){
-        console.log(tickets[i])
         for (let j = 0; j < tickets[i].amount; j++){
             let nameOfSeat = "";
             if (tickets[i].places && tickets[i].places[j]){nameOfSeat = (await getNameOfSeat(venue, tickets[i].places[j])).name}

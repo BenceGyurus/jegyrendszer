@@ -62,14 +62,25 @@ const parseBodyMiddleeware = (req, next)=>{
     next();
 }
 
+const readConfig = async () => {
+    try {
+        let config = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`));
+        return config;
+    }catch(err){
+        throw 'failed to read config file, check env variables';
+    }
+}
+
+const config = readConfig().catch(err => console.log(err));
+
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        if (file.mimetype.split("/")[1].toUpperCase() == "PNG" || file.mimetype.split("/")[1].toUpperCase() == "JPG" || file.mimetype.split("/")[1].toUpperCase() == "JPEG"){
+        if (config["ACCEPTED_IMAGE_EXTENSIONS"].includes(file.mimetype.split("/")[1].toUpperCase())){
             callBack(null, 'uploads')
         }
     },
     filename: (req, file, callBack) => {
-        if (file.mimetype.split("/")[1].toUpperCase() == "PNG" || file.mimetype.split("/")[1].toUpperCase() == "JPG" || file.mimetype.split("/")[1].toUpperCase() == "JPEG"){
+        if (config["ACCEPTED_IMAGE_EXTENSIONS"].includes(file.mimetype.split("/")[1].toUpperCase())){
             callBack(null, `${Functions.genrateToken()}.${file.mimetype.split("/")[1]}`)
         }
     }
@@ -77,16 +88,7 @@ const storage = multer.diskStorage({
 
 let upload = multer({ storage: storage })
 
-const readConfig = async () => {
-        try {
-            let config = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`));
-            return config;
-        }catch(err){
-            console.log('failed to read config file, check env variables');
-        }
-}
 
-const config = readConfig().catch(err => console.log(err));
 const logger = new Logger()
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -1282,9 +1284,8 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
             let eventDatas = await getTicketByReadableId(req.body.datas.eventId);
             let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.venue, req.body.datas.eventId, true);
             closeConnection(database);
-            console.log(tickets);
             let files = await  GenerateTicket(tickets);
-            let sysConfig = await readConfig()
+            let sysConfig = readConfig()
             for (let i = 0; i < files.length; i++){
                 files[i] = sysConfig["PY_DIR"] + `/pdfs/${files[i]}`;
             }

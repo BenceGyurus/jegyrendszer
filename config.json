@@ -20,6 +20,6 @@
     "QR_CODE_SIZE" : 80,
     "PDF_FONT_SIZE_TITLE" : 18,
     "PDF_FONT_SIZE_BODY" : 12,
-    "ZIP_DIR" : "../data/zips"
-
+    "ZIP_DIR" : "../data/zips",
+    "ACCEPTED_IMAGE_EXTENSIONS" : ["PNG", "JPG", "PNG", "JFIF", "JPEG"]
 }
