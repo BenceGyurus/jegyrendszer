@@ -95,6 +95,9 @@ const logger = new Logger()
 
 app.use(bodyParser.urlencoded({ extended: false }))
 
+app.get("/health", (req, res) => {
+    res.send('up and running');
+})
 
 //EVENTS
 app.get("/api/v1/events", async (req,res) =>{
