@@ -5,7 +5,7 @@ metadata:
   labels:
     app: handle-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: handle-server
@@ -18,21 +18,34 @@ spec:
       - name: handle-server-volume
         persistentVolumeClaim:
           claimName: backend-uploads-pvc
+      - name: handle-server-config
+        configMap:
+          name: backend-configmap
       containers:
       - name: handle-server
-        image: nginx
+        image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/handle-server:1.1
+        imagePullPolicy: Always
         resources:
+          limits:
+            cpu: 500m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
         ports:
         - containerPort: 3001
           name: backend-open
         envFrom:
-        - configMapRef:
-            name: handle-server-configmap
         - secretRef:
             name: handle-server-secretmap
+        env:
+        - name: CONFIGDIR
+          value: "/etc/config"
         volumeMounts:
         - name: handle-server-volume
           mountPath: /uploads
+        - name: handle-server-config
+          mountPath: /etc/config
 ---
 apiVersion: v1
 kind: Service
@@ -43,17 +56,8 @@ spec:
     app: handle-server
   ports:
   - protocol: TCP
-    port: 3000
+    port: 3001
     targetPort: backend-open
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: handle-server-configmap
-data:
-  EMAIL_SERVER: http://email-server-service.default.svc.cluster.local:5000
-  MONGO_URI: mongodb://mongo-service.default.svc.cluster.local:27017/
-  CONFIGDIR: /
 ---
 apiVersion: v1
 kind: Secret
@@ -70,11 +74,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: backend-uploads-pvc
 spec:
-  storageClassName: standard
-  volumeMode: Filesystem
-  volumeName: backend-uploads
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: standard-rwo
   resources:
     requests:
-      storage: 10Gi
-  accessModes:
-    - ReadWriteMany
+      storage: 15Gi
