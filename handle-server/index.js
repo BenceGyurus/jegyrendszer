@@ -1518,6 +1518,7 @@ app.post("/api/v1/print-ticket/:id", (req,res,next)=>parseBodyMiddleeware(req,ne
             tickets.forEach(ticket=>ticketIds.push(ticket._id));
             files = await GenerateTicket(ticketIds);
             let sysConfig = readConfig()
+            console.log(files)
             for (let i = 0; i < files.length; i++){
                 files[i] = sysConfig["NODE_SHARE"] + `/${files[i]}`;
             }

@@ -54,7 +54,7 @@ const GenerateTicket = async (ticketsIds)=>{
         };
         await axios.request(config)
           .then((response) => {
-            const fileStream = fs.createWriteStream(`${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`);
+            const fileStream = fs.createWriteStream(`${__dirname}/${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`);
             response.data.pipe(fileStream);
             fileStream.on('finish', () => {
               console.log('File downloaded successfully');
