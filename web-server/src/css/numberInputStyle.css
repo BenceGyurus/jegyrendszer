@@ -13,6 +13,7 @@
     border-bottom: 2px solid #ccc;
     transition: border-bottom-color 0.3s ease-in-out;
     -moz-appearance: textfield; /* Firefox */
+    margin-bottom: 10px;
   }
   
   .inputNumber::-webkit-outer-spin-button,
@@ -23,6 +24,6 @@
   
   .inputNumber:focus {
     outline: none;
-    border-bottom-color: rgb(185,211,65);
+    border-bottom-color: #007bff;
   }
   

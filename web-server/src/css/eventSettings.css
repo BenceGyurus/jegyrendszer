@@ -16,3 +16,25 @@
     margin: 10px 20px;
     position: fixed;
 }
+
+.contributors{
+    width: max-content;
+    position: absolute;
+    top: 100px;
+    right: 10px;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+}
+
+.contributors span{
+    font-weight: 300;
+    margin: 5px 10px 5px 2px;
+    display: block;
+}
+
+.contributors-grid{
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+    height: 60px;
+}

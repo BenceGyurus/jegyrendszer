@@ -44,6 +44,7 @@ const Tickets = require("./tickets.js");
 const createZip = require("./createZip.js");
 const NodeCache = require('node-cache');
 const { type } = require("os");
+const getContributors = require("./getContributorsOfEvent.js");
 
 const Cache = new NodeCache();
 
@@ -807,7 +808,7 @@ app.post("/api/v1/venues", async (req,res)=>{
 app.post("/api/v1/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), async (req,res)=> {
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
         let access = await control_Token(req.body.token, req);
-        if (access && access.includes("edit-rooms") && req.params.id){
+        if (access && (access.includes("edit-rooms") || access.includes("edit-events")) && req.params.id){
             if (req.params.id.length === 24){
                 let id = new ObjectId(req.params.id);
                 let { collection, database } = new Database("venue");
@@ -906,7 +907,7 @@ app.post("/api/v1/get-event-data/:id", async (req,res)=>{
             let userId = String((await GetUserDatas(body.token))._id);
             closeConnection(database);
             if (datas && datas?.eventData && datas?.eventData.users.includes(userId)){
-                res.send(datas.eventData);
+                res.send({...datas.eventData, contributors : await getContributors(datas)});
                 return;
             }
             else{
@@ -952,6 +953,9 @@ app.post("/api/v1/add-event/:id",async (req,res)=>{
 });
 
 app.post("/api/v1/events", async (req,res)=>{
+    let page = req.query.page ? req.query.page : 0;
+    let limit = req.query.limit ? req.query.limit : 0;
+    console.log(page, limit)
     let body = Functions.parseBody(req.body);
     if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -964,8 +968,18 @@ app.post("/api/v1/events", async (req,res)=>{
             }
             let events = [];
             let userId = String((await GetUserDatas(body.token))._id);
-            datas.forEach((element)=> element.eventData.users.includes(userId) ? events.push({eventData : element.eventData, addedBy : element.otherDatas.userData, id : element._id}) : false);
-            res.send(events);
+            datas.forEach((element)=> element.eventData.users.includes(userId) ? events.push({eventData : element.eventData, addedBy : element.otherDatas.userData, id : element._id, versions : element.versions, otherDatas : element.otherDatas}) : false);
+            let numberOfPages = events.length && limit ? Math.ceil(events.length/limit) : 0;
+            if (limit && (page-1)*limit < events.length){
+                events = events.slice((page-1)*limit, page*limit);
+                for (let i = 0; i < events.length; i++){
+                    events[i] = {eventData : events[i].eventData, addedBy : events[i].addedBy , contributor : await getContributors(events[i]), id : events[i].id}
+                }
+            }
+            else{
+                events = [];
+            }
+            res.send({events : events, numberOfPages : numberOfPages});
             closeConnection(database);
             return;
         } else return handleError(logger, "004", res);

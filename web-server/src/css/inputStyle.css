@@ -18,6 +18,6 @@
   
 .textInput:focus {
     outline: none;
-    border-bottom-color: rgb(185,211,65);
+    border-bottom-color: #007bff;
   }
   

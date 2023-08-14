@@ -70,27 +70,23 @@ const EditProfileMain = ()=>{
     }
 
     return (
-        <div>
+        <div className="edit-profile-container">
             
             {edit ? <div className = "natification-div"><Success message={edit} closeFunction={()=>{setEdit("")}} /></div> : ""}
             {error ? <div className = "natification-div"><Error message={error} closeFunction={()=>{setError("")}} /></div> : ""}
             <h1>
                 Profil szerkesztése
             </h1>
-            <div>
-                <div className = "edit-profile-div">
-                    <h2>Felhasználónév megváltoztatása</h2>
-                    <InputText title = "Felhasználónév" onChangeFunction={setUsername} value = {username} />
-                    <Button title="Frissítés" onClickFunction={changeUsername} />
-                </div>
-                <div className = "edit-profile-div">
-                    <h2>Jelszó megváltoztatása</h2>
-                    <Password title = "Régi jelszó" onChangeFunction={setOldPass}/>
-                    <Password title = "Új jelszó" onChangeFunction={setPass1} />
-                    <Password title = "Új jelszó újra" onChangeFunction={setPass2} />
-                    <Button title = "Frissítés" onClickFunction={changePassword}/>
-                </div>
-            </div>
+                <label htmlFor="username">Új Felhasználónév:</label>
+                <input type="text" id="username" name="username" onChange={(e)=>setUsername(e.target.value)} />
+                <button onClick={(e)=>changeUsername()}>Mentés</button>
+                <label htmlFor="oldPassword">Régi jelszó</label>
+                <input type="password" id="oldPassword" name="oldPassword" onChange={e=>setOldPass(e.target.value)}/>
+                <label htmlFor="newPassword">Új jelszó</label>
+                <input type="password" id="newPassword" name="newPassword" onChange={e=>setPass1(e.target.value)}/>
+                <label htmlFor="confirmPassword">Új jelszó mégegyszer</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" onChange={e=>setPass2(e.target.value)} />
+                <button onClick={e=>changePassword()}>Mentés</button>
         </div>
     )
 }

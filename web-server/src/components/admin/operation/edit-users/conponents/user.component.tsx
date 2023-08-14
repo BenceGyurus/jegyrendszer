@@ -1,5 +1,7 @@
 import "../../../../../css/user.css";
 import { v4 as uuid } from 'uuid';
+import Avatar from '@mui/material/Avatar';
+import StringAvatar from "../../../../avatar/avatar.component";
 type typeOfUser = {
     username : string,
     access : any,
@@ -15,11 +17,12 @@ type typeOfUserParams = {
 
 
 const User = ({ user,deleteEvent, editEvent }:typeOfUserParams)=>{
+
     return (
         <li className = "user-list-element" key = {user.id}>
         <div className="user-info">
         <div className = "userid">
-            <div className = "admin-user-icon"><i className="fas fa-user"></i></div>
+            <StringAvatar username = {user.username} />
             <div className = "user-info-datas">
             <span className="username">{user.username}</span>
             <span className = "status registered">Registered</span>

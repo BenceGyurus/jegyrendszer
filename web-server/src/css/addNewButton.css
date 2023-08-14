@@ -5,7 +5,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     font-size: 32px;
     border: none;
@@ -16,7 +16,7 @@
   }
   
 .add-button:hover {
-    background-color: #3e8e41;
+    background-color: #0056b3;
     transform: scale(1.1);
   }
   

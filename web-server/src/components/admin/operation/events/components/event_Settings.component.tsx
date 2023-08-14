@@ -19,6 +19,9 @@ import AddMedia from "./add-media.component";
 import MarkerMap from "../../../../map/create-marker-map.component";
 import Checkbox from "../../../../checkbox/checkbox.component";
 import UsersList from "./usersList .component";
+import AvatarGroup from '@mui/material/AvatarGroup';
+import StringAvatar from "../../../../avatar/avatar.component";
+import { Tooltip } from 'react-tooltip'
 
 type typeOfGroups = {
     id : string,
@@ -77,7 +80,8 @@ type typeOfEventSettingsParams = {
     company? : string,
     markerPosition? : typeOfCenter,
     localD? : boolean,
-    usersList? : Array<string>
+    usersList? : Array<string>,
+    contributors? : Array<string>
 }
 
 type typeOfMedia = {
@@ -102,7 +106,7 @@ type typeOfUsers = {
     username : string,
     _id : string
 }
-const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList}:typeOfEventSettingsParams )=>{
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList, contributors}:typeOfEventSettingsParams )=>{
 
     const parse_Media_Datas = (mediaDatas:any)=>{
         for (let i = 0; i < Object.keys(mediaDatas).length; i++){
@@ -318,10 +322,30 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         }
     }
 
+    const getUsersInList = (users:Array<string>)=>{
+        return users.map((user, index)=>{
+            return  (<span style={{color:"white"}}>{user}</span>);
+        });
+    }
+
 
     return (
         <div>
         <BackButton url="/admin/rendezvenyek" className = "create-event-back-button" />
+        {contributors ? <div className = "contributors-grid"><div className = "contributors" >
+            <span>Szerkesztők: </span>
+            
+            <AvatarGroup total={contributors.length} max={3} className="avatar-group">
+                {
+                    contributors.map((contributor)=>{
+                        return <StringAvatar width={40} height={40} username={contributor} />
+                    })
+                }
+            </AvatarGroup>
+            <Tooltip place="bottom" anchorSelect = ".avatar-group" id="my-tooltip-children-multiline" style={{color:"white"}} >
+                {getUsersInList(contributors)}
+            </Tooltip>
+        </div></div> : ""}
         <div className = "create-Event-Settings-Main">
             <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} />
             <InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} />

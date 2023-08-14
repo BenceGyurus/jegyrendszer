@@ -1,22 +1,89 @@
-.event-div{
-    width: 20%;
-    max-width: 400px;
-    min-width: 250px;
-    display: inline-table;
-    margin: 15px;
-    padding: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    height: 300px;
-    font-size: auto;
-}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  
+  .admin-event-container{
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .admin-event-container h1{
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
 
-.admin-event-cover-photo{
-    height: 100px;
+  .admin-event-list {
+    width: 80%;
     display: block;
-    margin: 2px auto;
-}
+    margin: 20px auto;
+  }
 
-.admin-event-name{
+  .admin-event-container img {
+    width: 100%;
+    height: 300px;
+    margin-bottom: 10px;
+    backface-visibility: hidden;
+    object-fit: cover;
+  }
+  
+  .admin-event {
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: white;
+    margin-bottom: 50px;
+  }
+
+  @media screen and (width > 1000px) {
+    .admin-event-list{
+        width: 100%;
+        padding: 0;
+    }
+    .admin-event{
+        width: 30%;
+        display: inline-table;
+        margin: 1%;
+    }
+    .admin-event-container img{
+        height: 200px;
+    }
+  }
+
+
+
+  
+  .admin-event-container h2 {
     font-size: 18px;
-}
+    margin: 5px 10px;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .admin-event-container button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin: 5px 20px 20px 10px;
+  }
+  
+  
+  .admin-event-container button.event-delete-button {
+    background-color: #dc3545;
+  }
+  
+  .admin-event-container button:hover {
+    opacity: 0.8;
+  }
+  

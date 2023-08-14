@@ -25,7 +25,8 @@ type typeOfEvent = {
 type typeOfEventDatas = {
     eventData : typeOfEvent,
     addedBy : {username : string, userId : string, readableid : string},
-    id : string
+    id : string,
+    contributor : Array<string>
 }
 
 type typeOfEventListParams = {
@@ -36,10 +37,10 @@ type typeOfEventListParams = {
 
 
 const EventList = ( { events, editFunction,deleteFunction }:typeOfEventListParams )=>{
-    return <div>
+    return <div className = "admin-event-list">
         {
             events.map((element)=>{
-                return <Event key={uuid()} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} />
+                return <Event key={uuid()} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} />
             })
         }
     </div>
