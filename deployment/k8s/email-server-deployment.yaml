@@ -21,10 +21,12 @@ spec:
       containers:
       - name: email-server
         image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/email-server:1.2
-        # imagePullPolicy: Always
+        imagePullPolicy: Always
+        imagePullSecrets:
+        - name: gcp-ar-login
         resources:
           limits:
-            cpu: 200m
+            cpu: 400m
             memory: 2Gi
           requests:
             cpu: 200m
