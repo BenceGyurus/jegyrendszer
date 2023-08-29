@@ -1,6 +1,7 @@
 import "../../css/eventPage.css";
 import Brand from "../brand/embed-brand.component";
 import Map from "../map/map.component";
+import OpenMapLink from "../openMap/openMap.component";
 
 type typeOfMedia = {
     apple_music? : string,
@@ -23,11 +24,12 @@ type typeOfPageElemens = {
     image : string,
     media : typeOfMedia,
     position : typeOfCenter,
-    location : string
+    location : string,
+    address : string
 }
 
 
-const TicketPageItems = ({title, description, date, image, media, location, position}:typeOfPageElemens)=>{
+const TicketPageItems = ({title, description, date, image, media, location, position, address}:typeOfPageElemens)=>{
     return (
         <div>
             <div className = "event-page-title-div">
@@ -66,7 +68,7 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
                     </span>
                     <p>
                     <span className = "location-icon"><i style={{fontSize : 25}} className="fas fa-map-marker-alt"></i></span>
-                        <span className = "event-location-name-span">{location}</span>
+                        <OpenMapLink address={address} text={location} className = "location-name-map-link" />
                     </p>
                 </div>
                 </div>

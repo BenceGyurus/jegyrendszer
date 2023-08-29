@@ -30,7 +30,7 @@ type typeOfSeat = {
 type typeOfAmountTicket = {
   id : string,
   numberOfTicket : number,
-  places : Array<string>,
+  seats : Array<string>,
   price : number,
   name : string,
   ticketId : string,
@@ -114,7 +114,7 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
   const drawSeats = () => {
     ctx.clearRect(0, 0, sizeOfArea.width, sizeOfArea.height);
     tickets.forEach(ticket=>{
-      ticket.places.forEach(place=>{
+      ticket.seats.forEach(place=>{
         seatPositions.forEach((seat:typeOfSeat) => {
           //const isSelected = selectedSeats.some((selectedSeat:any) => selectedSeat.x === seat.x && selectedSeat.y === seat.y);
           if (seat.id == place){

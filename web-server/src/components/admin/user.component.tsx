@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faRightFromBracket, faUserAlt, faUserPen} from "@fortawesome/free-solid-svg-icons";
 import "../../css/admin-user.css";
 import StringAvatar from "../avatar/avatar.component";
+import SkeletonUser from "./skeletonUser.component";
 
 const AdminUserComponent = ()=>{
 
@@ -19,15 +20,16 @@ const AdminUserComponent = ()=>{
     });
     }, []);
 
-    return <div className = "admin-user-element-main"><div className = "admin-user-element">
+    return (<div className = "admin-user-element-main">
+        {userName ? <div className = "admin-user-element">
         <StringAvatar username = {userName} width = {50} height = {50} />
         <span className = "admin-username">{userName}</span>
         <div className = "admin-operation-buttons-div">
         <span className = "admin-operation-button" id = "logout-button" onClick={(e)=>{localStorage.removeItem("long_token");window.location.reload()}}><FontAwesomeIcon icon={faRightFromBracket} /></span>
         <span className = "admin-operation-button" onClick={(e)=>{window.location.pathname = "/admin/profil"}}><FontAwesomeIcon icon = {faUserPen} /></span>
         </div>
-    </div>
-</div>;
+    </div> : <SkeletonUser />}
+</div>);
 
 }
 

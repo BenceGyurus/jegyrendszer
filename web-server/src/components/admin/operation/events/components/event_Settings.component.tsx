@@ -18,10 +18,16 @@ import BackButton from "../../../../back/backbutton.component";
 import AddMedia from "./add-media.component";
 import MarkerMap from "../../../../map/create-marker-map.component";
 import Checkbox from "../../../../checkbox/checkbox.component";
-import UsersList from "./usersList .component";
+import UsersList from "./usersList.component";
 import AvatarGroup from '@mui/material/AvatarGroup';
 import StringAvatar from "../../../../avatar/avatar.component";
 import { Tooltip } from 'react-tooltip'
+import LoadingButton from '@mui/lab/LoadingButton';
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import CloseIcon from '@mui/icons-material/Close';
+import TimeLine from "./timeLine.component";
 
 type typeOfGroups = {
     id : string,
@@ -81,7 +87,12 @@ type typeOfEventSettingsParams = {
     markerPosition? : typeOfCenter,
     localD? : boolean,
     usersList? : Array<string>,
-    contributors? : Array<string>
+    contributors? : Array<string>,
+    addre? : string,
+    open? : string,
+    end? : string,
+    isWardrobe? : boolean,
+    versions? : any
 }
 
 type typeOfMedia = {
@@ -106,7 +117,7 @@ type typeOfUsers = {
     username : string,
     _id : string
 }
-const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList, contributors}:typeOfEventSettingsParams )=>{
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList, contributors,addre, open, end, isWardrobe, versions}:typeOfEventSettingsParams )=>{
 
     const parse_Media_Datas = (mediaDatas:any)=>{
         for (let i = 0; i < Object.keys(mediaDatas).length; i++){
@@ -143,6 +154,12 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [localDiscounts, setLocalDiscounts]:[boolean, Function] = useState(localD ? localD : false);
     const [users, setUsers]:[Array<typeOfUsers>, Function] = useState([]);
     const [selectedUsers, setSelectedUsers]:[Array<string>, Function] = useState(usersList ? usersList : []);
+    const [isLoading, setIsLoading]:[boolean, Function] = useState(false);
+    const [successSave, setSuccessSave]:[boolean, Function] = useState(false);
+    const [address, setAddress]:[string, Function] = useState(addre ? addre : "");
+    const [gateOpening, setGateOpening]:[string, Function] = useState(open ? open : "");
+    const [endOfTheEvent, setEndOfTheEvent]:[string, Function] = useState(end ? end : "");
+    const [wardrobe, setWardrobe]:[boolean, Function] = useState(isWardrobe ? isWardrobe : false);
 
 
     const getUsers = ()=>{
@@ -243,6 +260,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     }
 
     const save = ()=>{
+        setIsLoading(true);
         let sendData = {
             name : nameOfEvent,
             description : desciption,
@@ -256,7 +274,11 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             company : selectedCompany,
             position: position,
             localDiscounts : localDiscounts,
-            users : selectedUsers
+            users : selectedUsers,
+            address : address,
+            gate_Opening : gateOpening,
+            end_Of_The_Event : endOfTheEvent,
+            wardrobe : wardrobe
         };
 
         postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
@@ -267,6 +289,8 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             else if (data.id && !id){
                 window.location.pathname += `/${data.id}`;
             }
+            setIsLoading(false);
+            setSuccessSave(true);
         })
     }
 
@@ -347,23 +371,42 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             </Tooltip>
         </div></div> : ""}
         <div className = "create-Event-Settings-Main">
-            <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} />
-            <InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} />
+            <div style={{position : "fixed", bottom : 10, left : 10, zIndex : 999999, width : "35%"}}>
+            <Collapse in={successSave}>
+        <Alert severity="success"
+          action={
+            <IconButton aria-label="close" color="inherit" size="small" onClick={() => {setSuccessSave(false);}}>
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }>
+          Sikeres mentés!
+        </Alert>
+      </Collapse>
+            </div>
+            <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} disabled = {isLoading} info={{text : "Ez a cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. A rendezvény url-e is ez alapján fog létrejönni."}} />
+            <InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} disabled = {isLoading} info={{text : "Az ide beírt helyszín fog megjelenni az oldalon", image : "/images/info/map.png"}} />
+            <InputText title = "Rendezvény helyszínének címe" onChangeFunction={setAddress} value={address} disabled = {isLoading} info={{text : "A rendezvény helyszínének a címe. Írányítószám város, utca házszám. Ez nem fog megjelenítésre kerülni az oldalon, hanem a helyszínre kattintva ennek a címnek a segítségével fogja megkeresni a felhasználó alapértelmezett térképével a helyszínt. Támogatott térképek: Google Maps, Apple Maps. Helyszíneknél megadható a helyszín neve is az utca, házszám helyett, de a térképek ilyenkor nem fogják minden esetben pontosan megtalálni."}} />
             <MarkerMap zoomLevel={14} center={position} title = {locationOfEvent} setPosition={setPostion} />
-            <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} />
+            <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} disabled = {isLoading} />
             <AddNewButton onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
-            <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" />
-            <Calendar onChangeFunction={setDateOfRelease} value = {dateOfRelease} title="Rendevény megjelenése az oldalon" />
+            <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" disabled = {isLoading} info={{ text : "Ez a dátum fog megjelenni az oldalon. A megadott dátum a rendezvényt már nem lehet rá vásárolni és eltűnik a főoldalról. A megadott dátumtól számított másfél évvel az oldal gyorsasága érdekében a rendezvény autómatikusan törlésre kerül", image : "/images/info/date.png"}} />
+            <Calendar onChangeFunction={setDateOfRelease} value = {dateOfRelease} title="Rendevény megjelenése az oldalon" disabled = {isLoading} info={{text : "A megadott időtől jelenik meg a rendezvény az oldalon és lehet rá jegyet vásárolni. Az értékének kisebbnek kell lennie mint a rendezvény dátuma."}} />
+            <Calendar onChangeFunction={setGateOpening} value = {gateOpening} title = "Kapunyitás" disabled= {isLoading} info={{text : "A kapunyitás az oldalon nem kerül mejelenítésre, ez a már megvásárol jegyen lesz látható."}} />
+            <Calendar onChangeFunction={setEndOfTheEvent} value={endOfTheEvent} title = "Esemény vége" disabled = {isLoading} info={{text : "Az esemény végére a az Apple pass és a jegy miatt van szükség, ott kerül majd megjelenítésre."}} />
+            <Checkbox title = "Ruhatár a helyszínen" onChangeFunction={setWardrobe} defaultChecked = {wardrobe} />
             <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
             <Select title = "Vállalt kiválasztása" options = {companyList} onChangeFunction={setSelectedCompany} value={selectedCompany} />
             <Checkbox title = "Helyi kedvezmények" onChangeFunction={setLocalDiscounts} defaultChecked={localDiscounts} />
-            <AddMedia media = {media} changeValueOfMedia={valueOfMedia} />
+            <AddMedia media = {media} changeValueOfMedia={valueOfMedia} disabled = {isLoading} />
+            <h4>Felhasználók engedélyezése:</h4>
             {users.length ? <UsersList selectedUsers={selectedUsers} userDatas={users} onChangeFunction={changeSelectedUsers} /> : ""}
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
-
-            <SaveButton onClickFunction={save} />
+            {versions && versions.length ? <TimeLine data = {versions} /> : ""}
+            <LoadingButton loading = {isLoading} onClick = {save} style={{margin : "10px auto", display : "block"}} variant="outlined">
+                Mentés
+            </LoadingButton>
         </div>
         </div>
     );

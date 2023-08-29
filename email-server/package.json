@@ -1,0 +1,19 @@
+{
+  "name": "email-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "jimp": "^0.22.10",
+    "nodemailer": "^6.9.4",
+    "pdfkit": "^0.13.0",
+    "qr-image": "^3.2.0",
+    "qrcode": "^1.5.3"
+  }
+}

@@ -8,6 +8,27 @@ import Coupon from "./buy-ticket-coupon.component";
 import postData from "../connection/request";
 import Error from "../notification/error.component";
 import Notification from "../notification/notification.component";
+import BuyingStepper from "./stepper.component";
+import LoadingButton from '@mui/lab/LoadingButton';
+import Box from '@mui/material/Box';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ContactlessIcon from '@mui/icons-material/Contactless';
+import BillingInformations from "./billing-infomations.component";
+import PaymentMethods from "./payment-methods.component";
+
+
+type typeOfBillAddress = {
+    firstname : string,
+    lastname : string,
+    postalCode : number,
+    city : string,
+    taxNumber : string,
+    phone : string,
+    mail : string
+}
+
 
 type typeOfTicketDatas = {
     eventId : string, 
@@ -15,7 +36,8 @@ type typeOfTicketDatas = {
     fullAmount : number, 
     fullPrice : number, 
     eventName : string, 
-    dateOfEvent : number
+    dateOfEvent : number,
+    customerDatas : typeOfBillAddress
 }
 
 type typeOfTickets = {
@@ -30,19 +52,9 @@ type typeOfCoupon = {
     money : boolean,
     amount : number
 }
-
-type typeOfBillAddress = {
-    firstname : string,
-    lastname : string,
-    postalCode : number,
-    city : string,
-    taxNumber : string,
-    phone : string,
-    mail : string
-}
-
 const BuyTicketMainPage = ()=>{
 
+    const [sameInvoiceData, setSameInvoiceData]:[boolean, Function] = useState(true);
     const [referalCode, setReferalCode]:[string, Function] = useState("");
     const [usedCoupon, setUsedCoupon]:[typeOfCoupon, Function] = useState({name : "", money : false, amount : 0});
     const [error, setError]:[string, Function] = useState("");
@@ -55,13 +67,25 @@ const BuyTicketMainPage = ()=>{
     const [taxNumber, setTaxNumber] = useState("");
     const [phone, setPhone] = useState("");
     const [mail, setMail] = useState("");
+    const [fetching, setfetching] = useState(false);
+    const [step, setStep] = useState(1);
+    const [link, setLink] = useState("");
     const [ticketDatas, setTicketDatas]:[typeOfTicketDatas, Function] = useState({
         eventId : "", 
         tickets : [], 
         fullAmount : 0, 
         fullPrice : 0, 
         eventName : "", 
-        dateOfEvent : 0
+        dateOfEvent : 0,
+        customerDatas : {
+            firstname : "",
+            lastname : "",
+            postalCode : 0,
+            city : "",
+            taxNumber : "",
+            phone : "",
+            mail : ""
+        }
     });
 
 
@@ -85,9 +109,10 @@ const BuyTicketMainPage = ()=>{
 
     const sendDatas = ()=>{
         if (firstname && lastname && String(postCode).length === 4 && city && address && phone  && mail){
+            setfetching(true);
             let datas = {
                 customerData : {
-                    fistname : firstname,
+                    firstname : firstname,
                     lastname : lastname,
                     postalCode : postCode,
                     city : city,
@@ -101,26 +126,80 @@ const BuyTicketMainPage = ()=>{
             }
             let token = window.location.pathname.split("/")[2];
             postData(`/payment/${token}`, {datas : datas})
-            .then(response=>{console.log(response)});
+            .then(response=>{if (response.link){setStep(2); getDatas(); setLink(response.link)} setfetching(false)});
         }
     }
 
-    useEffect(()=>{
+    const pay = ()=>{
+        if (link){
+            window.location.href = link;
+        }
+        else{
+            setError("Hiba történt a fizetés során");
+        }
+    }
+
+    const getDatas = ()=>{
         let token = window.location.pathname.split("/")[2];
         fetch(`/api/v1/buy-ticket-details/${token}`)
         .then(response=>response.json())
-        .then(data=>setTicketDatas(data));
+        .then(data=>{
+            if (!data.error){
+                if (data.customerDatas){
+                    setFirstname(data.customerDatas.firstname);setLastname(data.customerDatas.lastname); setPostCode(data.customerDatas.postalCode); setCity(data.customerDatas.city); setAddress(data.customerDatas.address); if (data.customerDatas.address2 != "null") setAddress2(data.customerDatas.address2); if (data.customerDatas.taxNumber != "null") setTaxNumber(data.customerDatas.taxNumber); setPhone(data.customerDatas.phone); setMail(data.customerDatas.mail)
+                }
+                setTicketDatas(data)
+            }
+        });
+    }
+
+    useEffect(()=>{
+        getDatas();
     }, []);
 
     return <div>
         {error ? <Notification element={<Error message={error} closeFunction={()=>{setError("")}} />} /> : ""}
-        <h1>Adatok megadása</h1>
-        <DatasOfCustomer setFirstName={setFirstname} setLastName={setLastname} setPostalCode={setPostCode} setCity={setCity} setAddress={setAddress} setAddress2={setAddress2} setMail={setMail} setPhone={setPhone} setTaxNumber={setTaxNumber} city = {city} />
+        <div style={{margin : 10}}><BuyingStepper active = {step} /></div>
+        { step == 1 ? <div><h1>Adatok megadása</h1>
+        <DatasOfCustomer setFirstName={setFirstname} setLastName={setLastname} setPostalCode={setPostCode} setCity={setCity} setAddress={setAddress} setAddress2={setAddress2} setMail={setMail} setPhone={setPhone} setTaxNumber={setTaxNumber} city = {city} firstName={firstname} lastName={lastname} zip = {postCode} tax={taxNumber} mail={mail} phone = {phone} address={address} address2={address2} setInvoiceName={()=>{}} sameInvoiceData={sameInvoiceData} setSameInvoiceData = {setSameInvoiceData} />
         <div className = "deitals">
-        {ticketDatas.eventId ? <Details tickets = {ticketDatas.tickets} fullPrice={ticketDatas.fullPrice} nameOfEvent={ticketDatas.eventName} coupon={usedCoupon} /> : <Loader />}
+        {ticketDatas.eventId ? <Details tickets = {ticketDatas.tickets} fullPrice={ticketDatas.fullPrice} nameOfEvent={ticketDatas.eventName} coupon={usedCoupon} /> : <Details />}
         <Coupon onClickFunction={useRefCode} changeReferalCode={setReferalCode} value = {referalCode} />
-        <button className = "payingButton" onClick={sendDatas}>Tovább a fizetéshez</button>
-        </div>
+        <PaymentMethods methods={[{id : "simple-pay", image : "/images/logos/simple_pay.png"}]} onChangeFunction={()=>{}} />
+        <div className = "button-grid"><LoadingButton
+          size="small"
+          onClick={sendDatas}
+          endIcon={<ArrowForwardIcon />}
+          loading={fetching}
+          loadingPosition="end"
+          variant="contained"
+          className = "payingButton"
+          style = {{background : "white", color : "#595959"}}
+        >Tovább a fizetéshez</LoadingButton></div></div></div> : "" }
+        {step == 2 ? <div>
+            <h1>Adatok ellenőrzése</h1>
+            <h2>Jegy adatai</h2>
+            <div className="deitals">{ticketDatas.eventId ? <Details tickets = {ticketDatas.tickets} fullPrice={ticketDatas.fullPrice} nameOfEvent={ticketDatas.eventName} coupon={usedCoupon} /> : <Loader />}</div>
+            <div className="deitals"><BillingInformations firstname={firstname} lastname={lastname} zip={postCode} city={city} address={address} address2 = {address2 == "null" ? undefined : address2} tax={taxNumber == "null" ? undefined : taxNumber} phone={phone} mail={mail} /></div>
+            <LoadingButton
+          size="small"
+          onClick={pay}
+          endIcon={<ContactlessIcon style={{color : "white"}} />}
+          loading={fetching}
+          loadingPosition="end"
+          variant="contained"
+          className = "payingButton"
+        >Fizetés</LoadingButton>
+        <LoadingButton
+          size="small"
+          onClick={()=>{setStep(1)}}
+          endIcon={<ArrowBackIcon />}
+          loading={fetching}
+          loadingPosition="end"
+          variant="contained"
+          className = "payingButton"
+        >Vissza</LoadingButton>
+        </div> : ""}
     </div>
 }
 

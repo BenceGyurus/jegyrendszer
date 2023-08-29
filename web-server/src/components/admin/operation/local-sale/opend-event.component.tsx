@@ -50,7 +50,7 @@ type typeOfEventDatas = {
 type typeOfAmountTicket = {
     id : string,
     numberOfTicket : number,
-    places : Array<string>,
+    seats : Array<string>,
     price : number,
     name : string,
     ticketId : string,
@@ -70,7 +70,7 @@ type typeOfDiscount = {
 
 const Local_Sale_Event = ()=>{
 
-    const genereateTicketAmout = (tickets:any):Array<typeOfAmountTicket>=>{
+    const genereateTicketAmout = (tickets:any):Array<any>=>{
         let newList:Array<typeOfAmountTicket> = [];
         for (let i = 0; i < tickets.length; i++){
             newList.push({...tickets[i], amount : 0, selected : 0})
@@ -79,8 +79,9 @@ const Local_Sale_Event = ()=>{
     }
 
     const [eventDatas, setEventDatas]:[any, Function] = useState();
+    const [venue, setVenue]:[any, Function] = useState();
     const [error, setError] = useState("");
-    const [amountTickets, setAmountTickets] = useState(genereateTicketAmout(eventDatas ? eventDatas.tickets : {}));
+    const [amountTickets, setAmountTickets]:[any, Function] = useState();
     const [selectedTickets, setSelectedTickets]:[Array<string>, Function] = useState([]);
     const [largeMap, setLargeMap]:[boolean, Function] = useState(false);
     const [discounts, setDiscounts]:[Array<typeOfDiscount>, Function] = useState([]);
@@ -127,10 +128,10 @@ const Local_Sale_Event = ()=>{
                 if (l[i].selected >= l[i].amount){
                 let lamdba = [...selectedTickets];
                 for (let j = lamdba.length-1; j >= 0; j--){
-                    if (!l[i].places.includes(lamdba[j]) || deleted){
+                    if (!l[i].seats.includes(lamdba[j]) || deleted){
                         newList.push(lamdba[j]);
                     }
-                    if (l[i].places.includes(lamdba[j])){
+                    if (l[i].seats.includes(lamdba[j])){
                         deleted = true;
                     }
                 }
@@ -164,7 +165,17 @@ const Local_Sale_Event = ()=>{
         .then(async (response)=>{
             if (!response.error){
                 setEventDatas(response);
-                setAmountTickets(genereateTicketAmout(response.tickets));
+                //setAmountTickets(genereateTicketAmout(response.tickets));
+                if (response.venue){
+                    fetch(`/api/v1/venue/${response.venue}?event=${id}`).then(
+                        async (response)=>{
+                            let v =(await response.json());
+                            if (v && !v.error){
+                                setVenue(v.venue);
+                            }
+                        }
+                    );
+                }
                 if (response.localDiscounts){
                     getDiscounts();
                 }
@@ -174,12 +185,19 @@ const Local_Sale_Event = ()=>{
                 response.message ? setError(response.message) : setError("Váratlan hiba történet az esemény betöltése közben")
             }
         })
+        fetch(`/api/v1/tickets/${id}?reserved=true`)
+        .then(async (response)=>{
+            let tickets = await response.json();
+            if (!tickets.error && tickets.length){
+                setAmountTickets(genereateTicketAmout(tickets));
+            }
+        })
     }, []);
 
     const selectSeat = (id:string)=>{
         let lTicketAmount = [...amountTickets];
         for (let i = 0; i < lTicketAmount.length; i++){
-            if (lTicketAmount[i].places.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
+            if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
                 let l = [...selectedTickets, id];
                 setSelectedTickets(l);
                 lTicketAmount[i].selected++;
@@ -213,7 +231,7 @@ const Local_Sale_Event = ()=>{
         let sendTickets = [];
         for (let i = 0; i < amountTickets.length; i++){
             if (amountTickets[i].amount > 0){
-                sendTickets.push({amount : amountTickets[i].amount, name : amountTickets[i].name, ticketId : amountTickets[i].id, places : getPlacesOfTicket(amountTickets[i].places)});
+                sendTickets.push({amount : amountTickets[i].amount, name : amountTickets[i].name, ticketId : amountTickets[i].id, places : getPlacesOfTicket(amountTickets[i].seats)});
             }
         }
         postFile("/buy-local", {token : ParseLocalStorage("long_token"), datas : {
@@ -247,7 +265,7 @@ const Local_Sale_Event = ()=>{
                 {succesfull ? <Notification element={<Success message={succesfull} />}/> : ""}
                 {eventDatas ? <EventDetails title = {eventDatas.title} description={eventDatas.description} image = {eventDatas.background} /> : ""}
                 {eventDatas ? <Tickets tickets = {amountTickets} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets} /> : ""}
-                {eventDatas && eventDatas.places && eventDatas.places.seatsDatas.length ? <Seats places = {eventDatas.places}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
+                {venue ? <Seats places = {venue}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
                 {discounts.length ? <DiscountList discounts={discounts} onClikcFunction={selectDiscount} selectedDiscount={selectedDiscount} /> : ""}
                 <div>Végösszeg: {getPrice()}Ft</div>
                 <div className = "buy-btn-div"><BuyButton onClickFunction={buy} /></div>

@@ -13,7 +13,11 @@ const Datas = {
     company : "string",
     position: "object",
     localDiscounts : "boolean",
-    users : "object"
+    users : "object",
+    address : "string",
+    gate_Opening : "string",
+    end_Of_The_Event : "string",
+    wardrobe : "boolean"
 }
 
 const controlTypeOfEvents = (inputs)=>{

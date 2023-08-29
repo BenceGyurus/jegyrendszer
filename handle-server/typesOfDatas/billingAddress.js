@@ -1,7 +1,7 @@
 const ControlDatas = require("./controlTypesOfDatas")
 
 const Datas = {
-    fistname : "string",
+    firstname : "string",
     lastname : "string",
     postalCode : 'string',
     city : "string",

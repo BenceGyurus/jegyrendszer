@@ -12,9 +12,6 @@ const closeConnection = (database)=>{
 const getEventDatas = async (eventId)=>{
     let eventDatas = await getTicketByReadableId(eventId);
     if (eventDatas){
-    let preBuyingDatabase = new Database("pre-buying");
-    let preBuyingDatas = await preBuyingDatabase.collection.find({eventId : eventId}).toArray();
-    closeConnection(preBuyingDatabase.database);
     if (eventDatas){
         for (let i = 0; i < eventDatas.tickets.length; i++){
             eventDatas.tickets[i].pendingPlaces = [];
@@ -22,25 +19,10 @@ const getEventDatas = async (eventId)=>{
             eventDatas.tickets[i].numberOfFreeTickets = eventDatas.tickets[i].numberOfTicket;
         }
     }
-    for (let i = 0; i < preBuyingDatas.length; i++){
-        if (preBuyingDatas[i].time+getTime("RESERVATION_TIME") > new Date().getTime()){     //config prebuying active time
-            for (let j = 0; j < preBuyingDatas[i].tickets.length;j++){
-                for (let k = 0; k < eventDatas.tickets.length; k++){
-                    if (preBuyingDatas[i].tickets[j].ticketId == eventDatas.tickets[k].id && eventDatas.tickets[k].seats.length){
-                        eventDatas.tickets[k].pendingPlaces.push(...preBuyingDatas[i].tickets[j].places);
-                    }
-                    if (preBuyingDatas[i].tickets[j].ticketId == eventDatas.tickets[k].id){
-                        eventDatas.tickets[k].numberOfFreeTickets-=preBuyingDatas[i].tickets[j].amount
-                    }
-                }
-            }
-        }
-    }
     const boughtDatabase = new Database("buy");
-    let boughtDatas = await boughtDatabase.collection.find({eventId : eventId}).toArray();
+    let boughtDatas = await boughtDatabase.collection.find({$and : [{eventId : eventId}, {$or : [{ time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")} }, {bought : true} ]}]}).toArray();
     closeConnection(boughtDatabase.database)
     for (let i = 0; i < boughtDatas.length; i++){
-        if ((boughtDatas[i].pending && boughtDatas[i].time + getTime("RESERVATION_TIME") > new Date().getTime()) || boughtDatas[i].bought){       //config prebuying active time
             for (let j = 0; j < boughtDatas[i].tickets.length; j++){
                 for (let k = 0; k < eventDatas.tickets.length; k++){
                     if (eventDatas.tickets[k].id == boughtDatas[i].tickets[j].ticketId && eventDatas.tickets[k].seats.length){
@@ -50,7 +32,6 @@ const getEventDatas = async (eventId)=>{
                         eventDatas.tickets[k].numberOfFreeTickets-=boughtDatas[i].tickets[j].amount
                     }
                 }
-            }
         }
     }
     return eventDatas;}

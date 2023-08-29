@@ -1,52 +1,33 @@
 /* Modern styling for checkboxes */
 .user-event-container {
     display: flex;
-    flex-direction: column;
     margin: 20px 5px 20px 5px;
+    flex-wrap: wrap;
   }
   
-.user-event {
-    margin: 5px;
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-    cursor: pointer;
-  }
-  
-.user-event input[type="checkbox"] {
-    position: relative;
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    border: 2px solid #4a4a4a;
-    border-radius: 4px;
-    margin-right: 10px;
-    outline: none;
-    cursor: pointer;
-  }
-  
-.user-event input[type="checkbox"]::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    width: 16px;
-    height: 16px;
-    background-color: #007bff; /* Color when checkbox is checked */
-    border-radius: 2px;
-    transition: transform 0.2s ease;
-  }
-.user-event input[type="checkbox"]:checked::before {
-    transform: translate(-50%, -50%) scale(0.6);
-  }
+.user-event{
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  border: 2px solid #fff;
+  width: max-content;
+  margin: 10px;
+  padding: 10px 15px;
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-.user-event label {
-    font-size: 16px;
-  }
-  
-  /* Hover effect */
-.user-event input[type="checkbox"]:not(:checked):hover {
-    border-color: #007bff;
-  }
-  
+.selected-user{
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-user-select: none;
+  border-color: #007bff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  width: max-content;
+  margin: 10px;
+  padding: 10px 15px;
+}

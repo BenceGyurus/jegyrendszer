@@ -18,4 +18,13 @@
     border: none;
     display:  block;
     cursor: pointer;
+    background: #3ad60f;
+    display: block;
+}
+
+@media screen and (width < 1000px) {
+    .button-grid{
+        width : max-content;
+        margin : 10px auto;
+    }
 }

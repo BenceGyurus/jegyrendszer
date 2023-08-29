@@ -14,10 +14,11 @@ type typeOfMedia = {
 
 type typeOfAddMediaParams = {
     media : typeOfMedia,
-    changeValueOfMedia : Function
+    changeValueOfMedia : Function,
+    disabled? : boolean
 }
 
-const AddMedia = ({media, changeValueOfMedia}:typeOfAddMediaParams)=>{
+const AddMedia = ({media, changeValueOfMedia, disabled}:typeOfAddMediaParams)=>{
 
     const [mediaWindow, setMediaWindow]:[boolean, Function] = useState(false);
 

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import AddNewButton from "../../../buttons/add_New.component";
 import Error from "../../../notification/error.component";
 import Loader from "../../../loader/loader.component";
+import LoadingSkeleton from "../events/components/loading_Skeleton.component";
+import { Button, Empty } from 'antd';
 
 type typeOfTickets = {
     name : string,
@@ -40,17 +42,18 @@ const Show_Events_Main = ()=>{
     const [error, setError] = useState("");
     const [response, setResponse] = useState(false);
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(3);
+    const [limit, setLimit] = useState(6);
     const [isLoading, setIsLoading] = useState(false);
     const [end, setEnd] = useState(false);
     const [numberOfPages, setNumberOfPages] = useState(1);
 
     const getEvets = ()=>{
+        setIsLoading(true);
         postData(`/events?page=${page}&limit=${limit}`, {token : ParseLocalStorage("long_token")}).then(
             async (datas)=>{
                 setResponse(true);
                 if (datas && !datas.datas && !datas.error){
-                    if (!datas.length) return setEnd(true);
+                    if (!datas.events.length) return setEnd(true);
                     setEvets(datas.events);
                     setNumberOfPages(datas.numberOfPages)
                 }else{
@@ -86,35 +89,29 @@ const Show_Events_Main = ()=>{
   
   
     function loadMoreContent() {
-        console.log(end, isLoading);
         if (end || isLoading) return;
             setIsLoading(true);
             getEvets();
     }
 
   
-    function handleScroll() {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-        loadMoreContent();
-      }
-    }
-  
     useEffect(() => {
-    loadMoreContent();
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    loadMoreContent()
+    }, [page]);
 
     const edit_Event = (id:string)=>{
         window.location.pathname = `/admin/rendezveny/${id}`;
     }
 
-    console.log(isLoading);
+    const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value);
+    };
+    console.log(response, !events.length);
 
     return <div className = "admin-event-container" >
         <h1>Rendezvények</h1>
         {error ? <Error message = {error} closeFunction = {()=>{setError("")}} /> : ""}
-        {events.length || response ? <EventList events={events} editFunction={edit_Event} deleteFunction={deleteEvent} /> : <Loader /> }
+        {(events.length || response) && !isLoading ? <EventList events={events} editFunction={edit_Event} deleteFunction={deleteEvent} numberOfPages={numberOfPages} page={page} handleChange={handleChange} /> : !events.length && response ? <div><Empty /></div> :  <LoadingSkeleton limit={limit} /> }
         <AddNewButton onClick={()=>{window.location.pathname = "/admin/rendezveny"}}/>
     </div>
 }

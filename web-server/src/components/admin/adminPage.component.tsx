@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "../../css/admin.css";
 import AdminUserComponent from "./user.component";
+import AccessSkeletons from "./accessSkeletons.component";
 const Admin = (params:any)=>{
     const [access, setAccess] = useState(false);
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Admin = (params:any)=>{
             <div className="admin-menu">
             <ul className = "accessListUl">
                 <AdminUserComponent />
-                <AccessList access = {access}/>
+                {access ? <AccessList access = {access}/> : <AccessSkeletons />}
             </ul>
             </div>
             <div className = "container">

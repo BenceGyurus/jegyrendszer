@@ -33,6 +33,7 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
     const [maxPrice, setMaxPrice]:[number, Function] = useState(maxPriceOfTicket ? maxPriceOfTicket : 0);
     const [name, setName]:[string, Function] = useState(nameOfTicket ? nameOfTicket : "");
     const [nOfTicket, setNumberOfTicket]:[number, Function] = useState(numberOfTicket ? numberOfTicket : 0); 
+    const [usingGroups, setUsingGroups]:[number, Function] = useState(0);
 
 
     const deleteFromAllSelected = (id:string)=>{
@@ -54,17 +55,21 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
                     allSelected = deleteFromAllSelected(id);
                 }
             })
+            setUsingGroups(usingGroups-1);
+            setNumberOfTicket(usingGroups-1);
             setIdsOfSeats(newList);
-            changeNumberOfTicket(false, 1);
+            //changeNumberOfTicket(false, 1);
         }
         else{
             let l = [...idsOfSeats, id];
             setIdsOfSeats(l);
-            changeNumberOfTicket(true, 1);
+            //changeNumberOfTicket(true, 1);
+            setUsingGroups(usingGroups+1);
+            setNumberOfTicket(usingGroups+1);
         }
     }
 
-    const changeNumberOfTicket = (status:boolean, n:number|null)=>{
+    /*const changeNumberOfTicket = (status:boolean, n:number|null)=>{
         let l = nOfTicket;
         if (status){
             setNumberOfTicket(n ? l+n: l+1);
@@ -73,7 +78,7 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
         }
         
         
-    }
+    }*/
 
     const appendGroup = (a:any, list:Array<any>)=>{
         let appended = 0;
@@ -85,7 +90,9 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
                     appended++;
                 }
             })
-            changeNumberOfTicket(true, appended);
+            //changeNumberOfTicket(true, appended);
+            setUsingGroups(usingGroups+appended);
+            setNumberOfTicket(usingGroups+appended);
             setIdsOfSeats(l);
         }
         else{
@@ -101,7 +108,9 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
                     }
                 }
             }
-            changeNumberOfTicket(false, a);
+            setUsingGroups(usingGroups-a);
+            setNumberOfTicket(usingGroups-a);
+            //changeNumberOfTicket(false, a);
             for (let i = 0; i < l.length; i++){
                 if (l[i]){
                     newList.push(l[i]);
@@ -128,11 +137,11 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
         <div className = "add-ticket-window">
             <WindowHeader title="Jegy hozzáadása" closeWindowFunction={closeFunction}/>
             <div className = "add-ticket-div">
-            <InputText title = "Jegy neve" onChangeFunction={setName} value = {name} />
+            <InputText title = "Jegy neve" onChangeFunction={setName} value = {name} info={{text : "A jegyhez tartózó név, ami megjelenik az oldalon is.", image : "/images/info/ticket-name.png"}} />
             <InputNumber title = "Jegy alapára" onChangeFunction={setPrice} value = {price} />
             <InputNumber title="Maximum jegyár" onChangeFunction={setMaxPrice} value = {maxPrice} />
             <InputNumber title = "Minimum jegyár" onChangeFunction={setMinPrice} value = {minPrice} />
-            <InputNumber title = "Jegyek száma" onChangeFunction={setNumberOfTicket} value = {nOfTicket > 0 ? nOfTicket : "0"} />
+            <InputNumber disabled = {!!idsOfSeats.length} title = "Jegyek száma" onChangeFunction={setNumberOfTicket} value = {nOfTicket > 0 ? nOfTicket : "0"} />
             <Button title = "Jegyek kiválasztása" onClickFunction={()=>{setSeats(true)}} />
             {seats ? <ShowSeats closeFunction = {()=>{setSeats(false)} } datasOfVenue = {datasOfVenue} addNewSeat = {select_Seat} seatList = {idsOfSeats} allSelected = {newAllSelected()} /> : ""}
             <Group_List groups={datasOfVenue.groups} seats = {datasOfVenue.seatsDatas} changeFunction = {appendGroup} seatList = {newAllSelected()}/>

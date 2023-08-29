@@ -19,7 +19,7 @@ const GetUserDatas = async (token)=>{
         closeConnection(tokenDatabase.database);
         if (userId && userId.userData && userId.userData.id){
             const {collection, database} = new Database("admin");
-            let user = await collection.findOne({_id : ObjectId(userId.userData.id)}, { projection : { username : 1, _id : 1 } });
+            let user = await collection.findOne({_id : ObjectId(userId.userData.id)}, { projection : { username : 1, _id : 1, externalSeller : 1 } });
             closeConnection(database);
             return user
         }

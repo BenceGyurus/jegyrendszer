@@ -1,7 +1,8 @@
-import InputText from "../input/inputText.component"
-import InputNumber from "../input/inputNumber.component"
-import { useState } from "react"
 import "../../css/datasOfCustomers.css";
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import { useState } from "react";
 
 
 type typeOfDatasOfCustormerParams = {
@@ -14,10 +15,21 @@ type typeOfDatasOfCustormerParams = {
     setTaxNumber : Function,
     setMail : Function,
     setPhone : Function,
-    city : string
+    city : string,
+    firstName : string,
+    lastName : string,
+    zip : string,
+    address : string,
+    address2 : string,
+    tax : string,
+    mail : string,
+    phone : string,
+    setInvoiceName : Function,
+    sameInvoiceData : boolean,
+    setSameInvoiceData : Function
 }
 
-const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, setAddress, setAddress2, setTaxNumber, setMail, setPhone, city}:typeOfDatasOfCustormerParams)=>{
+const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, setAddress, setAddress2, setTaxNumber, setMail, setPhone, city, firstName, lastName, zip, address, address2, tax, mail, phone, setInvoiceName, sameInvoiceData, setSameInvoiceData}:typeOfDatasOfCustormerParams)=>{
 
     const getCity = (zipcode:string)=>{
         if (zipcode){
@@ -32,18 +44,19 @@ const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, set
     };
 
 
+
     return <div className = "datas-of-customer">
         <h2>Számlázási adatok:</h2>
         <label htmlFor="lastName">Vezetéknév</label>
-        <input type="text" id = "lastName" onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
+        <input type="text" id = "lastName" defaultValue={firstName} onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
         <label htmlFor="firstname">Keresznév</label>
-        <input type="text" id = "firstname" onChange={e=>setLastName(e.target.value)} autoComplete="given-name" />
+        <input type="text" id = "firstname" defaultValue={lastName} onChange={e=>setLastName(e.target.value)} autoComplete="given-name" />
         <div className = "customer-data-component">
             <h3>Számlázási cím</h3>
             <div className = "post-code-and-city">
                 <div id = "postal-code-div">
                 <label htmlFor="postCode">Irányítószám</label>
-                <input type="text" id = "postCode" onBlur={e=>{getCity(e.target.value)}} onChange={e=>{setPostalCode(e.target.value)}} autoComplete="postal-code" />
+                <input type="text" id = "postCode" defaultValue={zip} onBlur={e=>{getCity(e.target.value)}} onChange={e=>{setPostalCode(e.target.value)}} autoComplete="postal-code" />
                 </div>
                 <div id = "city-div">
                 <label htmlFor="city">Település név</label>
@@ -51,19 +64,20 @@ const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, set
                 </div>
             </div>
             <label htmlFor="address">Cím</label>
-            <input type="text" id = "address" onChange={e=>{setAddress(e.target.value)}} autoComplete="street-address" />
+            <input type="text" id = "address" defaultValue={address} onChange={e=>{setAddress(e.target.value)}} autoComplete="street-address" />
             <label htmlFor="address2">Emelet, lépcsőház stb. (nem kötelező)</label>
-            <input type="text" id = "address2" onChange={e=>{setAddress2(e.target.value)}}/>
+            <input type="text" id = "address2" defaultValue={address2} onChange={e=>{setAddress2(e.target.value)}}/>
         </div>
         <label htmlFor="tax-number">Adószám (magánszemélynek nem kötelező)</label>
-        <input type="text" id = "tax-number" onChange={e=>{setTaxNumber(e.target.value)}}/>
+        <input type="text" id = "tax-number" defaultValue={tax} onChange={e=>{setTaxNumber(e.target.value)}}/>
         <div className = "contact customer-data-component">
             <h3>Kapcsolattartás</h3>
             <label htmlFor="email">E-mail cím</label>
-            <input type="email" id = "email" onChange={e=>{setMail(e.target.value)}} autoComplete="email" />
+            <input type="email" id = "email" defaultValue={mail} onChange={e=>{setMail(e.target.value)}} autoComplete="email" />
             <label htmlFor="phone">Telefonszám</label>
-            <input type="phone" id = "phone" onChange={e=>{setPhone(e.target.value)}} autoComplete="tel" />
+            <input type="phone" id = "phone" defaultValue={phone} onChange={e=>{setPhone(e.target.value)}} autoComplete="tel" />
         </div>
+        <br />
         <input type="checkbox" id = "accept" />
         <label htmlFor="accept">Elfogadom az <a href = "/aszf" target = "_blank" >Általános szerződési feltételeket</a></label>
     </div>

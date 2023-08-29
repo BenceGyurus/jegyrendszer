@@ -21,6 +21,7 @@ body {
     width: 80%;
     display: block;
     margin: 20px auto;
+    height: max-content;
   }
 
   .admin-event-container img {
@@ -38,6 +39,7 @@ body {
     overflow: hidden;
     background-color: white;
     margin-bottom: 50px;
+    height: 370px;
   }
 
   @media screen and (width > 1000px) {

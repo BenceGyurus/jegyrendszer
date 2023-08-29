@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TicketPageItems from "./page-items";
 import Tickets from "./tickets.component";
 import Seats from "./seats.component";
@@ -7,6 +7,8 @@ import "../../css/buy-ticket-page.css";
 import Error from "../notification/error.component";
 import postData from "../connection/request";
 import Notification from "../notification/notification.component";
+import Loader from "../loader/loader.component";
+import TicketSkeleton from "./ticket-skeleton.component";
 
 type typeOfTicket = {
     id : string,
@@ -40,11 +42,13 @@ type typeOfPageParams = {
     description : string,
     date : string,
     id : string,
-    tickets : Array<typeOfTicket>,
     placeDatas : typeOfPlaces,
     media : typeOfMedia,
     location : string,
-    position : typeOfCenter
+    position : typeOfCenter,
+    address : string,
+    ticketId : string,
+    venueId : string
 }
 type typeOfAmount = {
     id : string,
@@ -82,7 +86,9 @@ type typeOfCenter = {
     lng : number
 }
 
-const Page = ({title, background, description, date, id, tickets, placeDatas, media, position, location}:typeOfPageParams)=>{
+const Page = ({title, background, description, date, id, media, position, location, address, ticketId, venueId}:typeOfPageParams)=>{
+
+
 
     const genereateTicketAmout = (tickets:Array<typeOfTicket>):Array<typeOfAmountTicket>=>{
         let newList:Array<typeOfAmountTicket> = [];
@@ -91,10 +97,34 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
         }
         return newList;
     }
-
-    const [ticketsAmount, setTicketsAmount]:[Array<typeOfAmountTicket>, Function] = useState(genereateTicketAmout(tickets))
+    //const [tickets, setTickets]:[typeOfTicket, Function] = useState();
+    const [placeDatas, setPlaceDatas]:[any, Function] = useState([]);
+    const [ticketsAmount, setTicketsAmount]:[Array<any>, Function] = useState([])
     const [selectedTickets, setSelectedTickets]:[Array<string>, Function] = useState([]);
     const [errorNat, setErrorNat]:[string, Function] = useState("");
+
+
+    useEffect(()=>{
+        fetch(`/api/v1/tickets/${ticketId}?reserved=true`)
+        .then(async (response)=>{
+            let t = await response.json();
+            if (t.length && !t.error){
+                setTicketsAmount(genereateTicketAmout(t));
+            }
+        });
+        fetch(`/api/v1/venue/${venueId}?event=${ticketId}`)
+        .then(
+            async(response)=>{
+                let venue = await response.json();
+                if (!venue.error && venue)
+                {      
+                    console.log(venue);
+                    setPlaceDatas(venue.venue);
+                }
+            }
+        )
+    },[]);
+
 
     const incrementAmountOfTickets = (id:String)=>{
         let l = [...ticketsAmount];
@@ -120,10 +150,10 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
                 if (l[i].selected >= l[i].amount){
                 let lamdba = [...selectedTickets];
                 for (let j = lamdba.length-1; j >= 0; j--){
-                    if (!l[i].places.includes(lamdba[j]) || deleted){
+                    if (!l[i].seats.includes(lamdba[j]) || deleted){
                         newList.push(lamdba[j]);
                     }
-                    if (l[i].places.includes(lamdba[j])){
+                    if (l[i].seats.includes(lamdba[j])){
                         deleted = true;
                     }
                 }
@@ -137,7 +167,7 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
     const selectSeat = (id:string)=>{
         let lTicketAmount = [...ticketsAmount];
         for (let i = 0; i < lTicketAmount.length; i++){
-            if (lTicketAmount[i].places.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
+            if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
                 let l = [...selectedTickets, id];
                 setSelectedTickets(l);
                 lTicketAmount[i].selected++;
@@ -166,13 +196,13 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
         for (let i = 0; i < ticketsAmount.length; i++){
             if (ticketsAmount[i].amount > 0){
                 control = true;
-                if (!ticketsAmount[i].places.length && ticketsAmount[i].numberOfTicket > 0){
+                if (!ticketsAmount[i].seats.length && ticketsAmount[i].numberOfTicket > 0){
                     sendData.push({amount : ticketsAmount[i].amount, ticketId : ticketsAmount[i].id, places : false, eventId : id})
                 }
-                else if (ticketsAmount[i].numberOfTicket > 0 && ticketsAmount[i].places.length){
+                else if (ticketsAmount[i].numberOfTicket > 0 && ticketsAmount[i].seats.length){
                     let selected = [];
                     for (let j = 0; j < selectedTickets.length; j++){
-                        if (ticketsAmount[i].places.includes(selectedTickets[j])){
+                        if (ticketsAmount[i].seats.includes(selectedTickets[j])){
                             selected.push(selectedTickets[j]);
                         }
                     }
@@ -208,11 +238,12 @@ const Page = ({title, background, description, date, id, tickets, placeDatas, me
         setErrorNat(error[0]);
     }
 
+
     return <div className="event-page-div">
         {errorNat ? <Notification element={<Error message={errorNat} closeFunction={()=>{setErrorNat("")}} />} /> : ""}
-        <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media} position={position} location={location}/>
-        <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/>
-        {placeDatas.seatsDatas.length ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
+        <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media} position={position} location={location} address={address}/>
+        {ticketsAmount.length ? <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/> : <TicketSkeleton />}
+        {placeDatas && placeDatas.seatsDatas && placeDatas.seatsDatas.length && ticketsAmount.length && ticketsAmount ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
         <BuyButton onClickFunction={buy_Ticket} />
     </div>;
 }

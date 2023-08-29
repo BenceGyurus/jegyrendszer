@@ -14,7 +14,7 @@ const closeConnection = (database)=>{
     );
 }
 
-const Sales = async (userId)=>{
+const Sales = async (userId, external)=>{
     const eventDatabase = new Database("events");
     let events = await eventDatabase.collection.find({}, { projection : {eventData : 1}}).toArray();
     closeConnection(eventDatabase.database);
@@ -47,7 +47,7 @@ const Sales = async (userId)=>{
             else{
                 coupon = sale.coupon ? sale.coupon : "";
             }
-            if (sale.bought) sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : eventsOfUser.find(event=>event.readable_event_name == sale.eventId).name, eventId : sale.eventId, fullAmount : sale.fullAmount, buyId : sale._id, custormerName : sale.customerDatas ? `${sale.customerDatas.fistname} ${sale.customerDatas.lastname}` : "", cusotmerEmail : sale.customerDatas ? `${sale.customerDatas.mail}` : ""});
+            if (sale.bought && (!external || sale.user._id == userId)) sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : eventsOfUser.find(event=>event.readable_event_name == sale.eventId).name, eventId : sale.eventId, fullAmount : sale.fullAmount, buyId : sale._id, custormerName : sale.customerDatas ? `${sale.customerDatas.fistname} ${sale.customerDatas.lastname}` : "", cusotmerEmail : sale.customerDatas ? `${sale.customerDatas.mail}` : ""});
         };
     }
     closeConnection(ticketsDatabase.database);

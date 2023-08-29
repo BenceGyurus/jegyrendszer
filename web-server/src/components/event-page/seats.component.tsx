@@ -26,7 +26,7 @@ type typeOfPlaces = {
 type typeOfAmountTicket = {
     id : string,
     numberOfTicket : number,
-    places : Array<string>,
+    seats : Array<string>,
     price : number,
     name : string,
     ticketId : string,

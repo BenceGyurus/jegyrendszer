@@ -2,10 +2,12 @@ const uuid = require("uuid");
 const fs = require("fs");
 var browser = require('browser-detect');
 
+const databaseNames = JSON.parse(fs.readFileSync(`${__dirname}/database.json`));
+
 class Functions{
     static getBrowerDatas(req){return browser(req.headers['user-agent'])}
     static genrateToken(){return uuid.v4();}
-    static getIp(req){return req.headers['x-forwarded-for'] || req.socket.remoteAddress;}
+    static getIp(req){console.log(req.headers['x-forwarded-for']); return req.headers['x-forwarded-for'] || req.socket.remoteAddress;}
     static parseBody(body){try{return JSON.parse(Object.keys(body)[0]);}catch{return body;}}
     static encryption(text){
         let newText = "";
@@ -15,7 +17,7 @@ class Functions{
             newText += String(l < 0 ? -l : l);}return newText;}
     static getNameOfDatabase(key){
         try{
-            return JSON.parse(fs.readFileSync(`${__dirname}/database.json`))[key];
+            return databaseNames[key];
         }catch{
     
         }

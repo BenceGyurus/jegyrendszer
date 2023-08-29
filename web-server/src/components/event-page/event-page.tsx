@@ -36,7 +36,8 @@ type typeOfEventDatas = {
     tickets : Array<typeOfTicket>,
     title : string,
     position : typeOfCenter,
-    location : string
+    location : string,
+    address : string
 }
 
 type typeOfCenter = {
@@ -48,7 +49,7 @@ const EventPage = (params:any)=>{
 
     const [id, setId] = useState("");
     const [eventDatas, setEventDatas]:[any, Function] = useState();
-    const [responsed, setResponsed]:[boolean, Function] = useState(false)
+    const [responsed, setResponsed]:[boolean, Function] = useState(false);
 
     const parseMedia = (media:any)=>{
         Object.keys(media).forEach((key)=>{
@@ -77,7 +78,7 @@ const EventPage = (params:any)=>{
    return (
     <div>
         {
-            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} tickets = {eventDatas.tickets} placeDatas = {eventDatas.places} media = {parseMedia(eventDatas.media)} position = {eventDatas.position} location ={eventDatas.location}/></div> : ""
+            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} placeDatas = {eventDatas.places} media = {parseMedia(eventDatas.media)} position = {eventDatas.position} location ={eventDatas.location} address = {eventDatas.address} ticketId={(window.location.pathname.split("/")[window.location.pathname.split("/").length-1])} venueId={eventDatas.venue} /></div> : ""
         }
     </div>
 )

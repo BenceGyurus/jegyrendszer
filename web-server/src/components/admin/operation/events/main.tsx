@@ -32,7 +32,12 @@ type typeOfDatasParams = {
     position? : typeOfCenter,
     localDiscounts? : boolean,
     users? : Array<string>,
-    contributors? : Array<string>
+    contributors? : Array<string>,
+    address? : string,
+    gate_Opening? : string,
+    end_Of_The_Event? : string,
+    wardrobe? : boolean,
+    versions? : Array<{username : string, date : "string"}>
 }
 
 const Create_Event_Main = ()=>{
@@ -52,7 +57,7 @@ const Create_Event_Main = ()=>{
     }, []);
 
 
-    return (window.location.pathname.split("/")[3] ? Object.keys(datas).length > 9 ? <EventSettings mediaDatas={datas && datas.media ? datas.media : ""} name = {datas && datas.name ? datas.name : ""} description = {datas && datas.description ? datas.description : ""} tickets_ = {datas && datas.tickets ? datas.tickets : []} background = {datas && datas.background ? datas.background : ""} dOfEvent = {datas && datas.dateOfEvent ? datas.dateOfEvent : ""} dOfRelease = {datas && datas.dateOfRelease ? datas.dateOfRelease : ""} venue = {datas && datas.venue ? datas.venue : ""} location = {datas && datas.location ? datas.location : ""} company={datas && datas.company ? datas.company : ""} markerPosition={datas && datas.position ? datas.position : {lat : 47.2367, lng : 16.621456}} localD = {datas && datas.localDiscounts ? datas.localDiscounts : false} usersList={datas && datas.users ? datas.users : []} contributors = {datas && datas.contributors ? datas.contributors : []} /> : <div/>: <EventSettings />);
+    return (window.location.pathname.split("/")[3] ? Object.keys(datas).length > 9 ? <EventSettings mediaDatas={datas && datas.media ? datas.media : ""} name = {datas && datas.name ? datas.name : ""} description = {datas && datas.description ? datas.description : ""} tickets_ = {datas && datas.tickets ? datas.tickets : []} background = {datas && datas.background ? datas.background : ""} dOfEvent = {datas && datas.dateOfEvent ? datas.dateOfEvent : ""} dOfRelease = {datas && datas.dateOfRelease ? datas.dateOfRelease : ""} venue = {datas && datas.venue ? datas.venue : ""} location = {datas && datas.location ? datas.location : ""} company={datas && datas.company ? datas.company : ""} markerPosition={datas && datas.position ? datas.position : {lat : 47.2367, lng : 16.621456}} localD = {datas && datas.localDiscounts ? datas.localDiscounts : false} usersList={datas && datas.users ? datas.users : []} contributors = {datas && datas.contributors ? datas.contributors : []} addre={datas && datas.address ? datas.address : ""} open={datas && datas.gate_Opening ? datas.gate_Opening : ""} end={datas && datas.end_Of_The_Event ? datas.end_Of_The_Event : ""} isWardrobe = {datas && datas.wardrobe ? datas.wardrobe : false} versions = {datas && datas.versions ? datas.versions : [] } /> : <div/>: <EventSettings />);
 }
 
 export default Create_Event_Main;

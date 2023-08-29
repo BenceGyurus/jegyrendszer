@@ -1,3 +1,4 @@
+const getTime = require("./getTime.js");
 const Database = require("./mongo/mongo.js");
 
 const getPrice = (money, fullPrice, amount)=>{
@@ -10,14 +11,26 @@ const error = ()=>{
 
 const ControlCoupon = async (couponName, eventId, fullPrice)=>{
     const {collection, database} = new Database("coupons");
+    const buyingDatabase = new Database("buy");
     let coupon = await collection.findOne({name : couponName});
+    let used = {}
+    let buyings = await buyingDatabase.collection.find({coupon : couponName}).toArray();
+    for (let i = 0; i < buyings.length; i++){
+        if (getTime("RESERVATION_TIME")+buyings[i].time >= new Date().getTime()){
+            used[buyings[i].eventId] ? used[buyings[i].eventId]++ : used[buyings[i].eventId] = 1;
+        }
+    }
     setTimeout(
         ()=>{
             database.close();
+            buyingDatabase.database.close();
         },
         10000
     )
     if (coupon){
+        if (used[eventId]){
+            if ((coupon.type == 2 || coupon.type == 1) || coupon.events.includes(eventId) && used[eventId] >= 1) return error();
+        }
         if (new Date(coupon.validity).getTime() >= new Date().getTime()){
             if (coupon.type == 0 && coupon.events.includes(eventId)){
                 return {...getPrice(coupon.money, fullPrice, coupon.amount), name : coupon.name};

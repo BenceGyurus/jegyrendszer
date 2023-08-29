@@ -18,13 +18,6 @@ const header = ( {listOfNavMenu}:typeOfHeaderParams )=>{
   <a href="/"><img src="/images/logo.png" alt="agora-logo" className = "logo" /></a>
   <nav>
   <ul className="nav">
-              {listOfNavMenu ? listOfNavMenu.map((element:typeOfMenu, index)=>{
-                return (
-                  <li className="nav-item" key = {uuid()}>
-                    <a key = {uuid()} className="nav-link" href={element.link}>{element.title}</a>
-                  </li>
-                )
-            }) : ""}
             </ul>
   </nav>
 </div>

@@ -143,5 +143,10 @@
         "message" : "A következő bejelentkezésig várnia kell 5 percet",
         "type" : "error",
         "responseCode" : 400
+    },
+    "035" : {
+        "message" : "Az esemény nem a megadott teremhez tartozik",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

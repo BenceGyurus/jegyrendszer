@@ -3,7 +3,7 @@ import "../../css/select-ticket.css";
 type typeOfTicket = {
     id : string,
     numberOfTicket : number,
-    places : Array<string>,
+    seats : Array<string>,
     price : number,
     name : string,
     ticketId : string,

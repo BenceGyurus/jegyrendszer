@@ -1,5 +1,7 @@
 import Event from "./event.component";
 import { v4 as uuid } from 'uuid';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 type typeOfTickets = {
     name : string,
@@ -32,17 +34,25 @@ type typeOfEventDatas = {
 type typeOfEventListParams = {
     events : Array<typeOfEventDatas>,
     editFunction : Function,
-    deleteFunction : Function
+    deleteFunction : Function,
+    numberOfPages : number,
+    page : number,
+    handleChange : any
 }
 
 
-const EventList = ( { events, editFunction,deleteFunction }:typeOfEventListParams )=>{
+const EventList = ( { events, editFunction,deleteFunction, numberOfPages, page, handleChange }:typeOfEventListParams )=>{
+
+    console.log(numberOfPages);
     return <div className = "admin-event-list">
         {
             events.map((element)=>{
                 return <Event key={uuid()} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} />
             })
         }
+        <Stack spacing={2}>
+        <Pagination count={numberOfPages} page={page} onChange={handleChange} siblingCount={0} boundaryCount={2}/>
+        </Stack>
     </div>
 }
 

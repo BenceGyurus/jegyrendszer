@@ -3,10 +3,10 @@ import { useEffect,useState } from "react";
 import postData from "../../../../connection/request";
 import ParseLocalStorage from "../../../../../cookies/ParseLocalStorage";
 import Loader from "../../../../loader/loader.component";
-import Checkbox from "../../../../checkbox/checkbox.component";
 import "../../../../../css/addNewUserWindow.css";
 import { v4 as uuid } from 'uuid';
 import Button from "../../../../buttons/button.component";
+import {Checkbox, FormControl, FormControlLabel, FormGroup, Grid, Paper, Typography } from '@mui/material';
 type typeOfNewUserWindow = {
     closeFunction : Function,
     readyState : Function
@@ -14,6 +14,7 @@ type typeOfNewUserWindow = {
 const NewUserWindow = ({closeFunction, readyState}:typeOfNewUserWindow)=>{
     const [accessList, setAccesList]:any = useState();
     const [checkedAccesses, setCheckedAccesses]:any = useState();
+    const [externalSeller, setExternalSeller]:[boolean, Function] = useState(false);
     useEffect(()=>{
         postData("/get-all-access", {token : ParseLocalStorage("long_token")})
         .then((data:any)=>{
@@ -35,7 +36,7 @@ const NewUserWindow = ({closeFunction, readyState}:typeOfNewUserWindow)=>{
     }
 
     const newUser = ()=>{
-        postData("/add-new-user", {token : ParseLocalStorage("long_token"), access : checkedAccesses})
+        postData("/add-new-user", {token : ParseLocalStorage("long_token"), access : checkedAccesses, externalSeller : externalSeller})
         .then((data)=>{
             if (!data.error && data.token){
                 readyState(data.token, data.url);
@@ -47,21 +48,35 @@ const NewUserWindow = ({closeFunction, readyState}:typeOfNewUserWindow)=>{
         <div className = "new-user-window">
             <WindowHeader title = "Új felhasználó hozzáadása" closeWindowFunction={()=>{closeFunction()}} />
             <ul className = "accesses">
+                <FormGroup>
+                <FormControl component="fieldset">
             {
                 accessList && Object.keys(accessList).length ? 
                 Object.keys(accessList).map((element)=>{
                     let id = uuid();
-                    return <li key = {element} ><label htmlFor={id}>{accessList[element][0]}</label><Checkbox params = {[element]} id = {id} className = "checkbox" title = "" onChangeFunction = {changeCheck} defaultChecked = {false}/></li>;
+                return (<FormControlLabel
+                  key={element}
+                  control={<Checkbox onChange={e => changeCheck(e.target.checked, element)} />}
+                  label={accessList[element][0]}
+                />)
                 })
+                    
                 
                 : <Loader />
             }
+            </FormControl>
+            </FormGroup>
             </ul>
+            <div className = "seller">
+                <Checkbox title = "Külső eladó" onChange={e=>setExternalSeller(e.target.checked)} defaultChecked = {externalSeller} />
+            </div>
             <div className = "new-user-button">
             <Button title = "Létrehozás" onClickFunction={newUser}/>
             </div>
         </div>
     );
 }
+
+//return <li key = {element} ><label htmlFor={id}>{accessList[element][0]}</label><Checkbox params = {[element]} id = {id} className = "checkbox" title = "" onChangeFunction = {changeCheck} defaultChecked = {false}/></li>;
 
 export default NewUserWindow;

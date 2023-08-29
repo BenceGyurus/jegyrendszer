@@ -6,6 +6,7 @@ from email.message import EmailMessage
 from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
 import os
+import json
 
 def sendMail(receiver_address, imagename, email_subject, email_body, config):
     # message = EmailMessage()
@@ -14,7 +15,8 @@ def sendMail(receiver_address, imagename, email_subject, email_body, config):
     message['From'] = config['PY_MAIL']
     message['To'] = receiver_address
 
-    sender_pass = os.getenv('PY_PASS')
+    sender_pass = "agorasavaria2023"#"nbdcecfzxgcbnzbe"#os.getenv('PY_PASS')
+
 
 
     message['Subject'] = f'Jegy - {email_subject}'
@@ -26,12 +28,12 @@ def sendMail(receiver_address, imagename, email_subject, email_body, config):
     #     part = MIMEImage(attachment.read(), name=f"{imagename}.png")
     #     part.add_header('Content-Disposition', f'attachment; filename={imagename}.png')
     #     message.attach(part)
-    with open(f"{config['PY_DIR']}/{imagename}.pdf", 'rb') as attachment:
-        part = MIMEBase('application', 'pdf')
-        part.set_payload(attachment.read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition', f'attachment; filename= {imagename}.pdf')
-        message.attach(part)
+    #with open(f"{config['PY_DIR']}/{imagename}.pdf", 'rb') as attachment:
+    #    part = MIMEBase('application', 'pdf')
+    #    part.set_payload(attachment.read())
+    #    encoders.encode_base64(part)
+    #    part.add_header('Content-Disposition', f'attachment; filename= {imagename}.pdf')
+    #    message.attach(part)
     
 
     session = smtplib.SMTP('smtp.gmail.com', 587)
@@ -40,3 +42,5 @@ def sendMail(receiver_address, imagename, email_subject, email_body, config):
     text = message.as_string()
     session.sendmail(message['From'], message['To'], text)
     session.quit()
+
+sendMail("gyurus.bence@gmail.com", "", "Jegy", "test", json.loads(open(f"{os.getenv('CONFIGDIR')}/config.json", "r", encoding = "utf8").read()))

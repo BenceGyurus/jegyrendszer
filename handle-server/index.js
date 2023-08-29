@@ -43,8 +43,10 @@ const GenerateTicket = require("./genrate_ticket.js");
 const Tickets = require("./tickets.js");
 const createZip = require("./createZip.js");
 const NodeCache = require('node-cache');
-const { type } = require("os");
+const { type, version } = require("os");
 const getContributors = require("./getContributorsOfEvent.js");
+const SimplePayPayment = require("./simple-pay-payment.js");
+assert = require('assert');
 
 const Cache = new NodeCache();
 
@@ -75,7 +77,6 @@ const readConfig = () => {
 }
 
 const config = readConfig();
-console.log(config);
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
         if (config["ACCEPTED_IMAGE_EXTENSIONS"].includes(file.mimetype.split("/")[1].toUpperCase())){
@@ -143,48 +144,13 @@ app.get("/api/v1/events", async (req,res) =>{
 app.get("/api/v1/event/:id", async (req,res)=>{
     let id = req?.params?.id;
     if(id == undefined) return handleError(logger, "400", res);
-    //let {collection, database} = new Database("events");
-    /*let events = await collection.find().toArray();
-    let event = {};
-    if (events){
-        for (let i = 0; i < events.length; i++){
-            if (events[i].eventData.readable_event_name === id){
-                event = events[i].eventData;
-            }
-        }
-    }*/
-    let event = await getEventDatas(id);
-    if (event){
-        let l = new Database("venue");
-        let placeCollection = l.collection;
-        place = {};
-        if (event.venue){
-            place = await placeCollection.findOne({_id : new ObjectId(event.venue)}, {projection : {content : 1}});
-            if (Object.keys(place).length){
-                placesOfEvent = [];
-                place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
-                for (let i = 0; i < event.tickets.length; i++){
-                    for (let j = 0; j < event.tickets[i].seats.length; j++){
-                        for (let k = 0; k < place.seatsDatas.length; k++){
-                            if (place.seatsDatas[k].id == event.tickets[i].seats[j]){
-                                placesOfEvent.push(place.seatsDatas[k]);
-                            }
-                        }
-                    }
-                }
-            }else logger.warn(`Place not found with id ${event.venue}`)
-            place.seatsDatas = placesOfEvent;
-            
-        }
-        for (let i = 0; i < event.tickets.length; i++){
-            getPriceOfTicket(event.readable_event_name, event.tickets[i].id);
-        }
-        closeConnection(l.database);
-        res.send({allPendingPlaces : event.allPendingPlaces, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place, location : event.location, position: event.position});
-        return;
-    }
-    return handleError(logger, "014", res);
-    //closeConnection(database);
+    const cachedData = Cache.get(req.params.id);
+    if (cachedData) return res.send(cachedData);
+    let event = (await getTicketByReadableId(req.params.id));
+    let eventDatas = {media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent,location : event.location, position: event.position, address : event.address, venue : event.venue};
+    let cacheTime = getTime("CACHE_TIME")
+    if (event && eventDatas && req.params.id) Cache.set(req.params.id, eventDatas, cacheTime/1000);
+    event ? res.send(eventDatas) : handleError(logger, "014", res);
 });
 
 app.post("/api/v1/events-to-sale", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
@@ -195,7 +161,6 @@ app.post("/api/v1/events-to-sale", (req,res,next)=>parseBodyMiddleeware(req,next
             let events = await collection.find({}, { projection : { eventData : 1 } }).toArray();
             let sendEvents = [];
             const userId = String((await GetUserDatas(req.body.token))._id);
-            console.log(userId);
             for (let i = 0; i < events.length; i++){
                 if (events[i].eventData.users && events[i].eventData.users.includes(userId)){
                     sendEvents.push({title : events[i].eventData.name, description : events[i].eventData.description, imageName : events[i].eventData.background, date : events[i].eventData.dateOfEvent, id : events[i].eventData.readable_event_name})
@@ -211,52 +176,88 @@ app.post("/api/v1/events-to-sale", (req,res,next)=>parseBodyMiddleeware(req,next
     return handleError(logger, "400", res);
 })
 
+app.get("/api/v1/tickets/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.params && req.params.id){
+        let reserved = req.query.reserved == "true";
+        let tickets = reserved ? (await getEventDatas(req.params.id)).tickets : (await getTicketByReadableId(req.params.id)).tickets;
+        return res.send(tickets ? tickets : []);
+    }
+    return handleError(logger, "400", res);
+})
+
+app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.params && req.params.id){
+        let objectid;
+        try{
+            objectid = ObjectId(req.params.id);
+        }
+        catch{
+            console.log("The objectId couldnt be generated");
+        }
+        let eventId = req.query.event;
+        //console.log(eventId, r, req.params.id);
+        const {collection, database} = new Database("venue");
+        let eventDatas = {};
+        if (eventId){
+            eventDatas = await getTicketByReadableId(eventId);
+            if (eventDatas.venue != req.params.id) return handleError(logger, "035", res);
+        }
+        console.log(eventId);
+        let venue = await collection.findOne({_id : objectid}, {projection : { "content.name" : 1, "content.colorOfBackGround" : 1, "content.sizeOfArea" : 1, "content.background" : 1, "content.seatsDatas" : 1, "content.groups" : 1, "content.sizeOfSeat" : 1, "content.colorOfSeat" : 1, "content.stage" : 1 }});
+        closeConnection(database);
+        if (!eventId){
+            return venue ? res.send({venue : venue.content}) : handleError(logger, "400", res);
+        }
+        else{
+            if (venue && eventDatas){
+                placesOfEvent = [];
+                if (venue.content.seatsDatas && venue.content.seatsDatas.length){
+                for (let i = 0; i < eventDatas.tickets.length; i++){
+                    for (let j = 0; j < eventDatas.tickets[i].seats.length; j++){
+                        placesOfEvent.push(venue.content.seatsDatas.find(seat => eventDatas.tickets[i].seats[j] == seat.id));
+                    }
+                }
+                venue.content.seatsDatas = placesOfEvent;
+                return res.send({venue : venue.content});
+                }
+                venue.content.seatsDatas = false;
+                return res.send({venue : venue.content});
+            }
+            return handleError(logger, "400", res);
+            
+        }
+        /*
+            if (Object.keys(place).length){
+                placesOfEvent = [];
+                place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
+                for (let i = 0; i < event.tickets.length; i++){
+                    for (let j = 0; j < event.tickets[i].seats.length; j++){
+                        for (let k = 0; k < place.seatsDatas.length; k++){
+                            if (place.seatsDatas[k].id == event.tickets[i].seats[j]){
+                                placesOfEvent.push(place.seatsDatas[k]);
+                            }
+                        }
+                    }
+                }
+            }else logger.warn(`Place not found with id ${event.venue}`)
+            place.seatsDatas = placesOfEvent;
+        */
+    }
+    return handleError(logger, "400", res);
+});
+
 
 app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
             let event = await getEventDatas(req.params.id);
-            if (event.venue){
-                let userId = String((await GetUserDatas(req.body.token))._id);
-                if (!userId)return handleError("004");
-                if (event.users.includes(userId)){
-                let l = new Database("venue");
-                place = {};
-                place = await l.collection.findOne({_id : new ObjectId(event.venue)});
-                if (place){
-                    placesOfEvent = [];
-                    place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
-                    for (let i = 0; i < event.tickets.length; i++){
-                        for (let j = 0; j < event.tickets[i].seats.length; j++){
-                            for (let k = 0; k < place.seatsDatas.length; k++){
-                                if (place.seatsDatas[k].id == event.tickets[i].seats[j]){
-                                    placesOfEvent.push(place.seatsDatas[k]);
-                                }
-                            }
-                        }
-                    }
-                }else logger.warn(`Place not found with id ${event.venue}`)
-                closeConnection(l.database);
-                place.seatsDatas = placesOfEvent;
-                
-            for (let i = 0; i < event.tickets.length; i++){
-                getPriceOfTicket(event.readable_event_name, event.tickets[i].id);
-            }
-            return res.send({media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, tickets : Functions.getPlaces(event.tickets), places : place, location : event.location, position: event.position, localDiscounts : event.localDiscounts})
-            }
-            else{
-                return handleError(logger, "004", res);
-            }
-            }
-            else{
-                return handleError(logger, "000", res);
+            return res.send({media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, location : event.location, position: event.position, localDiscounts : event.localDiscounts, venue : event.venue})
             }
         }
         else{
             return handleError(logger, "004", res);
         }
-    }
     return handleError(logger, "400", res);
 });
 
@@ -390,13 +391,11 @@ app.post("/api/v1/get-all-access", (req,res,next)=>parseBodyMiddleeware(req,next
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
             let response_json = Functions.readJson("user/accesslist.json");
-            if (response_json) res.send(response_json);
-            else handleError(logger, "500", res)
+            if (response_json) return res.send(response_json);
+            else return handleError(logger, "500", res)
         }
     }
-    else{
-        handleError(logger, "004", res)
-    }
+    handleError(logger, "004", res);
 });
 
 
@@ -487,7 +486,7 @@ app.post("/api/v1/add-new-user", async (req,res)=>{
                     }
                 }
             }
-            collection.insertOne({token : token,access: userAccess ,datas : await otherData(req, body.token)});
+            collection.insertOne({token : token,access: userAccess ,datas : await otherData(req, body.token), externalSeller : body.externalSeller});
             res.send({token : token, url : "/uj-profil/"});
             closeConnection(database);
         }
@@ -518,7 +517,7 @@ app.post("/api/v1/create-profile/:token", async (req,res)=>{
                 let l = new Database("new-user");
                 let pedding = l.collection;
                 if (!(await adminDatabase.collection.findOne({username : body.username}))){
-                    await adminDatabase.collection.insertOne({username : body.username, password : Functions.encryption(body.password), readable_user_id : Functions.sanitizeingId(body.username), addedBy : datas.datas.userData, datas : await otherData(req), deleteable : true, access : access});
+                    await adminDatabase.collection.insertOne({username : body.username, password : Functions.encryption(body.password), readable_user_id : Functions.sanitizeingId(body.username), addedBy : datas.datas.userData, datas : await otherData(req), deleteable : true, access : access, externalSeller : datas.externalSeller});
                     res.send({error : !(await pedding.deleteOne({token : token})).acknowledged});
                 }
                 else{
@@ -824,7 +823,7 @@ app.post("/api/v1/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), 
                 }
             } else return handleError(logger, "404", res);
         } else return handleError(logger, "004", res);
-    } else return handleError(logger, "400", res);
+    } return handleError(logger, "400", res);
 })
 
 app.post("/api/v1/delete-venue/:id", async (req,res)=>{
@@ -867,7 +866,7 @@ app.post("/api/v1/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req
             closeConnection(database);
             return;
         } else return handleError(logger, "004", res);
-    } else return handleError(logger, "400", res);
+    }  return handleError(logger, "400", res);
 })
 
 
@@ -902,12 +901,27 @@ app.post("/api/v1/get-event-data/:id", async (req,res)=>{
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events") && id && id != "undefined"){
             let { collection, database } = new Database("events");
+            const userDatabase = new Database("admin");
             id = new ObjectId(id);
-            let datas = await collection.findOne({_id : id});
+            let datas = await collection.findOne({_id : id}, {projection : { eventData : 1, versions : 1, otherDatas : 1}});
+            let newVersions = [];
+            for (let i = 0; i < datas.versions.length; i++){
+                if (datas.versions[i].otherDatas && datas.versions[i].otherDatas.userData && datas.versions[i].otherDatas.userData.userId){
+                    let objectid;
+                        try{
+                        objectid = ObjectId(datas.versions[i].otherDatas.userData.userId);
+                        }catch{}
+                        newVersions.push({username : (await userDatabase.collection.findOne({_id : objectid}, {projection : {username : 1, _id : 0}})).username, date : datas.versions[i].otherDatas.objectTime});
+                }
+                
+                
+            }
+            console.log(newVersions);
             let userId = String((await GetUserDatas(body.token))._id);
             closeConnection(database);
+            closeConnection(userDatabase.database);
             if (datas && datas?.eventData && datas?.eventData.users.includes(userId)){
-                res.send({...datas.eventData, contributors : await getContributors(datas)});
+                res.send({...datas.eventData, contributors : await getContributors(datas), versions : newVersions});
                 return;
             }
             else{
@@ -933,7 +947,6 @@ app.post("/api/v1/add-event/:id",async (req,res)=>{
             if (data.eventData.users.includes(String(userId))){
                 if (userId && body.data.users && !body.data.users.includes(userId)){body.data.users.push(String(userId));}
                 else if (!body.data.users || !body.data.users.length){body.data.users = [String(userId)]}
-                console.log(body.data.users);
                 l = await collection.updateOne({_id : id}, {$set : {eventData : {...body.data, objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)}, versions : [...data.versions, { eventData : data.eventData, otherDatas : data.otherDatas }], otherDatas : await otherData(req,body.token)}});
                 closeConnection(database);
                 if (l && l.modifiedCount){
@@ -955,7 +968,6 @@ app.post("/api/v1/add-event/:id",async (req,res)=>{
 app.post("/api/v1/events", async (req,res)=>{
     let page = req.query.page ? req.query.page : 0;
     let limit = req.query.limit ? req.query.limit : 0;
-    console.log(page, limit)
     let body = Functions.parseBody(req.body);
     if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -1026,9 +1038,6 @@ app.post("/api/v1/get-all-event", async (req,res)=>{
             for (let i = 0; i < all_Events.length; i++){
                 if (all_Events[i]?.eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
                     all_Events[i]?.eventData.users.includes(userId) ? sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent}) : false;
-                } else {
-                    logger.err(`Failed to read db events`);
-                    return handleError(logger, "500", res);
                 }
             }
             res.send({events : sendList});
@@ -1061,9 +1070,8 @@ app.post("/api/v1/order-ticket", async (req,res)=>{
         }
         let response = await controlEvent(body.eventId, savingDatas.tickets, "");
         if (!response.error){
-            console.log(getEventDatas(body.eventId));
-            let {collection, database} = new Database("pre-buying");
-            let result = await collection.insertOne({...savingDatas, otherDatas : await otherData(req)});
+            let {collection, database} = new Database("buy");
+            let result = await collection.insertOne({...savingDatas, otherDatas : await otherData(req), pending : true, isPayingStarted : false, paymentMethod : "", status : "PENDNG"});
             res.send({error : false, token : result.insertedId});
             closeConnection(database);
         }
@@ -1113,20 +1121,29 @@ app.post("/api/v1/create-ticket", async (req, res) => {
             // newPass.setBarcodes()
         })
     )
-    console.log(ticketInfo)
     axios(axiosConfig)
         .then((email_response) => res.send({'filename': email_response.data}))
-        .catch((err) => {logger.err(`Failed ticket creation with`); console.log(err)});
+        .catch((err) => {logger.err(`Failed ticket creation with`);});
 })
 
 app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
     if (req.params && req.params.token){
-        const {collection, database} = new Database("pre-buying");
-        let datas = await collection.findOne({_id : new ObjectId(req.params.token)});
+        let token;
+        try{
+            token = new ObjectId(req.params.token);
+        }
+        catch{
+            console.log("Token couldnt be generated");
+        }
+        if (!token) {return handleError(logger, "500", res)};
+        const {collection, database} = new Database("buy");
+        let datas = await collection.findOne({_id : token});
         closeConnection(database);
-        if (datas && datas.time + getTime("RESERVATION_TIME") >= new Date().getTime() && datas.eventId){
+        ip = Functions.getIp(req);
+        let browserData = Functions.getBrowerDatas(req)
+        if (datas && datas.pending && datas.time + getTime("RESERVATION_TIME") >= new Date().getTime() && datas.eventId && ip == datas.otherDatas.ip && browserData.os == datas.otherDatas.browserData.os && browserData.name == datas.otherDatas.browserData.name){
             let eventDetails = await getTicketByReadableId(datas.eventId);
-            if (eventDetails) res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent});
+            if (eventDetails) res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent, customerDatas : datas.customerDatas});
             else {
                 logger.err(`Failed to get event details`);
                 return handleError(logger, "500", res);
@@ -1141,11 +1158,14 @@ app.post("/api/v1/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next),
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("ticket-sells")){
-            let userId = String((await GetUserDatas(req.body.token))._id);
-            res.send(await Sales(userId));
+            let userData = await GetUserDatas(req.body.token)
+            let userId = String((userData)._id);
+            console.log(userData);
+            res.send(await Sales(userId, userData.externalSeller));
         }
     }
 });
+
 //COUPONS
 app.post("/api/v1/new-coupon", async (req,res)=>{
     const body = Functions.parseBody(req.body);
@@ -1283,7 +1303,6 @@ app.post("/api/v1/delete-local-discount/:id", (req,res,next)=>parseBodyMiddleewa
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-discount")){
-            console.log(req.params.id);
             const {collection, database} = new Database("local-discount");
             let result = await collection.deleteOne({_id : ObjectId(req.params.id)})
             closeConnection(database);
@@ -1311,6 +1330,23 @@ const simplesign = (data) => cryptoJs.enc.Base64.stringify(cryptoJs.HmacSHA384(J
 
 //PAYMENT
 
+app.post("/api/v1/cancel-local-transaction/:id",(req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res,)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("local-sale")){
+            let {collection, database} = new Database("buy");
+            let objectid;
+            try{objectid = ObjectId(req.params.id)}catch{}
+            let transaction = await collection.findOne({_id : objectid});
+            let eventDatas = getTicketByReadableId(transaction.eventId);
+            transaction.cancelled = true;
+            transaction.bought = false;
+            transaction.status = "CANCELLED";
+            collection.updateOne({_id : objectid}, {$set : transaction});
+        }
+    }
+});
+
 app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object" && req.body.token){
         let error = false;
@@ -1323,6 +1359,7 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
         result = await controlEvent(req.body.datas.eventId, req.body.datas.tickets);
         if (result.error) return handleError(logger, result.errorCode, res);
         price = await GetFullPrice(req.body.datas.tickets, req.body.datas.eventId);
+        const {collection, database} = new Database("buy");
         if (!price.error){
             const uid = new ShortUniqueId({length: 32});
             const uuid = uid();
@@ -1341,19 +1378,19 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
                     localCoupon : req.body.datas.discount ? req.body.datas.discount : false,
                     coupon : false,
                     eventId : req.body.datas.eventId,
-                    fullAmount : price.fullAmount
+                    fullAmount : price.fullAmount,
+                    otherDatas : await otherData(req, req.body.token)
             }
-            //console.log(saveDatas);
-            const {collection, database} = new Database("buy");
             let result = await collection.insertOne(saveDatas);
             let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.venue, req.body.datas.eventId, true);
             closeConnection(database);
-            let files = await  GenerateTicket(tickets);
+            let files = await GenerateTicket(tickets);
+            console.log(files);
             let sysConfig = readConfig()
             for (let i = 0; i < files.length; i++){
-                files[i] = sysConfig["NODE_SHARE"] + `/${files[i]}`;
+                files[i] = __dirname + sysConfig["NODE_SHARE"] + `/${files[i]}`;
             }
-            //console.log(files);
+            console.log(files);
             zip = await createZip(files, `${result.insertedId}.zip`);
             res.writeHead(200, {
                 'Content-Disposition': `attachment; filename="${result.insertedId}.zip"`,
@@ -1374,11 +1411,13 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
 app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) , async (req, res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
-            let {collection, database} = new Database("pre-buying");
+            let {collection, database} = new Database("buy");
             let buyingDatas = await collection.findOne({_id : ObjectId(req.params.id)});
-            collection.deleteOne({_id : ObjectId(req.params.id)});
+            //collection.deleteOne({_id : ObjectId(req.params.id)});
             closeConnection(database);
-            if (buyingDatas){
+            let ip = Functions.getIp(req);
+            let browserData = Functions.getBrowerDatas(req);
+            if (buyingDatas && ip == buyingDatas.otherDatas.ip && browserData.os == buyingDatas.otherDatas.browserData.os && browserData.name == buyingDatas.otherDatas.browserData.name){
                 let error = false;
                 /*for (let i = 0; i < buyingDatas.tickets.length; i++){
                     Control_Seats(buyingDatas.tickets[i].places, buyingDatas.tickets[i].ticketId, buyingDatas.eventId) ? true : error = false;
@@ -1390,7 +1429,7 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                         let {price, error,name} = (await controlCoupon(req.body.datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice));
                         let fullPrice = await GetFullPrice(buyingDatas.tickets, buyingDatas.eventId);
                         const uid = new ShortUniqueId({length: 32});
-                        const uuid = uid();
+                        let uuid = uid();
                         saveDatas = {
                             price : price ? price : buyingDatas.fullPrice,
                             fullPrice : fullPrice.fullPrice,
@@ -1403,55 +1442,15 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                             status : false,
                             bought : false,
                             salt: uuid,
-                            fullAmount : buyingDatas.fullAmount
+                            fullAmount : buyingDatas.fullAmount,
+                            otherDatas : await otherData(req)
                         };
                     let l = new Database("buy");
-                    result = await l.collection.insertOne(saveDatas);
-
-                    /*let body = {
-                        salt: uuid,
-                        merchant: process.env.MERCHANT,
-                        orderRef: result.insertedId,
-                        currency: 'HUF',
-                        customerEmail: req.body.datas.customerData.mail,
-                        language: 'HU',
-                        sdkVersion: 'SimplePayV2.1_Payment_PHP_SDK_2.0.7_190701:dd236896400d7463677a82a47f53e36e',
-                        methods:[
-                            "CARD"
-                        ],
-                        total: price,
-                        timeout: new Date(new Date().getTime() + 15 * 60000).toISOString(),
-                        url: '',
-                        invoice: {
-                            name: `${req.body.datas.customerData.firstName} ${req.body.datas.customerData.lastName}`,
-                            company: 'hu',
-                            // state: ,
-                            city: req.body.datas.customerData.city,
-                            zip: req.body.datas.customerData.postalCode,
-                            address: req.body.datas.customerData.address,
-                            address2: req.body.datas.customerData.address2 == 'null' ? null : req.body.datas.customerData.address2,
-                            phone: req.body.datas.customerData.phone
-                        },
-                        items: [
-                            buyingDatas.tickets.map(x => {
-                                return {
-                                    ref: x.ticketId,
-                                    title: x.name,
-                                    desc: '',
-                                    amount: x.amount,
-                                    price: x.price / x.amount
-                                }
-                            })
-                        ]
-                    }
-                    /*await axios.post('https://sandbox.simplepay.hu/payment/v2/start', body, {headers: {
-                        'Content-type': 'application/json',
-                        'Signature': simplesign(body),
-                    }}).then((simple_res) => {
-                        return res.send({error : !result.acknowledged, paymentUrl: simple_res.body.paymentUrl});
-                    })*/
+                    result = await l.collection.updateOne({_id : ObjectId(req.params.id)}, {$set : saveDatas});
                     closeConnection(l.database);
+                    SimplePayPayment(uuid, req.params.id, req.body.datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice);
                     }
+                    return res.send({link : "http://localhost:3000"})
                 }
                 else{
                     return handleError(logger, result.errorCode ? result.errorCode : "001" ,res)
@@ -1489,10 +1488,13 @@ app.post("/api/v1/get-companies", (req,res,next)=>parseBodyMiddleeware(req,next)
             for (let i = 0; i < datas.length; i++){
                 sendDatas.push({name : datas[i].name, tax : datas[i].tax, _id : datas[i]._id});
             }
-            res.send({datas : sendDatas});
             closeConnection(database);
+            return res.send({datas : sendDatas});
         }
+        return handleError(logger, "004",res);
     }
+    return handleError(logger, "400", res);
+    
 });
 
 app.post("/api/v1/delete-company/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
@@ -1511,7 +1513,6 @@ app.post("/api/v1/edit-company/:id", (req,res,next)=>parseBodyMiddleeware(req,ne
     if (req.body && typeof req.body == TypeOfBody && req.params.id && req.body.datas){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("companies")){
-            console.log(req.body.datas);
             if (req.body.datas.name && req.body.datas.taxNumber){
                 const {collection, database} = new Database("companies");
                 let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {name : req.body.datas.name, tax : req.body.datas.taxNumber}});
@@ -1527,23 +1528,27 @@ app.post("/api/v1/print-ticket/:id", (req,res,next)=>parseBodyMiddleeware(req,ne
     if (req.body && req.body.token && req.params.id && typeof req.body === TypeOfBody){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
+            let objectId;
+            try {
             let objectId = ObjectId(req.params.id);
+            }catch{
+                console.log("ObjectId couldnt be generated");
+            }
+            if (!objectId) return handleError(logger, "400", res);
             const {collection, database} = new Database("tickets");
             let tickets = await collection.find({orderId : objectId}).toArray();
-            console.log(tickets);
             let ticketIds = [];
             tickets.forEach(ticket=>ticketIds.push(ticket._id));
-            files = await GenerateTicket(ticketIds);
+            let files = await GenerateTicket(ticketIds);
             let sysConfig = readConfig()
-            console.log(files)
             for (let i = 0; i < files.length; i++){
-                files[i] = sysConfig["NODE_SHARE"] + `/${files[i]}`;
+                files[i] = __dirname + sysConfig["NODE_SHARE"] + `/${files[i]}`;
             }
-            zip = await createZip(files, `${String(objectId)}.zip`);
+            zip = await createZip(files, `${req.params.id}.zip`);
             res.writeHead(200, {
-                'Content-Disposition': `attachment; filename="${String(objectId)}.zip"`,
+                'Content-Disposition': `attachment; filename="${req.params.id}.zip"`,
                 'Content-Type': "application/zip",
-            })
+              })
             closeConnection(database);
             return res.end(zip);
         }
@@ -1591,8 +1596,9 @@ app.post("/api/v1/get-companies-in-array", (req,res,next)=>parseBodyMiddleeware(
             closeConnection(database);
             return;
         }
+        return handleError(logger, "003", res);
     }
-    handleError(logger, "003", res);
+    handleError(logger, "400", res);
 });
 
 
@@ -1686,7 +1692,6 @@ app.post("/api/v1/edit-mail", (req,res,next)=>parseBodyMiddleeware(req,next), as
 app.use((req, res)=>{
     if (req.method === "GET"){
     imageName = req.url.split("/")[req.url.split("/").length-1];
-    console.log(imageName);
     try{
         res.sendFile(`${__dirname}/uploads/${imageName}`);
     }

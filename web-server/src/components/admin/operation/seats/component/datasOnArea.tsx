@@ -1,6 +1,7 @@
 import Group from "./group.component";
 import Seat from "./seat.component";
 import { v4 as uuid } from 'uuid';
+import { useState } from "react";
 
 type groupType = {
     name : string,
@@ -28,10 +29,24 @@ type DatasOnAreaParamsType = {
     selected : string,
     newPositionFunction: any,
     showAll:boolean,
-    colorOfSeat : string
+    colorOfSeat : string,
+    suggestedGroups : Array<Array<string>>
 };
 
-const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,colorOfSeat}:DatasOnAreaParamsType):any=>{
+function multiDimensionalIncludes(arr:Array<any>, value:any) {
+    for (const subArray of arr) {
+      if (Array.isArray(subArray)) {
+        if (multiDimensionalIncludes(subArray, value)) {
+          return true;
+        }
+      } else if (subArray === value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,colorOfSeat, suggestedGroups}:DatasOnAreaParamsType):any=>{
     return (groups.map(
         (group:any)=>{
             if (group.id == selected){
@@ -39,10 +54,11 @@ const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,c
                 {
                     seats.map(
                         (seat:any, index:number)=>{
-                            if ((seat.group == group.id) || showAll){
-                                return <Seat key = {uuid()} color = {colorOfSeat} name = {seat.name} id = {seat.id} posX = {seat.posX} posY = {seat.posY} title = {seat.title} size = {size} newPositionFunction = {newPositionFunction} index = {index}/>
-                            }
-                        }
+                                if ((seat.group == group.id) || showAll){
+                                        return <Seat key = {uuid()} color = {multiDimensionalIncludes(suggestedGroups, seat.id) ? "red" : colorOfSeat} name = {seat.name} id = {seat.id} posX = {seat.posX} posY = {seat.posY} title = {seat.title} size = {size} newPositionFunction = {newPositionFunction} index = {index}/> 
+                                    }
+                                }
+
                     )
                 }
             </Group>)

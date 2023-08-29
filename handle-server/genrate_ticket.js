@@ -20,6 +20,33 @@ const readConfig = () => {
   }
 }
 
+const saveFile = (response)=>{
+  let sysConfig = readConfig();
+  return new Promise((resolve, reject)=>{
+    const fileStream = fs.createWriteStream(`${__dirname}/${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`);
+            response.data.pipe(fileStream);
+            fileStream.on('finish', () => {
+              resolve()
+              console.log('File downloaded successfully');
+            });
+            fileStream.on('error', err => {
+              reject
+              console.error('Error saving file:', err.message);
+            });
+  });
+}
+
+const createDateToJson = (date)=>{
+  date = new Date(date);
+  return { 
+    h : date.getHours(),
+    y : date.getFullYear(),
+    d : date.getDate(),
+    m : date.getMinutes(),
+    month : date.getMonth()
+  }
+}
+
 const GenerateTicket = async (ticketsIds)=>{
     let sysConfig = readConfig();
     const ticketsDatabase = new Database("tickets");
@@ -35,11 +62,15 @@ const GenerateTicket = async (ticketsIds)=>{
           email : customerData ? customerData.mail : false,
           name : customerData ? customerData.name : false,
           location : eventData.location,
-          start : eventData.dateOfEvent,
+          start : createDateToJson(eventData.dateOfEvent),
+          end : createDateToJson(eventData.end_Of_The_Event),
+          open : createDateToJson(eventData.gate_Opening),
+          wardrobe : eventData.wardrobe,
           price : ticketData.price,
           seat : ticketData.seatName,
           title : eventData.name,
           local : ticketData.local,
+          nameOfTicket : ticketData.nameOfTicket,
           email_body : ""
         });
         let config = {
@@ -52,18 +83,11 @@ const GenerateTicket = async (ticketsIds)=>{
           data : data,
           responseType: 'stream'
         };
-        await axios.request(config)
-          .then((response) => {
-            const fileStream = fs.createWriteStream(`${__dirname}/${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`);
-            response.data.pipe(fileStream);
-            fileStream.on('finish', () => {
-              console.log('File downloaded successfully');
-            });
-            fileStream.on('error', err => {
-              console.error('Error saving file:', err.message);
-            });        
-        })
+        response = await axios.request(config)
+        console.log(data);
+        await saveFile(response);
         pdfs.push(`${String(ticketData._id)}.pdf`);
+
       }
     }
 

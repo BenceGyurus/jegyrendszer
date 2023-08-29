@@ -1,8 +1,9 @@
+import { Skeleton } from "@mui/material";
 import "../../css/buy-ticket-ticket-list.css";
 import {v4 as uuid} from "uuid";
 
 type typeOfTicketListParams = {
-    tickets : Array<typeOfTicket>
+    tickets? : Array<typeOfTicket>
 };
 
 type typeOfTicket = {
@@ -15,7 +16,7 @@ type typeOfTicket = {
 const TicketList = ({tickets}:typeOfTicketListParams)=>{
     return <ul className = "tickets-overview">
         {
-            tickets.map((ticket)=>{
+            tickets ? tickets.map((ticket)=>{
                 return (
                     <li key = {uuid()}>
                         <span className = "price-and-amount-sum">
@@ -25,7 +26,7 @@ const TicketList = ({tickets}:typeOfTicketListParams)=>{
                         <span className = "price-of-ticket buy-ticket-overview-price">{ticket.price}Ft</span>
                     </li>
                 )
-            })
+            }) : <li><span className="price-and-amount-sum"><Skeleton animation="wave" width = {100} height = {20} /></span><span className="price-of-ticket buy-ticket-overview-price"><Skeleton animation="wave" width = {50} height = {20} /></span></li>
         }
     </ul>
 }

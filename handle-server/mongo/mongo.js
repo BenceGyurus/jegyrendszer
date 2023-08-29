@@ -2,13 +2,16 @@ const fs = require("fs");
 const { MongoClient } = require("mongodb");
 const Function = require("../functions.js");
 
+const config = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`));
+
 class Database{
   constructor(name){
     let datas = Function.getNameOfDatabase(name);
+    console.log(datas);
     this.collectionName = datas.collection; this.databaseName = datas.database;
     this.mongoconfig = {};
-    try{this.mongoconfig = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`))}catch{return {error: true, errorCode: "001"}};
-    this.client = new MongoClient(this.mongoconfig['MONGO_URI']);
+    if (!this.mongoconfig) return {error : true};
+    this.client = new MongoClient(config['MONGO_URI']);
     this.Db();
     let db = this.client.db(this.databaseName);
     this.createCollection();

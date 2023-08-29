@@ -1,0 +1,44 @@
+.chart-container {
+    display: flex;
+    align-items: flex-end;
+    background-color: #f6f6f6;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  .bar {
+    width: 60px;
+    border-radius: 5px;
+    margin: 0 5px;
+    transition: height 0.5s ease-in-out;
+    display: flex;
+    flex-direction: column; /* To stack the value and label vertically */
+    align-items: center;
+    position: relative;
+  }
+  
+  .bar-value {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+    margin-top: 3px;
+    text-align: center;
+  }
+  
+  .bar-label {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+  }
+  
+  .max-price {
+    background-color: #ff6384; /* Red */
+  }
+  
+  .min-price {
+    background-color: #36a2eb; /* Blue */
+  }
+  
+  .normal-price {
+    background-color: #4bc0c0; /* Green */
+  }

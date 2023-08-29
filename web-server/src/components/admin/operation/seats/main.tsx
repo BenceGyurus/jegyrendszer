@@ -322,7 +322,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
             </div>
         <VenueDatas nameOfVenue={nameOfVenue} numberOfPlaces = {numberOfPlaces} seatsStatus = {turnOnSeats} onChangeFunction = {setTurnOnSeats} changeName = {setNameOfVenue} changeNumberOfPlaces = {setNumberOfPlaces} />
         {turnOnSeats ? <div><Area width = {!background.isImage ? sizeOfArea.width : sizeOfArea.width} height = {!background.isImage ? sizeOfArea.height : sizeOfArea.height} background = {background} clickEvent = {addNewSeat} size = {sizeOfSeat} posYOfArea = {setPotionOfTheAreaFromTop} posXOfArea = {setPotionOfTheAreaFromLeft}>
-        <DatasToArea groups={groups} seats = {getAbsoluteSeats()} size = {sizeOfSeat} selected = {selecttedGroup} newPositionFunction = {newPositionToSeat} showAll = {showAllSeats} colorOfSeat = {colorOfSeat}/>
+        <DatasToArea suggestedGroups = {suggestedGroups} groups={groups} seats = {getAbsoluteSeats()} size = {sizeOfSeat} selected = {selecttedGroup} newPositionFunction = {newPositionToSeat} showAll = {showAllSeats} colorOfSeat = {colorOfSeat}/>
         </Area>
         <ShowAllSeats showAll = {showAllSeats} onChangeFunction = {changeStatusOfShowAll}/>
         <GroupList groups = {groups} handleEvent = {editNameOfGroup} editFunction = {setStatusOfGroup} deleteEvent = {deleteGroup} setSelected = {setSelectedInGroups} selected = {selecttedGroup} seats = {seats} changeValue = {changeValueOfSeat} deleteSeatFunction = {deleteSeat} changeOpened = {changeStatusOfOpened} changeTitle={changeTitleOfSeat}/>

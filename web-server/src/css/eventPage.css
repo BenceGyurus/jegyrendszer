@@ -58,7 +58,14 @@
   align-items: center;
   width: 100%;
   text-align: center;
-  font-weight: 600;
+  font-weight: 200;
+}
+
+.location-name-map-link{
+  width: 80%;
+  text-decoration: none;
+  text-align: left;
+  margin: 4px;
 }
 
 .event-map-div{

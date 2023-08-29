@@ -1,7 +1,8 @@
 from flask import Flask, redirect, url_for, request, send_file
-from qrCode import *
+#from qrCode import *
 from sendMail import *
-from ticket import *
+#from ticket import *
+from createTicket import *
 #import time
 import json
 import os
@@ -20,19 +21,16 @@ def health():
 @app.route('/createCode', methods=['POST'])
 async def createCode():
     request_data = request.get_json()
-    qr = QrCode()
-    qr.create(request_data['id'], config)
-    #print(f"creating ticket for {request_data['id']} with email {request_data['email']}")
-    create_ticket(config, request_data['id'], request_data['seat'], request_data['title'], request_data['location'], request_data['start'], request_data["price"])
-    #time.sleep(10)
-    if request_data['local'] is False: sendMail(request_data['email'], request_data['id'], request_data['title'], request_data['email_body'], config)
-    # return f"{request_data['id']}.pdf"
+    print(request_data)
+    ticket_Buffer = create_ticket(request_data["title"], request_data["nameOfTicket"], request_data["price"], request_data["id"], request_data["location"], request_data["start"], request_data["end"], request_data["open"], request_data["seat"], False)
+    with open(f"{config['PY_DIR']}/{request_data['id']}.pdf", "wb") as f:
+        f.write(ticket_Buffer.read())
     return send_file(f"{config['PY_DIR']}/{request_data['id']}.pdf", as_attachment=True)
 
 if __name__ == "__main__":      
     # app.run(port=5000, host = "0.0.0.0")
     from waitress import serve
-    serve(app, host="192.168.22.248", port=5000)
+    serve(app, host="192.168.1.216", port=5000)
 
 def create_app():
    return app
