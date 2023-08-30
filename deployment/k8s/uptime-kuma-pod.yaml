@@ -1,27 +1,29 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: uptime-kuma
+  name: uptime-kuma-pod
   labels:
     app: uptime-kuma
 spec:
   containers:
   - name: uptime-kuma
-    image: louislam/uptime-kuma:1.11.4
+    image: louislam/uptime-kuma:latest
     env:
     - name: UPTIME_KUMA_PORT
       value: "3001"
-    - name: PORT
-      value: "3001"
     ports:
-    - name: uptime-kuma-port
+    - name: dash-port
       containerPort: 3001
       protocol: TCP
     volumeMounts:
     - mountPath: /app/data
-      name: mypvc
+      name: pvc
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
   volumes:
-  - name: mypvc
+  - name: pvc
     persistentVolumeClaim:
       claimName: uptime-kuma-pvc
       readOnly: false
@@ -33,7 +35,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: standard-rwo
+  storageClassName: local-path
   resources:
     requests:
       storage: 1Gi
@@ -43,11 +45,10 @@ kind: Service
 metadata:
   name: uptime-kuma-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: uptime-kuma
   ports:
   - protocol: TCP
     port: 3001
     targetPort: 3001
-    nodePort: 30002

@@ -1,0 +1,14 @@
+mongodb:
+  architecture: replicaset
+  replicaCount: 2
+  auth:
+    enabled: true
+    rootUser: root
+    rootPassword: "root"
+  image:
+    tag: 4.2.21-debian-10-r8
+redis:
+  architecture: standalone
+  auth:
+    enabled: true
+    password: "root"

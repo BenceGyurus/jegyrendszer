@@ -1,0 +1,9 @@
+dependencies:
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 13.17.2
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 18.0.1
+digest: sha256:f44c5355ac18e4970ac50cf3dbc2b77d75da9b16ae97ef5eb7f3c0fad039f04c
+generated: "2023-08-29T14:14:44.796296+02:00"

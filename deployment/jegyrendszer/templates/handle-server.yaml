@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: handle-server-deployment
+  labels:
+    app: handle-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: handle-server
+  template:
+    metadata:
+      labels:
+        app: handle-server
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+      - name: handle-server-volume
+        persistentVolumeClaim:
+          claimName: backend-uploads-pvc
+      - name: handle-server-config
+        configMap:
+          name: backend-configmap
+      containers:
+      - name: handle-server
+        image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/handle-server:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        ports:
+        - containerPort: 3001
+          name: backend-open
+        envFrom:
+        - secretRef:
+            name: handle-server-secretmap
+        env:
+        - name: CONFIGDIR
+          value: "/etc/config"
+        volumeMounts:
+        - name: handle-server-volume
+          mountPath: /uploads
+        - name: handle-server-config
+          mountPath: /etc/config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: handle-server-service
+spec:
+  selector:
+    app: handle-server
+  ports:
+  - protocol: TCP
+    port: 3001
+    targetPort: backend-open
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: handle-server-secretmap
+type: Opaque
+data:
+  SLACK_TOKEN: eG94cC0zMzExNTU0NTgyNzc1LTMzMjYxNDk0ODU2MDItNTU1ODEzMjQ4MDgxNi1iOTlmZWVhYjA3Y2M2MTM0MzYwZjllNDgwMGM5ZDE4Ygo=
+  APPLE_PASS_IDENTIFIER: ""
+  MERCHANT: ""
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-uploads-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 15Gi

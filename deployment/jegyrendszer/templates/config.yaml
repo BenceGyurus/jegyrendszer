@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-configmap
+data:
+  config.json: |
+    {
+      "TIMES" : "/etc/config/times.json",
+      "PY_DIR": "/tmp",
+      "PY_MAIL": "agora.mail.service@gmail.com",
+      "ZIP_DIR" : "../data/zips",
+      "NODE_SHARE": "/uploads",
+      "EMAIL_SERVER": "email-server-svc.default.svc.cluster.local:5000",
+      "MONGO_URI": "mongodb://mongo-service.default.svc.cluster.local:27017/",
+      "PDF_FONT_FAMILY" : "media/fonts/Rubik/static/Rubik-Regular.ttf",
+      "PDF_TITLE_COLOR" : "#34b019",
+      "PDF_BODY_COLOR" : "#000000",
+      "PDF_LEFT_MARGIN": 30,
+      "PDF_RIGHT_MARGIN" : 30,
+      "PDF_TOP_MARGIN" : 10,
+      "PDF_BOTTOM_MARGIN" : 10,
+      "PRINTABLE_PDF_WIDTH" : 500,
+      "PRINTABLE_PDF_HEIGHT" : 500,
+      "SEND_PDF_WIDTH" : 500,
+      "SEND_PDF_HEIGHT" : 300,
+      "QR_CODE_SIZE" : 80,
+      "PDF_FONT_SIZE_TITLE" : 18,
+      "PDF_FONT_SIZE_BODY" : 12
+    }
+  times.json: |
+    {
+      "LOGIN_DELAY" : 0,
+      "RESERVATION_TIME" : 900000,
+      "TOKEN_SESSION_TIME" : 28800000,
+      "MAX_LOGIN_TOKEN_DELAY" : 60000,
+      "DELETABLE_EVENT" : 47336400000,
+      "DELETABLE_ORDERS" : 47336400000
+    }
