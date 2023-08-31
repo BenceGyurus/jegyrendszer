@@ -4,6 +4,7 @@
     "NODE_SHARE": "/pdfs",
     "EMAIL_SERVER": "http://192.168.1.216:5000",
     "MONGO_URI": "mongodb://localhost:27017/",
+    "REDIS_URI": "",
     "SLACK_TOKEN": "xoxp-3311554582775-3326149485602-5558132480816-b99feeab07cc6134360f9e4800c9d18b",
     "TIMES" : "./times.json",
     "PDF_FONT_FAMILY" : "media/fonts/Rubik/static/Rubik-Regular.ttf",

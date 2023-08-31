@@ -4,6 +4,10 @@ metadata:
   name: handle-server-deployment
   labels:
     app: handle-server
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "3001"
 spec:
   replicas: 1
   selector:
@@ -70,6 +74,7 @@ data:
   SLACK_TOKEN: eG94cC0zMzExNTU0NTgyNzc1LTMzMjYxNDk0ODU2MDItNTU1ODEzMjQ4MDgxNi1iOTlmZWVhYjA3Y2M2MTM0MzYwZjllNDgwMGM5ZDE4Ygo=
   APPLE_PASS_IDENTIFIER: ""
   MERCHANT: ""
+  REDIS_PASS: cm9vdAo=
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
