@@ -15,7 +15,7 @@ spec:
         app: handle-server
     spec:
       imagePullSecrets:
-        - name: regcred
+      - name: regcred
       volumes:
       - name: handle-server-volume
         persistentVolumeClaim:
@@ -81,4 +81,4 @@ spec:
   storageClassName: local-path
   resources:
     requests:
-      storage: 15Gi
+      storage: 20Gi
