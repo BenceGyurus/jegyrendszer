@@ -8,3 +8,8 @@
     padding-left: 50px;
     padding-right: 50px;
 }
+
+.type-of-venue-selector{
+    width:max-content;
+    margin: 10px 0;
+}

@@ -12,16 +12,19 @@ input[type="datetime-local"] {
   padding: 8px;
   font-size: 16px;
   width: 100%;
+  display: block;
 }
 
 /* Style the label */
 .calendar-label {
+  display: block;
   font-size: 18px;
-  margin-right: 8px;
-  font-weight: bold;
+  font-weight: 300;
+  margin: 10px 0 6px 0;
 }
 
 .calendar-div{
-    margin: 20px 0;
-    width: 100%;
+  margin: 30px 0;
+  width: 100%;
+  display: block;
 }

@@ -33,6 +33,7 @@ import type { TourProps } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import { Radio } from 'antd';
 import { Button } from 'antd';
+import { Statistic } from 'antd';
 
 type typeOfGroups = {
     id : string,
@@ -97,7 +98,8 @@ type typeOfEventSettingsParams = {
     open? : string,
     end? : string,
     isWardrobe? : boolean,
-    versions? : any
+    versions? : any,
+    readable_event_name? : string
 }
 
 type typeOfMedia = {
@@ -122,8 +124,7 @@ type typeOfUsers = {
     username : string,
     _id : string
 }
-const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList, contributors,addre, open, end, isWardrobe, versions}:typeOfEventSettingsParams )=>{
-
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList, contributors,addre, open, end, isWardrobe, versions, readable_event_name}:typeOfEventSettingsParams )=>{
     const parse_Media_Datas = (mediaDatas:any)=>{
         for (let i = 0; i < Object.keys(mediaDatas).length; i++){
             if (mediaDatas[Object.keys(mediaDatas)[i]]){
@@ -166,8 +167,18 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [gateOpening, setGateOpening]:[string, Function] = useState(open ? open : "");
     const [endOfTheEvent, setEndOfTheEvent]:[string, Function] = useState(end ? end : "");
     const [wardrobe, setWardrobe]:[boolean, Function] = useState(isWardrobe ? isWardrobe : false);
+    const [soldTickets, setSoldTickets]:[any, Function] = useState();
     const titleRef:any = useRef(null);
 
+    const getTickets = ()=>{
+        if (readable_event_name){
+            fetch(`/api/v1/tickets/${readable_event_name}?reserved=true`)
+            .then(async (response)=>{
+                setSoldTickets(await response.json());
+            })
+        }
+    }
+    
     const steps: TourProps['steps'] = [
         {
           title: 'Upload File',
@@ -242,6 +253,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             }
         });
         getUsers();
+        getTickets();
     }, []);
 
     const changeSelectedVenue = (d:string)=>{
@@ -372,6 +384,36 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         });
     }
 
+    const summTickets = ()=>{
+        let summ = 0;
+        if (soldTickets && soldTickets.length){
+            soldTickets.forEach((ticket:any) => {
+                if (ticket.seats.length){
+                    summ+=ticket.seats.length
+                }
+                else{
+                    summ += ticket.numberOfTicket
+                }
+            });
+        }
+        return summ
+    }
+
+    const occupiedTicket = ()=>{
+        let summ = 0;
+        if (soldTickets && soldTickets.length){
+            soldTickets.forEach((ticket:any) => {
+                if (ticket.boughtPlaces.length){
+                    summ += ticket.seats.length - ticket.boughtPlaces.length
+                }
+                else{
+                    summ += ticket.numberOfFreeTickets
+                }
+            });
+        }
+        return summ
+    }
+
 
     return (
         <div>
@@ -403,6 +445,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         </Alert>
       </Collapse>
             </div>
+            <Statistic title="Jegyek" value={occupiedTicket()} suffix={`/ ${summTickets()}`} />
             <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} disabled = {isLoading} info={{text : "Ez a cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. A rendezvény url-e is ez alapján fog létrejönni."}} />
             <InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} disabled = {isLoading} info={{text : "Az ide beírt helyszín fog megjelenni az oldalon", image : "/images/info/map.png"}} />
             <InputText title = "Rendezvény helyszínének címe" onChangeFunction={setAddress} value={address} disabled = {isLoading} info={{text : "A rendezvény helyszínének a címe. Írányítószám város, utca házszám. Ez nem fog megjelenítésre kerülni az oldalon, hanem a helyszínre kattintva ennek a címnek a segítségével fogja megkeresni a felhasználó alapértelmezett térképével a helyszínt. Támogatott térképek: Google Maps, Apple Maps. Helyszíneknél megadható a helyszín neve is az utca, házszám helyett, de a térképek ilyenkor nem fogják minden esetben pontosan megtalálni."}} />

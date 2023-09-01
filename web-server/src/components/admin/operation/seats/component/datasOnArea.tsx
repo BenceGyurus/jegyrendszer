@@ -47,6 +47,16 @@ function multiDimensionalIncludes(arr:Array<any>, value:any) {
   }
 
 const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,colorOfSeat, suggestedGroups}:DatasOnAreaParamsType):any=>{
+
+  const scrollToId = (e:any, id:string)=>{
+    console.log(id);
+      const element = document.getElementById(id);
+      if (element) {
+        // 👇 Will scroll smoothly to the top of the next section
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+  }
+
     return (groups.map(
         (group:any)=>{
             if (group.id == selected){
@@ -55,7 +65,7 @@ const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,c
                     seats.map(
                         (seat:any, index:number)=>{
                                 if ((seat.group == group.id) || showAll){
-                                        return <Seat key = {uuid()} color = {multiDimensionalIncludes(suggestedGroups, seat.id) ? "red" : colorOfSeat} name = {seat.name} id = {seat.id} posX = {seat.posX} posY = {seat.posY} title = {seat.title} size = {size} newPositionFunction = {newPositionFunction} index = {index}/> 
+                                        return <Seat onClick={scrollToId} key = {uuid()} color = {multiDimensionalIncludes(suggestedGroups, seat.id) ? "red" : colorOfSeat} name = {seat.name} id = {seat.id} posX = {seat.posX} posY = {seat.posY} title = {seat.title} size = {size} newPositionFunction = {newPositionFunction} index = {index}/> 
                                     }
                                 }
 

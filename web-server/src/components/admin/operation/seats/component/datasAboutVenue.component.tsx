@@ -3,6 +3,8 @@ import WindowHeader from "../../../../window-header/windowHeader.component";
 import "../../../../../css/datasAboutVenue.css";
 import InputNumber from "../../../../input/inputNumber.component";
 import Checkbox from "../../../../checkbox/checkbox.component";
+import type { RadioChangeEvent } from 'antd';
+import { Radio } from 'antd';
 type typeOfVenueDatasParams = {
     nameOfVenue : string,
     seatsStatus:boolean,
@@ -17,7 +19,10 @@ const VenueDatas = ({nameOfVenue, seatsStatus, onChangeFunction, numberOfPlaces,
             <WindowHeader title = "Terem Adatok"/>
             <div className = "getDatasDiv">
             <InputText title = "Helyszín neve" onChangeFunction={changeName} value = {nameOfVenue ? nameOfVenue : ""}/>
-            <Checkbox onChangeFunction={onChangeFunction} defaultChecked = {seatsStatus} title = "Ülőhelyek"/>
+            <Radio.Group onChange={e=>onChangeFunction(e.target.value)} defaultValue={seatsStatus} className = "type-of-venue-selector">
+                <Radio.Button value={false}>Álló</Radio.Button>
+                <Radio.Button value={true}>Ülő</Radio.Button>
+            </Radio.Group>
             </div>
         </div>
     );

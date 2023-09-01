@@ -43,7 +43,7 @@ const GroupList = (params:groupListType):any=>{
                 {params.seats.map((seat:any, seatIndex:number)=>{
                     if ((seat.group === group.id && group.id == params.selected)){
                         let ids = [uuid(), uuid()];
-                        return (<div className = "form-container" key = {(seatIndex+1)*13}>
+                        return (<div className = "form-container" key = {(seatIndex+1)*13} id = {seat.id}>
                         <h3 className = "numberOfSeat">{seatIndex+1}</h3>
                         <div className = "form-group">
                         <label htmlFor={ids[0]} className = "labelOfGroupList">Ülőhely elnevezése:</label>

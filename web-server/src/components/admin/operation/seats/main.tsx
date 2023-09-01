@@ -17,7 +17,8 @@ import BackButton from "../../../back/backbutton.component";
 import Error from "../../../notification/error.component";
 import Success from "../../../notification/success.component";
 import Notification from "../../../notification/notification.component";
-
+import { Button, notification, Space } from 'antd';
+import Collapse from '@mui/material/Collapse';
 type groupType = {
     name : string,
     id : string,
@@ -312,6 +313,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         setSeats(l);
     }
 
+    console.log(turnOnSeats);
 
     return (
         <div>
@@ -321,18 +323,16 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
                 <BackButton url = "/admin/termek" />
             </div>
         <VenueDatas nameOfVenue={nameOfVenue} numberOfPlaces = {numberOfPlaces} seatsStatus = {turnOnSeats} onChangeFunction = {setTurnOnSeats} changeName = {setNameOfVenue} changeNumberOfPlaces = {setNumberOfPlaces} />
-        {turnOnSeats ? <div><Area width = {!background.isImage ? sizeOfArea.width : sizeOfArea.width} height = {!background.isImage ? sizeOfArea.height : sizeOfArea.height} background = {background} clickEvent = {addNewSeat} size = {sizeOfSeat} posYOfArea = {setPotionOfTheAreaFromTop} posXOfArea = {setPotionOfTheAreaFromLeft}>
+        <Collapse in={turnOnSeats}><div><Area width = {!background.isImage ? sizeOfArea.width : sizeOfArea.width} height = {!background.isImage ? sizeOfArea.height : sizeOfArea.height} background = {background} clickEvent = {addNewSeat} size = {sizeOfSeat} posYOfArea = {setPotionOfTheAreaFromTop} posXOfArea = {setPotionOfTheAreaFromLeft}>
         <DatasToArea suggestedGroups = {suggestedGroups} groups={groups} seats = {getAbsoluteSeats()} size = {sizeOfSeat} selected = {selecttedGroup} newPositionFunction = {newPositionToSeat} showAll = {showAllSeats} colorOfSeat = {colorOfSeat}/>
         </Area>
         <ShowAllSeats showAll = {showAllSeats} onChangeFunction = {changeStatusOfShowAll}/>
         <GroupList groups = {groups} handleEvent = {editNameOfGroup} editFunction = {setStatusOfGroup} deleteEvent = {deleteGroup} setSelected = {setSelectedInGroups} selected = {selecttedGroup} seats = {seats} changeValue = {changeValueOfSeat} deleteSeatFunction = {deleteSeat} changeOpened = {changeStatusOfOpened} changeTitle={changeTitleOfSeat}/>
         <Settings showSettingsWindow = {showSettingsWindow} widthOfArea={sizeOfArea.width} heightOfArea = {sizeOfArea.height} setHeightOfArea = {setHeightOfArea} setWidthOfArea = {setWidthOfArea} setSizeOfSeatsFunction = {(size:number) =>{setSizeOfSeat(size > 0 ? size : 1)}} sizeOfSeat = {sizeOfSeat} uploadFile = {uploadFile} delteImageFunction = {deleteImage} settingsWindow = {ChangeSettingsWindow} colorOfBackground = {colorOfBackGround} setColorOfBackground = {changeColorOfBackground} colorOfSeat = {colorOfSeat} changeColorOfSeats = {setColorOfSeat} nameOfBackgroundImage = {background} newGroupFunction = {addNewGroup} setSelectedStage = {setStage} selectedStage={stage}/>
-        {
-            suggestedGroups.length ? <SuggestNewGroups suggestedGroups = {suggestedGroups} seats = {seats} changeSeatsFunctions = {setSeats} addGroupsFunction = {addMoreGroups} groups = {groups} /> : ""
-        }
-        </div>
-        :
-        ""}
+        
+        <SuggestNewGroups suggestedGroups = {suggestedGroups} seats = {seats} changeSeatsFunctions = {setSeats} addGroupsFunction = {addMoreGroups} groups = {groups} open= {suggestedGroups.length>0} setOpen={()=>{setSuggestedGroups([])}} />
+        
+        </div></Collapse>
         <SaveButton onClickFunction={save}/>
         </div>
     );
