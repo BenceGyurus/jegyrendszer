@@ -47,6 +47,16 @@ const { type, version } = require("os");
 const getContributors = require("./getContributorsOfEvent.js");
 const SimplePayPayment = require("./simple-pay-payment.js");
 assert = require('assert');
+const { collectDefaultMetrics, register } = require('prom-client');
+collectDefaultMetrics({ timeout: 5000 });
+const Redis = require('ioredis');
+// const redis = new Redis({port: 6379, host: 'jegyrendszer-redis-headless', username: 'default', password: process.env.REDIS_PASS, db: 0});
+const redis = new Redis();
+const readFromRedisCache = async (key) => {
+    return await redis.get(key).then((result) => {
+        return result;
+    });
+}
 
 const Cache = new NodeCache();
 
@@ -97,59 +107,71 @@ const logger = new Logger()
 
 app.use(bodyParser.urlencoded({ extended: false }))
 
+//METRICS & HEALTH
 app.get("/health", (req, res) => {
-    res.send('up and running');
-})
+    return res.send('Up');
+});
+app.get("/metrics", (ctx) => {
+    ctx.headers['content-type'] = register.contentType;
+    ctx.body = register.metrics();
+});
 
 //EVENTS
 app.get("/api/v1/events", async (req,res) =>{
+    // const cachedData = await readFromRedisCache('eventstest');
     const cachedData = Cache.get('events');
     if (cachedData) {
         return res.send({events : cachedData});
     } else {
-    try{
-    let {collection, database} = new Database("events");
-    let datas = await collection.find().toArray();
-    let sendDatas = [];
-    let cache = true;
-    let cacheTime = getTime("CACHE_TIME")
-    for (let i = 0; i < datas.length; i++){
-        if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
-            sendDatas.push({
-                id : datas[i].eventData.readable_event_name,
-                date : datas[i].eventData.objectDateOfEvent,
-                title : datas[i].eventData.name,
-                description : datas[i].eventData.description,
-                imageName : datas[i].eventData.background
-            });
-            datas[i].eventData.objectDateOfEvent.getTime()+cacheTime <= new Date().getTime() ? cache = false : false;
-            
+        try{
+            let {collection, database} = new Database("events");
+            let datas = await collection.find().toArray();
+            let sendDatas = [];
+            let cache = true;
+            let cacheTime = getTime("CACHE_TIME")
+            for (let i = 0; i < datas.length; i++){
+                if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
+                    sendDatas.push({
+                        id : datas[i].eventData.readable_event_name,
+                        date : datas[i].eventData.objectDateOfEvent,
+                        title : datas[i].eventData.name,
+                        description : datas[i].eventData.description,
+                        imageName : datas[i].eventData.background
+                    });
+                    datas[i].eventData.objectDateOfEvent.getTime()+cacheTime <= new Date().getTime() ? cache = false : false;
+                    
+                }
+                else if (datas[i].eventData.objectDateOfRelease.getTime() >= new Date().getTime()+cacheTime){
+                    cache = false;
+                }
+            }
+            if (cache){
+                // redis.set('events', sendDatas, cacheTime/1000);
+                Cache.set('events', sendDatas, cacheTime/1000);
+            }
+            closeConnection(database);
+            res.status(200).send({events : sendDatas});
         }
-        else if (datas[i].eventData.objectDateOfRelease.getTime() >= new Date().getTime()+cacheTime){
-            cache = false;
+        catch{
+            handleError(logger, "500", res);
         }
-    }
-    if (cache){
-        Cache.set('events', sendDatas, cacheTime/1000);
-    }
-    closeConnection(database);
-    res.status(200).send({events : sendDatas});
-    }
-    catch{
-        handleError(logger, "500", res);
-    }
     }
 });
 
 app.get("/api/v1/event/:id", async (req,res)=>{
     let id = req?.params?.id;
     if(id == undefined) return handleError(logger, "400", res);
-    const cachedData = Cache.get(req.params.id);
-    if (cachedData) return res.send(cachedData);
+    const cachedData = await readFromRedisCache(req.params.id);
+    // const cachedData = Cache.get(req.params.id);
+    if (cachedData) return res.send(JSON.parse(cachedData));
     let event = (await getTicketByReadableId(req.params.id));
     let eventDatas = {media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent,location : event.location, position: event.position, address : event.address, venue : event.venue};
     let cacheTime = getTime("CACHE_TIME")
-    if (event && eventDatas && req.params.id) Cache.set(req.params.id, eventDatas, cacheTime/1000);
+    if (event && eventDatas && req.params.id) {
+        redis.set(req.params.id, JSON.stringify(eventDatas));
+        redis.expire(req.params.id, cacheTime / 20)
+    }
+    // if (event && eventDatas && req.params.id) Cache.set(req.params.id, eventDatas, cacheTime/1000);
     event ? res.send(eventDatas) : handleError(logger, "014", res);
 });
 

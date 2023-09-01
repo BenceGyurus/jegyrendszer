@@ -12,3 +12,8 @@ redis:
   auth:
     enabled: true
     password: "root"
+grafana:
+  replicas: 1
+  service:
+    type: LoadBalancer
+    port: 5000
