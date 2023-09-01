@@ -1,4 +1,5 @@
 import React from 'react';
+import drawSeat from './drawSeat';
 
 
 type typeOfSeatPostions = {
@@ -83,31 +84,7 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
     };
 
 
-    const drawSeat = (x:number, y:number, isAvailable:boolean, isSelected:boolean, pending:boolean, disabled:boolean) => {
-      const seatHeight = seatSize;
-      const cornerRadius = 2;
-
-      const gradient = ctx.createLinearGradient(x, y, x, y + seatHeight);
-      if (isSelected) {
-        gradient.addColorStop(0,'#3DA4FF'); // Blue for available, red for occupied
-        gradient.addColorStop(1,'#3496E2');
-      }else{
-      gradient.addColorStop(0, pending ? "yellow" : isAvailable ? disabled ? "grey" :  colorOfSeat : '#FF6767'); // Blue for available, red for occupied
-      gradient.addColorStop(1, pending ? "yellow" : isAvailable ? disabled ?  "grey"  : "rgba(0,0,0,0.9)" : '#FF5E5E'); // Slightly darker shade
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(x + cornerRadius, y);
-      ctx.arcTo(x + seatSize, y, x + seatSize, y + cornerRadius, cornerRadius);
-      ctx.arcTo(x + seatSize, y + seatHeight, x + seatSize - cornerRadius, y + seatHeight, cornerRadius);
-      ctx.arcTo(x, y + seatHeight, x, y + seatHeight - cornerRadius, cornerRadius);
-      ctx.arcTo(x, y, x + cornerRadius, y, cornerRadius);
-      ctx.closePath();
-
-      ctx.fillStyle = gradient;
-      ctx.fill();
-
-    };
+    
 
   //return place === seat.id ? <Seat marginLeft = {getMinX()/2} marginTop = {marginTop} color={places.colorOfSeat} seat={seat} size = {places.sizeOfSeat} classname = {!ticket.boughtPlaces.includes(seat.id) ? !ticket.pendingPlaces.includes(seat.id) ? ticket.amount > 0 ? seleted.includes(seat.id) ? "user-selected"  : ticket.selected >= ticket.amount ? "user-disabled" : "user-allowed" : "user-disabled" : "user-pending" : "user-bought"} onClickFunction = {onClickFunction} /> : "";
 
@@ -118,7 +95,7 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
         seatPositions.forEach((seat:typeOfSeat) => {
           //const isSelected = selectedSeats.some((selectedSeat:any) => selectedSeat.x === seat.x && selectedSeat.y === seat.y);
           if (seat.id == place){
-            drawSeat(seat.posX+marginLeft, seat.posY+marginTop, !ticket.boughtPlaces.includes(seat.id), selectedSeats.includes(seat.id) , ticket.pendingPlaces.includes(seat.id), ticket.amount <= ticket.selected)
+            drawSeat(seat.posX+marginLeft, seat.posY+marginTop, !ticket.boughtPlaces.includes(seat.id), selectedSeats.includes(seat.id) , ticket.pendingPlaces.includes(seat.id), ticket.amount <= ticket.selected, ctx, seatSize, colorOfSeat)
           }
         });
       })

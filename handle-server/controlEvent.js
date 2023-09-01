@@ -13,34 +13,18 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
     if (eventId){
         let eventDatas = await getTicketId(eventId);
         if (eventDatas.objectDateOfEvent.getTime() >= new Date().getTime()){
-            let {collection, database} = new Database("pre-buying");
-            let preBuyingDatas = await collection.find().toArray();
-            closeConnection(database);
             let pendingPlaces = [];
             let ticketAmount = {};
-            for (let i = 0; i < preBuyingDatas.length; i++){
-                if (preBuyingDatas[i].time+getTime("RESERVATION_TIME") > new Date().getTime() && String(preBuyingDatas[i]._id) != String(thisEventId)){            //config prebuying active time
-                    ticketAmount[preBuyingDatas[i].eventId] = ticketAmount[preBuyingDatas[i].eventId] ? ticketAmount[preBuyingDatas[i].eventId] : {};
-                    for (let k = 0; k < preBuyingDatas[i].tickets.length; k++){
-                        if (preBuyingDatas[i].tickets[k].places){
-                            pendingPlaces.push(...preBuyingDatas[i].tickets[k].places);
-                        }
-                        ticketAmount[preBuyingDatas[i].eventId][preBuyingDatas[i].tickets[k].ticketId] = ticketAmount[preBuyingDatas[i].eventId][preBuyingDatas[i].tickets[k].ticketId]  ? ticketAmount[preBuyingDatas[i].eventId][preBuyingDatas[i].tickets[k].ticketId] + preBuyingDatas[i].tickets[k].amount : preBuyingDatas[i].tickets[k].amount;
-                    }
-                }
-            }
             let boughtDatabase = new Database("buy");
-            let boughtDatas = await boughtDatabase.collection.find().toArray();
+            let boughtDatas = await boughtDatabase.collection.find({ $and : [ {$or : [{$and : [{pending : true}, { time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")}}]}, {bought : true}]}, {_id : { $ne : thisEventId }} ]}).toArray();
             closeConnection(boughtDatabase.database)
             for (let i = 0; i < boughtDatas.length; i++){
-                if ((boughtDatas[i].pending && boughtDatas[i].time+getTime("RESERVATION_TIME") > new Date().getTime()) || boughtDatas[i].bought){
                     ticketAmount[boughtDatas[i].eventId] = ticketAmount[boughtDatas[i].eventId] ? ticketAmount[boughtDatas[i].eventId] : {};
                     for (let j = 0; j < boughtDatas[i].tickets.length; j++){
                         if (boughtDatas[i].tickets[j].places){
                             pendingPlaces.push(...boughtDatas[i].tickets[j].places);
                         }
                         ticketAmount[boughtDatas[i].eventId][boughtDatas[i].tickets[j].ticketId] = ticketAmount[boughtDatas[i].eventId][boughtDatas[i].tickets[j].ticketId] ? ticketAmount[boughtDatas[i].eventId][boughtDatas[i].tickets[j].ticketId] + boughtDatas[i].tickets[j].amount : boughtDatas[i].tickets[j].amount
-                    }
                 }
             }
             for (let i = 0; i < eventDatas.tickets.length; i++){
@@ -57,7 +41,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
                             }
             
                             }
-                        if (preBuyingDatas.length && ticketAmount[eventDatas.readable_event_name] && Object.keys(ticketAmount[eventDatas.readable_event_name]).includes([eventDatas.tickets[i].id]) && !(ticketAmount[eventDatas.readable_event_name][eventDatas.tickets[i].id]+ticketIds[j].amount <= eventDatas.tickets[i].numberOfTicket)){
+                        if (ticketAmount[eventDatas.readable_event_name] && Object.keys(ticketAmount[eventDatas.readable_event_name]).includes([eventDatas.tickets[i].id]) && !(ticketAmount[eventDatas.readable_event_name][eventDatas.tickets[i].id]+ticketIds[j].amount <= eventDatas.tickets[i].numberOfTicket)){
                             return {error : true, errorCode : "031"};       //Erre a helyre már nem kapható jegy
                         }
                         else{

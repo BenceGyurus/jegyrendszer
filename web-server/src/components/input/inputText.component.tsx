@@ -1,21 +1,42 @@
 import { useRef,useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
+import { Tour } from 'antd';
+import type { TourProps } from 'antd';
 import "../../css/inputStyle.css";
+import { InfoCircleOutlined, UserOutlined } from '@ant-design/icons';
+import { Input, Tooltip } from 'antd';
 type typeOfInputTextParams = {
     title : string,
     onChangeFunction : Function,
     value? : string,
     params? : Array<any>,
     disabled? : boolean,
-    info? : { image? : string, text? : string}
+    info? : { image? : string, text? : string},
+    ref? : any
 }
 
 
-const InputText = ({ title,onChangeFunction,value,params, disabled,info }:typeOfInputTextParams)=>{
+const InputText = ({ title,onChangeFunction,value,params, disabled,info,ref }:typeOfInputTextParams)=>{
     const inputRef:any = useRef(null);
     let id = uuid();
 
+    const [open, setOpen] = useState(false);
+
     const [showTooltip, setShowTooltip] = useState(false);
+
+    const steps: TourProps['steps'] = [
+      {
+        title: title,
+        description: info && info.text ? info.text : "",
+        cover: (
+          info && info.image ? <img style={{width : 200}}
+            alt="tour.png"
+            src={info.image}
+          /> : ""
+        ),
+        target: () => inputRef.current,
+      }
+    ];
 
   const handleInfoButtonHover = () => {
     setShowTooltip(true);
@@ -31,27 +52,17 @@ const InputText = ({ title,onChangeFunction,value,params, disabled,info }:typeOf
 
     return (
       <div className="input-container">
-        <div>
+        <div ref = {ref ? ref : null} >
             <label htmlFor={id} className = "inputLabel">{title}</label>
-            <input type="text" id = {id} className = "textInput" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} ref = {inputRef} disabled = {disabled ? disabled : false}/>
-            {info && (
-          <div
-            className="info-button"
-            onMouseEnter={handleInfoButtonHover}
-            onMouseLeave={handleInfoButtonLeave}
-          >
-            {showTooltip && (
-              <span className="info-tooltip">
-                {info.image ? <img src={info.image} alt="Info Icon" /> : ""}
-                {info.text ? <p>{info.text}</p> : ""}
-              </span>
-            )}
-            <i className="fas fa-question" style={{color : "#007bff"}}></i>
-          </div>
-        )}
-        </div>
+            <Input placeholder={title} size = "large" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
+            <Tooltip title={info.text} zIndex={9999999}>
+              <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+            </Tooltip> : ""
+      } /></div>
         </div>
     );
 }
+
+//className = "textInput" 
 
 export default InputText;

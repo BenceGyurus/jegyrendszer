@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import InputText from "../../../../input/inputText.component";
 import InputNumber from "../../../../input/inputNumber.component";
 import TextArea from "../../../../input/textArea.component";
@@ -28,6 +28,11 @@ import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
 import TimeLine from "./timeLine.component";
+import { Tour } from 'antd';
+import type { TourProps } from 'antd';
+import type { RadioChangeEvent } from 'antd';
+import { Radio } from 'antd';
+import { Button } from 'antd';
 
 type typeOfGroups = {
     id : string,
@@ -133,6 +138,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         return `${new Date().getFullYear()}-${new Date().getMonth()+1 < 10 ? `0${new Date().getMonth()+1}` : new Date().getMonth()+1}-${new Date().getUTCDate() < 10 ? `0${new Date().getUTCDate()}` : new Date().getUTCDate()}T${new Date().getHours() < 10 ? `0${new Date().getHours()}` : new Date().getHours()}:${new Date().getMinutes() < 10 ? `0${new Date().getMinutes()}` : new Date().getMinutes()}`;
     }
 
+    const [openTour, setOpenTour] = useState<boolean>(true);
     const [id, setId]:[string, Function] = useState(window.location.pathname.split("/")[3]);
     const [nameOfEvent, setNameOfEvent]:[string, Function] = useState(name ? name : "");
     const [desciption, setDescription]:[string, Function] = useState(description ? description : "");
@@ -160,7 +166,21 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [gateOpening, setGateOpening]:[string, Function] = useState(open ? open : "");
     const [endOfTheEvent, setEndOfTheEvent]:[string, Function] = useState(end ? end : "");
     const [wardrobe, setWardrobe]:[boolean, Function] = useState(isWardrobe ? isWardrobe : false);
+    const titleRef:any = useRef(null);
 
+    const steps: TourProps['steps'] = [
+        {
+          title: 'Upload File',
+          description: 'Put your files here.',
+          cover: (
+            <img
+              alt="tour.png"
+              src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+            />
+          ),
+          target: () => titleRef.current,
+        }
+      ];
 
     const getUsers = ()=>{
         postData("/users-id-name", {token : ParseLocalStorage("long_token")})
@@ -386,6 +406,8 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} disabled = {isLoading} info={{text : "Ez a cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. A rendezvény url-e is ez alapján fog létrejönni."}} />
             <InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} disabled = {isLoading} info={{text : "Az ide beírt helyszín fog megjelenni az oldalon", image : "/images/info/map.png"}} />
             <InputText title = "Rendezvény helyszínének címe" onChangeFunction={setAddress} value={address} disabled = {isLoading} info={{text : "A rendezvény helyszínének a címe. Írányítószám város, utca házszám. Ez nem fog megjelenítésre kerülni az oldalon, hanem a helyszínre kattintva ennek a címnek a segítségével fogja megkeresni a felhasználó alapértelmezett térképével a helyszínt. Támogatott térképek: Google Maps, Apple Maps. Helyszíneknél megadható a helyszín neve is az utca, házszám helyett, de a térképek ilyenkor nem fogják minden esetben pontosan megtalálni."}} />
+            <h4>Esemény helyszíne</h4>
+            <h6>Válaszd ki a térképen a marker húzásávál az esemény helyszínét</h6>
             <MarkerMap zoomLevel={14} center={position} title = {locationOfEvent} setPosition={setPostion} />
             <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} disabled = {isLoading} />
             <AddNewButton onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
@@ -393,10 +415,16 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             <Calendar onChangeFunction={setDateOfRelease} value = {dateOfRelease} title="Rendevény megjelenése az oldalon" disabled = {isLoading} info={{text : "A megadott időtől jelenik meg a rendezvény az oldalon és lehet rá jegyet vásárolni. Az értékének kisebbnek kell lennie mint a rendezvény dátuma."}} />
             <Calendar onChangeFunction={setGateOpening} value = {gateOpening} title = "Kapunyitás" disabled= {isLoading} info={{text : "A kapunyitás az oldalon nem kerül mejelenítésre, ez a már megvásárol jegyen lesz látható."}} />
             <Calendar onChangeFunction={setEndOfTheEvent} value={endOfTheEvent} title = "Esemény vége" disabled = {isLoading} info={{text : "Az esemény végére a az Apple pass és a jegy miatt van szükség, ott kerül majd megjelenítésre."}} />
-            <Checkbox title = "Ruhatár a helyszínen" onChangeFunction={setWardrobe} defaultChecked = {wardrobe} />
+            <Radio.Group onChange={(e:any)=>{setWardrobe(e.target.value)}} defaultValue={wardrobe} className = "event-settings-radio">
+                <Radio.Button value={true}>Ruhatár a helyszínen</Radio.Button>
+                <Radio.Button value={false}>Nincsenek ruhatár a helyszínen</Radio.Button>
+            </Radio.Group>
             <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
             <Select title = "Vállalt kiválasztása" options = {companyList} onChangeFunction={setSelectedCompany} value={selectedCompany} />
-            <Checkbox title = "Helyi kedvezmények" onChangeFunction={setLocalDiscounts} defaultChecked={localDiscounts} />
+            <Radio.Group onChange={(e:any)=>{setLocalDiscounts(e.target.value)}} defaultValue={localDiscounts} className = "event-settings-radio">
+                <Radio.Button value={true}>Helyi kedvezmények</Radio.Button>
+                <Radio.Button value={false}>Nincsenek helyi kezvezmények</Radio.Button>
+            </Radio.Group>
             <AddMedia media = {media} changeValueOfMedia={valueOfMedia} disabled = {isLoading} />
             <h4>Felhasználók engedélyezése:</h4>
             {users.length ? <UsersList selectedUsers={selectedUsers} userDatas={users} onChangeFunction={changeSelectedUsers} /> : ""}
@@ -407,6 +435,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             <LoadingButton loading = {isLoading} onClick = {save} style={{margin : "10px auto", display : "block"}} variant="outlined">
                 Mentés
             </LoadingButton>
+            <Tour open={openTour} onClose={() => setOpenTour(false)} steps={steps} />
         </div>
         </div>
     );

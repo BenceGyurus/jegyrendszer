@@ -9,6 +9,7 @@ import postData from "../connection/request";
 import Notification from "../notification/notification.component";
 import Loader from "../loader/loader.component";
 import TicketSkeleton from "./ticket-skeleton.component";
+import Legend from "./legend.component";
 
 type typeOfTicket = {
     id : string,
@@ -243,6 +244,7 @@ const Page = ({title, background, description, date, id, media, position, locati
         {errorNat ? <Notification element={<Error message={errorNat} closeFunction={()=>{setErrorNat("")}} />} /> : ""}
         <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media} position={position} location={location} address={address}/>
         {ticketsAmount.length ? <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/> : <TicketSkeleton />}
+        <Legend />
         {placeDatas && placeDatas.seatsDatas && placeDatas.seatsDatas.length && ticketsAmount.length && ticketsAmount ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
         <BuyButton onClickFunction={buy_Ticket} />
     </div>;

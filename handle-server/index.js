@@ -247,6 +247,48 @@ app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), asy
 });
 
 
+app.post("/api/v1/ticket-validation/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id && req.body.eventId){
+        let access = await control_Token(req.body.token, req);
+        console.log(req.body);
+        if (access && access.includes("local-sale")){
+            const eventData = await getTicketByReadableId(req.body.eventId);
+            console.log(eventData);
+            if (eventData){
+                console.log(eventData);
+                let idOfTicket = "";
+                try{
+                    idOfTicket = ObjectId(req.params.id)
+                }catch{}
+                const {collection, database} = new Database("tickets");
+                ticketDatas = await collection.findOne({_id : idOfTicket, eventId : req.body.eventId});
+                if (ticketDatas && ticketDatas.valid) {
+                    closeConnection(database);
+                    return res.send({type : "warn", message : "A jegy már validálva lett."})
+                }
+                else if (ticketDatas){
+                    const buyingDatabase = new Database("buy");
+                    let b = await buyingDatabase.collection.findOne({_id : ObjectId(ticketDatas.orderId)});
+                    closeConnection(buyingDatabase.database);
+                    if (b && b.bought && b.status && !b.pending){
+                        collection.updateOne({_id : idOfTicket}, {$set : {valid : true}});
+                        closeConnection(collection);
+                        return res.send({ type : "success" , message : "A jegy aktív" })
+                    }
+                    else{
+                        closeConnection(collection);
+                        return res.send({type : "error", message : "Nem található jegy."})
+                    }
+                }
+                else{
+                    return res.send({type : "error", message : "Nem található jegy."})
+                }
+            }
+        }
+    } 
+    return handleError(logger, "500", res);
+});
+
 app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
         let access = await control_Token(req.body.token, req);
@@ -991,6 +1033,7 @@ app.post("/api/v1/events", async (req,res)=>{
             else{
                 events = [];
             }
+            console.log(events);
             res.send({events : events, numberOfPages : numberOfPages});
             closeConnection(database);
             return;
@@ -1419,9 +1462,6 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
             let browserData = Functions.getBrowerDatas(req);
             if (buyingDatas && ip == buyingDatas.otherDatas.ip && browserData.os == buyingDatas.otherDatas.browserData.os && browserData.name == buyingDatas.otherDatas.browserData.name){
                 let error = false;
-                /*for (let i = 0; i < buyingDatas.tickets.length; i++){
-                    Control_Seats(buyingDatas.tickets[i].places, buyingDatas.tickets[i].ticketId, buyingDatas.eventId) ? true : error = false;
-                }*/
                 let result = await controlEvent(buyingDatas.eventId, buyingDatas.tickets, buyingDatas._id);
                 if (!result.error){
                     let saveDatas = {};

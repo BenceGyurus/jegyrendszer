@@ -1,7 +1,7 @@
 import MediaShareWindow from "./add-media-window.component";
 import Brand from "../../../../brand/embed-brand.component";
 import { useState } from "react";
-import Button from "../../../../buttons/button.component";
+import { Button } from 'antd';
 
 
 type typeOfMedia = {
@@ -24,7 +24,7 @@ const AddMedia = ({media, changeValueOfMedia, disabled}:typeOfAddMediaParams)=>{
 
     return (
         <div>
-            <Button title = "Média hozzáadása" onClickFunction={()=>{setMediaWindow(true)}} />
+            <Button  type="primary" size="large" onClick={(e)=>{setMediaWindow(true)}} style={{color : "white"}} >Média hozzáadása</Button>
         {mediaWindow ? <MediaShareWindow media={media} closeFunction = {()=>{setMediaWindow(false)}} onChangeFunction = {changeValueOfMedia} /> : ""}
         <div className = "added">
             {

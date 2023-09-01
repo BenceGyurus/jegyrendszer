@@ -1,0 +1,29 @@
+.seat-legend-conteiner{
+    display: flex;
+    width: max-content;
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 2px 1px 10px rgba(0,0,0,0.1);
+    width: 80%;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    background-color: white;
+}
+
+.legend{
+    width: max-content;
+    max-width: 34%;
+    margin: 10px;
+}
+
+.legend-canvas{
+    display: block;
+    margin: 10px auto;
+}
+
+.legend-label{
+    text-align: center;
+}

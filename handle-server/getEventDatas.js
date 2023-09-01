@@ -20,7 +20,8 @@ const getEventDatas = async (eventId)=>{
         }
     }
     const boughtDatabase = new Database("buy");
-    let boughtDatas = await boughtDatabase.collection.find({$and : [{eventId : eventId}, {$or : [{ time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")} }, {bought : true} ]}]}).toArray();
+    let boughtDatas = await boughtDatabase.collection.find({$and : [{eventId : eventId}, {$or : [ {$and : [{ time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")} }, {pending : true}]}, {bought : true} ]}]}).toArray();
+    console.log(boughtDatas);
     closeConnection(boughtDatabase.database)
     for (let i = 0; i < boughtDatas.length; i++){
             for (let j = 0; j < boughtDatas[i].tickets.length; j++){

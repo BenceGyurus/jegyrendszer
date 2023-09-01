@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -10,46 +10,34 @@ import {
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import getLocalStorage from './storage/getStorage';
 import LoginPage from './component/loginPage/loginPage.component';
-import LoadEvents from './component/loadEvents/loadEvents.component';
 import postData from './requests/post';
 import Loader from './component/loader/loader.component';
 import BasicStyle from './defaultStyles/style';
-
+import defaultSettings from './defaultSettings';
+import controlToken from './control-token';
+import EventList from './component/eventList/eventList.component';
 function App(){
-  const isDarkMode = useColorScheme() === 'dark';
-  const [basicUrl, setBasicUrl] = useState("http://192.168.1.72:3000/api/v1");
   const [isTokenValid, setIsTokenValid] = useState(false);
   const [token, setToken] = useState("");
   const [loader, setLoader] = useState(false);
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor: defaultSettings.isDark ? Colors.darker : Colors.lighter,
   };
 
-  const controlToken = ()=>{
-    getLocalStorage("long_token").then(long_token=>{
-      if (long_token){
-        postData(`${basicUrl}/get-access`, {token : long_token})
-        .then(response=>{
-          if (response.access && !response.error){
-            setToken(long_token);
-          }
-          else{
-            setToken("");
-          }
-        })
-      }
-    })
-  }
+  
 
   useEffect(()=>{
-    controlToken();
+    controlToken().then((response:any)=>{
+      if (response) setToken(response);
+    });
   },[]);
 
+console.log(token);
 
   return (
-     <SafeAreaView style = {{backgroundColor : isDarkMode ? BasicStyle.dark.backgroundColor : BasicStyle.light.backgroundColor}}>
-      {!token ? <LoginPage isDark = {isDarkMode} defaultUrl={basicUrl} reloadEvent = {controlToken} loaderFunction = {setLoader} /> : <LoadEvents controlTokenFunction={controlToken} isDark = {isDarkMode} basicUrl={basicUrl} />}
+     <SafeAreaView style = {{backgroundColor : defaultSettings.isDark ? BasicStyle.dark.backgroundColor : BasicStyle.light.backgroundColor}}>
+      {!token ? <LoginPage reloadEvent = {controlToken} loaderFunction = {setLoader} /> : <EventList />}
       {loader ? <Loader /> : ""}
      </SafeAreaView>
   );
