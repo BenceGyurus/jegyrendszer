@@ -1,0 +1,9 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: ratelimit-middleware
+  namespace: kube-system
+spec:
+  rateLimit:
+    average: 175
+    burst: 50

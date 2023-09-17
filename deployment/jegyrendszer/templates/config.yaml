@@ -12,6 +12,7 @@ data:
       "NODE_SHARE": "/uploads",
       "EMAIL_SERVER": "email-server-svc:5000",
       "MONGO_URI": "mongodb://root:root@jegyrendszer-mongodb-headless:27017/",
+      "REDIS_URI": "redis://:root@jegyrendszer-redis-headless:6379/1",
       "PDF_FONT_FAMILY" : "media/fonts/Rubik/static/Rubik-Regular.ttf",
       "PDF_TITLE_COLOR" : "#34b019",
       "PDF_BODY_COLOR" : "#000000",

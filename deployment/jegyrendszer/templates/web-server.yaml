@@ -16,6 +16,10 @@ spec:
     spec:
       imagePullSecrets:
         - name: gcp-ar-login
+      hostAliases:
+      - ip: "10.10.10.111"
+        hostnames:
+        - "api.jegyrendszer.local"
       containers:
       - name: web-server
         image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/web-server:latest
@@ -30,15 +34,37 @@ spec:
           requests:
             cpu: 500m
             memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 30
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: web-server-svc
 spec:
-  type: LoadBalancer
   selector:
     app: web-server
   ports:
   - port: 8080
     targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-server-ingress
+spec:
+  rules:
+    - host: jegyrendszer.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: handle-server-svc
+                port:
+                  number: 8080
