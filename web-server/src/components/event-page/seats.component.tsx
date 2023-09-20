@@ -44,6 +44,8 @@ type typeOfSeatsParams = {
 }
 const Seats = ({places, tickets, seleted,onClickFunction}:typeOfSeatsParams)=>{
 
+    console.log(places, tickets);
+
     const [marginTop, setMarginTop] = useState(100);
 
     const getMinX = ()=>{

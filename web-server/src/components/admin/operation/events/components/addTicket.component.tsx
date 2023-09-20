@@ -33,90 +33,70 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
     const [maxPrice, setMaxPrice]:[number, Function] = useState(maxPriceOfTicket ? maxPriceOfTicket : 0);
     const [name, setName]:[string, Function] = useState(nameOfTicket ? nameOfTicket : "");
     const [nOfTicket, setNumberOfTicket]:[number, Function] = useState(numberOfTicket ? numberOfTicket : 0); 
-    const [usingGroups, setUsingGroups]:[number, Function] = useState(0);
+    const [usedGroups, setUsedGroups]:[number, Function] = useState(0);
+
+      
+    const removeItem = (array:Array<string>, item:string):Array<string>=>{
+        const index = array.indexOf(item);
+        if (index !== -1) {
+          array.splice(index, 1);
+        }
+        return array;
+    }
+
+    const remove_Seat = (id:string)=>{
+        let arr:Array<string> = [...idsOfSeats];
+        arr = removeItem(arr, id);
+        setIdsOfSeats(arr);
+        //allSelected = removeItem(allSelected, id);
+        setNumberOfTicket(nOfTicket > 0 ? nOfTicket-1 : nOfTicket);
+        setUsedGroups(usedGroups-1);
+    }
+
+    const select_Seat = (id:string)=>{
+        let arr:Array<string> = [...idsOfSeats];
+        if (!idsOfSeats.includes(id)){
+            setIdsOfSeats([...arr, id]);
+            let n = nOfTicket;
+            setNumberOfTicket(n+1);
+            setUsedGroups(usedGroups+1);
+        }
+        else{
+            remove_Seat(id);
+        }
+    }
 
 
     const deleteFromAllSelected = (id:string)=>{
         let l = [];
         for (let i = 0; i < allSelected.length; i++){
-            if (allSelected[i] === id){l.push(allSelected[i])}
+            if (allSelected[i] !== id){l.push(allSelected[i])}
         }
         return l;
     }
 
 
-    const select_Seat = (id:string)=>{
-        if (idsOfSeats.includes(id)){
-            let l = [...idsOfSeats];
-            let newList:Array<string> = [];
-            l.forEach((element)=>{
-                if (element != id){
-                    newList.push(element);
-                    allSelected = deleteFromAllSelected(id);
-                }
-            })
-            setUsingGroups(usingGroups-1);
-            setNumberOfTicket(usingGroups-1);
-            setIdsOfSeats(newList);
-            //changeNumberOfTicket(false, 1);
-        }
-        else{
-            let l = [...idsOfSeats, id];
-            setIdsOfSeats(l);
-            //changeNumberOfTicket(true, 1);
-            setUsingGroups(usingGroups+1);
-            setNumberOfTicket(usingGroups+1);
-        }
-    }
-
-    /*const changeNumberOfTicket = (status:boolean, n:number|null)=>{
-        let l = nOfTicket;
-        if (status){
-            setNumberOfTicket(n ? l+n: l+1);
-        }else{
-            setNumberOfTicket(n ? l-n: l-1);
-        }
-        
-        
-    }*/
 
     const appendGroup = (a:any, list:Array<any>)=>{
-        let appended = 0;
         if (a){
-            let l = [...idsOfSeats];
-            list.forEach((element)=>{
-                if (!allSelected.includes(element.id) && !idsOfSeats.includes(element.id)){
-                    l.push(element.id);
-                    appended++;
-                }
-            })
-            //changeNumberOfTicket(true, appended);
-            setUsingGroups(usingGroups+appended);
-            setNumberOfTicket(usingGroups+appended);
-            setIdsOfSeats(l);
+            let l:Array<string> = [];
+            let increment = 0;
+            list.forEach(item=>{
+                if (!allSelected.includes(item.id) && !idsOfSeats.includes(item.id)) {l.push(item.id);increment++};
+            });
+            setUsedGroups(usedGroups+increment);
+            setIdsOfSeats([...idsOfSeats, ...l]);
+            setNumberOfTicket(nOfTicket+increment);
         }
         else{
-            let newList:any = [];
-            let a = 0;
+            let decrement = 0;
             let l = [...idsOfSeats];
-            for (let i = 0; i < list.length; i++){
-                for (let j = 0; j < l.length; j++){
-                    if (list[i].id === l[j]){
-                        delete l[j];
-                        allSelected = deleteFromAllSelected(l[j]);
-                        a++;
-                    }
-                }
-            }
-            setUsingGroups(usingGroups-a);
-            setNumberOfTicket(usingGroups-a);
-            //changeNumberOfTicket(false, a);
-            for (let i = 0; i < l.length; i++){
-                if (l[i]){
-                    newList.push(l[i]);
-                }
-            }
-            setIdsOfSeats(newList);
+            list.forEach(item=>{
+                if (idsOfSeats.includes(item.id)) {removeItem(l, item.id);decrement++};
+            });
+            setUsedGroups(usedGroups-decrement);
+            setIdsOfSeats([...l]);
+            setNumberOfTicket(nOfTicket-decrement);
         }
     }
 
@@ -138,10 +118,10 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
             <WindowHeader title="Jegy hozzáadása" closeWindowFunction={closeFunction}/>
             <div className = "add-ticket-div">
             <InputText title = "Jegy neve" onChangeFunction={setName} value = {name} info={{text : "A jegyhez tartózó név, ami megjelenik az oldalon is.", image : "/images/info/ticket-name.png"}} />
-            <InputNumber title = "Jegy alapára" onChangeFunction={setPrice} value = {price} />
-            <InputNumber title="Maximum jegyár" onChangeFunction={setMaxPrice} value = {maxPrice} />
-            <InputNumber title = "Minimum jegyár" onChangeFunction={setMinPrice} value = {minPrice} />
-            <InputNumber disabled = {!!idsOfSeats.length} title = "Jegyek száma" onChangeFunction={setNumberOfTicket} value = {nOfTicket > 0 ? nOfTicket : "0"} />
+            <InputNumber money = {true} title = "Jegy alapára" onChangeFunction={setPrice} value = {price} />
+            <InputNumber money = {true} title="Maximum jegyár" onChangeFunction={setMaxPrice} value = {maxPrice} />
+            <InputNumber money = {true} title = "Minimum jegyár" onChangeFunction={setMinPrice} value = {minPrice} />
+            <InputNumber sufix="db" disabled = {!!idsOfSeats.length} title = "Jegyek száma" onChangeFunction={setNumberOfTicket} value = {nOfTicket > 0 ? nOfTicket : "0"} />
             <Button title = "Jegyek kiválasztása" onClickFunction={()=>{setSeats(true)}} />
             {seats ? <ShowSeats closeFunction = {()=>{setSeats(false)} } datasOfVenue = {datasOfVenue} addNewSeat = {select_Seat} seatList = {idsOfSeats} allSelected = {newAllSelected()} /> : ""}
             <Group_List groups={datasOfVenue.groups} seats = {datasOfVenue.seatsDatas} changeFunction = {appendGroup} seatList = {newAllSelected()}/>

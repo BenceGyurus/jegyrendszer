@@ -1,6 +1,6 @@
 .admin-user-element{
     flex-wrap: wrap;
-    flex-direction: column;
+    flex-direction: row;
     display: flex;
     align-items: center;
     padding: 5px;
@@ -12,6 +12,7 @@
     overflow: none;
     background-color: white;
     font-size: 14px;
+    max-height: 200px;
 }
 .admin-user-element span{
     margin: 3px;
@@ -19,7 +20,7 @@
 
 .admin-user-element .admin-username{
     display: inline-block;
-    width: 150px;
+    margin-left: 10px;
 }
 
 #user-icon{
@@ -64,4 +65,12 @@
 
 .admin-operation-buttons-div path{
     fill: white !important;
+}
+
+
+.admin-user-element-main{
+    position: absolute;
+    top: 90px;
+    right: 3px;
+    width: 200px;
 }

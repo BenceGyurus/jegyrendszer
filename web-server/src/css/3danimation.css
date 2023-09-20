@@ -1,0 +1,56 @@
+
+.animation-text{
+}
+
+@keyframes textShadowAnimation {
+    from {
+      text-shadow: 0px 0px 1px rgba(0, 0, 0, 1);
+      flex-wrap: wrap;
+    }
+    to {
+      text-shadow: -4px 5px 1px rgba(0, 0, 0, 1);
+      flex-wrap: nowrap;
+      flex-direction: column;
+    }
+  }
+
+  @keyframes appear-animation {
+    0% {
+      text-shadow: 0px 0px 1px rgba(240, 240, 240, 1);
+    }
+    to {
+      text-shadow: -4px 5px 1px rgba(190, 190, 190, 1);
+    }
+  }
+
+  
+
+.animation-text-shadow{
+    flex-wrap: wrap;
+    animation: textShadowAnimation .3s ease-in-out 1s forwards;
+    /*animation: rotate-animation .2s ease-in-out 1.2s forwards;*/
+    font-size: 90px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    height: 80vh;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    width: 100%;
+  }
+
+  .appear-text{
+    animation: appear-animation .3s ease-in-out 1s forwards;
+    /*animation: rotate-animation .2s ease-in-out 1.2s forwards;*/
+    font-size: 90px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    height: 80vh;
+    align-items: center;
+    font-weight: bold;
+    color: black;
+    width: 100%;
+    flex-direction: column;
+  }

@@ -18,7 +18,9 @@ type typeOfTicketsParams = {
     decrementFunction : Function
 }
 
+
 const Tickets = ({tickets, incrementFunction, decrementFunction}:typeOfTicketsParams)=>{
+
 
     const getPriceOfAllSelected = (tickets:Array<typeOfTicket>)=>{
         let summ = 0;

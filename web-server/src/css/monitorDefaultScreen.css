@@ -1,0 +1,18 @@
+.monitor-logo{
+    width : 80%;
+    opacity: 0.6;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+.monitor-background-holder{
+    position: absolute;
+    top: 80px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    overflow: hidden;
+}

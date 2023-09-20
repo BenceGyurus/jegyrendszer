@@ -66,5 +66,9 @@
     "tickets" : {
         "database" : "event",
         "collection" : "tickets"
+    },
+    "monitor" : {
+        "database" : "users",
+        "collection" : "monitor"
     }
 }

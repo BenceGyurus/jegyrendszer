@@ -71,7 +71,7 @@ const Registration = ()=>{
                 <Password value = {password} title = "Jelszó" onChangeFunction={setPassword} />
                 <Password value = {rePassword} title = "Jelszó újra" onChangeFunction={setRepassword} />
                 <Button title = "Regisztráció" onClickFunction={Control} />
-                {errors ? <Error message={errors}/> : successRegistration ? <Success message="Sikeres regisztráció!" /> : ""}
+                <Error message={errors} setOpen={()=>{setErrors("")}} open = {errors != ""} />
             </div>
         </div>
 
@@ -80,3 +80,5 @@ const Registration = ()=>{
 }
 
 export default Registration;
+
+//successRegistration ? <Success message="Sikeres regisztráció!" />

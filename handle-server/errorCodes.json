@@ -148,5 +148,10 @@
         "message" : "Az esemény nem a megadott teremhez tartozik",
         "type" : "error",
         "responseCode" : 400
+    },
+    "036" : {
+        "message" : "Ennél jegynél kötelező ülőhelyet választani",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

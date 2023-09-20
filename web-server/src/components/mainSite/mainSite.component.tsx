@@ -21,7 +21,7 @@ const App = ()=>{
     if (!events.length && !isItLoad){
         return <LoadingAnimation />;
     }
-    return events.length && isItLoad ? (<EventList events = {events} />) : (<div>{error ? <Notification element={<Error message={error} closeFunction={()=>{setError("")}} />} /> : ""}<NoEvent /></div>);
+    return events.length && isItLoad ? (<EventList events = {events} />) : error ? <Error message={error} setOpen={()=>{setError("")}} open = {error != ""} /> : <NoEvent />;
 }
 
 export default App;

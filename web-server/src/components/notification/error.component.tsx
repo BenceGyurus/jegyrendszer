@@ -1,19 +1,41 @@
 import "../../css/errorBox.css";
-
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import CloseIcon from '@mui/icons-material/Close';
+import AlertTitle from '@mui/material/AlertTitle';
 
 type typeOfErrorParams = {
     title? : string,
     message? : string,
-    closeFunction? : Function
+    open : boolean,
+    setOpen : Function
 }
 
-const Error = ( { title, message,closeFunction }:typeOfErrorParams ) => {
+const Error = ( { title, message, open, setOpen }:typeOfErrorParams ) => {
   return (
-    <div className="error-notification">
-    <span className="error-icon">❌</span>
-    <div className="error-title">{title ? title : "Hiba történet!"}</div>
-    <p className="error-message">{message}</p>
-    {closeFunction ? <a className="cta-button" onClick={e=>closeFunction()} >Bezár</a> : ""}
+    <div className = "notification-box">
+    <Collapse in={open}>
+    <Alert
+      severity="error"
+      action={
+        <IconButton
+          aria-label="close"
+          color="inherit"
+          size="small"
+          onClick={() => {
+            setOpen();
+          }}
+        >
+          <CloseIcon fontSize="inherit" />
+        </IconButton>
+      }
+      sx={{ mb: 2 }}
+    >
+      {title ? <AlertTitle>{title}</AlertTitle> : ""}
+      {message}
+    </Alert>
+  </Collapse>
   </div>
   );
 };

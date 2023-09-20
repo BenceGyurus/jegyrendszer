@@ -38,7 +38,7 @@ const Admin = ()=>{
     const changeUsername = (event:any)=>{setUsername(event.target.value);};
     return (
         <div>
-        {error ? <Notification element={<Error message = {error} title="Sikertelen bejelentkezés" closeFunction={()=>{setError("")}} />} /> : ""}
+        <Error message = {error} title="Sikertelen bejelentkezés" open = {error!=""} setOpen={()=>{setError("")}} />
     <div className="login-container">
     <h2>Admin bejelentkezés</h2>
     <form>

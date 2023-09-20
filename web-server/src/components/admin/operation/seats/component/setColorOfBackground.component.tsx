@@ -1,8 +1,10 @@
+import { ColorPicker } from "antd";
 import { useEffect, useRef } from "react";
 type typeOfSetColorOfBackgroundParams = {
     color : string,
     setColor : Function
 }
+
 
 const SetColorOfBackground = ({setColor, color}:typeOfSetColorOfBackgroundParams)=>{
     const colorRef:any = useRef(null);
@@ -13,8 +15,7 @@ const SetColorOfBackground = ({setColor, color}:typeOfSetColorOfBackgroundParams
     })
     return (
         <div>
-            <label htmlFor="color">Szín</label>
-            <input type="color" name="color" id="color" onChange={e=>setColor(e.target.value)} value = {color} />
+            <ColorPicker defaultValue={color} style={{zIndex : 100000000}} onChange={(value)=>setColor(value.toHexString())} showText={(color) => <span>Szín kiválasztása ({color.toHexString()})</span>} />
         </div>
     );
 }

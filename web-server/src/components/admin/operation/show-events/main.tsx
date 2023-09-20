@@ -7,6 +7,9 @@ import Error from "../../../notification/error.component";
 import Loader from "../../../loader/loader.component";
 import LoadingSkeleton from "../events/components/loading_Skeleton.component";
 import { Button, Empty } from 'antd';
+import Search from "antd/es/input/Search";
+import SearchField from "../../../searchField/Search.component";
+import "../../../../css/admin-event-list.css";
 
 type typeOfTickets = {
     name : string,
@@ -109,8 +112,8 @@ const Show_Events_Main = ()=>{
     console.log(response, !events.length);
 
     return <div className = "admin-event-container" >
-        <h1>Rendezvények</h1>
-        {error ? <Error message = {error} closeFunction = {()=>{setError("")}} /> : ""}
+        <div className = "event-list-header"><h1>Rendezvények</h1><SearchField /></div>
+        <Error message = {error} setOpen = {()=>{setError("")}} open = {error != ""} />
         {(events.length || response) && !isLoading ? <EventList events={events} editFunction={edit_Event} deleteFunction={deleteEvent} numberOfPages={numberOfPages} page={page} handleChange={handleChange} /> : !events.length && response ? <div><Empty /></div> :  <LoadingSkeleton limit={limit} /> }
         <AddNewButton onClick={()=>{window.location.pathname = "/admin/rendezveny"}}/>
     </div>

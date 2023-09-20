@@ -16,7 +16,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
             let pendingPlaces = [];
             let ticketAmount = {};
             let boughtDatabase = new Database("buy");
-            let boughtDatas = await boughtDatabase.collection.find({ $and : [ {$or : [{$and : [{pending : true}, { time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")}}]}, {bought : true}]}, {_id : { $ne : thisEventId }} ]}).toArray();
+            let boughtDatas = await boughtDatabase.collection.find({ $and : [ {$or : [{$and : [{pending : true}, { time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")}}]}, {$and : [{bought : true}, {pending : false}]}]}, {_id : { $ne : thisEventId }} ]}).toArray();
             closeConnection(boughtDatabase.database)
             for (let i = 0; i < boughtDatas.length; i++){
                     ticketAmount[boughtDatas[i].eventId] = ticketAmount[boughtDatas[i].eventId] ? ticketAmount[boughtDatas[i].eventId] : {};
@@ -30,6 +30,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is 
             for (let i = 0; i < eventDatas.tickets.length; i++){
                 for (let j = 0; j < ticketIds.length; j++){
                     if (eventDatas.tickets[i].id == ticketIds[j].ticketId){
+                        if (eventDatas.tickets[i].seats.length && !ticketIds[j].places.length) return {error : true, errorCode : "036"}
                         for (let n = 0; n < ticketIds[j].places.length; n++){
                             if (eventDatas.tickets[i].seats.length && eventDatas.tickets[i].seats.includes(ticketIds[j].places[n])){
                                 if (pendingPlaces.includes(ticketIds[j].places[n])){

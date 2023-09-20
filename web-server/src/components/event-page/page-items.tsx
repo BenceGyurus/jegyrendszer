@@ -1,7 +1,9 @@
+import { useState } from "react";
 import "../../css/eventPage.css";
 import Brand from "../brand/embed-brand.component";
 import Map from "../map/map.component";
 import OpenMapLink from "../openMap/openMap.component";
+import Share from "../share/share.component";
 
 type typeOfMedia = {
     apple_music? : string,
@@ -29,17 +31,39 @@ type typeOfPageElemens = {
 }
 
 
+
+
 const TicketPageItems = ({title, description, date, image, media, location, position, address}:typeOfPageElemens)=>{
+
+    const [months, setMonths] = useState(["JANUÁR", "FEBRUÁR", "MÁRCIUS", "ÁPRILIS", "MÁJUS", "JÚNUIS", "JÚLIUS", "AUGUSZTUS", "SZEPTEMBER", "OKTÓBER", "NOVEMBER", "DECEMBER"]);
+
+    const scroll = ()=>{
+        const element:any = document?.getElementById('tickets');
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+            });
+    }
+    }
+
     return (
         <div>
             <div className = "event-page-title-div">
             <h1 className = "event-page-title">{title}</h1>
+            <span className = "date-of-event">
+                {new Date(date).getFullYear()}. { months[new Date(date).getMonth()]} {new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()}. {new Date(date).getHours() < 10 ? `0${new Date(date).getHours()}` : new Date(date).getHours()}:{new Date(date).getMinutes() < 10 ? `0${new Date(date).getMinutes()}` : new Date(date).getMinutes()}
+            </span>
             </div>
             <div style = {{backgroundImage : `url(${image})`}} className = "event-page-image-div">
             {window.innerWidth >= 700 ? <div className = "image-gradient-top"></div> : ""}
             <div className = "image-gradient-bottom"></div>
             </div>
-            <a className = "buy-ticket-button" href = "#tickets">Jegyvásárlás</a>
+            <Share />
+            <button className="buy-ticket-button" onClick={e=>scroll()}>
+            Jegyvásárlás
+            </button>
             <p className = "event-page-description">{description}</p>
             {media.apple_music || media.spotify || media.facebook || media.instagram || media.youtube ?  <div className = "user-side-media">
                 <div className = "user-side-media-elements">
@@ -63,9 +87,6 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
             <div className = "event-map-div">
                 <div className = "event-location-and-date">
                 <div className="event-location-name">
-                    <span>
-                    {new Date(date).getFullYear()}.{new Date(date).getMonth()+1 < 10 ? `0${new Date(date).getMonth()+1}` : new Date(date).getMonth()+1}.{new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()}. {new Date(date).getHours() < 10 ? `0${new Date(date).getHours()}` : new Date(date).getHours()}:{new Date(date).getMinutes() < 10 ? `0${new Date(date).getMinutes()}` : new Date(date).getMinutes()}
-                    </span>
                     <p>
                     <span className = "location-icon"><i style={{fontSize : 25}} className="fas fa-map-marker-alt"></i></span>
                         <OpenMapLink address={address} text={location} className = "location-name-map-link" />

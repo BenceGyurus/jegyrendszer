@@ -27,7 +27,7 @@ const getEventDatas = async (eventId)=>{
             for (let j = 0; j < boughtDatas[i].tickets.length; j++){
                 for (let k = 0; k < eventDatas.tickets.length; k++){
                     if (eventDatas.tickets[k].id == boughtDatas[i].tickets[j].ticketId && eventDatas.tickets[k].seats.length){
-                        boughtDatas[i].bought ? eventDatas.tickets[k].boughtPlaces.push(...boughtDatas[i].tickets[j].places) : boughtDatas[i].pending ? eventDatas.tickets[k].pendingPlaces.push(...boughtDatas[i].tickets[j].places) : false;
+                        boughtDatas && boughtDatas[i].bought && boughtDatas[i].tickets && boughtDatas[i].tickets[j] && boughtDatas[i].tickets[j] && boughtDatas[i].tickets[j].places && boughtDatas[i].tickets[j].places.length ? eventDatas.tickets[k].boughtPlaces.push(...boughtDatas[i].tickets[j].places) : boughtDatas[i].pending ? eventDatas.tickets[k].pendingPlaces.push(...boughtDatas[i].tickets[j].places) : false;
                     }
                     if (boughtDatas[i].tickets[j].ticketId == eventDatas.tickets[k].id){
                         eventDatas.tickets[k].numberOfFreeTickets-=boughtDatas[i].tickets[j].amount

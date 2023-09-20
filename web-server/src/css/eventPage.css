@@ -1,12 +1,16 @@
+.mainDiv{
+  overflow-x: hidden;
+}
+
 .event-page-image-div{
-    width: 100%;
+    width: 105%;
     height: calc(100vh - 80px);
     position: relative;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    margin: 0;
     padding: 0;
+    position: relative;
 }
 
 .event-map{
@@ -45,6 +49,16 @@
   display: inline !important;
   font-size: 18px !important;
   text-align: left !important;
+}
+
+.date-of-event{
+  display: flex;
+  text-align: center;
+  width: 100%;
+  margin: 0px auto;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
 }
 
 
@@ -89,12 +103,12 @@
 .image-gradient-bottom::after {
     display: block;
     position: absolute;
-    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.0) 0%, rgba(0, 0, 0, 0.7) 100%);
-    top: 50%;
-    height: 50%;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.0) 0%, rgba(0, 0, 0, 0.93) 62%);
+    top: 20vh;
+    height: calc(80vh - 80px);
     width: 100%;
     content: '';
-    z-index: 0;
+    z-index: 10;
     margin: 0px;
     padding: 0px;
   }
@@ -113,14 +127,48 @@
     padding: 0;
   }
 
+  .event-page-title{
+    font-size: 2em;
+    margin: 10px auto;
+    font-weight: bold;
+    z-index: 30;
+    color: white;
+    padding: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .event-page-title-div{
+    position: absolute;
+    bottom: 2%;
+    z-index: 30;
+    width: 75%;
+    left: 12.5%;
+  }
+
   @media screen and (min-width: 900px) {
+      .event-page-image-div{
+        width: 100%;
+        height: calc(100vh - 80px);
+        position: relative;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        margin: 0;
+        padding: 0;
+      }
         .event-page-title-div{
             position: absolute;
             top: 10%;
             margin: 20px;
+            left: 10px
             
         }
+        .image-gradient-bottom::after{
+          background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0, rgba(0, 0, 0, 0.76) 100%);
+        }
         .image-gradient-top::after{
+          background-image: linear-gradient(to top, rgba(255, 255, 255, 0) 0, rgba(0, 0, 0, 0.76) 100%);
             height: 25%;
             z-index: 1;
         }
@@ -138,29 +186,22 @@
         .user-side-media-elements{
           width : max-content !important;
         }
+        .event-page-title{
+          font-size: 3.0em;
+          width: max-content;
+          margin: 30px 15px 0px 15px;
+          max-width: fit-content;
+          text-align: left;
+      }
+      .date-of-event{
+        display: inline;
+        position: absolute;
+        top: 10px;
+        left: -37%;
+      }
   }
 
-  @media screen and (min-width: 288px ) {
-    .event-page-title{
-        font-size: 3.4em;
-    }
-  }
 
-  .event-page-title{
-    font-size: 2.5em;
-    margin: 30px 15px 0px 15px;
-    font-weight: bold;
-    z-index: 30;
-    color: black;
-    color: white;
-    padding: 0;
-  }
-
-  .event-page-title-div{
-    position: absolute;
-    bottom: 5%;
-    z-index: 30;
-  }
 .event-page-date{
     margin: 10px;
     margin-top: 0;
@@ -212,4 +253,31 @@
   width: 90%;
   margin: 20px auto;
   text-align: justify;
+}
+
+.buy-ticket-button {
+  background-color: #007BFF;
+  color: #fff;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticket-icon-container {
+  display: inline-block;
+  transition: transform 0.3s;
+}
+
+.buy-ticket-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.buy-ticket-button:hover .ticket-icon-container {
+  transform: translateX(10px); /* Közelebb kerül a gombhoz */
 }

@@ -317,7 +317,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
 
     return (
         <div>
-            { error ? <Notification element = {<Error closeFunction={()=>{setError("")}} message={error} />} /> : ""}
+            <Error setOpen={()=>{setError("")}} message={error} open = {error != ""} />
             {succ ? <Notification element={<Success closeFunction={()=>{setSucc("")}} message = {succ} />} /> : ""}
             <div className = "back-button-locate-div">
                 <BackButton url = "/admin/termek" />

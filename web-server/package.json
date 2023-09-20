@@ -34,11 +34,13 @@
     "install": "^0.13.0",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
+    "qrcode.react": "^3.1.0",
     "randomcolor": "^0.6.2",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
+    "react-facebook": "^9.0.12",
     "react-json-to-csv": "^1.2.0",
     "react-leaflet": "^4.2.1",
     "react-leaflet-draw": "^0.20.4",
@@ -47,8 +49,12 @@
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.8.1",
     "react-scripts": "^5.0.1",
+    "react-share": "^4.4.1",
     "react-tooltip": "^5.20.0",
     "serve": "^14.2.0",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
+    "socketio": "^1.0.0",
     "styled-components": "^5.3.11",
     "typescript": "^4.9.5",
     "uuidv4": "^6.2.13",
@@ -82,6 +88,7 @@
   "devDependencies": {
     "@types/draft-js": "^0.11.12",
     "@types/leaflet": "^1.9.3",
-    "@types/react-json-to-csv": "^1.2.0"
+    "@types/react-json-to-csv": "^1.2.0",
+    "@types/socket.io-client": "^3.0.0"
   }
 }

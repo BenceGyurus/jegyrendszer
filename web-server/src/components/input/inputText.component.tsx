@@ -12,11 +12,13 @@ type typeOfInputTextParams = {
     params? : Array<any>,
     disabled? : boolean,
     info? : { image? : string, text? : string},
-    ref? : any
+    ref? : any,
+    money? : boolean,
+    website? : boolean
 }
 
 
-const InputText = ({ title,onChangeFunction,value,params, disabled,info,ref }:typeOfInputTextParams)=>{
+const InputText = ({ title,onChangeFunction,value,params, disabled,info,ref, website, money }:typeOfInputTextParams)=>{
     const inputRef:any = useRef(null);
     let id = uuid();
 
@@ -54,7 +56,7 @@ const InputText = ({ title,onChangeFunction,value,params, disabled,info,ref }:ty
       <div className="input-container">
         <div ref = {ref ? ref : null} >
             <label htmlFor={id} className = "inputLabel">{title}</label>
-            <Input placeholder={title} size = "large" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
+            <Input placeholder={title} addonAfter = {money ? "Ft" : ""} addonBefore = {website ? "wwww." : ""} size = "large" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
             <Tooltip title={info.text} zIndex={9999999}>
               <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
             </Tooltip> : ""

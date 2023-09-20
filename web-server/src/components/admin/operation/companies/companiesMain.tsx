@@ -52,7 +52,7 @@ const CompaniesMain = ()=>{
 
     return (
         <div>
-            {error ? <Notification element={<Error closeFunction={()=>{setError("")}}  message={error}/>} /> : ""}
+            <Error  open = {error != ""} setOpen={()=>{setError("")}}  message={error}/>
             <h1>Vállalatok</h1>
             {addNew || editCompany._id ? <AddCompany nameOfCompany={editCompany.name} tax={editCompany.tax} id={editCompany._id} closeWindowFunction={()=>{setAddNew(false); setEditCompany({name : "", tax : "", _id : ""})}} errorFunction = {setError} updateFunction={getCompanies} /> : ""}
             {companies.length ? <CompaniesList companies={companies} editFunction={editFunction} deleteFunction={deleteCompanyFunction} /> : <Loader />}

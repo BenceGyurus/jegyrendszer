@@ -1,5 +1,4 @@
 import "../../css/header.css";
-import { v4 as uuid } from 'uuid';
 
 type typeOfMenu = {
     title : string,
@@ -10,18 +9,14 @@ type typeOfHeaderParams = {
     listOfNavMenu? : Array<typeOfMenu> 
 }
 
-const header = ( {listOfNavMenu}:typeOfHeaderParams )=>{
-    return (
+const Header = ( {listOfNavMenu}:typeOfHeaderParams )=>{
 
-<header>
-<div className="header-container">
-  <a href="/"><img src="/images/logo.png" alt="agora-logo" className = "logo" /></a>
-  <nav>
-  <ul className="nav">
-            </ul>
-  </nav>
-</div>
-</header>
+    return (
+    <header>
+        <div className="header-container">
+        <a href="/"><img src="/images/logo.png" alt="agora-logo" className = "logo" /></a>
+        </div>
+    </header>
 
     
       
@@ -30,4 +25,4 @@ const header = ( {listOfNavMenu}:typeOfHeaderParams )=>{
 
 /*<img src="/images/logo.png" alt="agora-logo" id = "logo" />*/
 
-export default header;
+export default Header;

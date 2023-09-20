@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import drawSeat from './drawSeat';
+import Loader from '../loader/loader.component';
 
 
 type typeOfSeatPostions = {
@@ -8,6 +9,7 @@ type typeOfSeatPostions = {
   isAvailable : boolean,
 
 }
+
 
 type typeOfPlaces = {
   background : {isImage : boolean, name : "string"},
@@ -51,14 +53,16 @@ type typeOfSeatVisualizationParams = {
     marginLeft : number,
     tickets : Array<typeOfAmountTicket>,
     selectedSeats : Array<string>,
-    selectFunction : Function
+    selectFunction : Function,
+    sizeOfScale? : number
 }
 
 
-const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, stage, marginTop, marginLeft, tickets, selectedSeats, selectFunction}:typeOfSeatVisualizationParams) => {
+const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, stage, marginTop, marginLeft, tickets, selectedSeats, selectFunction, sizeOfScale}:typeOfSeatVisualizationParams) => {
   const canvasRef = React.useRef(null);
-  stage.x += marginLeft;
-  stage.y += marginTop/2;
+
+  const [progress, setProgress] = useState(false);
+  const [scale, setScale] = useState(sizeOfScale ? sizeOfScale : 1);
 
   const render = ()=>{
 
@@ -66,18 +70,18 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
     const ctx = canvas.getContext('2d');
 
     const drawStage = () => {
-      const gradient = ctx.createLinearGradient(stage.x, stage.y, stage.x, stage.y + stage.height);
+      const gradient = ctx.createLinearGradient(stage.x*scale, stage.y*scale, stage.x*scale, stage.y*scale + stage.height);
       gradient.addColorStop(0, '#212121'); // Darker color at the top
       gradient.addColorStop(1, '#424242'); // Lighter color at the bottom
 
       const cornerRadius = 10; // Adjust the corner radius to control the roundness of corners
 
       ctx.beginPath();
-      ctx.moveTo(stage.x + cornerRadius, stage.y);
-      ctx.arcTo(stage.x + stage.width, stage.y, stage.x + stage.width, stage.y + cornerRadius, cornerRadius);
-      ctx.arcTo(stage.x + stage.width, stage.y + stage.height, stage.x + stage.width - cornerRadius, stage.y + stage.height, cornerRadius);
-      ctx.arcTo(stage.x, stage.y + stage.height, stage.x, stage.y + stage.height - cornerRadius, cornerRadius);
-      ctx.arcTo(stage.x, stage.y, stage.x + cornerRadius, stage.y, cornerRadius);
+      ctx.moveTo(stage.x*scale + cornerRadius, stage.y*scale);
+      ctx.arcTo(stage.x*scale + stage.width, stage.y*scale, stage.x*scale + stage.width, stage.y*scale + cornerRadius, cornerRadius);
+      ctx.arcTo(stage.x*scale + stage.width, stage.y*scale + stage.height, stage.x*scale + stage.width - cornerRadius, stage.y*scale + stage.height, cornerRadius);
+      ctx.arcTo(stage.x*scale, stage.y*scale + stage.height, stage.x*scale, stage.y*scale + stage.height - cornerRadius, cornerRadius);
+      ctx.arcTo(stage.x*scale, stage.y*scale, stage.x*scale + cornerRadius, stage.y*scale, cornerRadius);
       ctx.closePath();
       ctx.fillStyle = gradient; // Gradient fill
       ctx.fill();
@@ -92,12 +96,11 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
     ctx.clearRect(0, 0, sizeOfArea.width, sizeOfArea.height);
     tickets.forEach(ticket=>{
       ticket.seats.forEach(place=>{
-        seatPositions.forEach((seat:typeOfSeat) => {
           //const isSelected = selectedSeats.some((selectedSeat:any) => selectedSeat.x === seat.x && selectedSeat.y === seat.y);
-          if (seat.id == place){
-            drawSeat(seat.posX+marginLeft, seat.posY+marginTop, !ticket.boughtPlaces.includes(seat.id), selectedSeats.includes(seat.id) , ticket.pendingPlaces.includes(seat.id), ticket.amount <= ticket.selected, ctx, seatSize, colorOfSeat)
+          let seat = seatPositions.find(pos => pos && pos.id == place);
+          if (seat && seat.id == place){
+            drawSeat((seat.posX)*scale+marginLeft, seat.posY*scale+marginTop, !ticket.boughtPlaces.includes(seat.id), selectedSeats.includes(seat.id) , ticket.pendingPlaces.includes(seat.id), ticket.amount <= ticket.selected, ctx, seatSize, colorOfSeat)
           }
-        });
       })
     });
   };
@@ -111,19 +114,18 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
 
 
   const handleSeatClick = (x:number, y:number) => {
-    console.log(x,y);
-    const clickedSeat = seatPositions.find((seat:any) => seat.posX+marginLeft <= x && x <= seat.posX+seatSize+marginLeft && seat.posY+marginTop <= y && y <= seat.posY+seatSize+marginTop);
-    console.log(clickedSeat);
+    setProgress(true);
+    const clickedSeat = seatPositions.find((seat:any) => seat && seat.posX*scale+marginLeft <= x && x <= seat.posX*scale+seatSize+marginLeft && seat.posY*scale+marginTop <= y && y <= seat.posY*scale+seatSize+marginTop);
     if (clickedSeat && clickedSeat.id) {
-      console.log(clickedSeat.id);
       selectFunction(clickedSeat.id);
       //setSelectedSeats((prevSelectedSeats:any) => [...prevSelectedSeats, clickedSeat]);
     }
+    setProgress(false);
     render();
     
   };
 
-  return <canvas ref={canvasRef} width={sizeOfArea.width+2*marginLeft} height={sizeOfArea.height+2*marginTop} onClick={(e) => handleSeatClick(e.nativeEvent.offsetX, e.nativeEvent.offsetY)} />;
+  return !progress ? <canvas ref={canvasRef} width={sizeOfArea.width+2*marginLeft} height={sizeOfArea.height+2*marginTop} onClick={(e) => handleSeatClick(e.nativeEvent.offsetX, e.nativeEvent.offsetY)} /> : <div style={{width : sizeOfArea.width+2*marginLeft, height : sizeOfArea.height+2*marginTop}}><Loader /></div>;
 };
 
 export default SeatVisualization;

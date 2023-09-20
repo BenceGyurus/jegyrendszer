@@ -7,7 +7,7 @@ const databaseNames = JSON.parse(fs.readFileSync(`${__dirname}/database.json`));
 class Functions{
     static getBrowerDatas(req){return browser(req.headers['user-agent'])}
     static genrateToken(){return uuid.v4();}
-    static getIp(req){console.log(req.headers['x-forwarded-for']); return req.headers['x-forwarded-for'] || req.socket.remoteAddress;}
+    static getIp(req){try{return req.headers['x-forwarded-for'] || req.socket.remoteAddress;}catch{try{return req.handshake.headers['x-forwarded-for'] || req.handshake.address.address;}catch{return ""}}}
     static parseBody(body){try{return JSON.parse(Object.keys(body)[0]);}catch{return body;}}
     static encryption(text){
         let newText = "";
@@ -22,6 +22,18 @@ class Functions{
     
         }
     }
+    static parseUserAgent(userAgent) {
+        const osRegex = /(\bAndroid\b|\biPhone OS\b|\biPad\b|\bWindows NT\b|\bMac OS X\b|\bLinux\b)/i;
+        const browserRegex = /(\bChrome\b|\bSafari\b|\bFirefox\b|\bEdge\b|\bOpera\b)/i;
+        
+        const osMatch = userAgent.match(osRegex);
+        const browserMatch = userAgent.match(browserRegex);
+        
+        const os = osMatch ? osMatch[0] : 'Unknown OS';
+        const browser = browserMatch ? browserMatch[0] : 'Unknown Browser';
+        
+        return { os, browser };
+      }
     static merge_Access(access_List){
         try{
             let returnList = {};

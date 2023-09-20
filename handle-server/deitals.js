@@ -5,8 +5,16 @@ async function otherData(req,token){
     let sendData = {};
     if (req){
         sendData.ip = getIp(req);
-        sendData.browserData = getBrowerDatas(req);
-        sendData.rawHeaders = req.rawHeaders;
+        try{
+            sendData.browserData = getBrowerDatas(req);
+        }catch{
+            console.log("There is no browser data");
+        }
+        try{
+            sendData.rawHeaders = req.rawHeaders;
+        }catch{
+            console.log("There is no rawheader")
+        }
         sendData.objectTime = new Date();
         sendData.timeInString = new Date().toJSON();
         sendData.timeInMil = new Date().getTime();

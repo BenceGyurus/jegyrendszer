@@ -26,3 +26,19 @@
     width: max-content;
     margin: 20px auto;
 }
+
+.connect-to-monitor-icon{
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    cursor: pointer;
+}
+
+.disconnected{
+    color : red !important;
+}
+
+.connected{
+    color : green !important;
+}

@@ -168,6 +168,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [endOfTheEvent, setEndOfTheEvent]:[string, Function] = useState(end ? end : "");
     const [wardrobe, setWardrobe]:[boolean, Function] = useState(isWardrobe ? isWardrobe : false);
     const [soldTickets, setSoldTickets]:[any, Function] = useState();
+    const [timeLine, setTimeLine]:[boolean, Function] = useState(false);
     const titleRef:any = useRef(null);
 
     const getTickets = ()=>{
@@ -316,7 +317,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
         .then(async (data)=>{
             if (data.datas){
-                <Error message={(await data.datas).message} />
+                //
             }
             else if (data.id && !id){
                 window.location.pathname += `/${data.id}`;
@@ -474,7 +475,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
-            {versions && versions.length ? <TimeLine data = {versions} /> : ""}
+            {versions && versions.length ? <TimeLine setTimeLine={()=>{setTimeLine(!timeLine)}} timeLine = {timeLine} data = {versions} /> : ""}
             <LoadingButton loading = {isLoading} onClick = {save} style={{margin : "10px auto", display : "block"}} variant="outlined">
                 Mentés
             </LoadingButton>

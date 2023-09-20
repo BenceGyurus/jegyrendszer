@@ -3,6 +3,7 @@ const Database = require("./mongo/mongo.js");
 const { ObjectId } = require('mongodb');
 const getTicketByReadableId = require('./getTicketByReadableId.js');
 const fs = require("fs");
+const createTicket = require('./ticket/createPdfTicket.js');
 
 const closeConnection = (database)=>{
   setTimeout(()=>{
@@ -57,35 +58,8 @@ const GenerateTicket = async (ticketsIds)=>{
       if (ticketData){
         eventData = await getTicketByReadableId(ticketData.eventId);
         customerData = !eventData.local ? await saleDatabase.collection.findOne({_id : ObjectId(ticketData.orderId)}) : false;
-        data = JSON.stringify({
-          id : String(ticketData._id),
-          email : customerData ? customerData.mail : false,
-          name : customerData ? customerData.name : false,
-          location : eventData.location,
-          start : createDateToJson(eventData.dateOfEvent),
-          end : createDateToJson(eventData.end_Of_The_Event),
-          open : createDateToJson(eventData.gate_Opening),
-          wardrobe : eventData.wardrobe,
-          price : ticketData.price,
-          seat : ticketData.seatName,
-          title : eventData.name,
-          local : ticketData.local,
-          nameOfTicket : ticketData.nameOfTicket,
-          email_body : ""
-        });
-        let config = {
-          method: 'post',
-          maxBodyLength: Infinity,
-          url: `${sysConfig["EMAIL_SERVER"]}/createCode`,
-          headers: { 
-              'Content-Type': 'application/json'
-          },
-          data : data,
-          responseType: 'stream'
-        };
-        response = await axios.request(config)
-        console.log(data);
-        await saveFile(response);
+        
+        fs.writeFileSync(`${__dirname}/${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`, await createTicket(eventData.name, ticketData.nameOfTicket, ticketData.price, String(ticketData._id), eventData.location, createDateToJson(eventData.dateOfEvent), createDateToJson(eventData.end_Of_The_Event), createDateToJson(eventData.gate_Opening), ticketData.seatName, eventData.wardrobe));
         pdfs.push(`${String(ticketData._id)}.pdf`);
 
       }

@@ -73,7 +73,7 @@ const EditProfileMain = ()=>{
         <div className="edit-profile-container">
             
             {edit ? <div className = "natification-div"><Success message={edit} closeFunction={()=>{setEdit("")}} /></div> : ""}
-            {error ? <div className = "natification-div"><Error message={error} closeFunction={()=>{setError("")}} /></div> : ""}
+            <Error message={error} setOpen={()=>{setError("")}} open = {error != ""} />
             <h1>
                 Profil szerkesztése
             </h1>

@@ -7,7 +7,6 @@ const Functions = require("./functions.js");
 const control_Token = require("./control-token.js");
 const mongodb = require("mongodb");
 const Topology = require("./databasesTopology.js");
-module.exports = app;
 const handleError = require("./handleError.js");
 const multer = require('multer');
 const Jimp = require('jimp');
@@ -46,10 +45,11 @@ const NodeCache = require('node-cache');
 const { type, version } = require("os");
 const getContributors = require("./getContributorsOfEvent.js");
 const SimplePayPayment = require("./simple-pay-payment.js");
-assert = require('assert');
 const { collectDefaultMetrics, register } = require('prom-client');
 collectDefaultMetrics({ timeout: 5000 });
 const Redis = require('ioredis');
+const setStatus = require("./buy-ticket.js");
+const shortid = require('shortid');
 // const redis = new Redis({port: 6379, host: 'jegyrendszer-redis-headless', username: 'default', password: process.env.REDIS_PASS, db: 0});
 const redis = new Redis();
 const readFromRedisCache = async (key) => {
@@ -57,6 +57,7 @@ const readFromRedisCache = async (key) => {
         return result;
     });
 }
+
 
 const Cache = new NodeCache();
 
@@ -162,6 +163,7 @@ app.get("/api/v1/event/:id", async (req,res)=>{
     let id = req?.params?.id;
     if(id == undefined) return handleError(logger, "400", res);
     const cachedData = await readFromRedisCache(req.params.id);
+    console.log(cachedData);
     // const cachedData = Cache.get(req.params.id);
     if (cachedData) return res.send(JSON.parse(cachedData));
     let event = (await getTicketByReadableId(req.params.id));
@@ -169,7 +171,7 @@ app.get("/api/v1/event/:id", async (req,res)=>{
     let cacheTime = getTime("CACHE_TIME")
     if (event && eventDatas && req.params.id) {
         redis.set(req.params.id, JSON.stringify(eventDatas));
-        redis.expire(req.params.id, cacheTime / 20)
+        redis.expire(req.params.id, cacheTime / 1000)
     }
     // if (event && eventDatas && req.params.id) Cache.set(req.params.id, eventDatas, cacheTime/1000);
     event ? res.send(eventDatas) : handleError(logger, "014", res);
@@ -1414,6 +1416,7 @@ app.post("/api/v1/cancel-local-transaction/:id",(req,res,next)=>parseBodyMiddlee
 
 app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object" && req.body.token){
+        console.log(req.body.datas);
         let error = false;
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
@@ -1592,7 +1595,7 @@ app.post("/api/v1/print-ticket/:id", (req,res,next)=>parseBodyMiddleeware(req,ne
         if (access && access.includes("local-sale")){
             let objectId;
             try {
-            let objectId = ObjectId(req.params.id);
+                objectId = ObjectId(req.params.id);
             }catch{
                 console.log("ObjectId couldnt be generated");
             }
@@ -1751,25 +1754,162 @@ app.post("/api/v1/edit-mail", (req,res,next)=>parseBodyMiddleeware(req,next), as
     handleError(logger, "004", res);
 });
 
-app.use((req, res)=>{
-    if (req.method === "GET"){
-    imageName = req.url.split("/")[req.url.split("/").length-1];
-    try{
-        res.sendFile(`${__dirname}/uploads/${imageName}`);
+//MONITOR
+
+app.post("/api/v1/monitors", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body === TypeOfBody && req.body.token){
+            let access = await control_Token(req.body.token, req);
+            if (access && access.includes("monitor")){
+                let userDatas =  await GetUserDatas(req.body.token);
+                const { collection, database } = new Database("monitor");
+                let result = await collection.find( { "otherDatas.ip" : Functions.getIp(req), connected : false }, { projection : { socketId : 1, time : 1, connected : 1, browser : 1 , os : 1} }  ).toArray();
+                closeConnection(database);
+                return result ? res.send( { monitors : result, error : false, delay : getTime("MONITOR_DELAY") } ) : res.send( { error : true } );
+            }
+            else{
+                return handleError(logger, "004", res);
+            }
     }
-    catch{
-        res.send({error : true})
-    }
-    }
+    return handleError(logger, "400", req);
 });
+
+
+//SIMPLE PAY RESPONSE
+app.use(express.json());
+
+app.post("/ipn",(req,res)=>{
+    const body = req.body;
+    if (body.orderRef && body.status)
+    setStatus(body.orderRef, body.status)
+})
+
+
+const server = require("http").createServer(app);
 
 if (controlConnection()){
     console.log(`The connection is successfully, the app is listening on PORT ${process.env.PORT || 3001}`)
-    app.listen(process.env.PORT || 3001);
+    server.listen(process.env.PORT || 3001);
 }
 else{
-    console.log("Couldn't connect to the database")
+    console.log("Couldn't connect to the database");
+    return;
 }
+
+const io = require("socket.io")(server);
+
+
+io.on("connection",(socket)=>{
+
+    socket.on("monitor-connection", async (payload)=>{
+        const { database, collection } = new Database("monitor");
+        let {os, browser} = Functions.parseUserAgent(socket.request.headers['user-agent']);
+        result = await collection.insertOne({time : new Date().getTime(), socketId : socket.id, otherDatas : await otherData(socket), browser : browser, os : os , connected : false});
+        //let result = await collection.updateOne({ id : payload.token, used : false, disconnected : false }, { $set : { used : true, connected : new Date().getTime(), socketId : socket.id} });
+        closeConnection(database);
+        if (result.insertedId){
+            socket.join(`${socket.id}-M`);
+            socket.emit("connection-status", {error : result.insertedId == "", id : result.insertedId, connected : result.insertedId != "", connectedMonitor : false});
+            socket.emit("ads", {ads : true, adsList : []});
+        }
+    });
+
+    socket.on("join-to-monitor", async (payload)=>{
+        console.log(payload)
+        if (payload && payload.token){
+            let access = await control_Token(payload.token, socket);
+            if (access && access.includes("monitor")){
+            const {collection, database} = new Database("monitor");
+            const monitor = await collection.updateOne({ $and : [{socketId : payload.id}, {connected : false} ]}, {$set : {connected : socket.id}});
+            await socket.join(`${monitor.socketId}-M`);
+            message = {connected : monitor.modifiedCount > 0, connectedMonitor : true, error : monitor.modifiedCount === 0, id : monitor.acknowledged ? payload.id : ""};
+            io.to(`${monitor.socketId}`).emit( "connection-status" ,message);
+            socket.emit("connection-status", message);
+            console.log("message sent");
+            closeConnection(database);
+            }
+        }
+    });
+
+    socket.on("display-event", async (payload)=>{
+        if (payload && payload.token){
+            const { collection, database } = new Database("monitor");
+            let monitorDatas = await collection.findOne( { connected : socket.id } );
+            let event = (await getTicketByReadableId(payload.eventId));
+            let eventDatas = {eventId : event.readable_event_name, venueId : event.venue};
+            if (monitorDatas && monitorDatas.socketId){
+                io.to(monitorDatas.socketId).emit( "event-display",  eventDatas);
+                console.log("event sent")
+                //socket.emit( "event-display" ,{ error : false, status : true, message : "Esemény megjelenítve." } );
+            }
+            else{
+                //io.to(`${monitorDatas.socketId}`).emit("event-display" , { error : true, message : "Esemény megjelenítése sikertelen." });
+                socket.emit( "event-display" ,{ error : false, status : true, message : "Esemény megjelenítve." } );
+            }
+            closeConnection(database);
+        }
+    });
+
+
+    //"otherDatas.ip" : Functions.getIp(req)
+
+    socket.on("tickets", async (payload)=>{
+        if (payload && payload.token && payload.tickets){
+            let access = await control_Token(payload.token, socket);
+            if (access && access.includes("monitor")){
+                const { collection, database } = new Database("monitor");
+                let monitorDatas = await collection.findOne( { connected : socket.id } );
+                //console.log(monitorDatas.socketId);
+                if (monitorDatas && monitorDatas.socketId){
+                    let venue = await getTicketByReadableId(payload.eventId)
+                    io.to(monitorDatas.socketId).emit("amount-tickets", { tickets : payload.tickets, eventId : payload.eventId, venueId : venue.venue });
+                    io.to(monitorDatas.connected).emit("tickets-sent", {sent : true});
+                }
+                closeConnection(database);
+            }
+        }
+    });
+
+    socket.on("stop-ticket-selecting", async (payload)=>{
+        if (payload && payload.token){
+            let access = await control_Token(payload.token, socket);
+            if (access && access.includes("monitor")){
+                const { collection, database } = new Database("monitor");
+                let monitorDatas = await collection.findOne( { connected : socket.id } );
+                //console.log(monitorDatas.socketId);
+                if (monitorDatas && monitorDatas.socketId){
+                    io.to(monitorDatas.socketId).emit("stop-ticket-selecting", {});
+                }
+                closeConnection(database);
+            }
+        }
+    });
+
+    socket.on("disconnect", async ()=>{
+        console.log("disconnected");
+        const {database, collection} = new Database("monitor");
+        datas = await collection.findOne({ socketId : socket.id });
+        if (datas && datas.connected) io.to(datas.connected).emit("connection-status", {connected : false});
+        datas = await collection.findOne({ connected : socket.id });
+        if (datas && datas.socketId) io.to(datas.socketId).emit("disconnected-user", {});
+        await collection.deleteOne({ socketId : socket.id });
+        await collection.updateOne({ connected : socket.id }, {$set :  { connected : false } });
+        closeConnection(database);
+    });
+});
+
+app.use((req, res, next)=>{
+    console.log(req.url);
+    if (req.method === "GET"){
+    imageName = req.url.split("/")[req.url.split("/").length-1];
+    try{
+        return res.sendFile(`${__dirname}/uploads/${imageName}`);
+    }
+    catch{
+        next();
+    }
+    }
+    next();
+});
 
 // CRONS
 cron.schedule("0 3 * * *", async () => {
@@ -1778,6 +1918,11 @@ cron.schedule("0 3 * * *", async () => {
     loginTokenDatabase.collection.deleteMany();
     collection.deleteMany();
     closeConnection(loginTokenDatabase.database);
+    closeConnection(database);
+})
+cron.schedule("59 * * * * *", async () => {
+    let {collection, database} = new Database("monitor");
+    console.log(await collection.deleteOne({time : {$lt : new Date().getTime()-(getTime("MONITOR_DELAY")*1.5)}}));
     closeConnection(database);
 })
 cron.schedule("30 3 * * 6", async () => {
@@ -1802,4 +1947,4 @@ cron.schedule("0 3 * * *", async () => {
     closeConnection(database);
     closeConnection(eventsDatabase.database);
     //let orders = DELETABLE_ORDERS
-})
+});

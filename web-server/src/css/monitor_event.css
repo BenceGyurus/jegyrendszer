@@ -1,0 +1,59 @@
+.qr-codes{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: right;
+    position: absolute;
+    top: 80px;
+    right: 10px;
+}
+
+.monitor-event-image-holder{
+    width: 100%;
+    height: calc(100vh - 80px);
+    overflow: hidden;
+    background-repeat: no-repeat;
+    -webkit-background-size: cover;
+    z-index: 100;
+    -moz-background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.monitor-event-image{
+    image-rendering: auto;
+}
+
+.monitor-event-main-holder{
+    overflow: hidden;
+}
+
+.monitor-event-title{
+    position: absolute;
+    bottom: 20px;
+    left: 50px;
+    width: 60%;
+    z-index: 1001;
+    color: black;
+}
+
+.monitor-event-title h1{
+    font-size: 8vh;
+    color: rgba(0,0,0,0.95);
+}
+
+.monitor-event-radius-top{
+    height: 50vh;
+    width: 100%;
+    background-image: linear-gradient(to top, transparent, rgba(255,255,255,0.3));
+}
+
+.monitor-event-radius-bottom{
+    position: absolute;
+    height: 70vh;
+    width: 100%;
+    background-image: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3));
+    bottom: 0;
+}

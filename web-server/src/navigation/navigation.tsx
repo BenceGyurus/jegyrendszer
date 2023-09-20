@@ -23,6 +23,9 @@ import EditAszf from "../components/admin/operation/edit-aszf/edit-aszf.componen
 import EditMail from "../components/admin/operation/edit-mail/edit-mail.component";
 import LocalDiscountMain from "../components/admin/operation/local-discount/local-discount-main.component";
 import AfterBuy from "../components/afterBuy/afterBuy.component";
+import TicketMonitor from "../components/admin/operation/monitor/monitor.component";
+import Monitor from "../components/monitor/monitor.component";
+import Animation3dText from "../components/event-ads-animations/3danimation.component";
 
 
 function Navigation() {
@@ -54,6 +57,9 @@ function Navigation() {
           <Route path = "/admin/edit-email" element = {<AdminPage component = {<EditMail />} />} />
           <Route path = "/admin/helyi-kedvezmenyek" element = {<AdminPage component = {<LocalDiscountMain />} />} />
           <Route path = "/vasarlas/*" element = {<AfterBuy />} />
+          <Route path = "/admin/monitor" element = {<AdminPage component = {<TicketMonitor />} />} />
+          <Route path = "/monitor" element = {<Monitor />} />
+          <Route path = "/test" element = {<Animation3dText text = "test" />} />
         </Routes>
       </BrowserRouter>
     </div>

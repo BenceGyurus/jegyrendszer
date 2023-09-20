@@ -10,6 +10,11 @@ import Notification from "../notification/notification.component";
 import Loader from "../loader/loader.component";
 import TicketSkeleton from "./ticket-skeleton.component";
 import Legend from "./legend.component";
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import Button from '@mui/material/Button';
+import CloseIcon from '@mui/icons-material/Close';
 
 type typeOfTicket = {
     id : string,
@@ -103,6 +108,7 @@ const Page = ({title, background, description, date, id, media, position, locati
     const [ticketsAmount, setTicketsAmount]:[Array<any>, Function] = useState([])
     const [selectedTickets, setSelectedTickets]:[Array<string>, Function] = useState([]);
     const [errorNat, setErrorNat]:[string, Function] = useState("");
+    const [selectNotification, setSelectNotification] = useState(false);
 
 
     useEffect(()=>{
@@ -119,7 +125,6 @@ const Page = ({title, background, description, date, id, media, position, locati
                 let venue = await response.json();
                 if (!venue.error && venue)
                 {      
-                    console.log(venue);
                     setPlaceDatas(venue.venue);
                 }
             }
@@ -128,6 +133,7 @@ const Page = ({title, background, description, date, id, media, position, locati
 
 
     const incrementAmountOfTickets = (id:String)=>{
+        setSelectNotification(true);
         let l = [...ticketsAmount];
         for (let i = 0; i < l.length; i++){
             console.log(l[i].numberOfFreeTickets, l[i].amount);
@@ -166,6 +172,7 @@ const Page = ({title, background, description, date, id, media, position, locati
     }
 
     const selectSeat = (id:string)=>{
+        setSelectNotification(false);
         let lTicketAmount = [...ticketsAmount];
         for (let i = 0; i < lTicketAmount.length; i++){
             if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
@@ -239,15 +246,33 @@ const Page = ({title, background, description, date, id, media, position, locati
         setErrorNat(error[0]);
     }
 
-
     return <div className="event-page-div">
-        {errorNat ? <Notification element={<Error message={errorNat} closeFunction={()=>{setErrorNat("")}} />} /> : ""}
+        <Error message={errorNat} open = {errorNat!=""} setOpen={()=>setErrorNat("")} />
         <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media} position={position} location={location} address={address}/>
-        {ticketsAmount.length ? <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/> : <TicketSkeleton />}
-        <Legend />
-        {placeDatas && placeDatas.seatsDatas && placeDatas.seatsDatas.length && ticketsAmount.length && ticketsAmount ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
+        {ticketsAmount && ticketsAmount.length ? <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/> : <TicketSkeleton />}
+        {placeDatas && placeDatas.seatsDatas && placeDatas.seatsDatas.length ? <Legend /> : ""}
+        {placeDatas && placeDatas.seatsDatas && placeDatas.seatsDatas.length && ticketsAmount && ticketsAmount.length ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
+        <div className = "alert-notification"><Collapse in={selectNotification}>
+        <Alert
+            severity = "info"
+            action={
+                <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                    setSelectNotification(false);
+                }}
+                >
+                <CloseIcon fontSize="inherit" />
+                </IconButton>
+            }
+            sx={{ mb: 2 }}
+            >
+          Válassza ki a helyeket a jegy tükrön!
+        </Alert>
+      </Collapse></div>
         <BuyButton onClickFunction={buy_Ticket} />
     </div>;
 }
-
 export default Page;

@@ -1,11 +1,11 @@
 import postData from "../connection/request";
 import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 import { useState, useEffect } from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faRightFromBracket, faUserAlt, faUserPen} from "@fortawesome/free-solid-svg-icons";
 import "../../css/admin-user.css";
 import StringAvatar from "../avatar/avatar.component";
 import SkeletonUser from "./skeletonUser.component";
+import { Button} from 'antd';
+
 
 const AdminUserComponent = ()=>{
 
@@ -22,15 +22,17 @@ const AdminUserComponent = ()=>{
 
     return (<div className = "admin-user-element-main">
         {userName ? <div className = "admin-user-element">
-        <StringAvatar username = {userName} width = {50} height = {50} />
+        <a href = "/admin/profil"><StringAvatar username = {userName} width = {30} height = {30} /></a>
         <span className = "admin-username">{userName}</span>
-        <div className = "admin-operation-buttons-div">
-        <span className = "admin-operation-button" id = "logout-button" onClick={(e)=>{localStorage.removeItem("long_token");window.location.reload()}}><FontAwesomeIcon icon={faRightFromBracket} /></span>
-        <span className = "admin-operation-button" onClick={(e)=>{window.location.pathname = "/admin/profil"}}><FontAwesomeIcon icon = {faUserPen} /></span>
-        </div>
     </div> : <SkeletonUser />}
 </div>);
 
 }
+
+
+/*
+        <div className = "admin-operation-buttons-div">
+        <Button icon = { <i className="fas fa-sign-out-alt"></i> } style={{border : "none", boxShadow : "1px 2px 2px rgba(0,0,0,0.1)", marginTop : 3, fontSize : 13}} onClick={()=>{localStorage.clear(); window.location.pathname = "/"}}>Kijelentkezés</Button>
+        </div>*/
 
 export default AdminUserComponent;

@@ -1,5 +1,7 @@
 const getTime = require("./getTime");
 const Database = require("./mongo/mongo");
+const signWithCryptoJS = require("./simple_signature");
+const axios = require('axios');
 
 const closeConnection = (database)=>{
     try{
@@ -11,49 +13,66 @@ const closeConnection = (database)=>{
     }
 }
 
-const SimplePayPayment = (salt, orderRef, customerDatas, ticketDatas, price)=>{
-    let body = {
-                salt: salt,
-                merchant: process.env.MERCHANT,
-                orderRef: orderRef,
-                currency: 'HUF',
-                customerEmail: customerDatas.mail,
-                language: 'HU',
-                sdkVersion: 'SimplePayV2.1_Payment_PHP_SDK_2.0.7_190701:dd236896400d7463677a82a47f53e36e',
-                methods:[
-                    "CARD"
-                ],
-                total: price,
-                timeout: new Date(new Date().getTime() + getTime("PAYMENT_DELAY")).toISOString(),
-                url: '',
-                invoice: {
-                        name: `${customerDatas.firstname} ${customerDatas.lastname}`,
-                        company: 'hu',
-                        //state: ,
-                        city: customerDatas.city,
-                        zip: customerDatas.postalCode,
-                        address: customerDatas.address,
-                        address2: customerDatas.address2 == 'null' ? null : req.body.datas.customerDatas.address2,
-                        phone: customerDatas.phone
-                    },
-                    items: [
-                        ticketDatas.map(x => {
-                            return {
-                                ref: x.ticketId,
-                                title: x.name,
-                                desc: '',
-                                amount: x.amount,
-                                price: x.unitPrice
-                                }
-                            })
-                        ]
-                    }
-                    /*await axios.post('https://sandbox.simplepay.hu/payment/v2/start', body, {headers: {
+const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, price)=>{
+    return new Promise((resolve, reject)=>{
+
+        let body = {
+            salt: salt,
+            merchant: process.env.MERCHANT,
+            orderRef: orderRef,
+            currency: 'HUF',
+            customerEmail: customerDatas.mail,
+            language: 'HU',
+            sdkVersion: 'SimplePayV2.1_Payment_PHP_SDK_2.0.7_190701:dd236896400d7463677a82a47f53e36e',
+            methods:[
+                "CARD"
+            ],
+            total: price,
+            timeout: new Date(new Date().getTime() + getTime("PAYMENT_DELAY")).toISOString(),
+            url: '',
+            invoice: {
+                    name: `${customerDatas.firstname} ${customerDatas.lastname}`,
+                    company: 'hu',
+                    //state: ,
+                    city: customerDatas.city,
+                    zip: customerDatas.postalCode,
+                    address: customerDatas.address,
+                    address2: customerDatas.address2 == 'null' ? null : req.body.datas.customerDatas.address2,
+                    phone: customerDatas.phone
+                },
+                items: [
+                    ticketDatas.map(x => {
+                        return {
+                            ref: x.ticketId,
+                            title: x.name,
+                            desc: '',
+                            amount: x.amount,
+                            price: x.unitPrice
+                            }
+                        })
+                    ]
+                }
+
+            const sign = signWithCryptoJS(JSON.stringify(body));
+
+            let config = {
+                    method: 'post',
+                    maxBodyLength: Infinity,
+                    url: 'https://sandbox.simplepay.hu/payment/v2/start',
+                    headers: {
                         'Content-type': 'application/json',
-                        'Signature': simplesign(body),
-                    }}).then((simple_res) => {
-                        return res.send({error : !result.acknowledged, paymentUrl: simple_res.body.paymentUrl});
-                    })*/
+                        'Signature': sign,
+                     },
+                     data : body
+                };
+    
+            axios.request('https://sandbox.simplepay.hu/payment/v2/start',config).then((result) => {
+                resolve({paymentUrl: result.body.paymentUrl});
+            })
+            .catch(()=>{
+                reject({error : true, response : result});
+            })
+    })
 
 
     }

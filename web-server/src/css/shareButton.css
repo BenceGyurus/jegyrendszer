@@ -1,0 +1,25 @@
+.share-button{
+    padding: 5px;
+    border: none;
+    outline: none;
+    border-radius: 2%;
+    font-size: 18px;
+    font-weight: 100;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px 0.1px black;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #3ad60f;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 30;
+    margin: 10px;
+}
+
+.share-button-icon{
+    margin: 0 7px 0 2px;
+    color: white !important;
+    fill: white !important;
+}

@@ -122,7 +122,7 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
             <span className = {`typeOfDiscount procent${!typeOfDiscount ? " selected-type" : ""}`} onClick={e=>setTypeOfDiscount(false)}>%</span>
             <span className = {`typeOfDiscount cash${typeOfDiscount ? " selected-type" : ""}`} onClick={e=>setTypeOfDiscount(true)}>Ft</span>
         </div>
-        <InputNumber title = "Kedvezmény mértéke" onChangeFunction={changeAmountOfDiscount} value={amountOfDiscount} />
+        <InputNumber sufix={typeOfDiscount ? "Ft" : "%"} title = "Kedvezmény mértéke" onChangeFunction={changeAmountOfDiscount} value={amountOfDiscount} />
         <Calendar title = "Érvényességi ideje" onChangeFunction={setValidity} value = {validity} />
         <Button onClickFunction={saveFunction} title = "Létrehozás" />
     </div>);

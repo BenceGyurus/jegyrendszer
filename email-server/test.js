@@ -1,8 +1,10 @@
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
-//const qr = require('qrcode');
-const { createCanvas, loadImage } = require('canvas');
 const qr = require('qrcode');
+
+function createDateToString(date) {
+    return `${date.y} ${date.month < 10 ? `0${date.month}` : date.month}. ${date.d < 10 ? `0${date.d}` : date.d}. ${date.h < 10 ? `0${date.h}` : date.h}:${date.m < 10 ? `0${date.m}` : date.m}`;
+}
 
 function autoSplit(text, doc, y, x, lineSize = 20, width = 300) {
     const words = text.split(' ');
@@ -42,6 +44,8 @@ async function createTicket(
 ) {
     const doc = new PDFDocument({ size: 'letter' });
     const buffer = [];
+    const margin = 50; // Adjust this value as needed
+    doc.page.margins = { top: margin, right: margin, bottom: margin, left: margin };
 
     doc.pipe(fs.createWriteStream('ticket.pdf'));
 
@@ -50,7 +54,7 @@ async function createTicket(
     const logoHeight = 100;
     const logoX = (doc.page.width - logoWidth) / 2;
     const logoY = 0//doc.page.height - 100;
-    let x = 100;
+    let x = 50;
     let y = logoY;
 
     const imageBuffer = fs.readFileSync('media/fulllogo.png');
@@ -74,57 +78,50 @@ async function createTicket(
     doc.text(`Vége: ${createDateToString(end)}`, 50, y += 20);
     doc.text(`Kapunyitás: ${createDateToString(gateOpen)}`, 50, y += 20);
 
-    const qrDataURL = await qr.toDataURL(ticket_id, { errorCorrectionLevel: 'L' });
+    const qrBuffer = await qr.toBuffer(ticket_id, { errorCorrectionLevel: 'L' });
 
-// Remove the data URL prefix and convert to a buffer
-    const dataUrlParts = qrDataURL.split(',');
-    const imageData = Buffer.from(dataUrlParts[1], 'base64');
+    // Add the QR code image from the buffer to the PDF document
+    doc.image(qrBuffer, doc.page.width - 200 - 20, logoY + 100, { width: 200, height: 200 });
 
-// Write the buffer to a PNG file
-    fs.writeFileSync('qrCode.png', imageData);
-    const qrImage = fs.readFileSync('qrCode.png');
-    doc.image(qrImage, doc.page.width - 200 - 20, logoY + 100, { width: 200, height: 200 });
+    /* Jegy kódja */
 
-    doc.font('media/fonts/Rubik/static/Rubik-Bold.ttf', 8).text(ticket_id, doc.page.width - 200 - 20 + 40, logoY + 220 - 10);
-
+    doc.font('media/fonts/Rubik/static/Rubik-Bold.ttf', 8).text(ticket_id, doc.page.width - 200 - 20 + 40, logoY + 290 - 10);
     y += 50;
+
+    /* Jegy tájékoztató cím */
 
     const sizeOfUseTicketTitle = 12;
     doc.font('media/fonts/Rubik/static/Rubik-Bold.ttf', sizeOfUseTicketTitle).text('Jegy használata', 50, y);
-    doc.lineWidth(1).moveTo(50 + (sizeOfUseTicketTitle / 1.7) * 'Jegy használata'.length, y + 3).lineTo(doc.page.width - 50, y + 3).stroke();
+    doc.lineWidth(1).moveTo(50 + (sizeOfUseTicketTitle / 1.7) * 'Jegy használata'.length, y + 8).lineTo(doc.page.width - 50, y + 3).stroke();
+
+    /* Jegy tájékoztató*/
 
     y += 30;
     doc.font('media/fonts/Rubik/static/Rubik-Bold.ttf', 8);
-    /*y = autoSplit(
-        'Ez a jegyet hozd el magaddal a rendezvényre nyomtatott vagy digitális formában. Ügyelj arra, hogy a jegyen látható QR kódot és az alatta található azonosítót ne add meg senkinek és ne tedd ki közösségi oldalakra.',
-        doc,
-        y,
-        50,
-        13,
-        doc.page.width - 100
-    );*/
     doc.text('Ez a jegyet hozd el magaddal a rendezvényre nyomtatott vagy digitális formában. Ügyelj arra, hogy a jegyen látható QR kódot és az alatta található azonosítót ne add meg senkinek és ne tedd ki közösségi oldalakra.', x, y);
     y += 30;
+
+    /* Ruhatár */
+
     const wardrobeText = isWardrobe ? 'A helyszínen ruhatár működik' : 'A helyszínen ruhatár nem működik';
-    y = autoSplit(wardrobeText, doc, y, 50, 12, doc.page.width - 100);
+    doc.text(wardrobeText, x ,y,);
+    y+= 30
+
+    /* Általános szerződési feltételek */
 
     doc.font('media/fonts/Rubik/static/Rubik-Light.ttf', 5);
     const aszf = fs.readFileSync('ticketAszf.txt', 'utf-8');
-    autoSplit(aszf, doc, doc.page.height-100, 50, 8, doc.page.width - 100);
+    doc.text(aszf, x, doc.page.height-100);
 
-    doc.addPage();
+
     doc.end();
 
     return buffer;
 }
 
-// Helper function to create a date string
-function createDateToString(date) {
-    return `${date.y} ${date.month}. ${date.d}. ${date.h}:${date.m}`;
-}
 
 let testDatas = {
-    event_title: "Awesome Event",
+    event_title: "Awesome Event hosszabb cim",
     ticket_name: "VIP Ticket",
     ticket_price: 1000,
     ticket_id: "TICKET123",

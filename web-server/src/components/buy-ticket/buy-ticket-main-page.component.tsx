@@ -158,7 +158,7 @@ const BuyTicketMainPage = ()=>{
     }, []);
 
     return <div>
-        {error ? <Notification element={<Error message={error} closeFunction={()=>{setError("")}} />} /> : ""}
+        <Error message={error} setOpen={()=>{setError("")}} open = {error != ""} />
         <div style={{margin : 10}}><BuyingStepper active = {step} /></div>
         { step == 1 ? <div><h1>Adatok megadása</h1>
         <DatasOfCustomer setFirstName={setFirstname} setLastName={setLastname} setPostalCode={setPostCode} setCity={setCity} setAddress={setAddress} setAddress2={setAddress2} setMail={setMail} setPhone={setPhone} setTaxNumber={setTaxNumber} city = {city} firstName={firstname} lastName={lastname} zip = {postCode} tax={taxNumber} mail={mail} phone = {phone} address={address} address2={address2} setInvoiceName={()=>{}} sameInvoiceData={sameInvoiceData} setSameInvoiceData = {setSameInvoiceData} />
