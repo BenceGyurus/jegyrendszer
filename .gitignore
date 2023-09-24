@@ -3,3 +3,4 @@
 .DS_Store
 *.tgz
 seat-detection
+handle-server/.dccache
