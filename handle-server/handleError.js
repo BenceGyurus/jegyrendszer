@@ -16,7 +16,7 @@ const handleError = (logger, errorCode, res, numberOfTries)=>{
         error = {message : "Váratlan hiba történt kérjük próbálja újra később", error : true, type : "error", responseCode : 404};
     }
     error.responseCode ? res.status(error.responseCode) : false; 
-    //logger.log(`Bad request - Error code ${errorCode}: ${error?.message}`)
+    logger.log(`Bad request - Error code ${errorCode}: ${error?.message}`)
     res.send({message : error.message, type : error.type, error : error.type == "error"});
 }
 
