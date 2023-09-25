@@ -50,14 +50,14 @@ collectDefaultMetrics({ timeout: 5000 });
 const Redis = require('ioredis');
 const setStatus = require("./buy-ticket.js");
 const shortid = require('shortid');
-// const redis = new Redis({port: 6379, host: 'jegyrendszer-redis-headless', username: 'default', password: process.env.REDIS_PASS, db: 0});
-const redis = new Redis();
+var redisOptions = {}
+if (process.env.NODE_ENV == 'production') redisOptions = {port: 6379, host: 'jegyrendszer-redis-headless', username: 'default', password: process.env.REDIS_PASS, db: 0};
+const redis = new Redis(redisOptions);
 const readFromRedisCache = async (key) => {
     return await redis.get(key).then((result) => {
         return result;
     });
 }
-
 
 const Cache = new NodeCache();
 
@@ -110,11 +110,14 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 //METRICS & HEALTH
 app.get("/health", (req, res) => {
+    logger.log('AJAJAJAJ');
     return res.send('Up');
 });
-app.get("/metrics", (ctx) => {
-    ctx.headers['content-type'] = register.contentType;
-    ctx.body = register.metrics();
+app.get("/metrics", (req, res) => {
+    res.set('Content-Type', register.contentType);
+    // ctx.headers['content-type'] = register.contentType;
+    // ctx.body = register.metrics();
+    res.end(register.metrics());
 });
 
 //EVENTS
