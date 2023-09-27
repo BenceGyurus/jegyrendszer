@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import drawSeat from './drawSeat';
 import Loader from '../loader/loader.component';
-
+import "../../css/seat-engine.css";
+import { Spin } from 'antd';
 
 type typeOfSeatPostions = {
   x : number,
@@ -54,11 +55,12 @@ type typeOfSeatVisualizationParams = {
     tickets : Array<typeOfAmountTicket>,
     selectedSeats : Array<string>,
     selectFunction : Function,
-    sizeOfScale? : number
+    sizeOfScale? : number,
+    disabled? : boolean
 }
 
 
-const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, stage, marginTop, marginLeft, tickets, selectedSeats, selectFunction, sizeOfScale}:typeOfSeatVisualizationParams) => {
+const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, stage, marginTop, marginLeft, tickets, selectedSeats, selectFunction, sizeOfScale, disabled}:typeOfSeatVisualizationParams) => {
   const canvasRef = React.useRef(null);
 
   const [progress, setProgress] = useState(false);
@@ -94,7 +96,7 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
 
   const drawSeats = () => {
     ctx.clearRect(0, 0, sizeOfArea.width, sizeOfArea.height);
-    tickets.forEach(ticket=>{
+    if (tickets){tickets.forEach(ticket=>{
       ticket.seats.forEach(place=>{
           //const isSelected = selectedSeats.some((selectedSeat:any) => selectedSeat.x === seat.x && selectedSeat.y === seat.y);
           let seat = seatPositions.find(pos => pos && pos.id == place);
@@ -102,7 +104,7 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
             drawSeat((seat.posX)*scale+marginLeft, seat.posY*scale+marginTop, !ticket.boughtPlaces.includes(seat.id), selectedSeats.includes(seat.id) , ticket.pendingPlaces.includes(seat.id), ticket.amount <= ticket.selected, ctx, seatSize, colorOfSeat)
           }
       })
-    });
+    });}
   };
   drawSeats();
   drawStage();
@@ -114,6 +116,7 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
 
 
   const handleSeatClick = (x:number, y:number) => {
+    if (!disabled){
     setProgress(true);
     const clickedSeat = seatPositions.find((seat:any) => seat && seat.posX*scale+marginLeft <= x && x <= seat.posX*scale+seatSize+marginLeft && seat.posY*scale+marginTop <= y && y <= seat.posY*scale+seatSize+marginTop);
     if (clickedSeat && clickedSeat.id) {
@@ -122,10 +125,10 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
     }
     setProgress(false);
     render();
-    
+  }
   };
 
-  return !progress ? <canvas ref={canvasRef} width={sizeOfArea.width+2*marginLeft} height={sizeOfArea.height+2*marginTop} onClick={(e) => handleSeatClick(e.nativeEvent.offsetX, e.nativeEvent.offsetY)} /> : <div style={{width : sizeOfArea.width+2*marginLeft, height : sizeOfArea.height+2*marginTop}}><Loader /></div>;
+  return !progress ? <Spin size='large' spinning={disabled ? disabled : false}><div className = "seat-map-canvas-holder" ><canvas ref={canvasRef} width={sizeOfArea.width+2*marginLeft} height={sizeOfArea.height+2*marginTop} onClick={(e) => handleSeatClick(e.nativeEvent.offsetX, e.nativeEvent.offsetY)} />{ disabled ?  <div className="canvas-overlay"></div> : ""}</div></Spin> : <div style={{width : sizeOfArea.width+2*marginLeft, height : sizeOfArea.height+2*marginTop}}><Loader /></div>;
 };
 
 export default SeatVisualization;

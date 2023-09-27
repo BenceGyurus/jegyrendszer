@@ -1798,7 +1798,12 @@ else{
     return;
 }
 
-const io = require("socket.io")(server);
+const { Server } = require("socket.io");
+
+const io = new Server(server, {
+    pingInterval : 5000,
+    pingTimeout : 5000
+  });
 
 
 io.on("connection",(socket)=>{
@@ -1864,13 +1869,24 @@ io.on("connection",(socket)=>{
                 //console.log(monitorDatas.socketId);
                 if (monitorDatas && monitorDatas.socketId){
                     let venue = await getTicketByReadableId(payload.eventId)
-                    io.to(monitorDatas.socketId).emit("amount-tickets", { tickets : payload.tickets, eventId : payload.eventId, venueId : venue.venue });
+                    io.to(monitorDatas.socketId).emit("amount-tickets", { tickets : payload.tickets, eventId : payload.eventId, venueId : venue.venue , selected : payload.selected });
                     io.to(monitorDatas.connected).emit("tickets-sent", {sent : true});
                 }
                 closeConnection(database);
             }
         }
     });
+
+    socket.on("ticket-selecting-stopped", async (payload)=>{
+        console.log(payload);
+        const { collection, database } = new Database("monitor");
+                let monitorDatas = await collection.findOne( { socketId : socket.id } );
+                //console.log(monitorDatas.socketId);
+                if (monitorDatas && monitorDatas.socketId){
+                    io.to(monitorDatas.connected).emit("stop-ticket-selecting", {selected : payload.selected, tickets: payload.tickets});
+                }
+                closeConnection(database);
+    })
 
     socket.on("stop-ticket-selecting", async (payload)=>{
         if (payload && payload.token){

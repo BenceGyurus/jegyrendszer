@@ -42,3 +42,8 @@
 .connected{
     color : green !important;
 }
+
+.user-select-button{
+    margin: 20px auto;
+    display: block;
+}

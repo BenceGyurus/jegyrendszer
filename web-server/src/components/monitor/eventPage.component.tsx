@@ -27,7 +27,8 @@ type typeOfEventPageParams = {
 const EventPage = ({ event }:typeOfEventPageParams)=>{
     return (<div className = "monitor-event-main-holder">
         <div>
-            <div className ="monitor-event-image-holder" style={{backgroundImage : `url("${event.background}")`}}><div className = "monitor-event-radius-top"></div><div className = "monitor-event-radius-bottom"></div></div>
+            <div className ="monitor-event-image-holder" style={{backgroundImage : `url("${event.background}")`, width : (window.innerHeight-80)*.6, height : (window.innerHeight-80)*.6}}>
+            </div>
             <div className = "monitor-event-title"><h1>{event.title}</h1></div>
             <div className = "qr-codes">
             {

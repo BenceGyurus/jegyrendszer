@@ -7,6 +7,7 @@ import SelectName from "./selectName.component";
 import socket from "../socket.io/socketio";
 import EventPage from "./eventPage.component";
 import DisplayVenue from "./displayVenue.component";
+import "../../css/monitor.css";
 
 const TicketMonitor = ()=>{
 
@@ -18,9 +19,85 @@ const TicketMonitor = ()=>{
     const [connected, setConnected] = useState("");
     const [event, setEvent]:any = useState();
     const [venue, setVenue]:any = useState();
-    const [tickets, setTickets] = useState();
+    const [tickets, setTickets]:any = useState();
     const [socketIO, setSocketIO]:any = useState();
     const [selected, setSelected]:[Array<string>, Function] = useState([]);
+
+    const [topBackgroundColor, setTopBackgroundColor] = useState('transparent'); 
+    const [bottomBackgroundColor, setBottomBackgroundColor] = useState('transparent'); 
+    const [topBackgroundColorRight, setTopBackgroundColorRight] = useState('transparent'); 
+    const [bottomBackgroundColorRight, setBottomBackgroundColorRight] = useState('transparent'); 
+    
+
+    const valueToHex = (c:number)=> {
+
+        var hex = c.toString(16);
+      
+        return hex
+      
+      }
+
+      const rgbToHex = (r:number, g:number, b:number) => {
+
+        return(valueToHex(r) + valueToHex(g) + valueToHex(b));
+      
+      }
+
+      function makeColorLighter(color:string, amount:number) {
+        // Parse the RGB values from the color string
+        const rgb = color.match(/\d+/g);
+      
+        if (rgb && rgb.length === 3) {
+          // Convert RGB values to integers
+          const r = parseInt(rgb[0]);
+          const g = parseInt(rgb[1]);
+          const b = parseInt(rgb[2]);
+      
+          // Calculate the lighter color by adding the specified amount to each RGB component
+          const lighterR = Math.min(r + amount, 255);
+          const lighterG = Math.min(g + amount, 255);
+          const lighterB = Math.min(b + amount, 255);
+      
+          // Return the lighter color as an "rgb(r, g, b)" string
+          return `rgb(${lighterR}, ${lighterG}, ${lighterB})`;
+        } else {
+          // Invalid color format, return the original color
+          return color;
+        }
+      }
+      
+
+      useEffect(() => {
+        if (event && event.background){
+        const image = new Image();
+        image.src = event.background;
+        image.crossOrigin = 'anonymous';
+    
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const context:any = canvas.getContext('2d');
+    
+          context.drawImage(image, 0, 0);
+    
+          const topPixelColor = context.getImageData(Math.ceil(image.width/4)-1, Math.ceil(image.height/8)-1, 1, 1).data;
+          const bottomPixelColor = context.getImageData(Math.ceil(image.width/3)*2-1, Math.ceil(image.height * .8)-1, 1, 1).data;
+          const topPixelColorRight = context.getImageData(Math.ceil(image.width/3)*2-1, Math.ceil(image.height/4)-1, 1, 1).data;
+          const bottomPixelColorRight = context.getImageData(Math.ceil(image.width/3)*2-1, Math.ceil(image.height * .8)-1, 1, 1).data;
+    
+        const topCssColor = makeColorLighter(`rgb(${topPixelColor[0]}, ${topPixelColor[1]}, ${topPixelColor[2]})`, 30);
+        const bottomCssColor = makeColorLighter(`rgb(${bottomPixelColor[0]}, ${bottomPixelColor[1]}, ${bottomPixelColor[2]})`, 30);
+        setTopBackgroundColorRight(makeColorLighter(`rgb(${topPixelColorRight[0]}, ${topPixelColorRight[1]}, ${topPixelColorRight[2]})`, 30));
+        setBottomBackgroundColorRight(makeColorLighter(`rgb(${bottomPixelColorRight[0]}, ${bottomPixelColorRight[1]}, ${bottomPixelColorRight[2]})`, 30));
+        
+          setTopBackgroundColor(topCssColor);
+          setBottomBackgroundColor(bottomCssColor);
+        };
+    }
+      }, [event]);
+
+      console.log(topBackgroundColor, topBackgroundColorRight);
 
     useEffect(()=>{
         const socketIo = socket();
@@ -37,9 +114,13 @@ const TicketMonitor = ()=>{
                 else if (!payload.connected){
                     setConnectionStatus(false);
                     setConnected("");
+                    setVenue(null);
+                    setSelected([]);
                 }
                 else{
                     setError403(true);
+                    setVenue(null);
+                    setSelected([]);
                 }
                 setConnecting(false);
             });
@@ -67,13 +148,11 @@ const TicketMonitor = ()=>{
                 setVenue(null);
             });
 
-            socketIo.on("stop-ticket-selecting", (paylaod)=>{
-                setVenue(null);
-            })
-
             socketIo.on("amount-tickets", (payload)=>{
                 if (!payload.error){
+                    console.log(payload);
                     setVenue(payload);
+                    if (payload.selected) setSelected(payload.selected);
                 }
                 else{
                     setError403(payload.message ? payload.message : "Váratlan hiba történet a terem betöltése közben");
@@ -83,13 +162,21 @@ const TicketMonitor = ()=>{
         })
     }, []);
 
+    useEffect(()=>{
+        if (socketIO){
+            socketIO.on("stop-ticket-selecting", (paylaod:any)=>{
+            socketIO.emit("ticket-selecting-stopped", venue && venue.tickets ? {selected : selected, tickets : venue.tickets} : {});
+            setSelected([]);
+            setVenue(null);
+        })}
+    }, [selected, venue]);
+
     const selectSeat = (id:string)=>{
         let lTicketAmount = venue.tickets;
         let l:Array<string> = [];
         for (let i = 0; i < lTicketAmount.length; i++){
             if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selected.includes(id)){
                 l = [...selected, id];
-                console.log(l);
                 setSelected(l);
                 lTicketAmount[i].selected++;
             }
@@ -119,23 +206,39 @@ const TicketMonitor = ()=>{
         return selectedPlaces.length ? selectedPlaces : false;
     }
 
-    const controlTickets = ()=>{
-        let sendTickets = [];
-        for (let i = 0; i < venue.tickets.length; i++){
-            if (venue.tickets[i].amount > 0){
-                sendTickets.push({amount : venue.tickets[i].amount, name : venue.tickets[i].name, ticketId : venue.tickets[i].id, places : getPlacesOfTicket(venue.tickets[i].seats)});
-            }
+    const ready = ()=>{
+        if (socketIO){
+            socketIO.emit("ticket-selecting-stopped", venue && venue.tickets ? {selected : selected, tickets : venue.tickets} : {});
+            setSelected([]);
+            setVenue(null);
         }
-        return sendTickets;
     }
-    
-    return <div>
-        <ConnectionStatus connected = {connectionStatus} connecting = {connecting} />    
+
+    const controlTickets = ()=>{
+        let isFull = true;
+        if (venue && venue.tickets && venue.tickets.length){
+        for (let i = 0; i < venue.tickets.length; i++){
+            isFull = venue.tickets[i].selected != venue.tickets[i].amount ? false : isFull;
+        }
+        }
+        return isFull
+    }
+    controlTickets()
+    //`linear-gradient(45deg, ${topBackgroundColor}, ${topBackgroundColorRight}, ${bottomBackgroundColor}, ${bottomBackgroundColorRight})`
+    return <div className = "monitor-background">
+        {!venue && event && event.background ? <div className = "monitor-background-animation">
+        {event && event.background ? <img style={{width: window.innerWidth*2, height: window.innerWidth*3}} src = {event.background} className = "monitor-event-image-background" /> : ""}
+        {event && event.background ? <img style={{width: window.innerWidth*2, height: window.innerWidth*3}} src = {event.background} className = "monitor-event-image-background-animated" /> : ""}
+        </div> : ""}
+        <ConnectionStatus connected = {connectionStatus} connecting = {connecting} />   
         {error403 ?  <Result status="403" title="403" subTitle="Hibás azonosítás" extra={<Button type="primary">Vissza főoldalra</Button>}/> : ""}
         {event && selected && venue ? <DisplayVenue venueId={venue.venueId} eventId={venue.eventId}aTickets={venue.tickets} selectEvent={selectSeat} selected={selected} /> : event && selected && !venue ? <EventPage event={event} />: ads  ? <></> : <DefaultScreen />}
-        {venue && venue.tickets && controlTickets().length ? <Button>Kész</Button> : ""}
+        { venue ? <button onClick={e=>ready()} className = {`ready-button ${venue && venue.tickets && !controlTickets() ? " disabled-ready-button" : ""}`} disabled = {venue && venue.tickets && !controlTickets()} >Kész</button> : <></>} 
     </div>
 
 }
+
+/*
+*/
 
 export default TicketMonitor;

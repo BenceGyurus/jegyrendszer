@@ -40,9 +40,10 @@ type typeOfSeatsParams = {
     places : typeOfPlaces,
     tickets : Array<typeOfAmountTicket>,
     seleted : Array<string>,
-    onClickFunction : Function
+    onClickFunction : Function,
+    disabled? : boolean
 }
-const Seats = ({places, tickets, seleted,onClickFunction}:typeOfSeatsParams)=>{
+const Seats = ({places, tickets, seleted,onClickFunction, disabled}:typeOfSeatsParams)=>{
 
     console.log(places, tickets);
 
@@ -70,7 +71,7 @@ const Seats = ({places, tickets, seleted,onClickFunction}:typeOfSeatsParams)=>{
 
 
     return (<div className = "select-ticket-main-div">
-            <SeatVisualization tickets = {tickets} seatPositions={places.seatsDatas} sizeOfArea={places.sizeOfArea} colorOfSeat={places.colorOfSeat} seatSize={places.sizeOfSeat} stage={getSizeOfStage(places.stage, places.sizeOfArea)} marginTop={places.stage == 1 || places.stage == 4 ? 50 : 0} marginLeft={places.stage == 3 || places.stage == 2 ? 50 : 0} selectedSeats={seleted} selectFunction={onClickFunction} />
+            <SeatVisualization disabled = {disabled} tickets = {tickets} seatPositions={places.seatsDatas} sizeOfArea={places.sizeOfArea} colorOfSeat={places.colorOfSeat} seatSize={places.sizeOfSeat} stage={getSizeOfStage(places.stage, places.sizeOfArea)} marginTop={places.stage == 1 || places.stage == 4 ? 50 : 0} marginLeft={places.stage == 3 || places.stage == 2 ? 50 : 0} selectedSeats={seleted} selectFunction={onClickFunction} />
         </div>);
 }
 

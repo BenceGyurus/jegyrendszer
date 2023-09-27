@@ -1,0 +1,66 @@
+
+.monitor-background-animation{
+    height: calc(100vh - 80px);
+    overflow: hidden;
+    z-index: 5;
+    display: block;
+    position: relative;
+}
+
+
+.ready-button{
+    position: absolute;
+    top: 85px;
+    right: 3px;
+    border: none;
+    color: #2ea336;
+    font-size: 25px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 10px;
+    font-weight: 100;
+    padding: 15px 20px;
+    background-color: transparent;
+    border: 2px solid #2ea336;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.monitor-event-image-background-animated{
+    left: -100%; bottom: -100%; filter: blur(35px);
+	animation-direction: reverse; 
+    animation-delay: 25s;
+    position: absolute; 
+    border-radius: 100%;
+	animation: rotate 50s linear infinite;
+    overflow: hidden;
+}
+
+.monitor-event-image-background{
+    position: absolute;
+    top: -100%;
+    right: -100%;
+    filter: blur(35px); z-index: 10; 
+    mix-blend-mode: luminosity;
+    position: absolute; 
+    border-radius: 100%;
+	animation: rotate 50s linear infinite;
+    overflow: hidden;
+}
+
+.disabled-ready-button{
+    color: rgba(46, 163, 54, 0.3);
+    border: 2px solid rgba(46, 163, 54, 0.3);
+    cursor: not-allowed;
+}
+
+@keyframes rotate{
+	0% {transform: rotate(0deg);}
+	100% {transform: rotate(360deg);}
+}
+.monitor-background{
+    min-height: calc(100vh - 80px);
+    height : auto;
+    right: 0; top: 0;
+}

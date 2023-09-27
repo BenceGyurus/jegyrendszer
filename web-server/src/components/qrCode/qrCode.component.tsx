@@ -10,9 +10,10 @@ const QR = ({url, icon}:typeOfQRParams)=>{
     errorLevel="H"
     value={url}
     icon={icon}
-    size={150}
-    iconSize={25}
-    style={{zIndex : 101, border : "none"}}
+    size={90}
+    iconSize={15}
+    style={{zIndex : 101, border : "none", margin: 5}}
+    color="white"
   />)
 
 }

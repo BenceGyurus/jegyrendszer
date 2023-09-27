@@ -1,9 +1,10 @@
 import "../../css/buyButton.css";
 type typeOfBuyButtonParams = {
-    onClickFunction : Function
+    onClickFunction : Function,
+    disabled? : boolean
 }
-const BuyButton = ({onClickFunction}:typeOfBuyButtonParams)=>{
-    return <button className="buy-btn" onClick={e=>onClickFunction()}>Vásárlás</button>
+const BuyButton = ({onClickFunction, disabled}:typeOfBuyButtonParams)=>{
+    return <button disabled = {disabled} className="buy-btn" onClick={e=>onClickFunction()}>Vásárlás</button>
 }
 
 export default BuyButton;

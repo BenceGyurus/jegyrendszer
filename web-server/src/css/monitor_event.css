@@ -5,13 +5,14 @@
     flex-direction: row;
     justify-content: right;
     position: absolute;
-    top: 80px;
-    right: 10px;
+    bottom: 2px;
+    right: 2px;
 }
 
 .monitor-event-image-holder{
-    width: 100%;
-    height: calc(100vh - 80px);
+    position: absolute;
+    top: 20%;
+    right: 35%;
     overflow: hidden;
     background-repeat: no-repeat;
     -webkit-background-size: cover;
@@ -20,6 +21,7 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    border-radius: 5px;
 }
 
 .monitor-event-image{
@@ -32,16 +34,17 @@
 
 .monitor-event-title{
     position: absolute;
-    bottom: 20px;
-    left: 50px;
-    width: 60%;
+    top: 80%;
+    left: 35%;
+    width: 30%;
     z-index: 1001;
-    color: black;
+    color: white;
+    text-align: center;
 }
 
 .monitor-event-title h1{
-    font-size: 8vh;
-    color: rgba(0,0,0,0.95);
+    font-size: 30px;
+    color: white;
 }
 
 .monitor-event-radius-top{
