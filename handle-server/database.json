@@ -70,5 +70,9 @@
     "monitor" : {
         "database" : "users",
         "collection" : "monitor"
+    },
+    "ads" : {
+        "database" : "ads",
+        "collection" : "ads"
     }
 }

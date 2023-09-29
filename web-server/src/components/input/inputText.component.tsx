@@ -56,8 +56,8 @@ const InputText = ({ title,onChangeFunction,value,params, disabled,info,ref, web
       <div className="input-container">
         <div ref = {ref ? ref : null} >
             <label htmlFor={id} className = "inputLabel">{title}</label>
-            <Input placeholder={title} addonAfter = {money ? "Ft" : ""} addonBefore = {website ? "wwww." : ""} size = "large" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
-            <Tooltip title={info.text} zIndex={9999999}>
+            <Input placeholder={title} addonAfter = {money ? "Ft" : ""} addonBefore = {website ? "www." : ""} size = "large" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
+            <Tooltip title={info.text} zIndex={9999999999}>
               <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
             </Tooltip> : ""
       } /></div>

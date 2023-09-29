@@ -1,0 +1,15 @@
+.ads-component{
+    width: 300px;
+    margin: 20px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    padding: 30px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ads-holder{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}

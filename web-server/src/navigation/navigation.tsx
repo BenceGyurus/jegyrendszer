@@ -26,6 +26,7 @@ import AfterBuy from "../components/afterBuy/afterBuy.component";
 import TicketMonitor from "../components/admin/operation/monitor/monitor.component";
 import Monitor from "../components/monitor/monitor.component";
 import Animation3dText from "../components/event-ads-animations/3danimation.component";
+import Ads from "../components/admin/operation/ads/ads.component";
 
 
 function Navigation() {
@@ -57,7 +58,7 @@ function Navigation() {
           <Route path = "/admin/edit-email" element = {<AdminPage component = {<EditMail />} />} />
           <Route path = "/admin/helyi-kedvezmenyek" element = {<AdminPage component = {<LocalDiscountMain />} />} />
           <Route path = "/vasarlas/*" element = {<AfterBuy />} />
-          <Route path = "/admin/monitor" element = {<AdminPage component = {<TicketMonitor />} />} />
+          <Route path = "/admin/monitor" element = {<AdminPage component = {<Ads />} />} />
           <Route path = "/monitor" element = {<Monitor />} />
           <Route path = "/test" element = {<Animation3dText text = "test" />} />
         </Routes>

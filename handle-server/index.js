@@ -1757,6 +1757,92 @@ app.post("/api/v1/edit-mail", (req,res,next)=>parseBodyMiddleeware(req,next), as
     handleError(logger, "004", res);
 });
 
+//ADS
+
+app.post("/api/v1/create-ads", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body === TypeOfBody && req.body.token && req.body.datas.name && req.body.datas.src && req.body.datas.type){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("monitor")){
+            const { collection, database } = new Database("ads");
+            result = await collection.insertOne({ website : req.body.datas.website, name : req.body.datas.name, src : req.body.datas.src, type : req.body.datas.type, otherDatas : await otherData(req, req.token) });
+            closeConnection(database);
+            return res.send( { error : !result.acknowledged } );
+        }
+        else{
+            return handleError(logger, "004", res);
+        }
+}
+return handleError(logger, "400", res);
+}); 
+
+app.post("/api/v1/edit-ads/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body === TypeOfBody && req.body.token && req.body.datas.name && req.body.datas.src && req.body.datas.type && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("monitor")){
+            const { collection, database } = new Database("ads");
+            let objectid = false;
+            try{
+                objectid = ObjectId(req.params.id);
+            }catch{
+
+            }
+            let result;
+            if (objectid){
+                result = await collection.updateOne( {_id  : objectid} , { $set : { website : req.body.datas.website, name : req.body.datas.name, src : req.body.datas.src, type : req.body.datas.type, otherDatas : await otherData(req, req.token)} });
+            }
+            closeConnection(database);
+            return res.send( { error : !result.acknowledged } );
+        }
+        else{
+            return handleError(logger, "004", res);
+        }
+}
+return handleError(logger, "400", res);
+}); 
+
+app.post("/api/v1/delete-ads/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body === TypeOfBody && req.body.token && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("monitor")){
+            const { collection, database } = new Database("ads");
+            let objectid = false;
+            try{
+                objectid = ObjectId(req.params.id);
+            }catch{
+
+            }
+            let result;
+            if (objectid){
+            result = await collection.deleteOne({_id : objectid});
+            }
+            closeConnection(database);
+            return res.send( { error : result.deletedCount < 1 } );
+        }
+        else{
+            return handleError(logger, "004", res);
+        }
+}
+return handleError(logger, "400", res);
+}); 
+
+app.post("/api/v1/ads", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && typeof req.body === TypeOfBody && req.body.token){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("monitor")){
+            let userDatas =  await GetUserDatas(req.body.token);
+            const { collection, database } = new Database("ads");
+            result = await collection.find({}, { projection : { name : 1, src : 1, type : 1, website : 1 } }).toArray();
+            closeConnection(database);
+            return result ? res.send( { error : false, ads : result } ) : res.send({ error : true });
+        }
+        else{
+            return handleError(logger, "004", res);
+        }
+}
+return handleError(logger, "400", res);
+}); 
+
+
 //MONITOR
 
 app.post("/api/v1/monitors", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
@@ -1773,7 +1859,7 @@ app.post("/api/v1/monitors", (req,res,next)=>parseBodyMiddleeware(req,next), asy
                 return handleError(logger, "004", res);
             }
     }
-    return handleError(logger, "400", req);
+    return handleError(logger, "400", res);
 });
 
 
