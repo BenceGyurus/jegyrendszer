@@ -7,6 +7,8 @@ mongodb:
     rootPassword: "root"
   image:
     tag: 4.2.21-debian-10-r8
+  metrics:
+    enabled: true
 redis:
   architecture: standalone
   auth:
