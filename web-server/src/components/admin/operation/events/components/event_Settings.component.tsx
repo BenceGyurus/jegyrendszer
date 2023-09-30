@@ -169,7 +169,25 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [wardrobe, setWardrobe]:[boolean, Function] = useState(isWardrobe ? isWardrobe : false);
     const [soldTickets, setSoldTickets]:[any, Function] = useState();
     const [timeLine, setTimeLine]:[boolean, Function] = useState(false);
-    const titleRef:any = useRef(null);
+    const ticketSalesRef = useRef(null);
+    const eventTitleRef = useRef(null)
+    const eventLocationRef = useRef(null);
+    const eventAddressRef = useRef(null);
+    const mapRef = useRef(null);
+    const desciptionRef = useRef(null);
+    const selectVenueRef = useRef(null);
+    const eventDateRef = useRef(null);
+    const releaseDateRef = useRef(null);
+    const gateOpeningRef = useRef(null);
+    const endOfEventRef = useRef(null);
+    const wardrobeRef = useRef(null);
+    const venueRef = useRef(null);
+    const companyRef = useRef(null);
+    const localDiscountsRef = useRef(null);
+    const usersRef = useRef(null);
+    const backgroundRef = useRef(null);
+    const ticketsRef = useRef(null);
+    const timeLineRef = useRef(null);
 
     const getTickets = ()=>{
         if (readable_event_name){
@@ -190,8 +208,206 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
               src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
             />
           ),
-          target: () => titleRef.current,
-        }
+          target: () => ticketSalesRef.current,
+        },
+        {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => eventTitleRef.current,
+          }
+          ,{
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => eventLocationRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => eventAddressRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => mapRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => desciptionRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => selectVenueRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => releaseDateRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => releaseDateRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => gateOpeningRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => endOfEventRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => wardrobeRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => venueRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => companyRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => localDiscountsRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => usersRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => backgroundRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => ticketsRef.current,
+          },
+          {
+            title: 'Upload File',
+            description: 'Put your files here.',
+            cover: (
+              <img
+                alt="tour.png"
+                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+              />
+            ),
+            target: () => timeLineRef.current,
+          },
       ];
 
     const getUsers = ()=>{
@@ -446,36 +662,65 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         </Alert>
       </Collapse>
             </div>
-            <Statistic title="Jegyek" value={occupiedTicket()} suffix={`/ ${summTickets()}`} />
-            <InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} disabled = {isLoading} info={{text : "Ez a cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. A rendezvény url-e is ez alapján fog létrejönni."}} />
-            <InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} disabled = {isLoading} info={{text : "Az ide beírt helyszín fog megjelenni az oldalon", image : "/images/info/map.png"}} />
-            <InputText title = "Rendezvény helyszínének címe" onChangeFunction={setAddress} value={address} disabled = {isLoading} info={{text : "A rendezvény helyszínének a címe. Írányítószám város, utca házszám. Ez nem fog megjelenítésre kerülni az oldalon, hanem a helyszínre kattintva ennek a címnek a segítségével fogja megkeresni a felhasználó alapértelmezett térképével a helyszínt. Támogatott térképek: Google Maps, Apple Maps. Helyszíneknél megadható a helyszín neve is az utca, házszám helyett, de a térképek ilyenkor nem fogják minden esetben pontosan megtalálni."}} />
-            <h4>Esemény helyszíne</h4>
+            <div ref = {ticketSalesRef}><Statistic title="Jegyek" value={occupiedTicket()} suffix={`/ ${summTickets()}`} /></div>
+            <div ref = {eventTitleRef}><InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} disabled = {isLoading} info={{text : "Ez a cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. A rendezvény url-e is ez alapján fog létrejönni."}} /></div>
+            <div ref = {eventLocationRef}><InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} disabled = {isLoading} info={{text : "Az ide beírt helyszín fog megjelenni az oldalon", image : "/images/info/map.png"}} /></div>
+            <div ref = {eventAddressRef}><InputText title = "Rendezvény helyszínének címe" onChangeFunction={setAddress} value={address} disabled = {isLoading} info={{text : "A rendezvény helyszínének a címe. Írányítószám város, utca házszám. Ez nem fog megjelenítésre kerülni az oldalon, hanem a helyszínre kattintva ennek a címnek a segítségével fogja megkeresni a felhasználó alapértelmezett térképével a helyszínt. Támogatott térképek: Google Maps, Apple Maps. Helyszíneknél megadható a helyszín neve is az utca, házszám helyett, de a térképek ilyenkor nem fogják minden esetben pontosan megtalálni."}} /></div>
+            <div ref = {mapRef}><h4>Esemény helyszíne</h4>
             <h6>Válaszd ki a térképen a marker húzásávál az esemény helyszínét</h6>
             <MarkerMap zoomLevel={14} center={position} title = {locationOfEvent} setPosition={setPostion} />
+            </div>
+            <div ref = {desciptionRef}>
             <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} disabled = {isLoading} />
+            </div>
+            <div ref = {selectVenueRef}>
             <AddNewButton onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
+            </div>
+            <div ref = {eventDateRef}>
             <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" disabled = {isLoading} info={{ text : "Ez a dátum fog megjelenni az oldalon. A megadott dátum a rendezvényt már nem lehet rá vásárolni és eltűnik a főoldalról. A megadott dátumtól számított másfél évvel az oldal gyorsasága érdekében a rendezvény autómatikusan törlésre kerül", image : "/images/info/date.png"}} />
+            </div>
+            <div ref = {releaseDateRef}>
             <Calendar onChangeFunction={setDateOfRelease} value = {dateOfRelease} title="Rendevény megjelenése az oldalon" disabled = {isLoading} info={{text : "A megadott időtől jelenik meg a rendezvény az oldalon és lehet rá jegyet vásárolni. Az értékének kisebbnek kell lennie mint a rendezvény dátuma."}} />
+            </div>
+            <div ref = {gateOpeningRef}>
             <Calendar onChangeFunction={setGateOpening} value = {gateOpening} title = "Kapunyitás" disabled= {isLoading} info={{text : "A kapunyitás az oldalon nem kerül mejelenítésre, ez a már megvásárol jegyen lesz látható."}} />
+            </div>
+            <div ref = {endOfEventRef}>
             <Calendar onChangeFunction={setEndOfTheEvent} value={endOfTheEvent} title = "Esemény vége" disabled = {isLoading} info={{text : "Az esemény végére a az Apple pass és a jegy miatt van szükség, ott kerül majd megjelenítésre."}} />
+            </div>
+            <div ref = {wardrobeRef}>
             <Radio.Group onChange={(e:any)=>{setWardrobe(e.target.value)}} defaultValue={wardrobe} className = "event-settings-radio">
                 <Radio.Button value={true}>Ruhatár a helyszínen</Radio.Button>
                 <Radio.Button value={false}>Nincsenek ruhatár a helyszínen</Radio.Button>
             </Radio.Group>
+            </div>
+            <div ref = {venueRef}>
             <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
+            </div>
+            <div ref = {companyRef}>
             <Select title = "Vállalt kiválasztása" options = {companyList} onChangeFunction={setSelectedCompany} value={selectedCompany} />
+            </div>
+            <div ref = {localDiscountsRef}>
             <Radio.Group onChange={(e:any)=>{setLocalDiscounts(e.target.value)}} defaultValue={localDiscounts} className = "event-settings-radio">
                 <Radio.Button value={true}>Helyi kedvezmények</Radio.Button>
                 <Radio.Button value={false}>Nincsenek helyi kezvezmények</Radio.Button>
             </Radio.Group>
+            </div>
             <AddMedia media = {media} changeValueOfMedia={valueOfMedia} disabled = {isLoading} />
+            <div ref = {usersRef}>
             <h4>Felhasználók engedélyezése:</h4>
             {users.length ? <UsersList selectedUsers={selectedUsers} userDatas={users} onChangeFunction={changeSelectedUsers} /> : ""}
+            </div>
+            <div ref = {backgroundRef}>
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
+            </div>
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
+            <div ref = {ticketsRef}>
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
+            </div>
+            <div ref = {timeLineRef}>
             {versions && versions.length ? <TimeLine setTimeLine={()=>{setTimeLine(!timeLine)}} timeLine = {timeLine} data = {versions} /> : ""}
+            </div>
             <LoadingButton loading = {isLoading} onClick = {save} style={{margin : "10px auto", display : "block"}} variant="outlined">
                 Mentés
             </LoadingButton>

@@ -69,36 +69,6 @@ const TicketMonitor = ()=>{
       }
       
 
-      useEffect(() => {
-        if (event && event.background){
-        const image = new Image();
-        image.src = event.background;
-        image.crossOrigin = 'anonymous';
-    
-        image.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = image.width;
-          canvas.height = image.height;
-          const context:any = canvas.getContext('2d');
-    
-          context.drawImage(image, 0, 0);
-    
-          const topPixelColor = context.getImageData(Math.ceil(image.width/4)-1, Math.ceil(image.height/8)-1, 1, 1).data;
-          const bottomPixelColor = context.getImageData(Math.ceil(image.width/3)*2-1, Math.ceil(image.height * .8)-1, 1, 1).data;
-          const topPixelColorRight = context.getImageData(Math.ceil(image.width/3)*2-1, Math.ceil(image.height/4)-1, 1, 1).data;
-          const bottomPixelColorRight = context.getImageData(Math.ceil(image.width/3)*2-1, Math.ceil(image.height * .8)-1, 1, 1).data;
-    
-        const topCssColor = makeColorLighter(`rgb(${topPixelColor[0]}, ${topPixelColor[1]}, ${topPixelColor[2]})`, 30);
-        const bottomCssColor = makeColorLighter(`rgb(${bottomPixelColor[0]}, ${bottomPixelColor[1]}, ${bottomPixelColor[2]})`, 30);
-        setTopBackgroundColorRight(makeColorLighter(`rgb(${topPixelColorRight[0]}, ${topPixelColorRight[1]}, ${topPixelColorRight[2]})`, 30));
-        setBottomBackgroundColorRight(makeColorLighter(`rgb(${bottomPixelColorRight[0]}, ${bottomPixelColorRight[1]}, ${bottomPixelColorRight[2]})`, 30));
-        
-          setTopBackgroundColor(topCssColor);
-          setBottomBackgroundColor(bottomCssColor);
-        };
-    }
-      }, [event]);
-
       console.log(topBackgroundColor, topBackgroundColorRight);
 
     useEffect(()=>{

@@ -16,7 +16,7 @@ type typeOfMapParams = {
 
 const markerIcon = new L.Icon({
     iconUrl : "/images/marker.png",
-    iconSize : [35,35],
+    iconSize : [30,30],
     iconRetinaUrl : "/images/marker.png"
 })
 

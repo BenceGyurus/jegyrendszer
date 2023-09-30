@@ -53,7 +53,7 @@ const InputText = ({ title,onChangeFunction,value,params, disabled,info,ref, web
     })
 
     return (
-      <div className="input-container">
+      <div className="input-container" ref = {ref}>
         <div ref = {ref ? ref : null} >
             <label htmlFor={id} className = "inputLabel">{title}</label>
             <Input placeholder={title} addonAfter = {money ? "Ft" : ""} addonBefore = {website ? "www." : ""} size = "large" onChange={e => {params ? onChangeFunction(e.target.value, ...params) : onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 

@@ -277,7 +277,3 @@
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
-
-.buy-ticket-button:hover .ticket-icon-container {
-  transform: translateX(10px); /* Közelebb kerül a gombhoz */
-}

@@ -24,7 +24,10 @@ type typeOfEventPageParams = {
     event : typeOfEvent
 }
 
+
 const EventPage = ({ event }:typeOfEventPageParams)=>{
+
+
     return (<div className = "monitor-event-main-holder">
         <div>
             <div className ="monitor-event-image-holder" style={{backgroundImage : `url("${event.background}")`, width : (window.innerHeight-80)*.6, height : (window.innerHeight-80)*.6}}>

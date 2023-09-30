@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import postData from "../../../connection/request";
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import SaveButton from "../../../saveButton/saveButton.component";
+import Info from "../../../info/info.component";
 const EditAszf = ()=>{
 
     const getAszf = ()=>{
