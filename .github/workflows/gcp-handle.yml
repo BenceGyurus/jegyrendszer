@@ -12,27 +12,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    # - name: google-cloud
-    #   uses: google-github-actions/setup-gcloud@v1
-    #   with:
-    #     service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-    #     project_id: ${{ env.PROJECT_ID }}
-    #     export_default_credentials: true
-
-    # - id: 'auth'
-    #   name: 'Authenticate to Google Cloud'
-    #   uses: 'google-github-actions/auth@v1'
-    #   with:
-    #     workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
-    #     service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
-
     - id: auth
       name: Authenticate with Google Cloud
       uses: google-github-actions/auth@v1
       with:
         token_format: access_token
-        # workload_identity_provider: <your-provider-id>
-        # service_account: <your-service-account>@<your-project-id>.iam.gserviceaccount.com
         credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
         access_token_lifetime: 300s
 
@@ -49,16 +33,6 @@ jobs:
 
     - name: Build Docker Image
       run: docker build -t $IMAGE_NAME:latest ./handle-server
-
-    # - name: Automatic Tagging of Releases
-    #   id: increment-git-tag
-    #   run: |
-    #     bash ./scripts/git_update.sh -v major
-
-    # - name: Configure Docker Client
-    #   run: |-
-    #     gcloud auth configure-docker --quiet
-    #     gcloud auth configure-docker europe-west3-docker.pkg.dev --quiet
 
     - name: Push Docker Image to Artifact Registry
       env:
