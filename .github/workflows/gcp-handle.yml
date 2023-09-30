@@ -12,20 +12,48 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: google-cloud
-      uses: google-github-actions/setup-gcloud@v1
+    # - name: google-cloud
+    #   uses: google-github-actions/setup-gcloud@v1
+    #   with:
+    #     service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+    #     project_id: ${{ env.PROJECT_ID }}
+    #     export_default_credentials: true
+
+    # - id: 'auth'
+    #   name: 'Authenticate to Google Cloud'
+    #   uses: 'google-github-actions/auth@v1'
+    #   with:
+    #     workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+    #     service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+
+    - id: auth
+      name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
       with:
-        service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-        project_id: ${{ env.PROJECT_ID }}
-        export_default_credentials: true
+        token_format: access_token
+        # workload_identity_provider: <your-provider-id>
+        # service_account: <your-service-account>@<your-project-id>.iam.gserviceaccount.com
+        credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+        access_token_lifetime: 300s
+
+    - name: Login to Artifact Registry
+      uses: docker/login-action@v1
+      with:
+        registry: europe-west3-docker.pkg.dev
+        username: oauth2accesstoken
+        password: ${{ steps.auth.outputs.access_token }}
+
+    - name: Get tag
+      id: get-tag
+      run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
     - name: Build Docker Image
-      run: docker build -t $IMAGE_NAME:latest ./email-server
+      run: docker build -t $IMAGE_NAME:latest ./handle-server
 
-    - name: Automatic Tagging of Releases
-      id: increment-git-tag
-      run: |
-        bash ./scripts/git_update.sh -v major
+    # - name: Automatic Tagging of Releases
+    #   id: increment-git-tag
+    #   run: |
+    #     bash ./scripts/git_update.sh -v major
 
     - name: Configure Docker Client
       run: |-
@@ -34,7 +62,7 @@ jobs:
 
     - name: Push Docker Image to Artifact Registry
       env:
-        GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        GIT_TAG: ${{ steps.get-tag.outputs.short_ref }}
       run: |-
         docker tag $IMAGE_NAME:latest europe-west3-docker.pkg.dev/$PROJECT_ID/jegyrendszer/$IMAGE_NAME:latest
         docker tag $IMAGE_NAME:latest europe-west3-docker.pkg.dev/$PROJECT_ID/jegyrendszer/$IMAGE_NAME:$GIT_TAG
