@@ -6,7 +6,7 @@ jobs:
     name: Build and Push to GCP
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: handle
+      IMAGE_NAME: handle-server
       PROJECT_ID: agora-jegyrendszer
     steps:
     - name: Checkout
@@ -55,10 +55,10 @@ jobs:
     #   run: |
     #     bash ./scripts/git_update.sh -v major
 
-    - name: Configure Docker Client
-      run: |-
-        gcloud auth configure-docker --quiet
-        gcloud auth configure-docker europe-west3-docker.pkg.dev --quiet
+    # - name: Configure Docker Client
+    #   run: |-
+    #     gcloud auth configure-docker --quiet
+    #     gcloud auth configure-docker europe-west3-docker.pkg.dev --quiet
 
     - name: Push Docker Image to Artifact Registry
       env:
