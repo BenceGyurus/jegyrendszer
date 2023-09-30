@@ -1,5 +1,5 @@
 ---
-name: Build and push HANDLE SERVER to GCP
+name: Build and push WEB SERVER to GCP
 on: workflow_dispatch
 jobs:
   build-push-gcr:
