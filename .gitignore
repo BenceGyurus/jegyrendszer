@@ -2,6 +2,7 @@
 # data/*
 .DS_Store
 *.tgz
+*.zip
 seat-detection
 handle-server/.dccache
 node_modules/

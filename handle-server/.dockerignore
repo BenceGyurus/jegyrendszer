@@ -2,3 +2,5 @@ target/
 node_modules/
 uploads/
 share/
+pdfs/
+.dccache
