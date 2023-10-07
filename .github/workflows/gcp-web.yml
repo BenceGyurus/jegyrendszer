@@ -32,7 +32,7 @@ jobs:
       run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
     - name: Build Docker Image
-      run: docker build -t $IMAGE_NAME:latest ./handle-server
+      run: docker build -t $IMAGE_NAME:latest ./web-server
 
     - name: Push Docker Image to Artifact Registry
       env:
