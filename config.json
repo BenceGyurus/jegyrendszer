@@ -22,5 +22,6 @@
     "PDF_FONT_SIZE_TITLE" : 18,
     "PDF_FONT_SIZE_BODY" : 12,
     "ZIP_DIR" : "../data/zips",
-    "ACCEPTED_IMAGE_EXTENSIONS" : ["PNG", "JPG", "PNG", "JFIF", "JPEG", "MOV", "MP4"]
+    "ACCEPTED_IMAGE_EXTENSIONS" : ["PNG", "JPG", "JFIF", "JPEG", "MOV", "MP4"],
+    "MAX_PAGINATOR_LIMIT" : 30
 }

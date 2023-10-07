@@ -39,18 +39,25 @@ body {
     overflow: hidden;
     background-color: white;
     margin-bottom: 50px;
-    height: 370px;
+    height: 100%;
+    position: relative;
   }
 
   @media screen and (width > 1000px) {
     .admin-event-list{
         width: 100%;
-        padding: 0;
     }
     .admin-event{
-        width: 30%;
-        display: inline-table;
-        margin: 1%;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .event-list-grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(30%, 1fr)); 
+        width: 100%;
+        padding: 0;
+        grid-gap: 1%;
     }
     .admin-event-container img{
         height: 200px;
@@ -89,3 +96,13 @@ body {
     opacity: 0.8;
   }
   
+.pagination-holder{
+    width: max-content;
+    margin: 10px auto;
+}
+
+.event-active{
+  position: absolute;
+  right: 17px;
+  top: 8px;
+}

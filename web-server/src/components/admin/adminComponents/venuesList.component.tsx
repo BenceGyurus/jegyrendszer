@@ -34,7 +34,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
     }
     
 
-    return venues.map((element, index)=>{
+    return(<div className = "venue-list"> {venues.map((element, index)=>{
         return (
             <div key={element.id} className = "venue">
                 <SmallMap sizeOfArea={element.sizeOfArea} colorOfBackGround = {element.colorOfBackGround} sizeOfSeats = {element.sizeOfSeat} colorOfSeat = {element.colorOfSeat} seatDatas = {element.seatsDatas} />
@@ -47,7 +47,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
                 <div className = "tooltip-position-div"><Tooltip title = {<i className="fas fa-info-circle"></i>} text = {`Hozzáadta: ${element.addedBy}`} /></div>
                 </div>
             </div>
-        );
-    });
+        );})}
+        </div>)
 }
 export default VenueList;

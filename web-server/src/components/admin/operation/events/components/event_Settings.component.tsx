@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import InputText from "../../../../input/inputText.component";
-import InputNumber from "../../../../input/inputNumber.component";
 import TextArea from "../../../../input/textArea.component";
 import "../../../../../css/eventSettings.css";
 import AddNewButton from "../../../../buttons/add_New.component";
-import SaveButton from "../../../../saveButton/saveButton.component";
 import AddTicket from "./addTicket.component";
 import Select from "../../../../input/select.component";
 import postData from "../../../../connection/request";
@@ -13,11 +11,9 @@ import ImageUpload from "../../../../image-upload/imageUpload.component";
 import { v4 as uuid } from 'uuid';
 import TicketList from "./ticketList.component";
 import Calendar from "../../../../calendar/calendar.component";
-import Error from "../../../../notification/error.component";
 import BackButton from "../../../../back/backbutton.component";
 import AddMedia from "./add-media.component";
 import MarkerMap from "../../../../map/create-marker-map.component";
-import Checkbox from "../../../../checkbox/checkbox.component";
 import UsersList from "./usersList.component";
 import AvatarGroup from '@mui/material/AvatarGroup';
 import StringAvatar from "../../../../avatar/avatar.component";
@@ -28,12 +24,10 @@ import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
 import TimeLine from "./timeLine.component";
-import { Tour } from 'antd';
-import type { TourProps } from 'antd';
-import type { RadioChangeEvent } from 'antd';
-import { Radio } from 'antd';
-import { Button } from 'antd';
-import { Statistic } from 'antd';
+import { Statistic,Button, Modal,Radio,TourProps,FloatButton, Tour  } from 'antd';
+import insertCookie from "../../../../../cookies/insertCookie";
+import { ExclamationCircleFilled, ExclamationCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import Error from "../../../../notification/error.component";
 
 type typeOfGroups = {
     id : string,
@@ -139,7 +133,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         return `${new Date().getFullYear()}-${new Date().getMonth()+1 < 10 ? `0${new Date().getMonth()+1}` : new Date().getMonth()+1}-${new Date().getUTCDate() < 10 ? `0${new Date().getUTCDate()}` : new Date().getUTCDate()}T${new Date().getHours() < 10 ? `0${new Date().getHours()}` : new Date().getHours()}:${new Date().getMinutes() < 10 ? `0${new Date().getMinutes()}` : new Date().getMinutes()}`;
     }
 
-    const [openTour, setOpenTour] = useState<boolean>(true);
+    const [openTour, setOpenTour] = useState<boolean>(!ParseLocalStorage("event_Tutorial"));
     const [id, setId]:[string, Function] = useState(window.location.pathname.split("/")[3]);
     const [nameOfEvent, setNameOfEvent]:[string, Function] = useState(name ? name : "");
     const [desciption, setDescription]:[string, Function] = useState(description ? description : "");
@@ -169,13 +163,13 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [wardrobe, setWardrobe]:[boolean, Function] = useState(isWardrobe ? isWardrobe : false);
     const [soldTickets, setSoldTickets]:[any, Function] = useState();
     const [timeLine, setTimeLine]:[boolean, Function] = useState(false);
+    const [error, setError]:[string, Function] = useState("");
     const ticketSalesRef = useRef(null);
     const eventTitleRef = useRef(null)
     const eventLocationRef = useRef(null);
     const eventAddressRef = useRef(null);
     const mapRef = useRef(null);
     const desciptionRef = useRef(null);
-    const selectVenueRef = useRef(null);
     const eventDateRef = useRef(null);
     const releaseDateRef = useRef(null);
     const gateOpeningRef = useRef(null);
@@ -188,6 +182,8 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const backgroundRef = useRef(null);
     const ticketsRef = useRef(null);
     const timeLineRef = useRef(null);
+    const mediaRef = useRef(null);
+    const [errorWindow, setErrorWindow] = useState("");
 
     const getTickets = ()=>{
         if (readable_event_name){
@@ -200,214 +196,94 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     
     const steps: TourProps['steps'] = [
         {
-          title: 'Upload File',
-          description: 'Put your files here.',
-          cover: (
-            <img
-              alt="tour.png"
-              src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-            />
-          ),
+          title: 'Jegy eladások',
+          description: 'A még megvásárolható jegyek és az összes jegyek számát mutatja.',
           target: () => ticketSalesRef.current,
         },
         {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Rendezvény címe',
+            description: 'Az itt megadaott cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. Az esemény url-e ebből fog generálódni.',
             target: () => eventTitleRef.current,
           }
           ,{
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Rendezvény helyszíne',
+            description: 'A megadott helyszín szöveges formában fog megjelenni az oldalon.',
             target: () => eventLocationRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Rendezvény helyszínének címe',
+            description: 'A megadott cím nem fog megjelenni az oldalon. A felhasználó eszközének alapértelmezett térképével ezt a címet fogja megadni. A cím formája: irányítószám, helység, utca házszám. Megadható a helyszín neve is, de ez nem minden térkép esetében működik pontosan.',
             target: () => eventAddressRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Térkény',
+            description: 'A rendezvény helyszínének megadása térképen. A helyszín kijelölése a marker húzásával lehetséges. Alapértelmezett értéke az AGORA Művelődési és Sportház.',
             target: () => mapRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Rendezvény leírása',
+            description: 'Itt adható meg a rendezvény leírása',
             target: () => desciptionRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
-            target: () => selectVenueRef.current,
+            title: 'Esemény időpontja',
+            description: 'A megadott időpont (ÉÉÉÉ.HH.NN.HH.MI) megjelenik az oldalon ezen kívül az esmény eddig az időpontig lesz látható a kezdőlapon és a jegyvásárlás is eddig az időpontig lehetséges. A megadott időpont után másfél évvel az oldal gyorsasága érdekében az esemény minden adattal együtt (borítókép, jegyvásárlások, jegyek, esemény) törlődni fog.',
+            target: () => eventDateRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Rendezvény megjelenése',
+            description: 'A megadott dátum és időpont után fog majd megjelenni az esemény az oldalon és a jegyvásárlás is csak a megdaott dátum után lehetséges. Az értékének minden esetben kisebbnek kell lennie mint a rendezvény időpontjánál.',
             target: () => releaseDateRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
-            target: () => releaseDateRef.current,
-          },
-          {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Kapunyitás',
+            description: 'A kapunyitás időpontja a jegyen lesz majd látható.',
             target: () => gateOpeningRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Esemény vége',
+            description: 'Az esemény végé a jegyen lesz megjelenítve, valamit az apple walletben való megjelenéséhez szükséges.',
             target: () => endOfEventRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Ruhatár a helyszínen',
+            description: 'A ruhatár a jegyen lesz megjelenítve a következőképpen: A helyszínen ruhatár működik/ A helyszínen ruhatár nem működik',
             target: () => wardrobeRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Helyszín kiválasztása',
+            description: 'Az oldalon létrehozott helyszínt lehet hozzárendelni az eseményhez. Jegy létrehozása csak hozzárendelt eseménnyel lehetséges.',
             target: () => venueRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Vállalat kiválasztása',
+            description: 'Az eseményhez hozzárendelhető az oldalon létrehozott vállalat.',
             target: () => companyRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Helyi kedvezmények engedélyezése',
+            description: 'A jegyirodában történő eladásnál engedélyezve vannak e a kedvezmények. A kedvezmények a helyi kedvezmények meüpontban hozhatóak létre.',
             target: () => localDiscountsRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Média hozzáadáse',
+            description: 'Az eseményhez hozzáadhatóak social media oldalak és zene streaming oldalak, mint a Spotify, Apple Music, Facebook, Instagram, Youtube. A média hozzáadása gombra kattintva a feluró ablakon adhatóak meg a linkek. Csak az fog megjelenni az oldalon, amelyik megvan adva.',
+            target: () => mediaRef.current,
+          },
+          {
+            title: 'Felhasználók engedélyezése',
+            description: 'A kiválasztott felhasználók fogják csak elérni az eseményt az oldalon és jegyet eladni az eseményhez és a az eseményhez kapcsolódó eladásokat is csak az engedélyezett felhasználók fogják látni.',
             target: () => usersRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Esemény borítóképe',
+            description: 'Az esemény borítóképét itt lehet feltölteni. A feltölthető kép formátuma .png .jpg/.jpeg. A borítóképen nem ajánlott felirat és qr kód megjelenítése.',
             target: () => backgroundRef.current,
           },
           {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
+            title: 'Az eseményhez létrehozott jegyek',
             target: () => ticketsRef.current,
-          },
-          {
-            title: 'Upload File',
-            description: 'Put your files here.',
-            cover: (
-              <img
-                alt="tour.png"
-                src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
-              />
-            ),
-            target: () => timeLineRef.current,
-          },
+          }
       ];
 
     const getUsers = ()=>{
@@ -416,6 +292,9 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             if (response.users){
                 setUsers(response.users);
             }
+            else if (response?.error){
+                setError(response.message ? response.message : "Hiba történt a felhasználók letöltése közben.");
+            }
         })
     }
 
@@ -423,11 +302,14 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         if (id){
             postData(`/venue/${id}`, {token : ParseLocalStorage("long_token")})
             .then((data:any)=>{
-                if (data){
+                if (data && !data.error){
                     for (let i = 0; i < data.seatsDatas.length; i++){
                         data.seatsDatas[i].colorOfSeat = data.colorOfSeat;
                     }
                     setVenueDatas(data);
+                }
+                else{
+                    setError(data?.message ? data.message : "Hiba történt a terem adatainak letöltése közben.");
                 }
             });
         }
@@ -447,13 +329,14 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     }
 
     useEffect(()=>{
+        if (id) setErrorWindow("Az esemény szerkesztése hatással lehet a már megvásárolt jegyekre, további információkért keresse fel a {} oldalt.");
         postData("/get-venues-in-array", {token : ParseLocalStorage("long_token")})
         .then((datas)=>{
             if (datas.datas){
                 setVenues(datas.datas);
             }
             else{
-
+                setError(datas?.message ? datas.message : "Hiba történt a helyszín adatainak letöltése közben.")
             }
         });
         if (selectedVenue){
@@ -468,13 +351,17 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
                 }
                 setCompanyList(list);
             }
+            else{
+                setError(response?.message ? response.message : "Hiba történt a cégek letöltése közben.");
+            }
         });
         getUsers();
         getTickets();
     }, []);
 
     const changeSelectedVenue = (d:string)=>{
-        setSelectedVenue(d) ;getPlaceDatas(d);
+        console.log(d);
+        setSelectedVenue(d === "default" ? "" : d) ;getPlaceDatas(d === "default" ? "" : d);
     }
 
     const addNewTickets = (datas:typeOfTicket)=>{
@@ -509,6 +396,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     }
 
     const save = ()=>{
+        if (!media.apple_music || media.instagram || media.facebook || media.spotify || media.youtube ) setErrorWindow("Az esemény tartalmán sokat lendíthet egy az eseménnyel kapcsolatos social média oldal csatolása.");
         setIsLoading(true);
         let sendData = {
             name : nameOfEvent,
@@ -538,8 +426,13 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             else if (data.id && !id){
                 window.location.pathname += `/${data.id}`;
             }
-            setIsLoading(false);
-            setSuccessSave(true);
+            if (!data.error){
+                setIsLoading(false);
+                setSuccessSave(true);
+            }
+            else{
+                setError(data?.message ? data.message : "Hiba történt a mentés közben.")
+            }
         })
     }
 
@@ -632,6 +525,10 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     }
 
 
+    const controlDates = ()=>{
+        if (endOfTheEvent && new Date(dateOfEvent) > new Date(endOfTheEvent)) setError("Az eseménynek korábban kell kezdődnie, mint befejeződnie");
+    }
+
     return (
         <div>
         <BackButton url="/admin/rendezvenyek" className = "create-event-back-button" />
@@ -660,71 +557,80 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
           }>
           Sikeres mentés!
         </Alert>
+        <Error title = "Hiba történt" message={error} open = {error !== ""} setOpen={()=>{setError("")}} />
       </Collapse>
             </div>
-            <div ref = {ticketSalesRef}><Statistic title="Jegyek" value={occupiedTicket()} suffix={`/ ${summTickets()}`} /></div>
-            <div ref = {eventTitleRef}><InputText title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} disabled = {isLoading} info={{text : "Ez a cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. A rendezvény url-e is ez alapján fog létrejönni."}} /></div>
-            <div ref = {eventLocationRef}><InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} disabled = {isLoading} info={{text : "Az ide beírt helyszín fog megjelenni az oldalon", image : "/images/info/map.png"}} /></div>
-            <div ref = {eventAddressRef}><InputText title = "Rendezvény helyszínének címe" onChangeFunction={setAddress} value={address} disabled = {isLoading} info={{text : "A rendezvény helyszínének a címe. Írányítószám város, utca házszám. Ez nem fog megjelenítésre kerülni az oldalon, hanem a helyszínre kattintva ennek a címnek a segítségével fogja megkeresni a felhasználó alapértelmezett térképével a helyszínt. Támogatott térképek: Google Maps, Apple Maps. Helyszíneknél megadható a helyszín neve is az utca, házszám helyett, de a térképek ilyenkor nem fogják minden esetben pontosan megtalálni."}} /></div>
-            <div ref = {mapRef}><h4>Esemény helyszíne</h4>
+            <div ref = {ticketSalesRef} className = "event-settings-holder"><Statistic title="Jegyek" value={occupiedTicket()} suffix={`/ ${summTickets()}`} /></div>
+            <div ref = {eventTitleRef} className = "event-settings-holder"><InputText maxLength={50} title="Rendezvény címe" onChangeFunction={setNameOfEvent} value = {nameOfEvent} disabled = {isLoading} info={{text : "Ez a cím fog megjelenni az oldalon. Az ajánlott hossza maximum 50 karakter. A rendezvény url-e is ez alapján fog létrejönni."}} /></div>
+            <div ref = {eventLocationRef} className = "event-settings-holder"><InputText title="Rendezvény helyszíne" onChangeFunction={setLocationOfEvent} value = {locationOfEvent} disabled = {isLoading} info={{text : "Az ide beírt helyszín fog megjelenni az oldalon", image : "/images/info/map.png"}} /></div>
+            <div ref = {eventAddressRef} className = "event-settings-holder"><InputText title = "Rendezvény helyszínének címe" onChangeFunction={setAddress} value={address} disabled = {isLoading} info={{text : "A rendezvény helyszínének a címe. Írányítószám város, utca házszám. Ez nem fog megjelenítésre kerülni az oldalon, hanem a helyszínre kattintva ennek a címnek a segítségével fogja megkeresni a felhasználó alapértelmezett térképével a helyszínt. Támogatott térképek: Google Maps, Apple Maps. Helyszíneknél megadható a helyszín neve is az utca, házszám helyett, de a térképek ilyenkor nem fogják minden esetben pontosan megtalálni."}} /></div>
+            <div ref = {mapRef} className = "event-settings-holder"><h4>Esemény helyszíne</h4>
             <h6>Válaszd ki a térképen a marker húzásávál az esemény helyszínét</h6>
             <MarkerMap zoomLevel={14} center={position} title = {locationOfEvent} setPosition={setPostion} />
             </div>
-            <div ref = {desciptionRef}>
+            <div ref = {desciptionRef} className = "event-settings-holder">
             <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} disabled = {isLoading} />
             </div>
-            <div ref = {selectVenueRef}>
-            <AddNewButton onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setAddWindow(false)}} />
+            <div ref = {eventDateRef} className = "event-settings-holder">
+            <Calendar error = {new Date(dateOfEvent) < new Date(dateOfRelease) || new Date(dateOfEvent) > new Date(endOfTheEvent)} onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" disabled = {isLoading} info={{ text : "Ez a dátum fog megjelenni az oldalon. A megadott dátum a rendezvényt már nem lehet rá vásárolni és eltűnik a főoldalról. A megadott dátumtól számított másfél évvel az oldal gyorsasága érdekében a rendezvény autómatikusan törlésre kerül", image : "/images/info/date.png"}} />
             </div>
-            <div ref = {eventDateRef}>
-            <Calendar onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" disabled = {isLoading} info={{ text : "Ez a dátum fog megjelenni az oldalon. A megadott dátum a rendezvényt már nem lehet rá vásárolni és eltűnik a főoldalról. A megadott dátumtól számított másfél évvel az oldal gyorsasága érdekében a rendezvény autómatikusan törlésre kerül", image : "/images/info/date.png"}} />
-            </div>
-            <div ref = {releaseDateRef}>
+            <div ref = {releaseDateRef} className = "event-settings-holder">
             <Calendar onChangeFunction={setDateOfRelease} value = {dateOfRelease} title="Rendevény megjelenése az oldalon" disabled = {isLoading} info={{text : "A megadott időtől jelenik meg a rendezvény az oldalon és lehet rá jegyet vásárolni. Az értékének kisebbnek kell lennie mint a rendezvény dátuma."}} />
             </div>
-            <div ref = {gateOpeningRef}>
+            <div ref = {gateOpeningRef} className = "event-settings-holder">
             <Calendar onChangeFunction={setGateOpening} value = {gateOpening} title = "Kapunyitás" disabled= {isLoading} info={{text : "A kapunyitás az oldalon nem kerül mejelenítésre, ez a már megvásárol jegyen lesz látható."}} />
             </div>
-            <div ref = {endOfEventRef}>
+            <div ref = {endOfEventRef} className = "event-settings-holder">
             <Calendar onChangeFunction={setEndOfTheEvent} value={endOfTheEvent} title = "Esemény vége" disabled = {isLoading} info={{text : "Az esemény végére a az Apple pass és a jegy miatt van szükség, ott kerül majd megjelenítésre."}} />
             </div>
-            <div ref = {wardrobeRef}>
+            <div ref = {wardrobeRef} className = "event-settings-holder">
             <Radio.Group onChange={(e:any)=>{setWardrobe(e.target.value)}} defaultValue={wardrobe} className = "event-settings-radio">
                 <Radio.Button value={true}>Ruhatár a helyszínen</Radio.Button>
                 <Radio.Button value={false}>Nincsenek ruhatár a helyszínen</Radio.Button>
             </Radio.Group>
             </div>
-            <div ref = {venueRef}>
+            <div ref = {venueRef} className = "event-settings-holder">
             <Select title = "Helyszín kiválasztása" options = {venues} onChangeFunction = {changeSelectedVenue} value = {selectedVenue} />
             </div>
-            <div ref = {companyRef}>
+            <div ref = {companyRef} className = "event-settings-holder">
             <Select title = "Vállalt kiválasztása" options = {companyList} onChangeFunction={setSelectedCompany} value={selectedCompany} />
             </div>
-            <div ref = {localDiscountsRef}>
+            <div ref = {localDiscountsRef} className = "event-settings-holder">
             <Radio.Group onChange={(e:any)=>{setLocalDiscounts(e.target.value)}} defaultValue={localDiscounts} className = "event-settings-radio">
                 <Radio.Button value={true}>Helyi kedvezmények</Radio.Button>
                 <Radio.Button value={false}>Nincsenek helyi kezvezmények</Radio.Button>
             </Radio.Group>
             </div>
+            <div ref = {mediaRef} className = "event-settings-holder">
             <AddMedia media = {media} changeValueOfMedia={valueOfMedia} disabled = {isLoading} />
-            <div ref = {usersRef}>
+            </div>
+            <div ref = {usersRef} className = "event-settings-holder">
             <h4>Felhasználók engedélyezése:</h4>
             {users.length ? <UsersList selectedUsers={selectedUsers} userDatas={users} onChangeFunction={changeSelectedUsers} /> : ""}
             </div>
-            <div ref = {backgroundRef}>
+            <div ref = {backgroundRef} className = "event-settings-holder">
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             </div>
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
-            <div ref = {ticketsRef}>
+            <div ref = {ticketsRef} className = "event-settings-holder">
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
             </div>
-            <div ref = {timeLineRef}>
-            {versions && versions.length ? <TimeLine setTimeLine={()=>{setTimeLine(!timeLine)}} timeLine = {timeLine} data = {versions} /> : ""}
-            </div>
+            {versions ? <div onClick = {e=>setTimeLine(!timeLine)} className = "time-line-collapse">Idővonal <span className = "time-line-open-icon">{ timeLine ? <i className="fas fa-caret-down"></i> : <i className="fas fa-caret-right"></i>}</span></div> : <></>}
+            <Collapse in = {timeLine}>
+            {timeLine ? <TimeLine setTimeLine={()=>{setTimeLine(!timeLine)}} timeLine = {timeLine} data = {versions} /> : ""}
+            </Collapse>
             <LoadingButton loading = {isLoading} onClick = {save} style={{margin : "10px auto", display : "block"}} variant="outlined">
                 Mentés
             </LoadingButton>
-            <Tour open={openTour} onClose={() => setOpenTour(false)} steps={steps} />
+            <FloatButton.Group>
+            <FloatButton className = "add-button" onClick={e=>{window.scrollTo(0, 0); setOpenTour(true)}} icon = {<QuestionCircleOutlined />} />
+            <FloatButton className = "add-button" icon = {<span>+</span>} onClick={()=>{reload_All_Selected(); selectedVenue ? setAddWindow(true) : setErrorWindow("Jegy létrehozása előtt ki kell választani helyszínt!")}} />
+            </FloatButton.Group>
+            <Tour open={openTour} onClose={() =>{ setOpenTour(false); insertCookie("event_Tutorial", "true")}} onFinish={()=>{insertCookie("event_Tutorial", "true")}} mask={true} steps={steps} />
+            {<Modal closable = {false} open = {errorWindow!==""} footer = {<Button onClick={()=>setErrorWindow("")}>OK</Button>}>
+                <h2>Oops!</h2>
+                <p>{errorWindow}</p>
+            </Modal>}
         </div>
         </div>
     );

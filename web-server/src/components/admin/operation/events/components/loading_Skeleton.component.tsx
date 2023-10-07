@@ -1,4 +1,5 @@
 import EventSkeleton from "./event_Skeleton.component"
+import { v4 as uuid } from 'uuid';
 
 type typeOfLoadingSkeletonParams = {
     limit : number
@@ -6,10 +7,10 @@ type typeOfLoadingSkeletonParams = {
 
 const LoadingSkeleton = ({limit}:typeOfLoadingSkeletonParams)=>{
 
-    return <div className = "admin-event-list">
+    return <div className = "admin-event-list" key = "skeleton">
         {
             Array.from(Array(limit), (e, i) => {
-                return  <EventSkeleton />
+                return  <EventSkeleton key={uuid()} skeletonKey = {uuid()} />
               })
         }
     </div>

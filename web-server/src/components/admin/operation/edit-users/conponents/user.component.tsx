@@ -2,6 +2,7 @@ import "../../../../../css/user.css";
 import { v4 as uuid } from 'uuid';
 import Avatar from '@mui/material/Avatar';
 import StringAvatar from "../../../../avatar/avatar.component";
+import { Badge, Tag } from "antd";
 type typeOfUser = {
     username : string,
     access : any,
@@ -25,13 +26,13 @@ const User = ({ user,deleteEvent, editEvent }:typeOfUserParams)=>{
             <StringAvatar username = {user.username} />
             <div className = "user-info-datas">
             <span className="username">{user.username}</span>
-            <span className = "status registered">Registered</span>
+            <Badge status="success" text="Registered" style={{marginLeft : 10, color : "#7d7d7d"}}/>
             </div>
             </div>
             <ul className="access-list">
             {Object.keys(user.access).map(
                     (element, index)=>{
-                        return <li key = {uuid()} className = "access">{user.access[element][0]}</li>
+                        return <li key = {uuid()} className = "access"><Tag color="blue">{user.access[element][0]}</Tag></li>
                     }
                 )}
             </ul>

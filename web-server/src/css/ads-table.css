@@ -1,0 +1,16 @@
+.action-button{
+    width : 50px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ads-table-header{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+.ads-table{
+    margin: 25px 10px;
+}

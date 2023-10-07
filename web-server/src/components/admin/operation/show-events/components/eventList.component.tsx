@@ -28,7 +28,8 @@ type typeOfEventDatas = {
     eventData : typeOfEvent,
     addedBy : {username : string, userId : string, readableid : string},
     id : string,
-    contributor : Array<string>
+    contributor : Array<string>,
+    isActive : boolean
 }
 
 type typeOfEventListParams = {
@@ -43,16 +44,19 @@ type typeOfEventListParams = {
 
 const EventList = ( { events, editFunction,deleteFunction, numberOfPages, page, handleChange }:typeOfEventListParams )=>{
 
-    console.log(numberOfPages);
-    return <div className = "admin-event-list">
+    return <div className = "admin-event-list" key = {uuid()}>
+        <div className = "event-list-grid" key = {uuid()}>
         {
             events.map((element)=>{
-                return <Event key={uuid()} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} />
+                return <Event eventKey={uuid()} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} isActive = {element.isActive} />
             })
         }
+        </div>
+        {numberOfPages > 1 ? <div className = "pagination-holder">
         <Stack spacing={2}>
         <Pagination count={numberOfPages} page={page} onChange={handleChange} siblingCount={0} boundaryCount={2}/>
         </Stack>
+        </div> : <></>}
     </div>
 }
 

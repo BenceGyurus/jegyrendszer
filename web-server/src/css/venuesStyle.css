@@ -2,20 +2,28 @@
     width: max-content;
     flex-direction: column;
     align-items: center;
-    height: 200px;
+    height: 100%;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    margin: 20px;
-    display: inline-table;
+    padding: 25px 8px;
+    display: block;
+    margin: 30px auto;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    max-width: 500px;
 }
 
 .venue-title {
-    font-size: 20px;
-    font-weight: 500;
+    font-size: 28px;
+    font-weight: 200;
     text-align: center;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     font-weight: bold;
+    max-width: 80%;
+    text-align: center;
+    margin: 7px auto;
 
   }
 
@@ -52,7 +60,26 @@
 }
 
 .tooltip-position-div{
-  float: right;
-  margin: 3px;
-  padding: 1px;
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+}
+
+.venue-list{
+  display: block;
+  width : 100%;
+}
+
+@media screen and (width > 1100px) {
+  .venue-list{
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(30%, 1fr)); 
+    width: 100%;
+    padding: 0;
+    grid-gap: 1%;
+  }
+  .venue {
+    display: flex;
+    width: 100%;
+}
 }

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import "../../../css/venues.css";
 import VenueList from "./venuesList.component";
 import { v4 as uuid } from 'uuid';
+import AddNewButton from "../../buttons/add_New.component";
 
 const Venues = ()=>{
 
@@ -35,7 +36,7 @@ const Venues = ()=>{
     return (
         <div key = {uuid()}>
             <h1>Helyszínek</h1>
-            <input type="button" value="+" className="add-venue-button" onClick = {()=>{navigate("/uj-terem")}}/>
+            <AddNewButton onClick={()=>{navigate("/uj-terem")}} />
             <VenueList venues={rooms} newRequest = {load}/>
         </div>
     )

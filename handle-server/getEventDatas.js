@@ -10,32 +10,33 @@ const closeConnection = (database)=>{
 
 
 const getEventDatas = async (eventId)=>{
-    let eventDatas = await getTicketByReadableId(eventId);
+    let {collection, database} = new Database("events");
+    let eventDatas = (await collection.findOne({"eventData.readable_event_name" : eventId}))
     if (eventDatas){
-    if (eventDatas){
-        for (let i = 0; i < eventDatas.tickets.length; i++){
-            eventDatas.tickets[i].pendingPlaces = [];
-            eventDatas.tickets[i].boughtPlaces = [];
-            eventDatas.tickets[i].numberOfFreeTickets = eventDatas.tickets[i].numberOfTicket;
+    if (eventDatas && eventDatas.eventData){
+        for (let i = 0; i < eventDatas.eventData.tickets.length; i++){
+            eventDatas.eventData.tickets[i].pendingPlaces = [];
+            eventDatas.eventData.tickets[i].boughtPlaces = [];
+            eventDatas.eventData.tickets[i].numberOfFreeTickets = eventDatas.eventData.tickets[i].numberOfTicket;
         }
     }
     const boughtDatabase = new Database("buy");
-    let boughtDatas = await boughtDatabase.collection.find({$and : [{eventId : eventId}, {$or : [ {$and : [{ time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")} }, {pending : true}]}, {bought : true} ]}]}).toArray();
+    let boughtDatas = await boughtDatabase.collection.find({$and : [{id : eventDatas._id}, {$or : [ {$and : [{ time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")} }, {pending : true}]}, {bought : true} ]}]}).toArray();
     console.log(boughtDatas);
     closeConnection(boughtDatabase.database)
     for (let i = 0; i < boughtDatas.length; i++){
             for (let j = 0; j < boughtDatas[i].tickets.length; j++){
-                for (let k = 0; k < eventDatas.tickets.length; k++){
-                    if (eventDatas.tickets[k].id == boughtDatas[i].tickets[j].ticketId && eventDatas.tickets[k].seats.length){
-                        boughtDatas && boughtDatas[i].bought && boughtDatas[i].tickets && boughtDatas[i].tickets[j] && boughtDatas[i].tickets[j] && boughtDatas[i].tickets[j].places && boughtDatas[i].tickets[j].places.length ? eventDatas.tickets[k].boughtPlaces.push(...boughtDatas[i].tickets[j].places) : boughtDatas[i].pending ? eventDatas.tickets[k].pendingPlaces.push(...boughtDatas[i].tickets[j].places) : false;
+                for (let k = 0; k < eventDatas.eventData.tickets.length; k++){
+                    if (eventDatas.eventData.tickets[k].id == boughtDatas[i].tickets[j].ticketId && eventDatas.eventData.tickets[k].seats.length){
+                        boughtDatas && boughtDatas[i].bought && boughtDatas[i].tickets && boughtDatas[i].tickets[j] && boughtDatas[i].tickets[j] && boughtDatas[i].tickets[j].places && boughtDatas[i].tickets[j].places.length ? eventDatas.eventData.tickets[k].boughtPlaces.push(...boughtDatas[i].tickets[j].places) : boughtDatas[i].pending ? eventDatas.eventData.tickets[k].pendingPlaces.push(...boughtDatas[i].tickets[j].places) : false;
                     }
-                    if (boughtDatas[i].tickets[j].ticketId == eventDatas.tickets[k].id){
-                        eventDatas.tickets[k].numberOfFreeTickets-=boughtDatas[i].tickets[j].amount
+                    if (boughtDatas[i].tickets[j].ticketId == eventDatas.eventData.tickets[k].id){
+                        eventDatas.eventData.tickets[k].numberOfFreeTickets-=boughtDatas[i].tickets[j].amount
                     }
                 }
         }
     }
-    return eventDatas;}
+    return eventDatas.eventData;}
     return false;
 }
 

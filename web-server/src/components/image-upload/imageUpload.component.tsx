@@ -3,6 +3,7 @@ import axios from 'axios';
 import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 import { useState } from "react";
 import Loader from "../loader/loader.component";
+import { Progress } from "antd";
 
 type typeOfFile = {
     fileName : string
@@ -24,20 +25,35 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
 
     const [image, setImage]:[typeOfFileType, Function] = useState({path : file.fileName});
     const [uploading, setUploading]:[boolean, Function] = useState(false);
+    const [percent, setPercent]:[number, Function] = useState(0);
+    const [errorUploading, setErrorUploading]:[boolean, Function] = useState(false);
 
-    const uploadFile = (event:any)=>{
+    const uploadFile = async (event:any)=>{
         if (event.target.files[event.target.files.length-1]){
         setUploading(true);
+        setPercent(0);
         const data = new FormData() ;
         data.append('file', event.target.files[event.target.files.length-1]);
-        axios.post(`/api/v1/upload-image/${ParseLocalStorage("long_token")}`, data)
-        .then(res => { // then print response status
-            if (res.data.path){
-                onChangeFunction(res.data.path, res.data.width, res.data.height);
-                setImage({path : res.data.path});
-                setUploading(false);
+        try {
+            const response = await axios.post(`/api/v1/upload-image/${ParseLocalStorage("long_token")}`, data, {
+              onUploadProgress: (progressEvent:any) => {
+                const progress = (progressEvent.loaded / progressEvent.total) * 100;
+                setPercent(progress);
+              },
+            });
+    
+            // Successful upload
+            if (response.data && response.data.path){
+                setTimeout(()=>{setUploading(false)}, 100)
+                setImage({path : response.data.path});
+                onChangeFunction(response.data.path);
             }
-        });
+            setErrorUploading(false);
+          } catch (error) {
+            // Handle errors
+            console.error("Error during upload:", error);
+            setErrorUploading(true)
+          }
         }
     }
 
@@ -54,7 +70,7 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
                 <input type="file" id="image-upload" name="image-upload" accept=".png,.jpeg,.img,.gif,.jifi,.jpg" onChange={e=>uploadFile(e)} />
                 {!uploading ? <label htmlFor="image-upload"><i className="fas fa-cloud-upload-alt"></i> Kép feltöltése
                 <div className="image-preview">{image.path ? <img src={image.path} alt="Feltöltött kép"/> : ""}</div>
-                </label> : <Loader />}
+                </label> : <Progress type="circle" percent={percent} status={errorUploading ? "exception" : "active"} />}
                 {image.path ? <button className="delete-button" type="button" onClick={e=>deleteFile(e)}><i className="close-icon fas fa-times"></i></button> : ""}
             </div>
         </div>

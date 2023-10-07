@@ -6,7 +6,6 @@ import Loader from "../../../loader/loader.component";
 import Users from "./conponents/users.component";
 import NewUserWindow from "./conponents/newUserWindow.component";
 import ShowToken from "./conponents/showtoken.component";
-import UserEditWindow from "./conponents/user-edit-window.component";
 import Notification from "../../../notification/notification.component";
 import Error from "../../../notification/error.component";
 import Success from "../../../notification/success.component";
@@ -18,7 +17,8 @@ type typeOfRegisteredUser = {
     cantEdit : Boolean,
     id : string,
     status: true,
-    pedding? : boolean
+    pedding? : boolean,
+    external : boolean
 }
 
 type typeOfPeddingUser = {
@@ -29,7 +29,8 @@ type typeOfPeddingUser = {
     status: false,
     access : Object,
     url : string,
-    token : string
+    token : string,
+    external : boolean
 }
 
 type typeOfUser = {
@@ -56,7 +57,7 @@ const Main = ()=>{
     const [users, setUsers] = useState(Array<typeOfUser>);
     const [openNewUser, setOpenNewUser] = useState(false);
     const [showUser, setShowUser] = useState({token : "", url : ""});
-    const [selectedUserToEdit, setSelectedUserToEdit]:[typeOfRegisteredUser, Function] = useState({username : "", access : {}, cantEdit : false, id : "", status : true});
+    const [selectedUserToEdit, setSelectedUserToEdit]:[typeOfRegisteredUser, Function] = useState({username : "", access : {}, cantEdit : false, id : "", status : true, external : false});
 
     useEffect(()=>{
         updateUsers();
@@ -67,6 +68,9 @@ const Main = ()=>{
         .then((data)=>{
             if (!data.error){
                 setUsers(data.users);
+            }
+            else{
+                setError(data.message ? data.message : "Hiba történt a felhasználó lekérdezése közben.");
             }
         })
     }
@@ -85,7 +89,7 @@ const Main = ()=>{
                 d = await data.responseData;
             }
             if (d && d.error){
-                
+                setError(d.message ? d.message : "Hiba történt a törlés közben");
             }
             else if (d && !d.error){
                 updateUsers();
@@ -99,8 +103,6 @@ const Main = ()=>{
             setSelectedUserToEdit(user);
         }
     }
-
-    console.log(selectedUserToEdit);
 
     const deletePeddingUser = (id:string)=>{
         if (id){
@@ -117,7 +119,19 @@ const Main = ()=>{
     const selectPeddingUser = (user:typeOfPeddingUser)=>{
         if (user.id){
             setSelectedUserToEdit({username : "Pedding felhasználó", access : user.access, cantEdit : false, id : user.id, status : false, pedding : true})
+        }else{
+            setError("Hiba történt a felhasználó kijelölése közben");
         }
+    }
+
+    const getAccesses = ()=>{
+        let e:any = {};
+        if (selectedUserToEdit.id){
+            Object.keys(selectedUserToEdit.access).forEach(item=>{
+                e[item] = true;
+            }); 
+        }
+        return e;
     }
 
 
@@ -126,10 +140,9 @@ const Main = ()=>{
         <h1>Felhasználók szerkesztése</h1>
         <Error message={error} setOpen={()=>{setError("")}} open = {error != ""} />
         {suc ? <Notification element={<Success message={suc} closeFunction={()=>{setSuc("")}} />} /> : ""}
-        {selectedUserToEdit.id ? <UserEditWindow closeFunction={()=>{setSelectedUserToEdit({username : "", access : {}, cantEdit : false, id : "", status : true})}} user={selectedUserToEdit} errorFunction={setError} updateFunction = {updateUsers} succFunction = {setSuc} /> : ""} 
         {!users.length ? <Loader /> : <Users addNewFunction={()=>{setOpenNewUser(true)}} deleteEvent={delete_User} users = {users} editEvent={selectUser} peddingDelete = {deletePeddingUser} peddingEdit = {selectPeddingUser}/>}
-        {openNewUser ? <NewUserWindow closeFunction = { ()=>{setOpenNewUser(false)}} readyState = {showAddedUser}/> : ""}
-        {showUser.token && showUser.url ? <ShowToken token = {showUser.token} url = {showUser.url} closeFunction = {()=>{setShowUser({token : "", url : ""})}} /> : ""}
+        {openNewUser || selectedUserToEdit.id ? <NewUserWindow closeFunction = { ()=>{setOpenNewUser(false); setSelectedUserToEdit({username : "", access : {}, cantEdit : false, id : "", status : true})}} accesses = {getAccesses()} external = {selectedUserToEdit.external} readyState = {showAddedUser} pending = {selectedUserToEdit.pedding} userId={selectedUserToEdit.id} updateFunction={updateUsers} setError={setError} /> : ""}
+        {(showUser.token && showUser.url)   ? <ShowToken token = {showUser.token} url = {showUser.url} closeFunction = {()=>{setShowUser({token : "", url : ""})}} /> : ""}
     </div>);
 }
 

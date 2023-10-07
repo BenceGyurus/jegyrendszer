@@ -1,3 +1,4 @@
+import { Badge } from "antd";
 import "../../../../../css/user.css";
 import { v4 as uuid } from 'uuid';
 type typeOfUser = {
@@ -30,8 +31,7 @@ const PeddingUser = ({ user, deleteFunction, editFunction }:typeOfUserParams)=>{
         <li key = {user.id} className = "user-list-element">
         <div className="user-info">
             <span className="username">Hozzáadta: {user.addedBy}</span>
-            <span className = "status pedding">Pedding</span>
-            <span className = "vaild">{`Érvényes: ${getDate(user.validTo)}`}</span>
+            <Badge status="processing" text="Pedding" style={{marginLeft : 10, color : "#7d7d7d"}}/>
             <br />
             <span className = "url">Regisztrációs link: <span className = "link">{window.location.origin}{user.url}{user.token}</span></span>
             <ul className="access-list">

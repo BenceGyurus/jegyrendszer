@@ -44,14 +44,14 @@ const Admin = ()=>{
     <form>
       <div className="login-form-group">
         <label htmlFor="username">Felhasználónév</label>
-        <input type="text" id="username" name="username" required onChange={event => changeUsername(event)}  />
+        <input type="text" id="username" name="username" required onChange={event => changeUsername(event)} onKeyDown={e=>{if (e.key.toUpperCase() === "ENTER") login()}}  />
       </div>
       <div className="login-form-group">
         <label htmlFor="password">Jelszó</label>
-        <input type="password" id="password" name="password" required onChange={event => changePassword(event)} />
+        <input type="password" id="password" name="password" required onChange={event => changePassword(event)} onKeyDown={e=>{if (e.key.toUpperCase() === "ENTER") login()}}  />
       </div>
       <div className="login-form-group">
-        <input type="button" value="Bejelentkezés" onClick={login} />
+        <input type="button" value="Bejelentkezés" onClick={login}/>
       </div>
     </form>
   </div>

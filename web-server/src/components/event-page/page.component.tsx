@@ -175,22 +175,19 @@ const Page = ({title, background, description, date, id, media, position, locati
         setSelectNotification(false);
         let lTicketAmount = [...ticketsAmount];
         for (let i = 0; i < lTicketAmount.length; i++){
+            console.log(lTicketAmount[i].amount, lTicketAmount[i].selected);
             if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
                 let l = [...selectedTickets, id];
                 setSelectedTickets(l);
                 lTicketAmount[i].selected++;
             }
-            else if (selectedTickets.includes(id)){
+            else if (lTicketAmount[i].seats.includes(id) && selectedTickets.includes(id)){
                 if (lTicketAmount[i].selected > 0){
                     lTicketAmount[i].selected--;
                 }
                 let l = [...selectedTickets];
                 let newList:Array<string> = [];
-                l.forEach((element:string)=>{
-                    if (element != id){
-                        newList.push(element)
-                    }
-                })
+                newList = l.filter(item=>item != id);
                 setSelectedTickets(newList);
             }
         }
@@ -245,6 +242,8 @@ const Page = ({title, background, description, date, id, media, position, locati
         }
         setErrorNat(error[0]);
     }
+
+    console.log(ticketsAmount);
 
     return <div className="event-page-div">
         <Error message={errorNat} open = {errorNat!=""} setOpen={()=>setErrorNat("")} />

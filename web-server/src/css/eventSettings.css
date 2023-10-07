@@ -41,3 +41,22 @@
 .event-settings-radio{
     margin: 10px 0;
 }
+
+.time-line-collapse{
+    cursor: pointer;
+    font-size: 13px;
+    margin: 40px auto;
+    text-align: center;
+    border: 1px solid #1677ff;
+    width: max-content;
+    padding: 8px 15px;
+    border-radius: 5px;
+}
+
+.time-line-open-icon{
+    margin-left: 5px;
+}
+
+.event-settings-holder{
+    margin-top: 5px;
+}

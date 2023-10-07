@@ -7,9 +7,10 @@ type typeOfCalendarParams = {
     value? : string,
     disabled? : boolean,
     info? : {text? : string, image? : string}
+    error? : boolean
 }
 
-const Calendar = ( { title, onChangeFunction, value, disabled, info }:typeOfCalendarParams )=>{
+const Calendar = ( { title, onChangeFunction, value, disabled, info, error }:typeOfCalendarParams )=>{
 
     const dateRef:any = useRef(null);
 
@@ -35,7 +36,7 @@ const Calendar = ( { title, onChangeFunction, value, disabled, info }:typeOfCale
 
     return <div className="input-container">
         {title ? <label className = "calendar-label" htmlFor="datetime-input">{title}</label> : ""}
-        <div><input type="datetime-local" id="datetime-input" name="datetime-input" onChange={e=>onChangeFunction ? onChangeFunction(e.target.value) : ""} ref={dateRef} disabled = {disabled ? disabled : false} /></div>
+        <div><input style = {{borderColor : error ? "#ba1f1c" : "#ccc"}} type="datetime-local" id="datetime-input" name="datetime-input" onChange={e=>onChangeFunction ? onChangeFunction(e.target.value) : ""} ref={dateRef} disabled = {disabled ? disabled : false} /></div>
         </div>
     
 };

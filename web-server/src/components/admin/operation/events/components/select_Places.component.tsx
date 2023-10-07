@@ -1,7 +1,8 @@
 import { useState } from "react"
 import "../../../../../css/select_Places.css";
-import WindowHeader from "../../../../window-header/windowHeader.component";
 import { v4 as uuid } from 'uuid';
+import Window from "../../../../window/window.component";
+import { Empty } from "antd";
 
 
 type typeOfShowSeatsParams = {
@@ -55,8 +56,8 @@ const ShowSeats = ({datasOfVenue, closeFunction, addNewSeat, seatList, allSelect
     //style = {{width : venueData.sizeOfArea.width, height : venueData.sizeOfArea.height}}
 
     return (
-        <div className = "select-places-div">
-            <WindowHeader title = "Helyek kiválasztása" closeWindowFunction={closeFunction} className = "select-places-window-header"/>
+
+        <Window title = "Helyek kiválasztása" closeFunction={closeFunction} >
             <div className = "select-place-div-2">
             {venueData ? <div className = "select-places-place-div">
             {
@@ -64,11 +65,11 @@ const ShowSeats = ({datasOfVenue, closeFunction, addNewSeat, seatList, allSelect
                     (venue:any)=>{
                         return !allSelected.includes(venue.id) || seatList.includes(venue.id) ? <span key = {uuid()} onClick={e => {addNewSeat(venue.id); setStatus(!status)}} className = "place" style = {{background:`${seatList.includes(venue.id) ? "red":"black"}`, width : venueData.sizeOfSeat, position: "absolute", top : venue.posY, left : venue.posX, height: venueData.sizeOfSeat}}></span> : "";
                     }
-                ): ""
+                ): <Empty />
             }
-            </div> : ""}
+            </div> : <Empty />}
             </div>
-        </div>
+        </Window>
     )
 }
 

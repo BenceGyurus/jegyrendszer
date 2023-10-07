@@ -166,7 +166,6 @@ app.get("/api/v1/event/:id", async (req,res)=>{
     let id = req?.params?.id;
     if(id == undefined) return handleError(logger, "400", res);
     const cachedData = await readFromRedisCache(req.params.id);
-    console.log(cachedData);
     // const cachedData = Cache.get(req.params.id);
     if (cachedData) return res.send(JSON.parse(cachedData));
     let event = (await getTicketByReadableId(req.params.id));
@@ -229,7 +228,6 @@ app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), asy
             eventDatas = await getTicketByReadableId(eventId);
             if (eventDatas.venue != req.params.id) return handleError(logger, "035", res);
         }
-        console.log(eventId);
         let venue = await collection.findOne({_id : objectid}, {projection : { "content.name" : 1, "content.colorOfBackGround" : 1, "content.sizeOfArea" : 1, "content.background" : 1, "content.seatsDatas" : 1, "content.groups" : 1, "content.sizeOfSeat" : 1, "content.colorOfSeat" : 1, "content.stage" : 1 }});
         closeConnection(database);
         if (!eventId){
@@ -277,12 +275,9 @@ app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), asy
 app.post("/api/v1/ticket-validation/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id && req.body.eventId){
         let access = await control_Token(req.body.token, req);
-        console.log(req.body);
         if (access && access.includes("local-sale")){
             const eventData = await getTicketByReadableId(req.body.eventId);
-            console.log(eventData);
             if (eventData){
-                console.log(eventData);
                 let idOfTicket = "";
                 try{
                     idOfTicket = ObjectId(req.params.id)
@@ -476,7 +471,7 @@ app.post("/api/v1/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async
         if (access && access.includes("edit-users")){
             let { collection, database } = new Database("admin");
             let sendDatas = [];
-            let datas = await collection.find()?.toArray();
+            let datas = await collection.find({} , {projection : { username : 1, access : 1, cantEdit : 1, externalSeller : 1 }} )?.toArray();
             if(datas == undefined) {
                 handleError(logger, "500", res);
                 logger.error(`Admin db cant be read`);
@@ -490,7 +485,8 @@ app.post("/api/v1/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async
                     username : datas[i].username,
                     access : Functions.merge_Access(datas[i].access),
                     cantEdit : datas[i].cantEdit,
-                    status : true
+                    status : true,
+                    external : datas[i].externalSeller
                 });
             }
             let l = new Database("new-user");
@@ -514,7 +510,8 @@ app.post("/api/v1/users", (req,res, next)=>parseBodyMiddleeware(req,next) ,async
                         status: false,
                         access : Functions.merge_Access(datas[i].access),
                         token : datas[i].token,
-                        url : "/uj-profil/"
+                        url : "/uj-profil/",
+                        external : datas[i].externalSeller
                     })
                 }
             }
@@ -648,17 +645,17 @@ app.post("/api/v1/delete-user", async (req,res)=>{
 });
 
 app.post("/api/v1/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    if (req.body && typeof req.body == TypeOfBody && req.body.token){
+    if (req.body && typeof req.body == TypeOfBody && req.body.token && req.body.access){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("edit-users")){
-            if (req?.body?.datas && typeof req?.body?.datas == "object" && req?.params?.id){
+            if (req?.body?.access && typeof req?.body?.access == "object" && req?.params?.id){
                 let {collection, database} = new Database("admin");
                 let accesslist = Functions.readJson("user/accesslist.json");
                 let updateDatas = [];
                 if (accesslist){
-                    for (let i = 0; i < Object.keys(req.body.datas).length; i++){
-                        if (Object.keys(accesslist).includes(Object.keys(req.body.datas)[i]) && req.body.datas[Object.keys(req.body.datas)[i]]){
-                            updateDatas.push(Object.keys(req.body.datas)[i]);
+                    for (let i = 0; i < Object.keys(accesslist).length; i++){
+                        if (req.body.access[Object.keys(accesslist)[i]]){
+                            updateDatas.push(Object.keys(accesslist)[i]);
                         }
                     }
                 }else {
@@ -668,8 +665,8 @@ app.post("/api/v1/edit-user/:id", (req,res,next)=>parseBodyMiddleeware(req,next)
                 }
                 !updateDatas.length ? updateDatas = ["profile"] : false;
                 // console.log(updateDatas);
-                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {access : updateDatas}});
-                res.send({error : !result.modifiedCount});
+                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {access : updateDatas, externalSeller : req?.body?.externalSeller}});
+                res.send({error : !result.acknowledged});
                 closeConnection(database);
             }
         }
@@ -985,7 +982,6 @@ app.post("/api/v1/get-event-data/:id", async (req,res)=>{
                 
                 
             }
-            console.log(newVersions);
             let userId = String((await GetUserDatas(body.token))._id);
             closeConnection(database);
             closeConnection(userDatabase.database);
@@ -1037,12 +1033,14 @@ app.post("/api/v1/add-event/:id",async (req,res)=>{
 app.post("/api/v1/events", async (req,res)=>{
     let page = req.query.page ? req.query.page : 0;
     let limit = req.query.limit ? req.query.limit : 0;
+    let search = req.query.search ? req.query.search : false;
+    console.log(search);
     let body = Functions.parseBody(req.body);
     if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         if (access && access.includes("edit-events")){
             let {collection,database} = new Database("events");
-            let datas = await collection.find().toArray();
+            let datas = search ? await collection.find({$or : [ {"eventData.name" :  {$regex: new RegExp(search, 'i')}}, {"eventData.description" : {$regex: new RegExp(search, 'i')}} ]}).toArray() : await collection.find().toArray();
             if (!datas) {
                 logger.err(`Failed to read db edit-events`);
                 return handleError(logger, "500", res);
@@ -1054,13 +1052,12 @@ app.post("/api/v1/events", async (req,res)=>{
             if (limit && (page-1)*limit < events.length){
                 events = events.slice((page-1)*limit, page*limit);
                 for (let i = 0; i < events.length; i++){
-                    events[i] = {eventData : events[i].eventData, addedBy : events[i].addedBy , contributor : await getContributors(events[i]), id : events[i].id}
+                    events[i] = {eventData : events[i].eventData, addedBy : events[i].addedBy , contributor : await getContributors(events[i]), id : events[i].id, isActive : new Date(events[i].eventData.dateOfEvent) > new Date() && new Date(events[i].eventData.dateOfRelease) < new Date()}
                 }
             }
             else{
                 events = [];
             }
-            console.log(events);
             res.send({events : events, numberOfPages : numberOfPages});
             closeConnection(database);
             return;
@@ -1122,8 +1119,10 @@ app.post("/api/v1/get-all-event", async (req,res)=>{
 app.post("/api/v1/order-ticket", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
-        let eventDatas = await getTicketByReadableId(body.eventId);
-        let savingDatas = {eventId : body.eventId, tickets : [], time : new Date().getTime(), fullPrice : 0, fullAmount : 0};
+        let {collection, database} = new Database("events");
+        let eventDatas = (await collection.findOne({"eventData.readable_event_name" : body.eventId}))
+        let savingDatas = {eventId : body.eventId, tickets : [], time : new Date().getTime(), fullPrice : 0, fullAmount : 0, id : eventDatas._id};
+        closeConnection(database);
         for (let i = 0; i < body.datas.length; i++){
             if (body.datas[i].ticketId && body.datas[i].eventId && eventDatas){
                 let response = await Control_Seats(body.datas[i].places, body.datas[i].ticketId, body.datas[i].eventId);
@@ -1225,13 +1224,27 @@ app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
 
 
 app.post("/api/v1/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    console.log(req.query);
+    console.log(req.query.eventName);
+    let eventName = req.query.eventName;
+    let startDate = req.query.from;
+    let endDate = req.query.to;
+    let limit = Number(req.query.limit) < config["MAX_PAGINATOR_LIMIT"] ? Number(req.query.limit) : 10;
+    let page = Number(req.query.page);
+
+    /*
+    const pageNumber = 2;
+    const pageSize = 10;
+    const skipValue = (pageNumber - 1) * pageSize;
+    const results = db.collectionName.find({}).skip(skipValue).limit(pageSize);
+    */
+
     if (req.body && typeof req.body == TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("ticket-sells")){
             let userData = await GetUserDatas(req.body.token)
             let userId = String((userData)._id);
-            console.log(userData);
-            res.send(await Sales(userId, userData.externalSeller));
+            res.send(await Sales(userId, userData.externalSeller, page, limit));
         }
     }
 });
@@ -1419,14 +1432,16 @@ app.post("/api/v1/cancel-local-transaction/:id",(req,res,next)=>parseBodyMiddlee
 
 app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object" && req.body.token){
-        console.log(req.body.datas);
         let error = false;
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
-        const eventDatas = await getTicketByReadableId(req.body.datas.eventId);
+        let {collection, database} = new Database("events");
+        let eventDatas = (await collection.findOne({"eventData.readable_event_name" : req.body.datas.eventId}))
+        closeConnection(database);
         const userId = String((await GetUserDatas(req.body.token))._id);
         if (!userId) return handleError(logger, "004", res);
-        if (eventDatas && eventDatas.users && eventDatas.users.includes(userId)){
+        console.log(eventDatas);
+        if (eventDatas && eventDatas.eventData && eventDatas.eventData.users && eventDatas.eventData.users.includes(userId)){
         result = await controlEvent(req.body.datas.eventId, req.body.datas.tickets);
         if (result.error) return handleError(logger, result.errorCode, res);
         price = await GetFullPrice(req.body.datas.tickets, req.body.datas.eventId);
@@ -1450,18 +1465,17 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
                     coupon : false,
                     eventId : req.body.datas.eventId,
                     fullAmount : price.fullAmount,
-                    otherDatas : await otherData(req, req.body.token)
+                    otherDatas : await otherData(req, req.body.token),
+                    id : eventDatas._id
             }
             let result = await collection.insertOne(saveDatas);
-            let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.venue, req.body.datas.eventId, true);
+            let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.eventData.venue, req.body.datas.eventId, true);
             closeConnection(database);
             let files = await GenerateTicket(tickets);
-            console.log(files);
             let sysConfig = readConfig()
             for (let i = 0; i < files.length; i++){
                 files[i] = __dirname + sysConfig["NODE_SHARE"] + `/${files[i]}`;
             }
-            console.log(files);
             zip = await createZip(files, `${result.insertedId}.zip`);
             res.writeHead(200, {
                 'Content-Disposition': `attachment; filename="${result.insertedId}.zip"`,
@@ -1908,7 +1922,6 @@ io.on("connection",(socket)=>{
     });
 
     socket.on("join-to-monitor", async (payload)=>{
-        console.log(payload)
         if (payload && payload.token){
             let access = await control_Token(payload.token, socket);
             if (access && access.includes("monitor")){
@@ -1918,7 +1931,6 @@ io.on("connection",(socket)=>{
             message = {connected : monitor.modifiedCount > 0, connectedMonitor : true, error : monitor.modifiedCount === 0, id : monitor.acknowledged ? payload.id : ""};
             io.to(`${monitor.socketId}`).emit( "connection-status" ,message);
             socket.emit("connection-status", message);
-            console.log("message sent");
             closeConnection(database);
             }
         }
@@ -1932,7 +1944,6 @@ io.on("connection",(socket)=>{
             let eventDatas = {eventId : event.readable_event_name, venueId : event.venue};
             if (monitorDatas && monitorDatas.socketId){
                 io.to(monitorDatas.socketId).emit( "event-display",  eventDatas);
-                console.log("event sent")
                 //socket.emit( "event-display" ,{ error : false, status : true, message : "Esemény megjelenítve." } );
             }
             else{
@@ -1964,7 +1975,6 @@ io.on("connection",(socket)=>{
     });
 
     socket.on("ticket-selecting-stopped", async (payload)=>{
-        console.log(payload);
         const { collection, database } = new Database("monitor");
                 let monitorDatas = await collection.findOne( { socketId : socket.id } );
                 //console.log(monitorDatas.socketId);

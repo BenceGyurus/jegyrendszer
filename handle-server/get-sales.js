@@ -14,21 +14,33 @@ const closeConnection = (database)=>{
     );
 }
 
-const Sales = async (userId, external)=>{
+const Sales = async (userId, external, page, limit, filters)=>{
     const eventDatabase = new Database("events");
-    let events = await eventDatabase.collection.find({}, { projection : {eventData : 1}}).toArray();
+    let events = await eventDatabase.collection.find({ "eventData.users" :  userId }, { projection : {eventData : 1}}).toArray();
     closeConnection(eventDatabase.database);
     let eventsOfUser = [];
     events.forEach(
         (event)=>{
             if (event.eventData && event.eventData.users && event.eventData.users.includes(userId)){
-                eventsOfUser.push(event.eventData);
+                eventsOfUser.push(event._id);
             }
         }
     );
     const salesDatabase = new Database("buy");
-    let sales = await salesDatabase.collection.find({}).toArray();
+    const skipValue = (page - 1) * limit;
+    let conditions = []
+    try{
+        userId = ObjectId(userId);
+    }
+    catch{
+        console.log("UserId couldn't be created ObjectId")
+    }
+    if (external) conditions.push( { "otherDatas.userData.userId" : userId } );
+    console.log({ $and : [ {id : { $in : eventsOfUser}}, ...conditions]});
+    let sales = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, ...conditions]}).skip(skipValue).limit(limit).toArray();
+    let max = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, ...conditions]}).count();
     sendSales = [];
+    console.log(sales);
     closeConnection(salesDatabase.database);
     const usersDatabase = new Database("admin");
     const localCoupons = new Database("local-discount");
@@ -36,7 +48,7 @@ const Sales = async (userId, external)=>{
     let sale;
     for (let i = 0; i < sales.length; i++){
         sale = sales[i];
-        if (eventsOfUser.find(event=>event.readable_event_name == sale.eventId)){
+        if (eventsOfUser.find(item=>String(item)==String(sale.id))){
             let userName = "";
             let coupon = "";
             if (sale.local){
@@ -47,13 +59,13 @@ const Sales = async (userId, external)=>{
             else{
                 coupon = sale.coupon ? sale.coupon : "";
             }
-            if (sale.bought && (!external || sale.user._id == userId)) sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : eventsOfUser.find(event=>event.readable_event_name == sale.eventId).name, eventId : sale.eventId, fullAmount : sale.fullAmount, buyId : sale._id, custormerName : sale.customerDatas ? `${sale.customerDatas.fistname} ${sale.customerDatas.lastname}` : "", cusotmerEmail : sale.customerDatas ? `${sale.customerDatas.mail}` : ""});
+            if (sale.bought) sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : events.find(item =>String(item._id) == eventsOfUser.find(event=>String(event) == String(sale.id)))?.eventData?.name, eventId : sale.eventId, fullAmount : sale.fullAmount, buyId : sale._id, custormerName : sale.customerDatas ? `${sale.customerDatas.fistname} ${sale.customerDatas.lastname}` : "", cusotmerEmail : sale.customerDatas ? `${sale.customerDatas.mail}` : ""});
         };
     }
     closeConnection(ticketsDatabase.database);
     closeConnection(localCoupons.database);
     closeConnection(usersDatabase.database);
-    return sendSales;
+    return { sales : sendSales, max : max};
 };
 
 module.exports = Sales;

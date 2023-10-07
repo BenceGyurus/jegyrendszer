@@ -19,3 +19,20 @@
 .admin{
     height: 100%;
 }
+
+.admin-page{
+    z-index: 3;
+}
+
+.background-style{
+    height: calc(100vh - 80px);
+    width: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 80px;
+}
+
+.bread-crumb-admin{
+    color : "white" !important;
+    z-index: 3; 
+}

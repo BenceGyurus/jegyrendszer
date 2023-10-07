@@ -6,6 +6,7 @@ import "../../../../../css/add_Ticket.css";
 import { useEffect, useState } from "react";
 import ShowSeats from "./select_Places.component";
 import Group_List from "./groupList.component";
+import Window from "../../../../window/window.component";
 
 type typeOfAddTicketParams = {
     closeFunction : Function,
@@ -113,9 +114,9 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
         return allSelected;
     }
 
+
     return (
-        <div className = "add-ticket-window">
-            <WindowHeader title="Jegy hozzáadása" closeWindowFunction={closeFunction}/>
+        <Window closeFunction = {closeFunction} title = "Jegyek hozzáadása" >
             <div className = "add-ticket-div">
             <InputText title = "Jegy neve" onChangeFunction={setName} value = {name} info={{text : "A jegyhez tartózó név, ami megjelenik az oldalon is.", image : "/images/info/ticket-name.png"}} />
             <InputNumber money = {true} title = "Jegy alapára" onChangeFunction={setPrice} value = {price} />
@@ -127,8 +128,7 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
             <Group_List groups={datasOfVenue.groups} seats = {datasOfVenue.seatsDatas} changeFunction = {appendGroup} seatList = {newAllSelected()}/>
             <Button title = "Mentés" onClickFunction={()=>{idOfTicket && editFunction ? editFunction({name : name, price : price, minPrice : minPrice, maxPrice : maxPrice, seats : idsOfSeats, numberOfTicket : nOfTicket}, idOfTicket) : saveFunction({name : name, price : price, minPrice : minPrice, maxPrice : maxPrice, seats : idsOfSeats, numberOfTicket : nOfTicket}); closeFunction()}} />
             </div>
-
-        </div>
+        </Window>
     )
 }
 

@@ -4,12 +4,11 @@ import postData from "../../../connection/request";
 import { useEffect, useState } from "react";
 import AddNewButton from "../../../buttons/add_New.component";
 import Error from "../../../notification/error.component";
-import Loader from "../../../loader/loader.component";
 import LoadingSkeleton from "../events/components/loading_Skeleton.component";
-import { Button, Empty } from 'antd';
-import Search from "antd/es/input/Search";
-import SearchField from "../../../searchField/Search.component";
+import { Button, Empty, Input } from 'antd';
 import "../../../../css/admin-event-list.css";
+import { CloseCircleFilled, SearchOutlined } from "@ant-design/icons";
+
 
 type typeOfTickets = {
     name : string,
@@ -36,7 +35,8 @@ type typeOfEventDatas = {
     eventData : typeOfEvent,
     addedBy : {username : string, userId : string, readableid : string},
     id : string,
-    contributor : Array<string>
+    contributor : Array<string>,
+    isActive : boolean
 }
 
 const Show_Events_Main = ()=>{
@@ -49,10 +49,21 @@ const Show_Events_Main = ()=>{
     const [isLoading, setIsLoading] = useState(false);
     const [end, setEnd] = useState(false);
     const [numberOfPages, setNumberOfPages] = useState(1);
+    const [searchKey, setSearchKey] = useState("");
+
+    const clearSerchKey = ()=>{
+        setSearchKey(""); search();
+    }
+
+    const search = ()=>{
+        setPage(1);
+        getEvets();
+    }
 
     const getEvets = ()=>{
         setIsLoading(true);
-        postData(`/events?page=${page}&limit=${limit}`, {token : ParseLocalStorage("long_token")}).then(
+        setResponse(false);
+        postData(`/events?page=${page}&limit=${limit}&search=${searchKey}`, {token : ParseLocalStorage("long_token")}).then(
             async (datas)=>{
                 setResponse(true);
                 if (datas && !datas.datas && !datas.error){
@@ -69,6 +80,7 @@ const Show_Events_Main = ()=>{
             }
         );
     }
+
 
     const deleteEvent = (id:string)=>{
         if (id){
@@ -89,6 +101,7 @@ const Show_Events_Main = ()=>{
             
         }
     }
+
   
   
     function loadMoreContent() {
@@ -96,6 +109,7 @@ const Show_Events_Main = ()=>{
             setIsLoading(true);
             getEvets();
     }
+
 
   
     useEffect(() => {
@@ -109,14 +123,19 @@ const Show_Events_Main = ()=>{
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
     };
-    console.log(response, !events.length);
 
     return <div className = "admin-event-container" >
-        <div className = "event-list-header"><h1>Rendezvények</h1><SearchField /></div>
+        <div className = "event-list-header"><h1>Rendezvények</h1></div>
+        <div className = "event-search-field-holder">
+            <Input placeholder="Keresés..." size="large" onKeyDown={e=>{if (e.key.toUpperCase() === "ENTER") {search()}}} suffix = {<SearchOutlined onClick={()=>search()} />} value = {searchKey} onChange={e=>setSearchKey(e.target.value)} />
+        </div>
         <Error message = {error} setOpen = {()=>{setError("")}} open = {error != ""} />
         {(events.length || response) && !isLoading ? <EventList events={events} editFunction={edit_Event} deleteFunction={deleteEvent} numberOfPages={numberOfPages} page={page} handleChange={handleChange} /> : !events.length && response ? <div><Empty /></div> :  <LoadingSkeleton limit={limit} /> }
         <AddNewButton onClick={()=>{window.location.pathname = "/admin/rendezveny"}}/>
     </div>
 }
+
+/*<Input className = "event-search-field-input" placeholder="Keresés..." onChange={e=>setSearchKey(e.target.value)} value = {searchKey} suffix = {<CloseCircleFilled onClick={e=>{setSearchKey(""); search()}}/>} />
+<Button className = "event-search-button" onClick = {e=>search()}>Keresés</Button>*/
 
 export default Show_Events_Main;

@@ -1,3 +1,4 @@
+import { Button } from "antd";
 import "../../css/backbutton.css";
 type typeOfBackButton = {
     url : string,
@@ -6,7 +7,7 @@ type typeOfBackButton = {
 
 const BackButton = ( { url, className }:typeOfBackButton )=>{
     return (
-        <button className={className ? `back-button ${className}` : "back-button"} onClick = {()=>{ window.location.pathname = url; }}><i className="fa fa-arrow-left"></i> Vissza</button>
+        <Button onClick = {()=>{ window.location.pathname = url; }} className={className}><span className = "back-arrow"><i className="fas fa-angle-left"></i></span> <span className = "back-button-title">Vissza</span></Button>
     );
 }
 

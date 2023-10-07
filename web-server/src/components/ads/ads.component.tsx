@@ -3,6 +3,7 @@ import postData from "../connection/request";
 import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 import Media from "../media/media.component";
 import "../../css/monitor-ads.css";
+import QR from "../qrCode/qrCode.component";
 
 const Ads = ()=>{
 
@@ -29,9 +30,8 @@ const Ads = ()=>{
     console.log(index);
 
     return <div>
-        <div className = "animated-ads-background">
-            <img src="/images/colored-logo.jpg" alt="background-logo" className = "animated-background-1" />
-            <img src="/images/colored-logo.jpg" alt="background-logo" className = "animated-background-2" />
+        <div className = "qr-codes-left">
+            <QR url="https://www.facebook.com/agora.savaria" color = "black" icon = "/images/logos/facebook-logo.png" size = {150} />
         </div>
         { ads && ads.length ? <Media file = {ads[index].src} autoPlay = {true} loop = {true} controls = {false}  /> : ""}
     </div>;

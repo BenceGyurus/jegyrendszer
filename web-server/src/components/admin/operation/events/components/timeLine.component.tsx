@@ -9,7 +9,7 @@ type typeOfDatasParams = {
 
 const createStringToDate = (date:string)=>{
     let objDate = new Date(date);
-    return `${objDate.getFullYear()} ${objDate.getMonth() < 10 ? `0${objDate.getMonth()}` : objDate.getMonth()}. ${objDate.getDate() < 10 ? `0${objDate.getDate()}` : objDate.getDate()}. ${objDate.getHours() < 10 ? `0${objDate.getHours()}` : objDate.getHours()}:${objDate.getMinutes() < 10 ? `0${objDate.getMinutes()}` : objDate.getMinutes()}`
+    return `${objDate.getFullYear()} ${objDate.getMonth()+1 < 10 ? `0${objDate.getMonth()+1}` : objDate.getMonth()+1}. ${objDate.getDate() < 10 ? `0${objDate.getDate()}` : objDate.getDate()}. ${objDate.getHours() < 10 ? `0${objDate.getHours()}` : objDate.getHours()}:${objDate.getMinutes() < 10 ? `0${objDate.getMinutes()}` : objDate.getMinutes()}`
 }
 
 const TimeLine = ({data, timeLine, setTimeLine}:typeOfDatasParams)=>{
@@ -28,13 +28,10 @@ const TimeLine = ({data, timeLine, setTimeLine}:typeOfDatasParams)=>{
     }, [])
 
     return (
-        <div onClick={e=>setTimeLine()}>
-        <h4>Idővonal</h4>
-        {timeLine ? <Timeline
+        <Timeline
         mode="alternate"
         items={itmes}
-      /> : ""}
-      </div>
+      />
     );
 
 }

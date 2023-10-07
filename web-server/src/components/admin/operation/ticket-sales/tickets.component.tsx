@@ -4,6 +4,7 @@ import Table from "../../../table/table.component";
 import CsvDownloadButton from 'react-json-to-csv';
 import postFile from "../../../connection/file";
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
+import TicketsTable from "./table.component";
 
 type typeOfTicket = {
     name : string,
@@ -25,7 +26,8 @@ type typeOfDatas = {
     date : string, 
     fullPrice : number, 
     eventName : string, 
-    eventId : string
+    eventId : string,
+    buyId : string
 }
 
 
@@ -90,17 +92,13 @@ const TicketStats = ({datas}:typeOfTicketStatsParams)=>{
     }
 
     return (
-        <div className = "table-div">
-            <div className = "table-top">
-                <div><h2>Jegyvásárlások</h2> <span>{datas.length} jegyvasárlás</span></div>
-                <CsvDownloadButton style={{border : "none"}} className = "add-new-user-button" data={datas} filename = "jegyeladasok.csv"><i className="fas fa-cloud-download-alt"></i> Letöltés (.CSV)</CsvDownloadButton>
-            </div>
-            <div className = "table-grid">
-            <Table printFunction = {printFunction} datas={sortDatas()} columns={[{title : "Esemény neve", key : "eventName"}, {title : "Vásárlás ideje", key : "date", type : "date"}, {title : "Kupon", key : "coupon"}, {title :"Eladó", key : "user"}, {title :"Ár", key : "price"}, {title :"Teljes ár", key : "fullPrice"}, {title : "Mennyiség", key : "fullAmount"}, {title : "Jegyiroda", key : "local", type : "boolean"}]} sortFunction={sortByFunction} reverseFunction={reverseFunction} onChangeFunction={filterFunction} sortedBy={sortBy} reverse = {reverse} selectedId={selected} selectFunction={setSelected} filter={filter}/>
-            </div>
-        </div>
+        <TicketsTable tickets={datas}/>
     )
     
 }
+
+//<CsvDownloadButton style={{border : "none"}} className = "add-new-user-button" data={datas} filename = "jegyeladasok.csv"><i className="fas fa-cloud-download-alt"></i> Letöltés (.CSV)</CsvDownloadButton>
+
+//<Table printFunction = {printFunction} datas={sortDatas()} columns={[{title : "Esemény neve", key : "eventName"}, {title : "Vásárlás ideje", key : "date", type : "date"}, {title : "Kupon", key : "coupon"}, {title :"Eladó", key : "user"}, {title :"Ár", key : "price"}, {title :"Teljes ár", key : "fullPrice"}, {title : "Mennyiség", key : "fullAmount"}, {title : "Jegyiroda", key : "local", type : "boolean"}]} sortFunction={sortByFunction} reverseFunction={reverseFunction} onChangeFunction={filterFunction} sortedBy={sortBy} reverse = {reverse} selectedId={selected} selectFunction={setSelected} filter={filter}/>
 
 export default TicketStats;

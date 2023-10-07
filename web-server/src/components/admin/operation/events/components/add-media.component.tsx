@@ -24,7 +24,7 @@ const AddMedia = ({media, changeValueOfMedia, disabled}:typeOfAddMediaParams)=>{
 
     return (
         <div>
-            <Button  type="primary" size="large" onClick={(e)=>{setMediaWindow(true)}} style={{color : "white"}} >Média hozzáadása</Button>
+            <Button size="large" onClick={(e)=>{setMediaWindow(true)}} style={{color : "white"}} >Média hozzáadása</Button>
         {mediaWindow ? <MediaShareWindow media={media} closeFunction = {()=>{setMediaWindow(false)}} onChangeFunction = {changeValueOfMedia} /> : ""}
         <div className = "added">
             {
