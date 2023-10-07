@@ -7,7 +7,7 @@ function createDateToString(date) {
 }
 
 function autoSplit(text, doc, y, x, lineSize = 20, width = 300) {
-    const words = text.split(' ');
+    const words = text?.split(' ');
     let currentLine = words[0];
     const lines = [];
 

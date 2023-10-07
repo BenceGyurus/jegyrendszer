@@ -8,7 +8,7 @@ const closeConnection = (database)=>{
     }, 10000);
 }
 
-const Tickets = async (orderId, tickets, venue, eventId, local)=>{
+const Tickets = async (orderId, tickets, venue, eventId, local, id)=>{
     const {collection, database} = new Database("tickets");
     let ticketIds = [];
     for (let i = 0; i < tickets.length; i++){
@@ -22,7 +22,8 @@ const Tickets = async (orderId, tickets, venue, eventId, local)=>{
                 orderId : orderId,
                 eventId : eventId,
                 local : local,
-                ticketId : tickets[i].ticketId
+                ticketId : tickets[i].ticketId,
+                eId : id
             })).insertedId);
         }
     }

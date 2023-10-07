@@ -3,7 +3,10 @@ import AvatarGroup from '@mui/material/AvatarGroup';
 import StringAvatar from "../../../../avatar/avatar.component";
 import { Tooltip } from 'react-tooltip'
 import { v4 as uuid } from 'uuid';
-import { Badge } from "antd";
+import { Badge, Avatar, Card  } from "antd";
+import { DeleteColumnOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import Meta from "antd/es/card/Meta";
+
 
 type typeOfEventParams = {
     name : string,
@@ -26,26 +29,44 @@ const Event = ( { name, description, background, editFunction, deleteFunction,id
 }
 
 
-    return (<div className="admin-event" key={eventKey}>
+    return (
+      <Card
+      cover={
+        <img alt="esemény képe" src={background}/>
+    }
+    actions={[
+      <DeleteOutlined onClick = {e=>deleteFunction(id)} />,
+      <EditOutlined onClick = {e=>editFunction(id)} />
+    ]}
+  >
+    <div className = "card-spaceing">
+    <AvatarGroup total={contributors.length} max={3} className="avatar-group" id = {id}>
+          {
+            contributors.map((contributor, index)=>{
+              return <StringAvatar key={uuid()} width={40} height={40} username={contributor} />
+                })
+            }
+    </AvatarGroup>
+    <div className = "event-title-in-card">
+    <Badge status={isActive ? `success` : "error"} text = {isActive ? "Aktív" : "Inaktív"} style={{color : isActive ? "#8dc572" : "#be6464", marginLeft: 12}}/>
+    <h2>{name}</h2>
+    </div>
+    </div>
+  </Card>
+    );
+}
+
+export default Event;
+
+/*<div className="admin-event" key={eventKey}>
       <div style={{position: "absolute", margin:5}} key = {uuid()}>
-          <AvatarGroup total={contributors.length} max={3} className="avatar-group" id = {id}>
-                {
-                    contributors.map((contributor, index)=>{
-                        return <StringAvatar key={uuid()} width={40} height={40} username={contributor} />
-                    })
-                }
-            </AvatarGroup>
+          
       </div>
-    <img src={background} alt="Event 1" key = {uuid()} />
+      <img src={background} alt="Event 1" key = {uuid()} />
+    <Badge status={isActive ? `success` : "error"} text = {isActive ? "Aktív" : "Inaktív"} style={{color : isActive ? "#8dc572" : "#be6464", marginLeft: 12}}/>
     <h2>{name}</h2>
     <div className="buttons" key = {uuid()}>
       <button className="edit-button" onClick = {e=>editFunction(id)} >Szerkesztés</button>
       <button className="event-delete-button" onClick = {e=>deleteFunction(id)} >Törlés</button>
     </div>
-    <div className = "event-active">
-        <Badge status={isActive ? `success` : "error"} text = {isActive ? "Aktív" : "Inaktív"} style={{color : isActive ? "#8dc572" : "#be6464"}}/>
-      </div>
-  </div>);
-}
-
-export default Event;
+  </div>*/

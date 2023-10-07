@@ -52,14 +52,29 @@ const GenerateTicket = async (ticketsIds)=>{
     let sysConfig = readConfig();
     const ticketsDatabase = new Database("tickets");
     const saleDatabase = new Database("buy");
+    const eventDatabse = new Database("events");
     let pdfs = [];
     for (let i = 0; i < ticketsIds.length; i++){
-      ticketData = await ticketsDatabase.collection.findOne({_id : ObjectId(ticketsIds[i])});
+      idOfTicket = ticketsId;
+      try{
+        idOfTicket = new ObjectId(ticketsIds[i]);
+      }
+      catch{}
+      ticketData = await ticketsDatabase.collection.findOne({_id : idOfTicket});
+      console.log(ticketData);
       if (ticketData){
-        eventData = await getTicketByReadableId(ticketData.eventId);
-        customerData = !eventData.local ? await saleDatabase.collection.findOne({_id : ObjectId(ticketData.orderId)}) : false;
-        
-        fs.writeFileSync(`${__dirname}/${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`, await createTicket(eventData.name, ticketData.nameOfTicket, ticketData.price, String(ticketData._id), eventData.location, createDateToJson(eventData.dateOfEvent), createDateToJson(eventData.end_Of_The_Event), createDateToJson(eventData.gate_Opening), ticketData.seatName, eventData.wardrobe));
+        const buyDatabase = new Database("buy");
+        id = ticketData.eId;
+        try{
+          id = new ObjectId(id);
+        }
+        catch{}
+        let eventData = (await eventDatabse.collection.findOne({_id : id}))?.eventData;
+        closeConnection(buyDatabase.database);
+        if(eventData){
+          customerData = !eventData?.local ? await saleDatabase.collection.findOne({_id : ObjectId(ticketData.orderId)}) : false;
+          fs.writeFileSync(`${__dirname}/${sysConfig['NODE_SHARE']}/${String(ticketData._id)}.pdf`, await createTicket(eventData.name, ticketData.nameOfTicket, ticketData.price, String(ticketData._id), eventData.location, createDateToJson(eventData.dateOfEvent), createDateToJson(eventData.end_Of_The_Event), createDateToJson(eventData.gate_Opening), ticketData.seatName, eventData.wardrobe));
+        }
         pdfs.push(`${String(ticketData._id)}.pdf`);
 
       }

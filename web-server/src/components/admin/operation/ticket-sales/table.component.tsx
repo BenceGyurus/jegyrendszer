@@ -2,7 +2,7 @@ import { Space, Table, Tag, DatePicker,Badge, Dropdown, Button } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import type { Dayjs } from 'dayjs';
 import React, { useState } from 'react';
-import { DownOutlined } from '@ant-design/icons';
+import { DeleteFilled, DownOutlined, PrinterFilled } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { v4 as uuid } from 'uuid';
 
@@ -33,7 +33,9 @@ type typeOfDatas = {
 }
 
 type typeOfTicketsTable = {
-    tickets : Array<typeOfDatas>
+    tickets : Array<typeOfDatas>,
+    deleteFunction : Function,
+    printFunction : Function
 }
 
 interface DataType {
@@ -45,7 +47,7 @@ interface DataType {
     fullPrice : number,
     isLocal : boolean,
     nameOfCustomer : string,
-    tickets : Array<typeOfTicket>
+    tickets : Array<typeOfTicket>,
   }
 
 interface ExpandedDataType {
@@ -58,7 +60,7 @@ interface ExpandedDataType {
   type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
 
-const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
+const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTable) => {
 
     const [dates, setDates] = useState<RangeValue>(null);
     const [value, setValue] = useState<RangeValue>(null);
@@ -90,22 +92,15 @@ const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
         title: 'Esemény neve',
         dataIndex: 'eventName',
         key: 'eventName',
+        sortDirections: ['descend', 'ascend'],
+        sorter: (a,b) => a.eventName.charCodeAt(16) - b.eventName.charCodeAt(16)
     },
     {
         title: 'Vásárlás ideje',
         dataIndex: 'eventDate',
         key: 'eventDate',
         render: (text) => <span>{convertDate(text)}</span>,
-        filterDropdown : () => <RangePicker
-        value={dates || value}
-        onCalendarChange={(val) => {
-          setDates(val);
-        }}
-        onChange={(val) => {
-          setValue(val);
-        }}
-        onOpenChange={onOpenChange}
-      />
+        sorter : (a,b)=> new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime()
     },
     {
         title : "Eladó neve",
@@ -117,13 +112,13 @@ const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
         title : "Jegyek száma",
         dataIndex : "numberOfTickets",
         key : "numberOfTickets",
-        render : (text) => <span>{text}db</span>,
+        render : (text) => <span>{text} db</span>,
     },
     {
         title : "Teljes ár",
         dataIndex : "fullPrice",
         key : "fullPrice",
-        render : (text) => <span>{text}Ft</span>,
+        render : (text) => <span>{text.toLocaleString('hu-HU', { useGrouping: true, minimumFractionDigits: 0 })} Ft</span>,
         sorter: (a, b) => a.fullPrice - b.fullPrice,
     },
     {
@@ -131,16 +126,6 @@ const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
         dataIndex : "isLocal",
         key : "fullPrice",
         render : (isLocal) => <span style={{color : isLocal ? "green" : "red"}}>{isLocal ? "Igen" : "Nem"}</span>,
-        filters: [
-            {
-                text: 'Igen',
-                value: true,
-            },
-            {
-                text: 'Nem',
-                value: false,
-            },
-        ],
         filterMode: 'tree',
         filterSearch: true,
         
@@ -149,6 +134,11 @@ const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
         title : "Vásárló neve",
         dataIndex : "nameOfCustormer",
         key : "nameOfCustomer"
+    },
+    {
+        title : "Műveletek",
+        dataIndex : "actions",
+        key : "actions"
     }
   ];
 
@@ -164,6 +154,7 @@ const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
             isLocal : ticket.local,
             nameOfCustomer : "",
             tickets : ticket.tickets,
+            actions : <span><DeleteFilled onClick={e=>deleteFunction(ticket.buyId)}/><PrinterFilled onClick={e=>printFunction(ticket.buyId)} /></span>
         }
     });
   }
@@ -181,8 +172,8 @@ const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
     let data:any = t.map(item=>{
         return {
             name : item.name,
-            price : item.price,
-            amount : item.amount,
+            price : <span>{item.price.toLocaleString('hu-HU', { useGrouping: true, minimumFractionDigits: 0 })} Ft</span>,
+            amount : <span>{item.amount} db</span>,
             key : uuid()
         }
     })
@@ -206,5 +197,17 @@ const TicketsTable = ({ tickets }:typeOfTicketsTable) => {
       />
   );
 };
+
+/*
+ filterDropdown : () => <RangePicker
+        value={dates || value}
+        onCalendarChange={(val) => {
+          setDates(val);
+        }}
+        onChange={(val) => {
+          setValue(val);
+        }}
+        onOpenChange={onOpenChange}
+      />*/
 
 export default TicketsTable;

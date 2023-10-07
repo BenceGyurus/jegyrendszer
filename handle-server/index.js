@@ -1469,7 +1469,7 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
                     id : eventDatas._id
             }
             let result = await collection.insertOne(saveDatas);
-            let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.eventData.venue, req.body.datas.eventId, true);
+            let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.eventData.venue, req.body.datas.eventId, true, eventDatas._id);
             closeConnection(database);
             let files = await GenerateTicket(tickets);
             let sysConfig = readConfig()

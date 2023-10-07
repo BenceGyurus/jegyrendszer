@@ -87,12 +87,16 @@ const TicketStats = ({datas}:typeOfTicketStatsParams)=>{
         console.log(id);
         postFile(`/print-ticket/${id}`, {token : ParseLocalStorage("long_token")})
         .then(response=>{
-
+            console.log(response);
         })
     }
 
+    const deleteFunction = (id:string)=>{
+
+    }
+
     return (
-        <TicketsTable tickets={datas}/>
+        <TicketsTable tickets={datas} printFunction={printFunction} deleteFunction={deleteFunction}/>
     )
     
 }
