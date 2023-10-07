@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: nginx
+        image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/control:latest
+        env:
+        - name: TZ
+          value: "Europe/Vienna"
+        envFrom:
+        - secretRef: 
+            name: handle-server-secretmap
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipwhitelist-middleware@kubernetescrd
+spec:
+  rules:
+    - host: nginx.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-svc
+                port:
+                  number: 80
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: handle-server-secretmap
+type: Opaque
+data:
+  SLACK_TOKEN: eG94cC0zMzExNTU0NTgyNzc1LTMzMjYxNDk0ODU2MDItNTU1ODEzMjQ4MDgxNi1iOTlmZWVhYjA3Y2M2MTM0MzYwZjllNDgwMGM5ZDE4Ygo=
+  REDIS_PASS: cm9vdAo=
+  APPLE_PASS_IDENTIFIER: ""
+  MERCHANT: ""

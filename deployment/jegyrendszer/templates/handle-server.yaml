@@ -41,14 +41,24 @@ spec:
         ports:
         - containerPort: 3001
           name: backend-open
-        envFrom:
-        - secretRef:
-            name: handle-server-secretmap
         env:
         - name: CONFIGDIR
           value: "/etc/config"
         - name: NODE_ENV
           value: "production"
+        - name: TZ
+          value: "Europe/Vienna"
+        - name: SLACK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: handle-server-secretmap
+              key: SLACK_TOKEN
+        - name: REDIS_PASS
+          value: "root"
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: handle-server-secretmap
+          #     key: REDIS_PASS
         volumeMounts:
         - name: handle-server-volume
           mountPath: /uploads
