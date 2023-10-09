@@ -1,7 +1,7 @@
 .discounts-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
   }
   
   .local-discount-card {
@@ -9,7 +9,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin-bottom: 20px;
+    margin: 20px;
     width: 200px;
     cursor: pointer;
     border: 2px solid #fff;

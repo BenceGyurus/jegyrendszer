@@ -47,4 +47,18 @@
     font-weight: bold;
     color: white;
   }
+
+  .tickets-holder{
+    width: 48%;
+    min-width: 300px;
+    margin: 1%
+  }
+
+  .ticket{
+    margin: 30px auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
   

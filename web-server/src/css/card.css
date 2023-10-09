@@ -1,0 +1,10 @@
+.ant-card-actions{
+    width: 100%;
+    position: absolute;
+    height: 50px;
+    bottom: 0px;
+}
+
+.ant-card{
+    padding-bottom: 50px;
+}

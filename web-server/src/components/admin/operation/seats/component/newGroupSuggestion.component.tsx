@@ -5,13 +5,14 @@ import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from "react";
+import seatOfType from "../type/seat";
+import groupType from "../type/group";
 type typeOfSuggestNewGroupsParams = {
     suggestedGroups : Array<Array<string>>,
-    seats : Array<any>,
+    seats : Array<seatOfType>,
     changeSeatsFunctions:Function,
     addGroupsFunction:Function,
-    groups : Array<any>,
+    groups : Array<groupType>,
     open : boolean,
     setOpen : Function
 };
@@ -46,11 +47,4 @@ const SuggestNewGroups = ({suggestedGroups, seats, changeSeatsFunctions, addGrou
       );
 }
 
-/*
-<div className = "popup show">
-            <button className="close-button-new-group">x</button>
-            <h3>{suggestedGroups.length} új csoport létrehozása ajánlott</h3>
-            <input type="button" className = "popup-button" value="Csoportok mutatása" />
-            <input type="button" value="Autómatikus létrehozás" className = "popup-button" onClick={} />
-        </div>*/
 export default SuggestNewGroups;

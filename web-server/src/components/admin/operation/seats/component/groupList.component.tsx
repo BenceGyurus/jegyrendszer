@@ -1,33 +1,29 @@
 import "../../../../../css/groupSettings.css";
 import { v4 as uuid } from 'uuid';
-type groupType = {
-    name : string,
-    id : string,
-    posX : number,
-    posY : number,
-    status : boolean
-}
+import seatOfType from "../type/seat";
+import groupType from "../type/group";
+
 type groupListType = {
     groups : Array<groupType>,
-    handleEvent : any,
-    editFunction : any,
-    deleteEvent : any,
-    setSelected :any,
+    handleEvent : Function,
+    editFunction : Function,
+    deleteEvent : Function,
+    setSelected :Function,
     selected: string,
-    seats: any,
-    changeValue:any,
+    seats: Array<seatOfType>,
+    changeValue:Function,
     deleteSeatFunction:Function,
-    changeOpened : any,
+    changeOpened : Function,
     changeTitle:Function
 }
-const GroupList = (params:groupListType):any=>{
+const GroupList = (params:groupListType)=>{
     if (params.groups.length == 0){
         return <h2>Nincs csoport létrehozva</h2>
     }
     return (
         <div className = "Group-Div">
         <ul className = "tab">
-        {params.groups.map((group:any, index)=>{
+        {params.groups.map((group:groupType, index)=>{
             if (group.status){
                 return (<input key = {uuid()} type="text" className = "tablinks" defaultValue={group.name} onBlur = {event =>{params.handleEvent(index, event.target.value)}}/>)}
             else{
@@ -36,11 +32,11 @@ const GroupList = (params:groupListType):any=>{
         })}
         </ul>
         <div>
-        {params.groups.map((group:any, index:number)=>{
+        {params.groups.map((group:groupType, index:number)=>{
             if (params.selected == group.id){
             return (
                 <div className = "tab-content" key = {index}>
-                {params.seats.map((seat:any, seatIndex:number)=>{
+                {params.seats.map((seat:seatOfType, seatIndex:number)=>{
                     if ((seat.group === group.id && group.id == params.selected)){
                         let ids = [uuid(), uuid()];
                         return (<div className = "form-container" key = {(seatIndex+1)*13} id = {seat.id}>

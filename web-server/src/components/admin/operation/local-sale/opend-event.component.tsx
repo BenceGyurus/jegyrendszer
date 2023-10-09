@@ -11,13 +11,12 @@ import DiscountList from "./discountList.component";
 import BuyButton from "../../../buy-button/buy-button.component";
 import postFile from "../../../connection/file";
 import Success from "../../../notification/success.component";
-import { DesktopOutlined, DisconnectOutlined, WifiOutlined } from "@ant-design/icons";
-import socket from "../../../socket.io/socketio";
+import { DisconnectOutlined } from "@ant-design/icons";
 import Window from "../../../window/window.component";
 import { Button, Empty, Spin } from "antd";
 import MonitorList from "./monitorList.component";
-import SocketIo from "../../../socket.io/socketio";
 import SocketCommunication from "./socketCommunication";
+import { GiftTwoTone } from "@ant-design/icons";
 
 type typeOfSeat = {
     group : string,
@@ -65,7 +64,8 @@ type typeOfAmountTicket = {
     selected : number,
     pendingPlaces : Array<string>,
     numberOfFreeTickets : number,
-    boughtPlaces : Array<string>
+    boughtPlaces : Array<string>,
+    _id : string
 }
 
 type typeOfDiscount = {
@@ -182,6 +182,7 @@ const Local_Sale_Event = ()=>{
     const [connectingToMonitor, setConnectingToMonitor] = useState(false);
     const [connectedId, setConnectedId]:[string, Function] = useState("");
     const [userSelecting, setUserSelecting]:[boolean, Function] = useState(false);
+    const [buying, setBuying] = useState(false);
 
     useEffect(()=>{
         let id = window.location.pathname.split("/")[3]
@@ -222,11 +223,10 @@ const Local_Sale_Event = ()=>{
     useEffect(()=>{
         if (socketIO){
             socketIO.on("connection-status", (payload:any)=>{
-                console.log(payload);
-                if (payload.connected){
-                    console.log(eventDatas);
+                console.log(payload, eventDatas);
+                if (payload.connected && eventDatas?._id){
                     if (payload.connectedMonitor && window.location.pathname.split("/")[3]){
-                        socketIO.emit("display-event", {eventId : window.location.pathname.split("/")[3], token : ParseLocalStorage("long_token")});
+                        socketIO.emit("display-event", {eventId : eventDatas._id, token : ParseLocalStorage("long_token")});
                     }
                     setConnectedToSocketMonitor(true);
                     setConnectingToMonitor(false);
@@ -253,7 +253,7 @@ const Local_Sale_Event = ()=>{
                 setUserSelecting(false);
             })
         }
-    }, [amountTickets, selectedTickets, selectedTickets])
+    }, [amountTickets, selectedTickets, selectedTickets, eventDatas])
 
 
     const selectSeat = (id:string)=>{
@@ -302,22 +302,25 @@ const Local_Sale_Event = ()=>{
         return sendTickets;
     }
 
-    const buy = async ()=>{
+    const buy = async (invitation:boolean | undefined)=>{
         if (!userSelecting){
-        socketIO.on("disconnect", () => {});
-        let sendTickets = controlAmountTickets();
-        postFile("/buy-local", {token : ParseLocalStorage("long_token"), datas : {
-            eventId : window.location.pathname.split("/")[3],
-            discount : selectedDiscount,
-            tickets : sendTickets,
-        }}, "/admin/helyi-eladas")
-        .then((response:any)=>{
-            if (response.error){
-                setError(response.message);
-            }
-            else{
-                setSuccessfull(response.message);
-            }
+            setBuying(true)
+            socketIO.on("disconnect", () => {});
+            let sendTickets = controlAmountTickets();
+            postFile("/buy-local", {token : ParseLocalStorage("long_token"), datas : {
+                eventId : window.location.pathname.split("/")[3],
+                discount : selectedDiscount,
+                tickets : sendTickets,
+                invitation : !!invitation
+            }}, "/admin/helyi-eladas")
+            .then((response:any)=>{
+                setBuying(false);
+                if (response.error){
+                    setError(response.message);
+                }
+                else{
+                    setSuccessfull(response.message);
+                }
         })
     }
     }
@@ -325,7 +328,7 @@ const Local_Sale_Event = ()=>{
     const getPrice = ()=>{
         for (let i = 0; i < discounts.length;i++){
             if (discounts[i]._id === selectedDiscount){
-                return discounts[i].money ? fullPrice > discounts[i].amount ? fullPrice-discounts[i].amount : 0 : fullPrice-fullPrice*(discounts[i].amount/100);
+                return Math.round(discounts[i].money ? fullPrice > discounts[i].amount ? fullPrice-discounts[i].amount : 0 : fullPrice-fullPrice*(discounts[i].amount/100));
             }
         }
         return fullPrice;
@@ -365,10 +368,11 @@ const Local_Sale_Event = ()=>{
                 <span className = "connect-to-monitor-icon" onClick={e=>{getMonitors()}}><i className={`fas fa-wifi ${connectedToSocketMonitor ? "connected" : "disconnected"}`}></i></span>
                 {eventDatas ? <EventDetails title = {eventDatas.title} description={eventDatas.description} image = {eventDatas.background} /> : ""}
                 {eventDatas && amountTickets ? <Spin tip="Helyek kiválasztása folyamatban..." spinning = {userSelecting}><Tickets tickets = {amountTickets} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets} /></Spin> : ""}
-                { userSelecting ? <Button className = "user-select-button" icon = {<DisconnectOutlined />} onClick = {e=>closeTicketSelecting()} >Kiválasztás megszakítása</Button> : <Button className = "user-select-button" onClick={e=>sendTicketDatas()} disabled = {!(connectedToSocketMonitor && connectedId && venue && venue.seatsDatas && venue.seatsDatas.length && controlAmountTickets().length)} icon = {<i className="fas fa-share"></i>} >Kiválasztás monitoron</Button>}
-                {venue ? <Seats disabled = {userSelecting} places = {venue}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
+                { venue && venue.length ? userSelecting ? <Button className = "user-select-button" icon = {<DisconnectOutlined />} onClick = {e=>closeTicketSelecting()} >Kiválasztás megszakítása</Button> : <Button className = "user-select-button" onClick={e=>sendTicketDatas()} disabled = {!(connectedToSocketMonitor && connectedId && venue && venue.seatsDatas && venue.seatsDatas.length && controlAmountTickets().length)} icon = {<i className="fas fa-share"></i>} >Kiválasztás monitoron</Button> : <></>}
+                {venue && venue.length ? <Seats disabled = {userSelecting} places = {venue}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
                 {discounts.length ? <DiscountList discounts={discounts} onClikcFunction={selectDiscount} selectedDiscount={selectedDiscount} /> : ""}
-                <div>Végösszeg: {getPrice()}Ft</div>
+                <div>Végösszeg: {getPrice().toLocaleString('hu-HU', { useGrouping: true, minimumFractionDigits: 0 })}Ft {discounts.length && selectedDiscount ? <span>(<span className = "discount-price">{`- ${(fullPrice-getPrice()).toLocaleString('hu-HU', { useGrouping: true, minimumFractionDigits: 0 })} Ft`}</span>)</span> : ""}</div>
+                <div className = "buy-btn-div"><Button loading = {buying} disabled = {userSelecting} icon = {<GiftTwoTone />}  onClick={()=>buy(true)}>Meghívó nyomtatása</Button></div>
                 <div className = "buy-btn-div"><BuyButton disabled = {userSelecting} onClickFunction={buy} /></div>
             </div>
         );

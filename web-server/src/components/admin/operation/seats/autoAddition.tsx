@@ -1,3 +1,5 @@
+import groupType from "./type/group";
+
 type seatOfType = {
     name : string,
     title : string,
@@ -7,7 +9,7 @@ type seatOfType = {
     group : string
 }
 
-function detectNewGroup(groups:any){
+function detectNewGroup(groups:Array<{elements : Array<seatOfType>}>){
     let detectedGroups:Array<string> = [];
     let newGroups:Array<Array<string>> = [];
     for (let i = 0; i < groups.length; i++){

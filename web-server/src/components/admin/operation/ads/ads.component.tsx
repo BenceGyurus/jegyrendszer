@@ -3,9 +3,8 @@
 import React from 'react';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import AddNewButton from "../../../buttons/add_New.component";
 import { useEffect, useState } from "react";
-import { Button, Empty, Spin } from "antd";
+import { Button, Spin } from "antd";
 import postData from "../../../connection/request";
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import AdsWindow from "./adWindow.component";
@@ -13,6 +12,7 @@ import Error from "../../../notification/error.component";
 import Media from '../../../media/media.component';
 import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import "../../../../css/ads-table.css";
+import typeOfAds from './type/ads';
 
 interface DataType {
   key: React.Key;
@@ -27,10 +27,10 @@ interface DataType {
 const Ads = ()=>{
 
     const [addNewWindow, setAddNewWindow] = useState(false);
-    const [ads, setAds]:[any, Function] = useState();
+    const [ads, setAds]:[Array<typeOfAds>, Function] = useState([]);
     const [res, setRes] = useState(false);
     const [error, setError] = useState("");
-    const [editDatas, setEditDatas]:[any, Function] = useState();
+    const [editDatas, setEditDatas]:[typeOfAds, Function] = useState({ src : "", website : "", name : "", _id : "", type : "" });
 
     const columns: ColumnsType<DataType> = [
         { title: 'ID', dataIndex: 'name', key: 'name' },
@@ -59,7 +59,7 @@ const Ads = ()=>{
     }, []);
 
     const editAdsFunction = (id:string)=>{
-        setEditDatas(ads.find((item:any)=>item._id === id));
+        setEditDatas(ads.find((item:typeOfAds)=>item._id === id));
     }
 
     const deleteAdsFunction = (id:string)=>{
@@ -73,9 +73,9 @@ const Ads = ()=>{
         }); 
     }
 
-    const getColumns = ()=>{
+    const getColumns:any = ()=>{
         if (ads && ads.length){
-            return ads.map((item:any, index:number) =>{
+            return ads.map((item:typeOfAds, index:number):{name : string, type : string, file : string, key : string, action : JSX.Element, url : string | JSX.Element} =>{
                 return { name : item.name, type : item.type, file : item.src, url : <a href = {item.website}>{item.website}</a>, key : index.toString(), action : <span className = "action-button"><EditFilled onClick={e=>editAdsFunction(item._id)} /><DeleteFilled onClick={e=>deleteAdsFunction(item._id)} /> </span> }
             })
         }

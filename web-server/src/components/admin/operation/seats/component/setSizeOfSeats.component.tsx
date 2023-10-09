@@ -21,6 +21,5 @@ const SetSizeOfSeats = ({ onChangeFunction, size }:typeOfSetSizeOfSeatsParams)=>
     );
 }
 
-//<input type="number" name="sizeOfSeat" id="sizeOfSeat" onChange={event => onChangeFunction(Number(event.target.value))} ref={seatRef}/>
 
 export default SetSizeOfSeats;

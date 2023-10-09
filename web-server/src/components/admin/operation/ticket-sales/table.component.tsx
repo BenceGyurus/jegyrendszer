@@ -1,36 +1,15 @@
-import { Space, Table, Tag, DatePicker,Badge, Dropdown, Button } from 'antd';
+import { Space, Table, Tag, DatePicker,Badge, Dropdown, Button, Tooltip } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import type { Dayjs } from 'dayjs';
 import React, { useState } from 'react';
 import { DeleteFilled, DownOutlined, PrinterFilled } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { v4 as uuid } from 'uuid';
+import typeOfTicket from './types/ticket';
+import typeOfDatas from './types/tableData';
+import typeOfCustomerDatas from './types/customerData';
 
 const { RangePicker } = DatePicker;
-
-type typeOfTicket = {
-    name : string,
-    price : number,
-    unitPrice : number,
-    amount : number,
-    ticketId : string,
-    places : Array<string>,
-    eventId : string
-}
-
-
-type typeOfDatas = {
-    user : string, 
-    coupon : string, 
-    price : number, 
-    local : boolean, 
-    tickets : Array<typeOfTicket>,
-    date : string, 
-    fullPrice : number, 
-    eventName : string, 
-    eventId : string,
-    buyId : string
-}
 
 type typeOfTicketsTable = {
     tickets : Array<typeOfDatas>,
@@ -46,7 +25,7 @@ interface DataType {
     numberOfTickets : number,
     fullPrice : number,
     isLocal : boolean,
-    nameOfCustomer : string,
+    nameOfCustomer : typeOfCustomerDatas | undefined,
     tickets : Array<typeOfTicket>,
   }
 
@@ -132,8 +111,9 @@ const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTa
     },
     {
         title : "Vásárló neve",
-        dataIndex : "nameOfCustormer",
-        key : "nameOfCustomer"
+        dataIndex : "nameOfCustomer",
+        key : "nameOfCustomer",
+        render : (text)=> <Tooltip placement="top" title = {<div><span>Név: {text?.customerName}</span><br /><span>E-mail cím: {text?.cusotmerEmail}</span><br /><span>Telefonszám: {text?.phoneNumber}</span></div>}><span className = "customer-data-link">{text?.customerName ? text?.customerName : ""}</span></Tooltip>
     },
     {
         title : "Műveletek",
@@ -152,9 +132,9 @@ const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTa
             fullPrice : ticket.fullPrice,
             numberOfTickets : getFullNumberOfTicket(ticket.tickets),
             isLocal : ticket.local,
-            nameOfCustomer : "",
             tickets : ticket.tickets,
-            actions : <span><DeleteFilled onClick={e=>deleteFunction(ticket.buyId)}/><PrinterFilled onClick={e=>printFunction(ticket.buyId)} /></span>
+            actions : <span><DeleteFilled onClick={e=>deleteFunction(ticket.buyId)}/><PrinterFilled onClick={e=>printFunction(ticket.buyId)} /></span>,
+            nameOfCustomer : {customerName : ticket?.customerName ? ticket?.customerName : "", cusotmerEmail : ticket?.cusotmerEmail, phoneNumber : ticket?.phoneNumber}
         }
     });
   }

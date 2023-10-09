@@ -7,7 +7,6 @@ const config = JSON.parse(fs.readFileSync(`${process.env.CONFIGDIR}/config.json`
 class Database{
   constructor(name){
     let datas = Function.getNameOfDatabase(name);
-    console.log(datas);
     this.collectionName = datas.collection; this.databaseName = datas.database;
     this.mongoconfig = {};
     if (!this.mongoconfig) return {error : true};

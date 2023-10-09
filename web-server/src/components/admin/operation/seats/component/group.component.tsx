@@ -1,17 +1,14 @@
-import Draggable from "react-draggable"
 import { v4 as uuid } from 'uuid';
 import { Children } from "react";
 type groupParamsType = {
     posX : number,
     posY : number,
     id : string,
-    children : any
+    children : JSX.Element[] | JSX.Element
 }
-const Group = ({posX, posY, id, children}:groupParamsType):any=>{
-    const mappedChildren = Children.map(children, child =>
-        <div>
-          {child}
-        </div>
+const Group = ({posX, posY, id, children}:groupParamsType)=>{
+    const mappedChildren = Children.map(children, (child:JSX.Element) =>
+        (<>{child}</>)
       );
     return (
         <div key = {uuid()}>

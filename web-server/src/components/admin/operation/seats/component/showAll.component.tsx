@@ -3,7 +3,7 @@ import { Radio } from 'antd';
 
 type paramsTypeOfShowAllSeats = {
     showAll : boolean,
-    onChangeFunction: any
+    onChangeFunction: Function
 }
 
 const ShowAllSeats = ({showAll,onChangeFunction}:paramsTypeOfShowAllSeats):any=>{

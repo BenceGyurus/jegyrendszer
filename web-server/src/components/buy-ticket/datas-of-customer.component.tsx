@@ -3,6 +3,9 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { useState } from "react";
+import { Input } from "antd";
+import FormItem from "antd/es/form/FormItem";
+import PhoneInput from "antd-phone-input";
 
 
 type typeOfDatasOfCustormerParams = {
@@ -48,34 +51,35 @@ const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, set
     return <div className = "datas-of-customer">
         <h2>Számlázási adatok:</h2>
         <label htmlFor="lastName">Vezetéknév</label>
-        <input type="text" id = "lastName" defaultValue={firstName} onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
+        <Input type="text" id = "lastName" defaultValue={firstName} onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
         <label htmlFor="firstname">Keresznév</label>
-        <input type="text" id = "firstname" defaultValue={lastName} onChange={e=>setLastName(e.target.value)} autoComplete="given-name" />
+        <Input type="text" id = "firstname" defaultValue={lastName} onChange={e=>setLastName(e.target.value)} autoComplete="given-name" />
         <div className = "customer-data-component">
             <h3>Számlázási cím</h3>
             <div className = "post-code-and-city">
                 <div id = "postal-code-div">
                 <label htmlFor="postCode">Irányítószám</label>
-                <input type="text" id = "postCode" defaultValue={zip} onBlur={e=>{getCity(e.target.value)}} onChange={e=>{setPostalCode(e.target.value)}} autoComplete="postal-code" />
+                <Input type="text" id = "postCode" defaultValue={zip} onBlur={e=>{getCity(e.target.value)}} onChange={e=>{setPostalCode(e.target.value)}} autoComplete="postal-code" />
                 </div>
                 <div id = "city-div">
                 <label htmlFor="city">Település név</label>
-                <input type="text" id = "city" value = {city} onChange={e=>{setCity(e.target.value)}} autoComplete="country-name"/>
+                <Input type="text" id = "city" value = {city} onChange={e=>{setCity(e.target.value)}} autoComplete="country-name"/>
                 </div>
             </div>
             <label htmlFor="address">Cím</label>
-            <input type="text" id = "address" defaultValue={address} onChange={e=>{setAddress(e.target.value)}} autoComplete="street-address" />
+            <Input type="text" id = "address" defaultValue={address} onChange={e=>{setAddress(e.target.value)}} autoComplete="street-address" />
             <label htmlFor="address2">Emelet, lépcsőház stb. (nem kötelező)</label>
-            <input type="text" id = "address2" defaultValue={address2} onChange={e=>{setAddress2(e.target.value)}}/>
+            <Input type="text" id = "address2" defaultValue={address2} onChange={e=>{setAddress2(e.target.value)}}/>
         </div>
         <label htmlFor="tax-number">Adószám (magánszemélynek nem kötelező)</label>
-        <input type="text" id = "tax-number" defaultValue={tax} onChange={e=>{setTaxNumber(e.target.value)}}/>
+        <Input type="text" id = "tax-number" defaultValue={tax} onChange={e=>{setTaxNumber(e.target.value)}}/>
         <div className = "contact customer-data-component">
             <h3>Kapcsolattartás</h3>
             <label htmlFor="email">E-mail cím</label>
-            <input type="email" id = "email" defaultValue={mail} onChange={e=>{setMail(e.target.value)}} autoComplete="email" />
+            <Input type="email" id = "email" defaultValue={mail} onChange={e=>{setMail(e.target.value)}} autoComplete="email" />
             <label htmlFor="phone">Telefonszám</label>
-            <input type="phone" id = "phone" defaultValue={phone} onChange={e=>{setPhone(e.target.value)}} autoComplete="tel" />
+            <Input type = "phone" id = "phone" defaultValue={phone} onChange={e=>setPhone(e.target.value)} autoComplete="phone" />
+
         </div>
         <br />
         <input type="checkbox" id = "accept" />

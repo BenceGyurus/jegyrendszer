@@ -15,7 +15,7 @@ const SetColorOfBackground = ({setColor, color}:typeOfSetColorOfBackgroundParams
     })
     return (
         <div>
-            <ColorPicker defaultValue={color} style={{zIndex : 100000000}} onChange={(value)=>setColor(value.toHexString())} showText={(color) => <span>Szín kiválasztása ({color.toHexString()})</span>} />
+            <ColorPicker defaultValue={color} onChange={(value)=>setColor(value.toHexString())} showText={(color) => <span>Szín kiválasztása ({color.toHexString()})</span>} />
         </div>
     );
 }

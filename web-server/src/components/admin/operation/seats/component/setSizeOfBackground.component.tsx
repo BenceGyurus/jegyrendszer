@@ -5,22 +5,23 @@ type typeOfSetSizeOfBackgroundParams = {
     width : number,
     height : number,
     setWidth : Function,
-    setHeight : Function
+    setHeight : Function,
+    scale : boolean,
+    setScale : Function
 }
-const SetSizeOfBackground = ( { width, height, setWidth, setHeight }:typeOfSetSizeOfBackgroundParams )=>{
+const SetSizeOfBackground = ( { width, height, setWidth, setHeight, scale, setScale }:typeOfSetSizeOfBackgroundParams )=>{
     const [ holdScale, setHoldScale ] = useState(true);
 
     return (
         <div className = "">
-            <Checkbox onChangeFunction={setHoldScale} defaultChecked = {holdScale} title = "Oldalarány megtartása" />
+            <Checkbox onChangeFunction={setScale} defaultChecked = {scale} title = "Oldalarány megtartása" />
             <div>
-                <InputNumber sufix="px" title = "Szélesség" value = {width <= 0.9 ? "" : Math.round(width)} onChangeFunction = {setWidth} functionParams = {[holdScale]} />
-                <InputNumber sufix="px" title = "Magasság" value = {width <= 0.9 ? "" : Math.round(height)} onChangeFunction = {setHeight} disabled = {holdScale}/>
+                <InputNumber sufix="px" title = "Szélesség" value = {width <= 0.9 ? "" : Math.round(width)} onChangeFunction = {setWidth} />
+                <InputNumber sufix="px" title = "Magasság" value = {width <= 0.9 ? "" : Math.round(height)} onChangeFunction = {setHeight} disabled = {scale}/>
             </div>
         </div>
     )
 }
 
-//<label htmlFor="width">Szélesség:</label><input type="number" name="width" value = {width <= 0.9 ? "" : Math.round(width)} id="width" onChange={(event:any) => {}} /><label htmlFor="height">Magasság:</label> <input type = "number" name = "height" id = "height" onChange={event => setHeight(Number(event.target.value))} disabled={holdScale} value = {height <= 0.9 ? "" : Math.round(height)} defaultValue = {Math.ceil(height)}/>
 
 export default SetSizeOfBackground;

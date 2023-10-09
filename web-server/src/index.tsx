@@ -8,6 +8,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import "./css/card.css";
 
 
 //const ds = "A két felvonásos, lendületes és rendkívül látványos zenés darab amellett, hogy ragyogó szórakozást ígér, segíthet újra felfedezni, új oldaláról megismerni a mára közismert név mögött rejtőző csodálatos zseni elméjét és életének rejtélyeit!";

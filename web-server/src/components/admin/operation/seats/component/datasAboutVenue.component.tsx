@@ -1,9 +1,6 @@
 import InputText from "../../../../input/inputText.component";
 import WindowHeader from "../../../../window-header/windowHeader.component";
-import "../../../../../css/datasAboutVenue.css";
-import InputNumber from "../../../../input/inputNumber.component";
-import Checkbox from "../../../../checkbox/checkbox.component";
-import type { RadioChangeEvent } from 'antd';
+import "../../../../../css/datasAboutVenue.css"; 
 import { Radio } from 'antd';
 type typeOfVenueDatasParams = {
     nameOfVenue : string,

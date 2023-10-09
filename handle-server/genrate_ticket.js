@@ -55,7 +55,7 @@ const GenerateTicket = async (ticketsIds)=>{
     const eventDatabse = new Database("events");
     let pdfs = [];
     for (let i = 0; i < ticketsIds.length; i++){
-      idOfTicket = ticketsId;
+        idOfTicket = ticketsIds[i];
       try{
         idOfTicket = new ObjectId(ticketsIds[i]);
       }

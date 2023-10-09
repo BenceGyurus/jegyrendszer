@@ -14,7 +14,7 @@ const closeConnection = (database)=>{
     );
 }
 
-const Sales = async (userId, external, page, limit, filters)=>{
+const Sales = async (userId, external, page, limit, search, filters)=>{
     const eventDatabase = new Database("events");
     let events = await eventDatabase.collection.find({ "eventData.users" :  userId }, { projection : {eventData : 1}}).toArray();
     closeConnection(eventDatabase.database);
@@ -36,11 +36,11 @@ const Sales = async (userId, external, page, limit, filters)=>{
         console.log("UserId couldn't be created ObjectId")
     }
     if (external) conditions.push( { "otherDatas.userData.userId" : userId } );
-    console.log({ $and : [ {id : { $in : eventsOfUser}}, ...conditions]});
-    let sales = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, ...conditions]}).skip(skipValue).limit(limit).toArray();
-    let max = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, ...conditions]}).count();
+    if (search) conditions.push( {$or : [{ "customerDatas.firstname" : {$regex: new RegExp(search, 'g')} }, { "customerDatas.lastname" : {$regex: new RegExp(search, 'g')} }, {eventName : {$regex: new RegExp(search, 'i')}}, { price : {$regex: new RegExp(search, 'i')}}, { "customerDatas.fullName" : {$regex: new RegExp(search, 'i')}}]} )
+    let sales = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions]}).sort({ time: -1 }).skip(skipValue).limit(limit).toArray();
+    console.log(sales.length);
+    let max = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions]}).count();
     sendSales = [];
-    console.log(sales);
     closeConnection(salesDatabase.database);
     const usersDatabase = new Database("admin");
     const localCoupons = new Database("local-discount");
@@ -59,7 +59,7 @@ const Sales = async (userId, external, page, limit, filters)=>{
             else{
                 coupon = sale.coupon ? sale.coupon : "";
             }
-            if (sale.bought) sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : events.find(item =>String(item._id) == eventsOfUser.find(event=>String(event) == String(sale.id)))?.eventData?.name, eventId : sale.eventId, fullAmount : sale.fullAmount, buyId : sale._id, custormerName : sale.customerDatas ? `${sale.customerDatas.fistname} ${sale.customerDatas.lastname}` : "", cusotmerEmail : sale.customerDatas ? `${sale.customerDatas.mail}` : ""});
+            sendSales.push({user : userName, coupon : coupon, price : sale.price, local : !!sale.local, tickets : sale.tickets, date : new Date(sale.time), fullPrice : sale.fullPrice, eventName : events.find(item =>String(item._id) == eventsOfUser.find(event=>String(event) == String(sale.id)))?.eventData?.name, eventId : sale.eventId, fullAmount : sale.fullAmount, buyId : sale._id, customerName : sale.customerDatas ? `${sale?.customerDatas?.firstname ? sale.customerDatas.firstname : ""}${sale?.customerDatas?.lastname ? ` ${sale.customerDatas.lastname}` : ""}` : "", cusotmerEmail : sale.customerDatas ? `${sale.customerDatas.mail}` : "", phoneNumber : sale?.customerDatas?.phone ? sale?.customerDatas?.phone : ""});
         };
     }
     closeConnection(ticketsDatabase.database);

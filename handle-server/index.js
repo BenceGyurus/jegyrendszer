@@ -316,7 +316,7 @@ app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,nex
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
             let event = await getEventDatas(req.params.id);
-            return res.send({media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, location : event.location, position: event.position, localDiscounts : event.localDiscounts, venue : event.venue})
+            return res.send({_id : event.id, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, location : event.location, position: event.position, localDiscounts : event.localDiscounts, venue : event.venue})
             }
         }
         else{
@@ -1212,7 +1212,7 @@ app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
         let browserData = Functions.getBrowerDatas(req)
         if (datas && datas.pending && datas.time + getTime("RESERVATION_TIME") >= new Date().getTime() && datas.eventId && ip == datas.otherDatas.ip && browserData.os == datas.otherDatas.browserData.os && browserData.name == datas.otherDatas.browserData.name){
             let eventDetails = await getTicketByReadableId(datas.eventId);
-            if (eventDetails) res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent, customerDatas : datas.customerDatas});
+            if (eventDetails) res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent, customerDatas : {...datas.customerDatas, fullName : `${datas?.customerData?.firstname} ${datas?.customerData?.lastname}`}});
             else {
                 logger.err(`Failed to get event details`);
                 return handleError(logger, "500", res);
@@ -1244,7 +1244,7 @@ app.post("/api/v1/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next),
         if (access && access.includes("ticket-sells")){
             let userData = await GetUserDatas(req.body.token)
             let userId = String((userData)._id);
-            res.send(await Sales(userId, userData.externalSeller, page, limit));
+            res.send(await Sales(userId, userData.externalSeller, page, limit, req.query.search));
         }
     }
 });
@@ -1466,10 +1466,11 @@ app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), as
                     eventId : req.body.datas.eventId,
                     fullAmount : price.fullAmount,
                     otherDatas : await otherData(req, req.body.token),
-                    id : eventDatas._id
+                    id : eventDatas._id,
+                    invitation : req.body.datas.invitation
             }
             let result = await collection.insertOne(saveDatas);
-            let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.eventData.venue, req.body.datas.eventId, true, eventDatas._id);
+            let tickets = await Tickets(result.insertedId,price.tickets, eventDatas.eventData.venue, req.body.datas.eventId, true, eventDatas._id, req.body.datas.invitation);
             closeConnection(database);
             let files = await GenerateTicket(tickets);
             let sysConfig = readConfig()
@@ -1515,7 +1516,7 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
                         saveDatas = {
                             price : price ? price : buyingDatas.fullPrice,
                             fullPrice : fullPrice.fullPrice,
-                            customerDatas : req.body.datas.customerData,
+                            customerDatas : {...req.body.datas.customerData, fullName : `${req.body?.datas?.customerData?.firstname} ${req.body?.datas?.customerData?.lastname}`},
                             time : new Date().getTime(),
                             coupon : !error ? name : false,
                             eventId : buyingDatas.eventId,
@@ -1940,7 +1941,16 @@ io.on("connection",(socket)=>{
         if (payload && payload.token){
             const { collection, database } = new Database("monitor");
             let monitorDatas = await collection.findOne( { connected : socket.id } );
-            let event = (await getTicketByReadableId(payload.eventId));
+            payload.eventId = payload.eventId.replace("%E2%80%93", "-");
+            console.log("eventId:", payload.eventId);
+            //let event = (await getTicketByReadableId(payload.eventId));
+            let eventDatabase = new Database("events");
+            try{
+                payload.eventId = new ObjectId(payload.eventId);
+            }catch{}
+            let event = (await eventDatabase.collection.findOne({_id : payload.eventId})).eventData;
+            closeConnection(eventDatabase.database);
+            console.log(event);
             let eventDatas = {eventId : event.readable_event_name, venueId : event.venue};
             if (monitorDatas && monitorDatas.socketId){
                 io.to(monitorDatas.socketId).emit( "event-display",  eventDatas);

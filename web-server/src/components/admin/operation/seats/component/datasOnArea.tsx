@@ -1,25 +1,8 @@
 import Group from "./group.component";
 import Seat from "./seat.component";
 import { v4 as uuid } from 'uuid';
-import { useState } from "react";
-
-type groupType = {
-    name : string,
-    id : string,
-    posX : number,
-    posY : number,
-    status : boolean,
-    opend: boolean
-}
-
-type seatOfType = {
-    name : string,
-    title : string,
-    id : string,
-    posX : number,
-    posY : number,
-    group : string
-}
+import groupType from "../type/group";
+import seatOfType from "../type/seat";
 
 
 type DatasOnAreaParamsType = {
@@ -27,13 +10,13 @@ type DatasOnAreaParamsType = {
     seats : Array<seatOfType>,
     size : number,
     selected : string,
-    newPositionFunction: any,
+    newPositionFunction: Function,
     showAll:boolean,
     colorOfSeat : string,
     suggestedGroups : Array<Array<string>>
 };
 
-function multiDimensionalIncludes(arr:Array<any>, value:any) {
+function multiDimensionalIncludes(arr:Array<unknown>, value:boolean | string | Array<unknown> | number | object) {
     for (const subArray of arr) {
       if (Array.isArray(subArray)) {
         if (multiDimensionalIncludes(subArray, value)) {
@@ -46,9 +29,9 @@ function multiDimensionalIncludes(arr:Array<any>, value:any) {
     return false;
   }
 
-const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,colorOfSeat, suggestedGroups}:DatasOnAreaParamsType):any=>{
+const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,colorOfSeat, suggestedGroups}:DatasOnAreaParamsType)=>{
 
-  const scrollToId = (e:any, id:string)=>{
+  const scrollToId = (e:Event, id:string)=>{
     console.log(id);
       const element = document.getElementById(id);
       if (element) {
@@ -57,24 +40,24 @@ const DatasToArea = ({groups, seats, size,selected,newPositionFunction,showAll,c
       }
   }
 
-    return (groups.map(
-        (group:any)=>{
+    return <>{groups.map(
+        (group:groupType)=>{
             if (group.id == selected){
             return (<Group key = {uuid()} posX = {group.posX} posY = {group.posY} id = {group.id}>
-                {
+                <>{
                     seats.map(
-                        (seat:any, index:number)=>{
+                        (seat:seatOfType, index:number)=>{
                                 if ((seat.group == group.id) || showAll){
                                         return <Seat onClick={scrollToId} key = {uuid()} color = {multiDimensionalIncludes(suggestedGroups, seat.id) ? "red" : colorOfSeat} name = {seat.name} id = {seat.id} posX = {seat.posX} posY = {seat.posY} title = {seat.title} size = {size} newPositionFunction = {newPositionFunction} index = {index}/> 
                                     }
                                 }
 
                     )
-                }
+                }</>
             </Group>)
             }
         }
-    ));
+    )}</>
 }
 
 export default DatasToArea;

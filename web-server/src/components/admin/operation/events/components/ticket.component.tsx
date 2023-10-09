@@ -3,6 +3,8 @@ import { v4 as uuid } from 'uuid';
 import "../../../../../css/edit-ticket.css";
 import TicketPriceChart from "./ticketPrice.component";
 import TicketCounter from "./numberOfTicket.component";
+import { Card, Progress } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 type typeOfTicket = {
     id : string,
@@ -32,8 +34,16 @@ type typeOfPlace = {
     colorOfSeat : string
 }
 
+
 const Ticket = ( { ticket, sizeOfSeat,seatsDatas, sizeOfArea,editFunction, deleteFunction }:typesOfTicketParams )=>{
-    return  <div className = "edit-ticket-div" key={uuid()}>
+    return  (<Card className = "tickets-holder" actions={[<DeleteOutlined onClick={e=>deleteFunction(ticket.id)}  />, <EditOutlined onClick={e=>editFunction(ticket.id)}/>]} cover = {<SmallMap sizeOfArea={sizeOfArea} colorOfBackGround = "white" colorOfSeat="black" seatDatas={seatsDatas} sizeOfSeats = {sizeOfSeat} selectedSeats = {ticket.seats} selectColor = "red" />}>
+        <h3>{ticket.name}</h3>
+        <span>{ticket.price} Ft</span>
+    </Card>)
+}
+
+/*
+<div className = "edit-ticket-div" key={uuid()}>
       <div className="ticket-counter">
       <div className="event-info">
         <div className="ticket-title">{ticket.name}</div>
@@ -45,10 +55,10 @@ const Ticket = ( { ticket, sizeOfSeat,seatsDatas, sizeOfArea,editFunction, delet
       </div>
     </div>
     <TicketPriceChart min={ticket.minPrice} max={ticket.maxPrice} normal={ticket.price} />
-    <SmallMap sizeOfArea={sizeOfArea} colorOfBackGround = "white" colorOfSeat="black" seatDatas={seatsDatas} sizeOfSeats = {sizeOfSeat} selectedSeats = {ticket.seats} selectColor = "red" />
+    
     <button className = "edit-button ticket-button" onClick={e=>editFunction(ticket.id)}>Szerkesztés</button>
     <button className = "delete-button ticket-button" onClick={e=>deleteFunction(ticket.id)} >Törlés</button> 
     </div>
-}
+}*/
 
 export default Ticket;

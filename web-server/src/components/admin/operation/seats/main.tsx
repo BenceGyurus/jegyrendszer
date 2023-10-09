@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { Ref, RefObject, useEffect, useState } from "react"
 import Area from "./component/seatArea.component"
 import { v4 as uuid } from 'uuid';
 import GroupList from "./component/groupList.component";
@@ -19,37 +19,15 @@ import Success from "../../../notification/success.component";
 import Notification from "../../../notification/notification.component";
 import { Button, notification, Space } from 'antd';
 import Collapse from '@mui/material/Collapse';
-type groupType = {
-    name : string,
-    id : string,
-    posX : number,
-    posY : number,
-    status : boolean,
-    opend: boolean
-}
+import seatOfType from "./type/seat";
+import groupType from "./type/group";
+import typeOfBackGround from "./type/background";
+import typeOfSizeOfArea from "./type/sizeOfArea";
 
-type seatOfType = {
-    name : string,
-    title : string,
-    id : string,
-    posX : number,
-    posY : number,
-    group : string
-}
-
-type typeOfBackGround = {
-    isImage: boolean,
-    name : string
-}
-
-type typeOfSizeOfArea = {
-    width : number,
-    height: number
-}
 
 type propsType = {
     seatsDatas? : Array<seatOfType>
-    groupsDatas? : any,
+    groupsDatas? : Array<groupType>,
     bg? : typeOfBackGround,
     cbg? : string,
     places? : number,
@@ -65,11 +43,12 @@ type propsType = {
 }
 
 const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfSeat, cOfSeat, seatMode, suGroups, name, id, stageData}:propsType)=>{
+    console.log(groupsDatas);
     const [colorOfBackGround, setColorOfBackGround] = useState(cbg ? cbg : "#FFFFFF");
     const [sizeOfArea, setSizeOfArea] = useState(area ? area : {width : 720, height : 480});
     const [background, setBackground] = useState(bg ? bg : {isImage : false, name: colorOfBackGround});
     const [seats, setSeats] = useState(seatsDatas ? seatsDatas : []);
-    const [groups, setGroups] = useState(groupsDatas && groupsDatas.length >= 1 ? groupsDatas : [{name : "Default", posX : 0, posY : 0, id : uuid(), status: false, opened : false}]);
+    const [groups, setGroups]:[Array<groupType>, Function] = useState(groupsDatas && groupsDatas.length >= 1 ? groupsDatas : [{name : "Default", posX : 0, posY : 0, id : uuid(), status: false, opened : false}]);
     const [selecttedGroup, setSelectedGroup] = useState(sGroups? sGroups : groups[0].id);
     const [sizeOfSeat, setSizeOfSeat] = useState(sOfSeat ? sOfSeat : 30);
     const [showAllSeats, setShowAllSeats] = useState(false);
@@ -85,6 +64,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
     const [stage, setStage] = useState(stageData ? stageData : 0);
     const [error, setError] = useState("");
     const [succ, setSucc] = useState("");
+    const [scale, setScale] = useState(false);
 
     const save = ()=>{
         let datas = {
@@ -144,8 +124,8 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         return absolteSeats;
     }
 
-    const getNewArray = (array:Array<unknown>):Array<seatOfType>=>{
-        let newArray:any = [];
+    const getNewArray = (array:Array<seatOfType>):Array<seatOfType>=>{
+        let newArray:Array<seatOfType> = [];
         for (let i = 0; i < array.length; i++){
             if (array[i]){
                 newArray.push(array[i]);
@@ -192,7 +172,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         let {detectedGroups, recommendedGroups} = Auto_Addition(seats, sizeOfSeat);
         setSuggestedGroups(recommendedGroups);
         let newData = [...groups];
-        newData[index] = ({name : name ,id : newData[index].id ,posX : newData[index].posX, posY : newData[index].posY, status : false, opened : newData[index].opened});
+        newData[index] = ({name : name ,id : newData[index].id ,posX : newData[index].posX, posY : newData[index].posY, status : false, opened : newData[index]?.opened});
         setGroups(newData);
     }
 
@@ -200,8 +180,8 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         let {detectedGroups, recommendedGroups} = Auto_Addition(seats, sizeOfSeat);
         setSuggestedGroups(recommendedGroups);
         if (groups.length > 1){
-        let newData:any = [];
-        let newSeats:any = [];
+        let newData:Array<groupType> = [];
+        let newSeats:Array<seatOfType> = [];
         let id:string = "";
         for (let i = 0; i < groups.length; i++){
             if (i != index){
@@ -239,7 +219,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         setSeats(newData);
     }
 
-    const newPositionToSeat = (index:number ,posX:number, posY:number, event:any, data:any)=>{
+    const newPositionToSeat = (index:number ,posX:number, posY:number, event:Event)=>{
         let {detectedGroups, recommendedGroups} = Auto_Addition(seats, sizeOfSeat);
         setSuggestedGroups(recommendedGroups);
         let newData = [...seats];
@@ -274,7 +254,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
 
     }
 
-    const setWidthOfArea = (width:number, scale:boolean, heightRef:any, widthRef:any)=>{
+    const setWidthOfArea = (width:number, heightRef:RefObject<null>, widthRef:RefObject<null>)=>{
         let sizeData = {...sizeOfArea};
         if (width <= 0){
             width = 0.9;
@@ -300,7 +280,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         setShowSettingsWindow(!showSettingsWindow);
     }
 
-    const addMoreGroups = (grouplist:Array<any>)=>{
+    const addMoreGroups = (grouplist:Array<groupType>)=>{
         let {detectedGroups, recommendedGroups} = Auto_Addition(seats, sizeOfSeat);
         setSuggestedGroups(recommendedGroups);
         let newData = [...groups, ...grouplist];
@@ -328,7 +308,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
         </Area>
         <ShowAllSeats showAll = {showAllSeats} onChangeFunction = {changeStatusOfShowAll}/>
         <GroupList groups = {groups} handleEvent = {editNameOfGroup} editFunction = {setStatusOfGroup} deleteEvent = {deleteGroup} setSelected = {setSelectedInGroups} selected = {selecttedGroup} seats = {seats} changeValue = {changeValueOfSeat} deleteSeatFunction = {deleteSeat} changeOpened = {changeStatusOfOpened} changeTitle={changeTitleOfSeat}/>
-        <Settings showSettingsWindow = {showSettingsWindow} widthOfArea={sizeOfArea.width} heightOfArea = {sizeOfArea.height} setHeightOfArea = {setHeightOfArea} setWidthOfArea = {setWidthOfArea} setSizeOfSeatsFunction = {(size:number) =>{setSizeOfSeat(size > 0 ? size : 1)}} sizeOfSeat = {sizeOfSeat} uploadFile = {uploadFile} delteImageFunction = {deleteImage} settingsWindow = {ChangeSettingsWindow} colorOfBackground = {colorOfBackGround} setColorOfBackground = {changeColorOfBackground} colorOfSeat = {colorOfSeat} changeColorOfSeats = {setColorOfSeat} nameOfBackgroundImage = {background} newGroupFunction = {addNewGroup} setSelectedStage = {setStage} selectedStage={stage}/>
+        <Settings setScale={setScale} scale = {scale} showSettingsWindow = {showSettingsWindow} widthOfArea={sizeOfArea.width} heightOfArea = {sizeOfArea.height} setHeightOfArea = {setHeightOfArea} setWidthOfArea = {setWidthOfArea} setSizeOfSeatsFunction = {(size:number) =>{setSizeOfSeat(size > 0 ? size : 1)}} sizeOfSeat = {sizeOfSeat} uploadFile = {uploadFile} delteImageFunction = {deleteImage} settingsWindow = {ChangeSettingsWindow} colorOfBackground = {colorOfBackGround} setColorOfBackground = {changeColorOfBackground} colorOfSeat = {colorOfSeat} changeColorOfSeats = {setColorOfSeat} nameOfBackgroundImage = {background} newGroupFunction = {addNewGroup} setSelectedStage = {setStage} selectedStage={stage}/>
         
         <SuggestNewGroups suggestedGroups = {suggestedGroups} seats = {seats} changeSeatsFunctions = {setSeats} addGroupsFunction = {addMoreGroups} groups = {groups} open= {suggestedGroups.length>0} setOpen={()=>{setSuggestedGroups([])}} />
         

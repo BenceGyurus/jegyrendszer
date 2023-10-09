@@ -7,12 +7,7 @@ import postData from "../../../connection/request";
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import CompaniesList from "./companiesList.component";
 import Loader from "../../../loader/loader.component";
-
-type typeOfCompany = {
-    name : string,
-    tax : string,
-    _id : string
-}
+import typeOfCompany from "./type/company";
 
 const CompaniesMain = ()=>{
 

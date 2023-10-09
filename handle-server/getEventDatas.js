@@ -24,6 +24,7 @@ const getEventDatas = async (eventId)=>{
     let boughtDatas = await boughtDatabase.collection.find({$and : [{id : eventDatas._id}, {$or : [ {$and : [{ time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")} }, {pending : true}]}, {bought : true} ]}]}).toArray();
     console.log(boughtDatas);
     closeConnection(boughtDatabase.database)
+    closeConnection(database);
     for (let i = 0; i < boughtDatas.length; i++){
             for (let j = 0; j < boughtDatas[i].tickets.length; j++){
                 for (let k = 0; k < eventDatas.eventData.tickets.length; k++){
@@ -36,7 +37,7 @@ const getEventDatas = async (eventId)=>{
                 }
         }
     }
-    return eventDatas.eventData;}
+    return {id : eventDatas._id,...eventDatas.eventData};}
     return false;
 }
 

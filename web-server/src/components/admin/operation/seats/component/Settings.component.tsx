@@ -9,6 +9,7 @@ import NewGroup from "./newGroup.component";
 import WindowHeader from "../../../../window-header/windowHeader.component";
 import SettingsButton from "./settingsButton.component";
 import Stage from "./stageInSettings.component";
+import Window from "../../../../window/window.component";
 type typesOfSettingsParams = {
     widthOfArea : number,
     heightOfArea : number,
@@ -27,21 +28,20 @@ type typesOfSettingsParams = {
     nameOfBackgroundImage: {isImage : boolean, name : string},
     newGroupFunction : Function,
     selectedStage : number,
-    setSelectedStage : Function
+    setSelectedStage : Function,
+    scale : boolean,
+    setScale : Function
 }
-const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,setSizeOfSeatsFunction, sizeOfSeat, uploadFile, delteImageFunction, showSettingsWindow, settingsWindow, colorOfBackground, setColorOfBackground, colorOfSeat,changeColorOfSeats, nameOfBackgroundImage, newGroupFunction, selectedStage, setSelectedStage}:typesOfSettingsParams )=>{
+const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,setSizeOfSeatsFunction, sizeOfSeat, uploadFile, delteImageFunction, showSettingsWindow, settingsWindow, colorOfBackground, setColorOfBackground, colorOfSeat,changeColorOfSeats, nameOfBackgroundImage, newGroupFunction, selectedStage, setSelectedStage, scale, setScale}:typesOfSettingsParams )=>{
     return (
         showSettingsWindow ? 
-        <div className = "settings opendSettings">
-            <WindowHeader title = "Beállítások" closeWindowFunction={settingsWindow}/>
+        <Window title = "Beállítások" closeFunction={settingsWindow}>
             <div className = "contentOfSettings">
             <h2>Háttér beállítása</h2>
             <h3>Háttér mérete</h3>
-            <SetSizeOfBackground width = {widthOfArea} height = {heightOfArea} setWidth = {setWidthOfArea} setHeight = {setHeightOfArea}/>
+            <SetSizeOfBackground setScale={setScale} scale = {scale} width = {widthOfArea} height = {heightOfArea} setWidth = {setWidthOfArea} setHeight = {setHeightOfArea}/>
             <h3>Kép beállítása háttérnek</h3>
             <ImageUpload onChangeEvent = {uploadFile} deleteImageFunction = {delteImageFunction} imageName = {nameOfBackgroundImage}/>
-            <h3>Háttérszín beállítása</h3>
-            <SetColorOfBackground color = {colorOfBackground} setColor = {setColorOfBackground} />
             <h2>Ülőhelyek beállítása</h2>
             <h3>Ülőhelyek mérete</h3>
             <SetSizeOfSeats onChangeFunction={setSizeOfSeatsFunction} size = {sizeOfSeat}/>
@@ -54,7 +54,7 @@ const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,s
             <h3>Új csoport létrehozása</h3>
             <NewGroup addNewFunction = {newGroupFunction} />
             </div>
-        </div>
+        </Window>
         :
         <SettingsButton onClickEvent={settingsWindow} className = "settingsButton"/>
 
@@ -68,6 +68,12 @@ const Settings = ( {widthOfArea, heightOfArea, setWidthOfArea, setHeightOfArea,s
 }
 
 //
+
+//Background color set
+/*
+<h3>Háttérszín beállítása</h3>
+<SetColorOfBackground color = {colorOfBackground} setColor = {setColorOfBackground} />
+*/
 
 //<div className = "settings-btn"><img src="/images/settings.png" alt="settings-image" onClick={event => settingsWindow()} className = "settingsIcon" /></div>
 

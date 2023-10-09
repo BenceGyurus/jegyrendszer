@@ -5,6 +5,8 @@ import insertCookie from "../../cookies/insertCookie";
 import { useNavigate } from 'react-router-dom';
 import Notification from "../notification/notification.component";
 import Error from "../notification/error.component";
+import { Input } from "antd";
+import Password from "antd/es/input/Password";
 const Admin = ()=>{
     const [username, setUsername] = useState("");
     const [password, setpassword] = useState("");
@@ -44,11 +46,11 @@ const Admin = ()=>{
     <form>
       <div className="login-form-group">
         <label htmlFor="username">Felhasználónév</label>
-        <input type="text" id="username" name="username" required onChange={event => changeUsername(event)} onKeyDown={e=>{if (e.key.toUpperCase() === "ENTER") login()}}  />
+        <Input autoComplete="username" size="large" type="text" id="username" name="username" required onChange={event => changeUsername(event)} onKeyDown={e=>{if (e.key.toUpperCase() === "ENTER") login()}}  />
       </div>
       <div className="login-form-group">
         <label htmlFor="password">Jelszó</label>
-        <input type="password" id="password" name="password" required onChange={event => changePassword(event)} onKeyDown={e=>{if (e.key.toUpperCase() === "ENTER") login()}}  />
+        <Password autoComplete="password" size = "large" type="password" id="password" name="password" required onChange={event => changePassword(event)} onKeyDown={e=>{if (e.key.toUpperCase() === "ENTER") login()}}  />
       </div>
       <div className="login-form-group">
         <input type="button" value="Bejelentkezés" onClick={login}/>

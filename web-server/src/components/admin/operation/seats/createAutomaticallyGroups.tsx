@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
-const createAutoGroups = (groups:Array<Array<string>>, seats:Array<any>, changeSeatsFunctions:Function, addGroupsFunction:Function, oldGroups:Array<any>)=>{
+import seatOfType from './type/seat';
+const createAutoGroups = (groups:Array<Array<string>>, seats:Array<seatOfType>, changeSeatsFunctions:Function, addGroupsFunction:Function, oldGroups:Array<any>)=>{
     let newGroups = [];
     for (let i = 0; i < groups.length; i++){
         let id = uuid();

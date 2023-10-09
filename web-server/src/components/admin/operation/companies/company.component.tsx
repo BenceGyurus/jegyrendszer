@@ -1,10 +1,5 @@
 import "../../../../css/company.css";
-
-type typeOfCompany = {
-    name : string,
-    tax : string,
-    _id : string
-}
+import typeOfCompany from "./type/company";
 
 type typeOfCompanyParams = {
     company : typeOfCompany,

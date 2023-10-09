@@ -1,10 +1,6 @@
 import { useState } from "react";
 import Company from "./company.component";
-type typeOfCompany = {
-    name : string,
-    tax : string,
-    _id : string
-}
+import typeOfCompany from "./type/company";
 
 type typeOfCompaniesListParams = {
     companies : Array<typeOfCompany>,

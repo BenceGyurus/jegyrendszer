@@ -20,12 +20,13 @@ const InputNumber = ({ title,onChangeFunction,value,disabled,functionParams, mon
     const numberInputRef:any = useRef(null);
     useEffect(()=>{
         if (numberInputRef.current && value){numberInputRef.current.value = value}
-    })
+    }, [value]);
+    console.log(value);
     return (
         <div className="input-container">
-        <div ref = {numberInputRef ? numberInputRef : null} >
+        <div>
             <label htmlFor={id} className = "inputLabel">{title}</label>
-            <Input disabled = {disabled} type='number' placeholder={title} addonAfter = {money ? "Ft" : sufix ? sufix : ""} size = "large" onChange={e => {onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
+            <Input ref={numberInputRef} disabled = {disabled} type='number' placeholder={title} addonAfter = {money ? "Ft" : sufix ? sufix : ""} size = "large" onChange={e => {onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
             <Tooltip title={info.text} zIndex={9999999}>
               <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
             </Tooltip> : ""

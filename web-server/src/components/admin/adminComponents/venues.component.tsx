@@ -35,7 +35,7 @@ const Venues = ()=>{
 
     return (
         <div key = {uuid()}>
-            <h1>Helyszínek</h1>
+            <h1 className = "venues-title">Helyszínek</h1>
             <AddNewButton onClick={()=>{navigate("/uj-terem")}} />
             <VenueList venues={rooms} newRequest = {load}/>
         </div>

@@ -499,14 +499,14 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         if (soldTickets && soldTickets.length){
             soldTickets.forEach((ticket:any) => {
                 if (ticket.seats.length){
-                    summ+=ticket.seats.length
+                    summ+=Number(ticket.seats.length);
                 }
                 else{
-                    summ += ticket.numberOfTicket
+                    summ += Number(ticket.numberOfTicket);
                 }
             });
         }
-        return summ
+        return summ;
     }
 
     const occupiedTicket = ()=>{
@@ -535,14 +535,14 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         {contributors ? <div className = "contributors-grid"><div className = "contributors" >
             <span>Szerkesztők: </span>
             
-            <AvatarGroup total={contributors.length} max={3} className="avatar-group">
+            <AvatarGroup total={contributors.length} max={5} className="avatar-group">
                 {
                     contributors.map((contributor)=>{
                         return <StringAvatar width={40} height={40} username={contributor} />
                     })
                 }
             </AvatarGroup>
-            <Tooltip place="bottom" anchorSelect = ".avatar-group" id="my-tooltip-children-multiline" style={{color:"white"}} >
+            <Tooltip  place="bottom" anchorSelect = ".avatar-group" id="my-tooltip-children-multiline" style={{color : '#7d7d7d', background : "#525252", borderRadius : 5}} >
                 {getUsersInList(contributors)}
             </Tooltip>
         </div></div> : ""}
@@ -612,7 +612,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             </div>
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
-            <div ref = {ticketsRef} className = "event-settings-holder">
+            <div ref = {ticketsRef} className = "event-settings-holder event-settings-tickets">
             { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
             </div>
             {versions ? <div onClick = {e=>setTimeLine(!timeLine)} className = "time-line-collapse">Idővonal <span className = "time-line-open-icon">{ timeLine ? <i className="fas fa-caret-down"></i> : <i className="fas fa-caret-right"></i>}</span></div> : <></>}

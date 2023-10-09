@@ -1,5 +1,7 @@
 import WindowHeader from "../../../../window-header/windowHeader.component";
 import "../../../../../css/showNewUserToken.css";
+import Window from "../../../../window/window.component";
+import { Button, Input } from "antd";
 type typeOfShowTokenParams = {
     token : string,
     url : string,
@@ -15,14 +17,13 @@ const ShowToken = ( { token, url, closeFunction }:typeOfShowTokenParams )=>{
     }
 
     return (
-        <div className = "showNewUserToken">
-            <WindowHeader title="Felhasználó" closeWindowFunction={closeFunction} />
-            <div>
+        <Window title = "Regisztrációs link" closeFunction={closeFunction}>
+            <div className = "reg-window-mid">
                 <h3>Regisztrációs link</h3>
-                <input id = "token" className = "inputOfToken" type="text" value = {`${window.location.origin}${url}${token}`} />
-                <input className = "copy-button" type="button" value="Másolás" onClick = {copy}/>
+                <Input id = "token" className = "inputOfToken" type="text" value = {`${window.location.origin}${url}${token}`} />
+                <Button className = "copy-button" onClick = {copy} >Másolás</Button>
             </div>
-        </div>
+        </Window>
     )
 }
 

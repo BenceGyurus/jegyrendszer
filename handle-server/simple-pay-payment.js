@@ -66,12 +66,12 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
                      data : body
                 };
     
-            axios.request('https://sandbox.simplepay.hu/payment/v2/start',config).then((result) => {
+            /*axios.request('https://sandbox.simplepay.hu/payment/v2/start',config).then((result) => {
                 resolve({paymentUrl: result.body.paymentUrl});
             })
             .catch(()=>{
                 reject({error : true, response : result});
-            })
+            })*/
     })
 
 

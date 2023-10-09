@@ -9,8 +9,8 @@ type AreaParams = {
     width : number,
     height : number,
     background : BackgroundType
-    children : any,
-    clickEvent : any,
+    children : JSX.Element,
+    clickEvent : Function,
     size:number,
     posYOfArea:Function,
     posXOfArea:Function

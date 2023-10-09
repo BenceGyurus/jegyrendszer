@@ -83,3 +83,23 @@
     width: 100%;
 }
 }
+
+.venue-list-venue-body{
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+
+.venue-datas-holder{
+  margin-left: 20px;
+}
+
+.venue-name{
+  margin-top: 5px;
+}
+
+.card-logo{
+  width: 80%;
+  opacity: .9;
+}

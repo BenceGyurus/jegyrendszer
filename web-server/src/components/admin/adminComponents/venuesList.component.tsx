@@ -3,6 +3,10 @@ import SmallMap from "./smallMap.component"
 import postData from "../../connection/request";
 import ParseLocalStorage from "../../../cookies/ParseLocalStorage";
 import Tooltip from "../../tooltip/tooltip.component";
+import { Card, Tag } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import StringAvatar from "../../avatar/avatar.component";
+import Meta from "antd/es/card/Meta";
 
 type typeOfVenueDatas = {
     name : string,
@@ -36,17 +40,20 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
 
     return(<div className = "venue-list"> {venues.map((element, index)=>{
         return (
-            <div key={element.id} className = "venue">
-                <SmallMap sizeOfArea={element.sizeOfArea} colorOfBackGround = {element.colorOfBackGround} sizeOfSeats = {element.sizeOfSeat} colorOfSeat = {element.colorOfSeat} seatDatas = {element.seatsDatas} />
-                <div className = "venue-body">
-                <h3 className = "venue-title">{element.name}</h3>
-                <div className = "venue-buttons">
-                <input type="button" value="Szerkesztés" className = "edit-button" onClick = {e => {handleEditFunction(element.id)}} />
-                <input type="button" value="Törlés" className = "delete-button" onClick = {event=>handleDeleteFunction(element.id)} />
-                </div>
-                <div className = "tooltip-position-div"><Tooltip title = {<i className="fas fa-info-circle"></i>} text = {`Hozzáadta: ${element.addedBy}`} /></div>
+            <Card bordered = {true} cover = {
+              element.seatsDatas.length ? <SmallMap sizeOfArea={element.sizeOfArea} colorOfBackGround = {element.colorOfBackGround} sizeOfSeats = {element.sizeOfSeat} colorOfSeat = {element.colorOfSeat} seatDatas = {element.seatsDatas} /> : <img className = "card-logo" src="/images/logo.png" alt="agora logo" />
+            }
+            actions={[<DeleteOutlined onClick = {event=>handleDeleteFunction(element.id)} />, <EditOutlined onClick = {e => {handleEditFunction(element.id)}} />]}>
+            <div className = "venue-list-venue-body">
+                <StringAvatar username={element.addedBy} />
+                <div className = "venue-datas-holder">
+                    <Tag bordered = {false} color={element.seatsDatas.length ? "blue" : "magenta"}>
+                        {element.seatsDatas.length ? "ülő" : "álló"}
+                    </Tag>
+                    <h3 className = "venue-name">{element.name}</h3>
                 </div>
             </div>
+            </Card>
         );})}
         </div>)
 }

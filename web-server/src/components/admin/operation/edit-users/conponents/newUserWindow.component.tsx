@@ -24,8 +24,6 @@ const NewUserWindow = ({closeFunction, readyState, accesses, external, userId, p
     const [checkedAccesses, setCheckedAccesses]:[any, Function] = useState(accesses ? accesses : []);
     const [externalSeller, setExternalSeller]:[boolean, Function] = useState(external ? external : false);
     const [loaded, setLoaded]:[boolean, Function] = useState(false);
-
-    console.log(external, accesses);
     
     useEffect(()=>{
         setLoaded(false);
@@ -98,6 +96,5 @@ const NewUserWindow = ({closeFunction, readyState, accesses, external, userId, p
     );
 }
 
-//return <li key = {element} ><label htmlFor={id}>{accessList[element][0]}</label><Checkbox params = {[element]} id = {id} className = "checkbox" title = "" onChangeFunction = {changeCheck} defaultChecked = {false}/></li>;
 
 export default NewUserWindow;

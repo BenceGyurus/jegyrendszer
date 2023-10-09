@@ -47,3 +47,7 @@
     margin: 20px auto;
     display: block;
 }
+
+.discount-price{
+    color : green;
+}
