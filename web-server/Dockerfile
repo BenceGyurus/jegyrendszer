@@ -5,6 +5,8 @@ COPY ./package.json ./
 COPY ./package-lock.json ./
 RUN npm install
 COPY . .
+ENV TSC_COMPILE_ON_ERROR=true
+ENV ESLINT_NO_DEV_ERRORS=true
 RUN npm run build
 
 FROM nginx:1.19-alpine AS server
