@@ -95,8 +95,8 @@ metadata:
   name: backend-uploads-pvc
 spec:
   accessModes:
-  - ReadWriteOnce
-  storageClassName: local-path
+  - ReadWriteMany
+  storageClassName: nfs
   resources:
     requests:
       storage: 20Gi
