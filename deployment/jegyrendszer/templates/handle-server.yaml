@@ -96,7 +96,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-  storageClassName: nfs
+  storageClassName: {{.Values.global.storageClass.nfs}}
   resources:
     requests:
       storage: 20Gi

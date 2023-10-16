@@ -77,3 +77,7 @@ prometheus:
               annotations:
                 summary: "Host high CPU load (instance {{ $labels.instance }})"
                 description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+global:
+  storageClass:
+    default: local-path
+    nfs: nfs
