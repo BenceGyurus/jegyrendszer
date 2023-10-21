@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  traefik:
+    image: traefik:v2.5
+    ports:
+      - '8080:8080'
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/traefik/conf/traefik.yml:/traefik.yml
+      - /root/traefik/conf/provider.yml:/providers/provider.yml

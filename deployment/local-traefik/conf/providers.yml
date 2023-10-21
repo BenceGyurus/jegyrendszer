@@ -1,0 +1,15 @@
+http:
+  routers:
+    router0:
+      entryPoints:
+      - web
+      service: cluster
+      rule: PathPrefix(`/`)
+
+  services:
+    cluster:
+      loadBalancer:
+        servers:
+        - url: 10.10.10.111
+        - url: 10.10.10.112
+        passHostHeader: true

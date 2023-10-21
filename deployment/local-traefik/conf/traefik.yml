@@ -1,0 +1,6 @@
+api:
+  dashboard: true
+  insecure: true
+providers:
+  file:
+    directory: /providers
