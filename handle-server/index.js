@@ -23,7 +23,7 @@ const axios = require('axios').default;
 const fs = require("fs");
 const cron = require('node-cron');
 const controlCoupon = require("./controlCoupon.js");
-const Logger = require('./slack-logger');
+const LoggerModule = require('./slack-logger');
 const controlEvent = require("./controlEvent.js");
 const getEventDatas = require("./getEventDatas.js");
 const getStatsOfEvents = require("./getStatsOfEvents.js");
@@ -104,13 +104,13 @@ const storage = multer.diskStorage({
 let upload = multer({ storage: storage })
 
 
-const logger = new Logger()
+const logger = LoggerModule();
 
 app.use(bodyParser.urlencoded({ extended: false }))
 
 //METRICS & HEALTH
 app.get("/health", (req, res) => {
-    logger.log('AJAJAJAJ');
+    logger.info('Health check requested');
     return res.send('Up');
 });
 app.get("/metrics", (req, res) => {
@@ -884,7 +884,7 @@ app.post("/api/v1/venue/:id", (req,res, next)=>parseBodyMiddleeware(req, next), 
                     res.send(datas.content);
                     return;
                 } else {
-                    logger.err(`Venue id failed to read id ${id}`)
+                    logger.error(`Venue id failed to read id ${id}`)
                     return handleError(logger, "500", res);
                 }
             } else return handleError(logger, "404", res);
@@ -925,7 +925,7 @@ app.post("/api/v1/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req
                     sendArray.push({title : datas[i].content.name, value : datas[i]._id});
                 }
             }else{
-                logger.err(`Venue db failed to read`)
+                logger.error(`Venue db failed to read`)
                 return handleError(logger, "500", res);
             }
             res.send({datas : sendArray});
@@ -990,7 +990,7 @@ app.post("/api/v1/get-event-data/:id", async (req,res)=>{
                 return;
             }
             else{
-                logger.err(`Event not found with id ${id}`);
+                logger.error(`Event not found with id ${id}`);
                 return handleError(logger, "500", res);
             }
         } else return handleError(logger, "004", res);
@@ -1042,7 +1042,7 @@ app.post("/api/v1/events", async (req,res)=>{
             let {collection,database} = new Database("events");
             let datas = search ? await collection.find({$or : [ {"eventData.name" :  {$regex: new RegExp(search, 'i')}}, {"eventData.description" : {$regex: new RegExp(search, 'i')}} ]}).toArray() : await collection.find().toArray();
             if (!datas) {
-                logger.err(`Failed to read db edit-events`);
+                logger.error(`Failed to read db edit-events`);
                 return handleError(logger, "500", res);
             }
             let events = [];
@@ -1192,7 +1192,7 @@ app.post("/api/v1/create-ticket", async (req, res) => {
     )
     axios(axiosConfig)
         .then((email_response) => res.send({'filename': email_response.data}))
-        .catch((err) => {logger.err(`Failed ticket creation with`);});
+        .catch((err) => {logger.error(`Failed ticket creation with`);});
 })
 
 app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
@@ -1214,7 +1214,7 @@ app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
             let eventDetails = await getTicketByReadableId(datas.eventId);
             if (eventDetails) res.send({eventId : datas.eventId, tickets : datas.tickets, fullAmount : datas.fullAmount, fullPrice : datas.fullPrice, eventName : eventDetails.name, dateOfEvent : eventDetails.objectDateOfEvent, customerDatas : {...datas.customerDatas, fullName : `${datas?.customerData?.firstname} ${datas?.customerData?.lastname}`}});
             else {
-                logger.err(`Failed to get event details`);
+                logger.error(`Failed to get event details`);
                 return handleError(logger, "500", res);
             }
             return;
@@ -1284,7 +1284,7 @@ app.post("/api/v1/get-coupons", async (req,res)=>{
             let sendDatas = [];
             let datas = await collection.find().toArray();
             if(!datas){
-                logger.err(`Failed to read db coupons`);
+                logger.error(`Failed to read db coupons`);
                 closeConnection(database);
                 return handleError(logger, "500", res);
             }
