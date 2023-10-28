@@ -9,7 +9,7 @@ metadata:
     prometheus.io/path: /metrics
     prometheus.io/port: "3001"
 spec:
-  replicas: 2
+  replicas: {{.Values.replication.handle}}
   selector:
     matchLabels:
       app: handle-server
@@ -46,6 +46,8 @@ spec:
           value: "/etc/config"
         - name: NODE_ENV
           value: "production"
+        - name: LOKI_URL
+          value: "http://localhost:3100"
         - name: TZ
           value: "Europe/Vienna"
         - name: SLACK_TOKEN
@@ -95,8 +97,8 @@ metadata:
   name: backend-uploads-pvc
 spec:
   accessModes:
-  - ReadWriteOnce
-  storageClassName: local-path
+  - ReadWriteMany
+  storageClassName: {{.Values.handle.storageClass}}
   resources:
     requests:
       storage: 20Gi

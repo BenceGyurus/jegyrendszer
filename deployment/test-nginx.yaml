@@ -11,6 +11,10 @@ spec:
       labels:
         app: nginx
     spec:
+      volumes:
+      - name: test-nginx-volume
+        persistentVolumeClaim:
+          claimName: test-nginx-pvc
       imagePullSecrets:
       - name: regcred
       containers:
@@ -22,6 +26,9 @@ spec:
         envFrom:
         - secretRef: 
             name: handle-server-secretmap
+        volumeMounts:
+        - name: test-nginx-volume
+          mountPath: /share
         resources:
           limits:
             memory: "128Mi"
@@ -30,37 +37,37 @@ spec:
         - containerPort: 8080
 
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-svc
-spec:
-  selector:
-    app: nginx
-  ports:
-  - port: 80
-    targetPort: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nginx-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipwhitelist-middleware@kubernetescrd
-spec:
-  rules:
-    - host: nginx.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nginx-svc
-                port:
-                  number: 80
----
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: nginx-svc
+# spec:
+#   selector:
+#     app: nginx
+#   ports:
+#   - port: 80
+#     targetPort: 8080
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: nginx-ingress
+#   annotations:
+#     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+#     traefik.ingress.kubernetes.io/router.middlewares: kube-system-ipwhitelist-middleware@kubernetescrd
+# spec:
+#   rules:
+#     - host: nginx.local
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: nginx-svc
+#                 port:
+#                   number: 80
+# ---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -71,3 +78,15 @@ data:
   REDIS_PASS: cm9vdAo=
   APPLE_PASS_IDENTIFIER: ""
   MERCHANT: ""
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-nginx-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 1Gi

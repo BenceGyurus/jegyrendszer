@@ -4,7 +4,7 @@ const handleError = require("./handleError.js");
 const Logger = require("./slack-logger.js");
 const getTime = require("./getTime.js");
 
-const logger = new Logger();
+const logger = Logger();
 
 const closeConnection = (database)=>{
     try{
