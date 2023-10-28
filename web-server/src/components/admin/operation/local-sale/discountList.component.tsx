@@ -1,4 +1,6 @@
 import Discount from "./discount.component"
+import { useState } from 'react'
+import { RadioGroup } from '@headlessui/react'
 
 
 type typeOfDiscount = {
@@ -18,7 +20,9 @@ const DiscountList = ({discounts, selectedDiscount, onClikcFunction}:typeOfDisco
         {discounts.map((discount)=>{
             return <Discount discount={discount} onClickFunction={onClikcFunction} selected = {selectedDiscount === discount._id} />
         })}
+
     </div>
 }
+
 
 export default DiscountList;

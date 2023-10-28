@@ -1,0 +1,6 @@
+.settings-holder{
+    height: max-content;
+    overflow-y:  auto;
+    overflow-x: none;
+    margin: 20px;
+}

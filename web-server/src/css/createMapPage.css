@@ -1,0 +1,25 @@
+.create-map-page{
+    width: 100%;
+    height: calc(100vh - 80px);
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+}
+
+.create-map-settings{
+    width: 30%;
+    height: calc( 100vh - 80px );
+    box-shadow: 1px 7px 5px rgba(0,0,0,.3);
+    margin: 0;
+}
+
+.seat-map{
+    width: 70%;
+    height: calc( 100vh - 80px );
+    margin: 0;
+}
+
+.action-settings-selector{
+    width: max-content;
+    margin: 10px auto;
+}

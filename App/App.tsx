@@ -6,7 +6,6 @@
  */
 
 import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
   useColorScheme,
@@ -15,7 +14,7 @@ import {
 import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
-import LoginPage from './components/loginPage/loginPage.component';
+import Navigation from './components/navigation/navigation.component';
 
 
 function App(): JSX.Element {
@@ -27,7 +26,7 @@ function App(): JSX.Element {
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <LoginPage />
+      <Navigation />
     </SafeAreaView>
   );
 }

@@ -1,0 +1,17 @@
+.zoom-controls {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  .seating-arrangement {
+    display: flex;
+    flex-wrap: wrap;
+    cursor: grab;
+    user-select: none;
+    overflow: hidden;
+    transition: transform 0.1s;
+  }
+  
+  .seating-arrangement:active {
+    cursor: grabbing;
+  }

@@ -184,7 +184,7 @@ app.post("/api/v1/events-to-sale", (req,res,next)=>parseBodyMiddleeware(req,next
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
             const { collection, database } = new Database("events");
-            let events = await collection.find({}, { projection : { eventData : 1 } }).toArray();
+            let events = await collection.find({ "eventData.objectDateOfEvent" : { $gt : new Date(new Date().getTime()-getTime("AVAILABLE_FOR_PURCHASE_AFTER_THE_EVENT")) } }, { projection : { eventData : 1 } }).sort( { "eventData.objectDateOfEvent" : 1 } ).toArray();
             let sendEvents = [];
             const userId = String((await GetUserDatas(req.body.token))._id);
             for (let i = 0; i < events.length; i++){

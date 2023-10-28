@@ -19,6 +19,7 @@
     color: #333;
     font-size: 18px;
     margin-bottom: 10px;
+    width: 77%;
   }
   
   .discount-amount {
@@ -45,4 +46,15 @@
   .selected-discount-amount {
     color: #ff5733;
     font-size: 24px;
+  }
+
+  .local-discount-card-title{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .local-discount-card-check-circle svg{
+    fill: #007bff !important;
   }

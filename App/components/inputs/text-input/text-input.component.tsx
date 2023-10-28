@@ -28,7 +28,7 @@ const InputText =  ({value, onChange, styles, title, size, password}:typeOfInput
 
     return (<View style = {{...textInputStyle.inputBox}}>
         {title ? <Text style = {{color : useColorScheme()==="dark" ? Theme.dark.color : Theme.light.color, ...textInputStyle.inputLabel}}>{title}</Text> : <></>}
-        <TextInput style = {{...textInputStyle.textInput, ...styles, backgroundColor : useColorScheme() === "dark" ? Theme.dark.inputBackground : Theme.light.inputBackground, color : useColorScheme() === "dark" ? Theme.dark.color : Theme.light.color, ...getSize()}} onChange={e=>onChange()} value={value} secureTextEntry={password && !control ? true : false}  />
+        <TextInput style = {{...textInputStyle.textInput, ...styles, backgroundColor : useColorScheme() === "dark" ? Theme.dark.inputBackground : Theme.light.inputBackground, color : useColorScheme() === "dark" ? Theme.dark.color : Theme.light.color, ...getSize()}} onChange={(text) => onChange(text.nativeEvent.text)} value={value} secureTextEntry={password && !control ? true : false}  />
     </View>)
 }
 

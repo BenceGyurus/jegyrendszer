@@ -5,7 +5,7 @@
     top: 20%;
     height: 400px;
     overflow-y: auto;
-    overflow-x: none;
+    overflow-x: hidden;
     background-color: white;
 }
 

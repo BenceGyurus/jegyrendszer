@@ -27,6 +27,8 @@ import TicketMonitor from "../components/admin/operation/monitor/monitor.compone
 import Monitor from "../components/monitor/monitor.component";
 import Animation3dText from "../components/event-ads-animations/3danimation.component";
 import Ads from "../components/admin/operation/ads/ads.component";
+import Page from "../components/createSeatMap/page.component";
+import Test from "../components/seat-visualization-engine/test";
 
 
 function Navigation() {
@@ -60,7 +62,8 @@ function Navigation() {
           <Route path = "/vasarlas/*" element = {<AfterBuy />} />
           <Route path = "/admin/monitor" element = {<AdminPage component = {<Ads />} />} />
           <Route path = "/monitor" element = {<Monitor />} />
-          <Route path = "/test" element = {<Animation3dText text = "test" />} />
+          <Route path = "/test" element = {<Page />} />
+          <Route path = "/seat-test" element = {<Test />} />
         </Routes>
       </BrowserRouter>
     </div>

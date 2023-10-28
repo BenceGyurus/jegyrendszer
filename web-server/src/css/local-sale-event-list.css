@@ -1,9 +1,9 @@
-.local-sale-event-div{
-    width: 300px;
-    display: inline-table;
-    box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    padding: 10px;
+
+.local-sale-event-div img{
+    width: 100%;
+    margin-bottom: 5px;
+    backface-visibility: hidden;
+    object-fit: cover;
 }
 
 .local-sale-image{
@@ -13,4 +13,12 @@
 .local-sale-event-title{
     max-width: 100%;
     text-align: center;
+}
+
+.local-sale-event-list-holder{
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(30%, 1fr)); 
+    width: 100%;
+    padding: 0;
+    grid-gap: 1%;
 }

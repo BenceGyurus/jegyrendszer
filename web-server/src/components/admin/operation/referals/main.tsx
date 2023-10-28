@@ -26,7 +26,7 @@ const ReferalMain = ()=>{
     const [coupons, setCoupons] = useState(Array<typeOfCoupon>);
     const [editCoupont, setEditCoupon]:[typeOfCoupon, Function] = useState({_id : "", name : "", amount : 0, money : false, usedEvent : [], usedTicket : 0, validity : "", events : [], type : 0});
     const [ran, setRan]:[boolean, Function] = useState(false);
-    const [typeOfLists, setTypeOfLists]:[string, Function] = useState("list");
+    const [typeOfLists, setTypeOfLists]:[boolean, Function] = useState(false);
 
 
     const editFunction = (id:string)=>{
@@ -61,15 +61,16 @@ const ReferalMain = ()=>{
     },[]);
 
 
+    console.log(typeOfLists);
 
     return (
         <div className = "referal">
             <h1>Kuponok</h1>
-            <div><Segmented defaultValue={typeOfLists} onChange={e=>setTypeOfLists(e)} options={[{value: 'list',icon: <BarsOutlined />,},{value: 'kanban',icon: <AppstoreOutlined />,}]}
+            <div><Segmented defaultValue={typeOfLists ? 'kanban' : "list"} onChange={e=>setTypeOfLists(e !== "list")} options={[{value: 'list',icon: <BarsOutlined />,},{value: 'kanban',icon: <AppstoreOutlined />,}]}
     /></div>
             {opened || editCoupont._id ? <AddNewRefCode gotEvents={editCoupont.events} name = {editCoupont.name} tofDiscound = {editCoupont.money} amount = {editCoupont.amount} tOfCoupon={editCoupont.type} valid={editCoupont.validity} closeFunction={()=>{setOpened(false); setEditCoupon({_id : "", name : "", amount : 0, money : false, usedEvent : [], usedTicket : 0, validity : "", events : [], type : 0})}} refresh = {getCoupons} gotId={editCoupont._id} /> : ""}
             <AddNewButton onClick={()=>{setOpened(true)}} />
-            {coupons ? <RefCodeList coupons = {coupons} editFunction = {editFunction} deleteFunction = {deleteFunction} /> : ""}
+            {coupons ? typeOfLists ? <RefCodeList coupons = {coupons} editFunction = {editFunction} deleteFunction = {deleteFunction} /> : <></> : ""}
         </div>
     );
 }

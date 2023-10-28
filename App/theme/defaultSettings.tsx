@@ -24,11 +24,22 @@ const Theme = {
             boxMarginVertical : 15,
             borderRadiusTop : 3
         },
+        title : {
+            fontSize : 22
+        },
+        card: {
+            borderColor : "#303030",
+            borderWidth : 1,
+            padding : 20,
+            margin: 10,
+            borderRadius: 10
+        },
         borderColor : "#17bdff",
         borderRadius : 20,
         boxShadow : "",
         borderSize : 2,
-        fontFamily : "Rubik-Regular"
+        fontFamily : "Rubik-Regular",
+        weightFontFamily : "Rubik-Bold"
     },
 }
 

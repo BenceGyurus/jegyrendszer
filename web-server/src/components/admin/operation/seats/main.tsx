@@ -17,7 +17,7 @@ import BackButton from "../../../back/backbutton.component";
 import Error from "../../../notification/error.component";
 import Success from "../../../notification/success.component";
 import Notification from "../../../notification/notification.component";
-import { Button, notification, Space } from 'antd';
+import { Button, notification, Radio, Space } from 'antd';
 import Collapse from '@mui/material/Collapse';
 import seatOfType from "./type/seat";
 import groupType from "./type/group";
@@ -65,6 +65,7 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
     const [error, setError] = useState("");
     const [succ, setSucc] = useState("");
     const [scale, setScale] = useState(false);
+    const [action, setAction]:["zoom" | "drag" | "select", Function] = useState("drag")
 
     const save = ()=>{
         let datas = {
@@ -303,7 +304,9 @@ const SeatMain = ({seatsDatas, groupsDatas, bg, cbg, places, area, sGroups, sOfS
                 <BackButton url = "/admin/termek" />
             </div>
         <VenueDatas nameOfVenue={nameOfVenue} numberOfPlaces = {numberOfPlaces} seatsStatus = {turnOnSeats} onChangeFunction = {setTurnOnSeats} changeName = {setNameOfVenue} changeNumberOfPlaces = {setNumberOfPlaces} />
-        <Collapse in={turnOnSeats}><div><Area width = {!background.isImage ? sizeOfArea.width : sizeOfArea.width} height = {!background.isImage ? sizeOfArea.height : sizeOfArea.height} background = {background} clickEvent = {addNewSeat} size = {sizeOfSeat} posYOfArea = {setPotionOfTheAreaFromTop} posXOfArea = {setPotionOfTheAreaFromLeft}>
+        <Collapse in={turnOnSeats}><div>
+        <Radio.Group optionType="button" buttonStyle="solid" options={[{label : <i className="fas fa-mouse-pointer"></i>, value : "drag"}, {label : <i className="fas fa-object-group"></i>, value : "select"}, {label : <i className="fas fa-search-plus"></i>, value : "zoom"}]} onChange={e=>setAction(e.target.value)} value={action} />
+        <Area action={action} width = {!background.isImage ? sizeOfArea.width : sizeOfArea.width} height = {!background.isImage ? sizeOfArea.height : sizeOfArea.height} background = {background} clickEvent = {addNewSeat} size = {sizeOfSeat} posYOfArea = {setPotionOfTheAreaFromTop} posXOfArea = {setPotionOfTheAreaFromLeft}>
         <DatasToArea suggestedGroups = {suggestedGroups} groups={groups} seats = {getAbsoluteSeats()} size = {sizeOfSeat} selected = {selecttedGroup} newPositionFunction = {newPositionToSeat} showAll = {showAllSeats} colorOfSeat = {colorOfSeat}/>
         </Area>
         <ShowAllSeats showAll = {showAllSeats} onChangeFunction = {changeStatusOfShowAll}/>

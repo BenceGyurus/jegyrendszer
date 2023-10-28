@@ -1,11 +1,9 @@
 import "../../../../../css/show-admin-event.css";
 import AvatarGroup from '@mui/material/AvatarGroup';
 import StringAvatar from "../../../../avatar/avatar.component";
-import { Tooltip } from 'react-tooltip'
 import { v4 as uuid } from 'uuid';
 import { Badge, Avatar, Card  } from "antd";
-import { DeleteColumnOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import Meta from "antd/es/card/Meta";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 
 type typeOfEventParams = {

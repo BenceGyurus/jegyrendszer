@@ -51,34 +51,44 @@ const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, set
     return <div className = "datas-of-customer">
         <h2>Számlázási adatok:</h2>
         <label htmlFor="lastName">Vezetéknév</label>
-        <Input type="text" id = "lastName" defaultValue={firstName} onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
+        <br />
+        <Input className = "input" size="large" type="text" id = "lastName" defaultValue={firstName} onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
+        <br />
         <label htmlFor="firstname">Keresznév</label>
-        <Input type="text" id = "firstname" defaultValue={lastName} onChange={e=>setLastName(e.target.value)} autoComplete="given-name" />
+        <br />
+        <Input size="large" type="text" id = "firstname" defaultValue={lastName} onChange={e=>setLastName(e.target.value)} autoComplete="given-name" />
         <div className = "customer-data-component">
             <h3>Számlázási cím</h3>
             <div className = "post-code-and-city">
                 <div id = "postal-code-div">
                 <label htmlFor="postCode">Irányítószám</label>
-                <Input type="text" id = "postCode" defaultValue={zip} onBlur={e=>{getCity(e.target.value)}} onChange={e=>{setPostalCode(e.target.value)}} autoComplete="postal-code" />
+                <Input size="large" type="text" id = "postCode" defaultValue={zip} onBlur={e=>{getCity(e.target.value)}} onChange={e=>{setPostalCode(e.target.value)}} autoComplete="postal-code" />
                 </div>
                 <div id = "city-div">
                 <label htmlFor="city">Település név</label>
-                <Input type="text" id = "city" value = {city} onChange={e=>{setCity(e.target.value)}} autoComplete="country-name"/>
+                <Input size="large" type="text" id = "city" value = {city} onChange={e=>{setCity(e.target.value)}} autoComplete="country-name"/>
                 </div>
             </div>
             <label htmlFor="address">Cím</label>
-            <Input type="text" id = "address" defaultValue={address} onChange={e=>{setAddress(e.target.value)}} autoComplete="street-address" />
+            <br />
+            <Input size="large" type="text" id = "address" defaultValue={address} onChange={e=>{setAddress(e.target.value)}} autoComplete="street-address" />
+            <br />
             <label htmlFor="address2">Emelet, lépcsőház stb. (nem kötelező)</label>
-            <Input type="text" id = "address2" defaultValue={address2} onChange={e=>{setAddress2(e.target.value)}}/>
+            <br />
+            <Input size="large" type="text" id = "address2" defaultValue={address2} onChange={e=>{setAddress2(e.target.value)}}/>
         </div>
         <label htmlFor="tax-number">Adószám (magánszemélynek nem kötelező)</label>
-        <Input type="text" id = "tax-number" defaultValue={tax} onChange={e=>{setTaxNumber(e.target.value)}}/>
+        <br />
+        <Input size="large" type="text" id = "tax-number" defaultValue={tax} onChange={e=>{setTaxNumber(e.target.value)}}/>
         <div className = "contact customer-data-component">
             <h3>Kapcsolattartás</h3>
             <label htmlFor="email">E-mail cím</label>
-            <Input type="email" id = "email" defaultValue={mail} onChange={e=>{setMail(e.target.value)}} autoComplete="email" />
+            <br />
+            <Input size="large" type="email" id = "email" defaultValue={mail} onChange={e=>{setMail(e.target.value)}} autoComplete="email" />
+            <br />
             <label htmlFor="phone">Telefonszám</label>
-            <Input type = "phone" id = "phone" defaultValue={phone} onChange={e=>setPhone(e.target.value)} autoComplete="phone" />
+            <br />
+            <Input size="large" type = "phone" id = "phone" defaultValue={phone} onChange={e=>setPhone(e.target.value)} autoComplete="phone" />
 
         </div>
         <br />

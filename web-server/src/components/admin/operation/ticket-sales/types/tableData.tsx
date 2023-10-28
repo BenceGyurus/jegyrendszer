@@ -1,5 +1,4 @@
 import typeOfTicket from "./ticket"
-import typeOfCustomerDatas from "./customerData"
 
 type typeOfDatas = {
     user : string, 
