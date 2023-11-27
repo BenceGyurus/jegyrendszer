@@ -8,7 +8,7 @@ import InputText from "../input/inputText.component";
 import { AutoComplete, Card, Input, Select } from "antd";
 import groupByCommonWords from "./groupByCommonWords";
 
-const CreateingSettings = ({ sizeOfSeat, spaceBetween, setSizeOfSeat, setSizeOfBetween, nameOfCoulmn, nameOfPosition, nameOfSeat, setNameOfCoulmn, setNameOfPosition, setNameOfSeat, groups, seats }:typeOfCreateigSettingsParams)=>{
+const CreateingSettings = ({ sizeOfSeat, spaceBetween, setSizeOfSeat, setSizeOfBetween, nameOfCoulmn, nameOfPosition, nameOfSeat, setNameOfCoulmn, setNameOfPosition, setNameOfSeat, groups, seats, isRomanicSeatNumber, isRomanicTheRow, setIsRomanicSeatNumber, setIsRomanicTheRow }:typeOfCreateigSettingsParams)=>{
 
     const setWidthOfSeat = (width:number)=>{
         setSizeOfSeat((prev:typeOfSizeOfSeat)=>({height : prev.height, width : Number(width)}));
@@ -28,7 +28,10 @@ const CreateingSettings = ({ sizeOfSeat, spaceBetween, setSizeOfSeat, setSizeOfB
 
 
     return (<div className = "settings-holder">
-                <div>
+                <div className = "example-seat-holder">
+                    <div className = "example-seat" style={{width : sizeOfSeat.width, height : sizeOfSeat.height}}></div>
+                </div>
+                <div className = "sizeOfSeats">
                     <InputNumber size="middle" value={sizeOfSeat.height} title = "Ülőhelyek magassága" sufix="px" onChangeFunction={setHeightOfSeat} />
                     <InputNumber size="middle" value={sizeOfSeat.width} title = "Ülőhelyek szélessége" sufix="px" onChangeFunction={setWidthOfSeat} />
                 </div>
@@ -48,12 +51,12 @@ const CreateingSettings = ({ sizeOfSeat, spaceBetween, setSizeOfSeat, setSizeOfB
                     </div>
                 <div>
                     <span className = "">Sorok száma</span>
-                    <Select defaultValue={true} options={[{ value: true, label: 'Római szám' }, { value: false, label: 'Arab szám' }]}/>
+                    <Select defaultValue={isRomanicTheRow} onChange={e=>setIsRomanicTheRow(e)} options={[{ value: true, label: 'Római szám' }, { value: false, label: 'Arab szám' }]}/>
                     <InputText value = {nameOfCoulmn} title = "Ülőhely neve" onChangeFunction={setNameOfCoulmn} />
                 </div>
                 <div>
                     <span>Székek száma</span>
-                    <Select defaultValue={true} options={[{ value: true, label: 'Római szám' }, { value: false, label: 'Arab szám' }]} />
+                    <Select defaultValue={isRomanicSeatNumber} onChange={e=>setIsRomanicSeatNumber(e)} options={[{ value: true, label: 'Római szám' }, { value: false, label: 'Arab szám' }]} />
                     <InputText value = {nameOfSeat} title = "Ülőhely neve" onChangeFunction={setNameOfSeat} />
                 </div>
                     </div>

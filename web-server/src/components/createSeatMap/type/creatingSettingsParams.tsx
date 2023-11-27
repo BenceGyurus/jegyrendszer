@@ -17,7 +17,10 @@ type typeOfCreateigSettingsParams = {
     setNameOfSeat : Function,
     groups : Array<typeOfGroup>,
     seats : Array<typeOfSeat>
-    
+    isRomanicTheRow : boolean,
+    setIsRomanicTheRow : Function,
+    isRomanicSeatNumber : boolean,
+    setIsRomanicSeatNumber : Function
 }
 
 export default typeOfCreateigSettingsParams

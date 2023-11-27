@@ -11,36 +11,14 @@ import typeOfSizeOfSeat from "./type/sizeOfSeat";
 import typeOfArea from "./type/area";
 import RenderSeats from "./renderSeats.component";
 import typeOfSeat from "./type/seat";
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import Backend, { HTML5Backend } from 'react-dnd-html5-backend';
-import Draggable from "react-draggable";
 import Drag from "../drag/drag.component";
 import TransformsSettings from "./transformsSettings.component";
 import stairsTransform from "./stairsTransform";
 import findCommonPrefix from "./findCommonPrefix";
 import typeOfGroup from "./type/group";
 import GroupsSettings from "./goupsSettings.component";
+import SeatList from "./seatList.component";
 
-
-function DraggableSpan({ id, top, left, style }:{id : string, top : number, left : number, style:React.CSSProperties}) {
-  const [, ref] = useDrag({
-    type: 'SPAN',
-    item: { id },
-  });
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        position: 'absolute',
-        top,
-        left,
-        ...style
-      }}
-    >
-    </div>
-  );
-}
 
 const Page = ()=>{
     
@@ -59,9 +37,23 @@ const Page = ()=>{
     const [nameOfSeat, setNameOfSeat] = useState("");
     const [nameOfSelectedSeats, setNameOfSelectedSeats] = useState("");
     const [selectedGroups, setSelectedGroups] = useState<Array<string>>([]);
+    const [isRomanicTheRow, setIsRomanicTheRow] = useState(false);
+    const [isRomanicSeatNumber, setIsRomanicSeatNumber] = useState(false);
+    const [dicretcion, setDicretcion] = useState(false);     //left : true, right : false
+
+    const romanize = (num:number) => {
+      var lookup:any = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1},roman = '',i;
+      for ( i in lookup ) {
+        while ( num >= lookup[i] ) {
+          roman += i;
+          num -= lookup[i];
+        }
+      }
+      return roman;
+    }
 
 
-    function darkenRGBColor(rgbColorString: string, amount: number): string {
+    const darkenRGBColor=(rgbColorString: string, amount: number): string => {
       const colorMatch = rgbColorString.match(/(\d+), (\d+), (\d+)/);
       
       if (colorMatch) {
@@ -71,17 +63,12 @@ const Page = ()=>{
         let r = parseInt(rString);
         let g = parseInt(gString);
         let b = parseInt(bString);
-    
-        // Adjust the color components to make it darker
         r = Math.max(r - amount, 0);
         g = Math.max(g - amount, 0);
         b = Math.max(b - amount, 0);
-    
-        // Generate the modified RGB string
         const modifiedColor = `rgb(${r}, ${g}, ${b})`;
         return modifiedColor;
       } else {
-        // Invalid RGB color format, return the original string
         return rgbColorString;
       }
     }
@@ -128,7 +115,7 @@ const Page = ()=>{
         let group:string = uuid();
         for (let i = 0; i < Math.floor((area.width+2*spaceBetween.x)/(sizeOfSeat.width+spaceBetween.x)); i++){
           for (let j = 0; j < Math.floor((area.height+2*spaceBetween.y)/(sizeOfSeat.height+spaceBetween.y)); j++){
-            l.push({y :  area.startY+j*(sizeOfSeat.height+spaceBetween.y)+ 80, x : area.startX+i*(sizeOfSeat.width+spaceBetween.x), width : sizeOfSeat.width, height : sizeOfSeat.height, name : `${nameOfPosition} ${j+1}. ${nameOfCoulmn} ${i+1}. ${nameOfSeat}`, id : uuid(), group : group });
+            l.push({y :  area.startY+j*(sizeOfSeat.height+spaceBetween.y)+ 80, x : area.startX+i*(sizeOfSeat.width+spaceBetween.x), width : sizeOfSeat.width, height : sizeOfSeat.height, name : `${nameOfPosition} ${ isRomanicTheRow ? romanize(j+1) : j+1}. ${nameOfCoulmn} ${ isRomanicSeatNumber ? romanize(i+1) : i+1}. ${nameOfSeat}`, id : uuid(), group : group });
           }
         }
         setGroups([...groups ,{name: nameOfPosition ? nameOfPosition : "Névtelen csoport", id : group, color : generateRandomColor()}]);
@@ -169,17 +156,13 @@ const Page = ()=>{
             action === "create" ? <Box endFunction={createNewSeats} width={window.innerWidth*.7} height={window.innerHeight-80} boxChildren={<RenderSeats area={area} sizeOfSeat={sizeOfSeat} spaceBetween={spaceBetween} />} setArea={setArea} style = {{cursor : "crosshair", width : window.innerWidth*.7, height : window.innerHeight-80, position : "absolute"}} ></Box> : action === "select" ? <Box  width={window.innerWidth*.7} height={window.innerHeight-80} boxStyle={{background : "rgba(130, 213, 255,0.5)", border : "1px solid rgba(130, 213, 255,1)"}} style = {{ cursor : "cell" , width : window.innerWidth*.7, height : window.innerHeight-80, position : "absolute"}} setArea={setArea} selectingFunction={selecting} startFunction={selecting} endFunction={()=>{setAction("drag")}} ></Box> : <Drag style={{cursor : "grab"}} startFunction={console.log} onDragFunction={changeSelectedPos} width={window.innerWidth*.7} height = {window.innerHeight-80} ></Drag>
            }
            <div>
-            {
-              seats.map(seat=>{
-                return !selectedSeats.includes(seat.id) ? <span style={{position : "absolute", top : seat.y, left : seat.x, width : seat.width, height : seat.height, display : "inline-flex", background :  groups ? groups.find(group=>group.id===seat.group)?.color : "black"}}></span> :   <span key={seat.id} id={seat.id} style = {{ position : "absolute", width : seat.width, height : seat.height, display : "inline-flex", background : "#82d5ff", top : seat.y , left : seat.x}} ></span> 
-              })
-            }
+              <SeatList seats={seats} groups={groups} selectedSeats={selectedSeats} onClickFunction={()=>{console.log("click")}} />
             </div>
         </div>
         <div className = "create-map-settings">
             <div className = "action-settings-selector"><Radio.Group optionType="button" buttonStyle="solid" options={[{label : <SelectOutlined />, value : "select"}, {label : <InsertRowAboveOutlined />, value : "create"}, {label : <GroupOutlined />, value : "groups"}, {label : <DragOutlined />, value : "drag"}]} onChange={e=>setAction(e.target.value)} value={action} /></div>
             {
-                action === "create" ? <CreateingSettings seats={seats} groups={groups} nameOfCoulmn={nameOfCoulmn} setNameOfCoulmn={setNameOfCoulmn} nameOfPosition={nameOfPosition} setNameOfPosition={setNameOfPosition} nameOfSeat={nameOfSeat} setNameOfSeat={setNameOfSeat}   sizeOfSeat={sizeOfSeat} spaceBetween={spaceBetween} setSizeOfSeat={setSizeOfSeat} setSizeOfBetween={setSpaceBetween} /> : action === "drag" ? <TransformsSettings incrementStairs={incrementStairs} decrementStairs={decrementStaris} /> : action === "groups" ? <GroupsSettings seats={seats} groups={groups} setGroups={setGroups} /> : <SelectingSettings value = {nameOfSelectedSeats} />
+                action === "create" ? <CreateingSettings isRomanicSeatNumber = {isRomanicSeatNumber} setIsRomanicSeatNumber={setIsRomanicSeatNumber} isRomanicTheRow = {isRomanicTheRow} setIsRomanicTheRow={setIsRomanicTheRow} seats={seats} groups={groups} nameOfCoulmn={nameOfCoulmn} setNameOfCoulmn={setNameOfCoulmn} nameOfPosition={nameOfPosition} setNameOfPosition={setNameOfPosition} nameOfSeat={nameOfSeat} setNameOfSeat={setNameOfSeat}   sizeOfSeat={sizeOfSeat} spaceBetween={spaceBetween} setSizeOfSeat={setSizeOfSeat} setSizeOfBetween={setSpaceBetween} /> : action === "drag" ? <TransformsSettings incrementStairs={incrementStairs} decrementStairs={decrementStaris} /> : action === "groups" ? <GroupsSettings seats={seats} groups={groups} setGroups={setGroups} /> : <SelectingSettings value = {nameOfSelectedSeats} />
             }
         </div>
     </div>);
@@ -187,6 +170,13 @@ const Page = ()=>{
 
 export default Page;
 
+
+/*
+{
+              seats.map(seat=>{
+                return !selectedSeats.includes(seat.id) ? <span style={{borderRadius : "15%", position : "absolute", top : seat.y, left : seat.x, width : seat.width, height : seat.height, display : "inline-flex", background :  groups ? groups.find(group=>group.id===seat.group)?.color : "black"}}></span> :   <span key={seat.id} id={seat.id} style = {{ position : "absolute", width : seat.width, height : seat.height, display : "inline-flex", background : "#82d5ff", top : seat.y , left : seat.x}} ></span> 
+              })
+            }*/
 
 
 /*
