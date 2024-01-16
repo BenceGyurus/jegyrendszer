@@ -27,8 +27,10 @@ import TicketMonitor from "../components/admin/operation/monitor/monitor.compone
 import Monitor from "../components/monitor/monitor.component";
 import Animation3dText from "../components/event-ads-animations/3danimation.component";
 import Ads from "../components/admin/operation/ads/ads.component";
-import Page from "../components/createSeatMap/page.component";
 import Test from "../components/seat-visualization-engine/test";
+import CreateSeats from "../components/createSeatMap/createSeats.component";
+import LoadSeatMap from "../components/createSeatMap/loadSeatMap.component";
+import Statistics from "../components/admin/operation/statistics/statistics.component";
 
 
 function Navigation() {
@@ -44,10 +46,10 @@ function Navigation() {
           <Route path = "/admin/termek" element = {<AdminPage component = {<Venues />}/>}/>
           <Route path = "/admin/felhasznalok" element = {<AdminPage component = {<Main />}/>}/>
           <Route path = "/admin/profil" element = {<AdminPage component = {<EditProfileMain />} /> } />
-          <Route path = "/uj-terem" element = {<NewVenue />}/>
+          <Route path = "/uj-terem" element = {<LoadSeatMap />}/>
           <Route path = "/uj-profil/*" element = {<Registration />}/>
           <Route path = "/admin/rendezveny/*" element = {<Create_Event_Main />} />
-          <Route path = "/admin/terem-szerkesztes/*" element = {<NewVenue />}/>
+          <Route path = "/admin/terem-szerkesztes/*" element = {<LoadSeatMap />}/>
           <Route path = "/admin/rendezvenyek" element = {<AdminPage component = {<Show_Events_Main />} />} />
           <Route path = "/admin/kuponok" element = {<AdminPage component = {<ReferalMain />}/>} />
           <Route path= "*" element = {<ErrorPage />} />
@@ -62,8 +64,10 @@ function Navigation() {
           <Route path = "/vasarlas/*" element = {<AfterBuy />} />
           <Route path = "/admin/monitor" element = {<AdminPage component = {<Ads />} />} />
           <Route path = "/monitor" element = {<Monitor />} />
-          <Route path = "/test" element = {<Page />} />
+          <Route path = "/test" element = {<CreateSeats />} />
           <Route path = "/seat-test" element = {<Test />} />
+          <Route path = "/admin/statisztika" element = {<AdminPage component = {<Statistics />} />} />
+          <Route path = "/statusz" element = {<AfterBuy />} />
         </Routes>
       </BrowserRouter>
     </div>

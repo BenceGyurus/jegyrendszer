@@ -26,9 +26,9 @@ const Legend = ()=>{
 
     // Loop through the seats and draw them
 
-    drawSeat(0, 0, true, false, false, true, contextes[0], seatSize, "black");
-    drawSeat(0, 0, false, false, true, false, contextes[1], seatSize, "black");
-    drawSeat(0, 0, false, false, false, false, contextes[2], seatSize, "black");
+    drawSeat(0, 0, true, false, false, true, contextes[0], 50,50, "black");
+    drawSeat(0, 0, false, false, true, false, contextes[1], 50,50, "black");
+    drawSeat(0, 0, false, false, false, false, contextes[2], 50,50, "black");
     
     }); 
    

@@ -9,17 +9,22 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import "./css/card.css";
+import Cookies from './cookies/cookie';
+import { CookiesProvider } from 'react-cookie';
 
 
 //const ds = "A két felvonásos, lendületes és rendkívül látványos zenés darab amellett, hogy ragyogó szórakozást ígér, segíthet újra felfedezni, új oldaláról megismerni a mára közismert név mögött rejtőző csodálatos zseni elméjét és életének rejtélyeit!";
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
-    <div>
-        <Header listOfNavMenu={[{title : "Főoldal", link : "/"}, {title : "Admin", link : "/admin"}]}/>
-        <div className = "mainDiv">
-            <Navigation />
+    <CookiesProvider defaultSetOptions={{ path: '/' }}>
+        <div>
+            <Header listOfNavMenu={[{title : "Főoldal", link : "/"}, {title : "Admin", link : "/admin"}]}/>
+            <Cookies />
+            <div className = "mainDiv">
+                <Navigation />
+            </div>
+            <Footer/>
         </div>
-        <Footer/>
-    </div>
+    </CookiesProvider>
 );

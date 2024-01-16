@@ -2,6 +2,9 @@ const Functions = require("./functions.js");
 const Database = require("./mongo/mongo.js");
 const getTicketId = require("./getTicketByReadableId.js");
 const getTime = require("./getTime.js");
+const getTicketByReadableId = require("./getTicketByReadableId.js");
+const getVenueFromId = require("./getVenue.js");
+const { ObjectId } = require("mongodb");
 
 const closeConnection = (database)=>{
     setTimeout(()=>{
@@ -10,56 +13,74 @@ const closeConnection = (database)=>{
 }
 
 const controlEvent = async (eventId, ticketIds, thisEventId)=>{ // ticketIds is an Array
+    let result = {error : false, errorCode : ""};
+    /*try{
+        thisEventId = ObjectId(thisEventId);
+    }catch{};*/
     if (eventId){
-        let eventDatas = await getTicketId(eventId);
-        if (eventDatas.objectDateOfEvent.getTime() >= new Date().getTime()){
-            let pendingPlaces = [];
-            let ticketAmount = {};
-            let boughtDatabase = new Database("buy");
-            let boughtDatas = await boughtDatabase.collection.find({ $and : [ {$or : [{$and : [{pending : true}, { time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")}}]}, {$and : [{bought : true}, {pending : false}]}]}, {_id : { $ne : thisEventId }} ]}).toArray();
-            closeConnection(boughtDatabase.database)
-            for (let i = 0; i < boughtDatas.length; i++){
-                    ticketAmount[boughtDatas[i].eventId] = ticketAmount[boughtDatas[i].eventId] ? ticketAmount[boughtDatas[i].eventId] : {};
-                    for (let j = 0; j < boughtDatas[i].tickets.length; j++){
-                        if (boughtDatas[i].tickets[j].places){
-                            pendingPlaces.push(...boughtDatas[i].tickets[j].places);
-                        }
-                        ticketAmount[boughtDatas[i].eventId][boughtDatas[i].tickets[j].ticketId] = ticketAmount[boughtDatas[i].eventId][boughtDatas[i].tickets[j].ticketId] ? ticketAmount[boughtDatas[i].eventId][boughtDatas[i].tickets[j].ticketId] + boughtDatas[i].tickets[j].amount : boughtDatas[i].tickets[j].amount
-                }
-            }
-            for (let i = 0; i < eventDatas.tickets.length; i++){
-                for (let j = 0; j < ticketIds.length; j++){
-                    if (eventDatas.tickets[i].id == ticketIds[j].ticketId){
-                        if (eventDatas.tickets[i].seats.length && !ticketIds[j].places.length) return {error : true, errorCode : "036"}
-                        for (let n = 0; n < ticketIds[j].places.length; n++){
-                            if (eventDatas.tickets[i].seats.length && eventDatas.tickets[i].seats.includes(ticketIds[j].places[n])){
-                                if (pendingPlaces.includes(ticketIds[j].places[n])){
-                                    return {error : true, errorCode : "033"};
-                                }
+        //let eventDatas = await getTicketByReadableId(eventId);
+        const {collection, database} = new Database("events");
+        const buyingDatabase = new Database("buy");
+        let boughtTickets = false;
+        let eventDatas = await collection.findOne({$and : [{"eventData.readable_event_name" : eventId},{"eventData.objectDateOfRelease" : { $lt : new Date()}}, {"eventData.objectDateOfEvent" : { $gt : new Date()}} ]}, {projection : {"eventData.venue" : 1, "eventData.tickets" : 1}});
+        try{
+            boughtTickets = await (buyingDatabase.collection.find({$and : [
+                {"id" : eventDatas._id},
+                {$or : [
+                    {bought : true},
+                    {$and : [{pending : true}, {time : {$gt: new Date().getTime()-getTime("RESERVATION_TIME")}}]}
+                ]}
+            ], }).toArray());
+        }catch{
+            return {error : true, errorCode : "035"};
+        }
+
+        if (eventDatas){
+            let venue = await getVenueFromId(eventDatas.eventData.venue);
+            let thisTicket = {};
+            if (venue && ticketIds){
+                for (let i = 0; i < ticketIds.length; i++){
+                    let ticketId = ticketIds[i];
+                    thisTicket = eventDatas.eventData.tickets.find(eventTicket=>eventTicket.id===ticketId.ticketId);
+                    console.log("thisTicket: ", !!((!ticketId.places || !ticketId.places.length) && thisTicket?.seats?.length));
+                    if (thisTicket && thisTicket.seats.length && ticketId.places && ticketId.places.length){
+                            ticketId.places.forEach(seat=>{
+                                if (!thisTicket.seats.includes(seat) || !venue.seats.find(venueSeat=>venueSeat.id === seat)){result = {error : true, errorCode : "037"};}
+                                boughtTickets.forEach(boughtTicket=>{
+                                    if (String(boughtTicket._id) != String(thisEventId)){
+                                        if (boughtTicket?.tickets.find(ticket=>ticket.ticketId === thisTicket.id)?.places?.includes(seat)){result = {error : true, errorCode : "033"}}
+                                    }
+                                })
+                            })
+                    }
+                    else if ((!ticketId.places || !ticketId.places.length) && thisTicket?.seats?.length){ result = {error : true, errorCode : "036"} }
+                    else if (thisTicket){
+                       let amountOfThisTicket = 0;
+                        boughtTickets.forEach(boughtTicket=>{
+                            if (String(boughtTicket._id) != String(thisEventId)){
+                                let amount = boughtTicket.tickets.find(item=>item.ticketId === thisTicket.id)?.amount;
+                                if (typeof boughtTicket.tickets.find(item=>item.ticketId === thisTicket.id)?.amount != "number") amount = Number(boughtTicket.tickets.find(item=>item.ticketId === thisTicket.id)?.amount);
+                                amountOfThisTicket += amount ? amount : 0;
                             }
-                            else if (!eventDatas.tickets[i].seats.includes(ticketIds[i].places[n])){
-                                return {error : true, errorCode : "001"};           // A megadott hely nem található az adatbázisban
-                            }
-            
-                            }
-                        if (ticketAmount[eventDatas.readable_event_name] && Object.keys(ticketAmount[eventDatas.readable_event_name]).includes([eventDatas.tickets[i].id]) && !(ticketAmount[eventDatas.readable_event_name][eventDatas.tickets[i].id]+ticketIds[j].amount <= eventDatas.tickets[i].numberOfTicket)){
-                            return {error : true, errorCode : "031"};       //Erre a helyre már nem kapható jegy
-                        }
-                        else{
-                            
-                        }
+                       })
+                       if (amountOfThisTicket + ticketId.amount > thisTicket.numberOfTicket) result = {error : true, errorCode : "038"};
                     }
                 }
             }
-            return {error : false, errorCode : ""};
+            else{
+                return {error : true, errorCode : "032"};
+            }
         }
-        else{
-            return {error: true, errorCode : "032"}            //Az eseményre már nem, lehet jegyet vásárolni :c
-        }
+        closeConnection(database);
+        closeConnection(buyingDatabase.database);
     }
-    else{
-        return {error : true, errorCode : "no eventId"};           //Váratlan hiba történt
-    }
+    return result
 }
 
 module.exports = controlEvent;
+
+/*
+
+
+
+*/

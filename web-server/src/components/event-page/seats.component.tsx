@@ -1,23 +1,28 @@
 import Seat from "./seat.component";
 import "../../css/selectTickets.css"
 import Stage from "./stage.component";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SeatVisualization from "../seat-visualization-engine/seats.component";
 
 type typeOfSeat = {
     group : string,
     id : string,
     name : string,
-    posX : number,
-    posY : number,
-    title : string
+    x : number,
+    y : number,
+    title : string,
+    size : {
+        width : number,
+        height : number
+    },
+    color : string
 }
 
 type typeOfPlaces = {
     background : {isImage : boolean, name : "string"},
     colorOfBackground : string,
     colorOfSeat : string,
-    seatsDatas : Array<typeOfSeat>,
+    seats : Array<typeOfSeat>,
     sizeOfArea : {width : number, height : number},
     sizeOfSeat : number,
     stage : number,
@@ -45,19 +50,33 @@ type typeOfSeatsParams = {
 }
 const Seats = ({places, tickets, seleted,onClickFunction, disabled}:typeOfSeatsParams)=>{
 
-    console.log(places, tickets);
-
     const [marginTop, setMarginTop] = useState(100);
 
-    const getMinX = ()=>{
+    /*const getMinX = ()=>{
         let min = 0;
         /*places.seatsDatas.forEach((place:any) => {
                 if (min === -1){ min = place.posX}
                 else if (min > place.posX){
                     min = place.posX;
                 }
-        });*/
+        });
         return places.sizeOfArea.width > window.innerWidth ? min-100 : 0;
+    }*/
+
+
+    const getSizeOfArea = ()=>{
+        let maxX = 0;
+        let maxY = 0;
+        if (places){
+            places.seats.forEach((seat:any, index:number)=>{
+                if (index === 0 || maxX < seat.x+seat.size.width){maxX = seat.x+seat.size.width};
+                if (index === 0 || maxY < seat.y){maxY = seat.y};
+            })
+        }
+        return {
+            width : maxX,
+            height : maxY+120
+        }
     }
 
     const getSizeOfStage = (type:number, sizeOfArea:{width : number, height : number})=>{
@@ -70,29 +89,10 @@ const Seats = ({places, tickets, seleted,onClickFunction, disabled}:typeOfSeatsP
     }
 
 
+
     return (<div className = "select-ticket-main-div">
-            <SeatVisualization disabled = {disabled} tickets = {tickets} seatPositions={places.seatsDatas} sizeOfArea={places.sizeOfArea} colorOfSeat={places.colorOfSeat} seatSize={places.sizeOfSeat} stage={getSizeOfStage(places.stage, places.sizeOfArea)} marginTop={places.stage == 1 || places.stage == 4 ? 50 : 0} marginLeft={places.stage == 3 || places.stage == 2 ? 50 : 0} selectedSeats={seleted} selectFunction={onClickFunction} />
+            <SeatVisualization disabled = {disabled} tickets = {tickets} seatPositions={places.seats} sizeOfArea={getSizeOfArea()} colorOfSeat={places.colorOfSeat} seatSize={places.sizeOfSeat} stage={getSizeOfStage(places.stage, getSizeOfArea())} marginTop={places.stage == 1 || places.stage == 4 ? 50 : 0} marginLeft={places.stage == 3 || places.stage == 2 ? 50 : 0} selectedSeats={seleted} selectFunction={onClickFunction} />
         </div>);
 }
 
 export default Seats;
-
-
-/*
-<div style = {{display: "flex", alignItems : "center", justifyContent : "center"}}>
-        <div className = "selectTickets" style={{height : (places.sizeOfArea.height+2*marginTop), background: places.colorOfBackground, width:places.sizeOfArea.width}}>
-        {places.stage == 1 ? <Stage top = {marginTop} sizeOfArena={places.sizeOfArea} type = {places.stage}  left = {getMinX()/2} classNameList={["user-side-top-stage"]} /> : ""}
-        {places.stage == 2 ? <Stage top = {marginTop} sizeOfArena={places.sizeOfArea} type = {places.stage} left = {getMinX()/2} classNameList={["user-side-left-stage"]} isVertical = {true} /> : ""}
-        {
-            tickets.map((ticket:typeOfAmountTicket)=>{
-                return ticket.places.map((place:string)=>{
-                    return places.seatsDatas.map((seat:typeOfSeat)=>{
-                        return place === seat.id ? <Seat marginLeft = {getMinX()/2} marginTop = {marginTop} color={places.colorOfSeat} seat={seat} size = {places.sizeOfSeat} classname = {!ticket.boughtPlaces.includes(seat.id) ? !ticket.pendingPlaces.includes(seat.id) ? ticket.amount > 0 ? seleted.includes(seat.id) ? "user-selected"  : ticket.selected >= ticket.amount ? "user-disabled" : "user-allowed" : "user-disabled" : "user-pending" : "user-bought"} onClickFunction = {onClickFunction} /> : "";
-                    })
-                })
-            })
-        }
-         {places.stage == 3 ? <Stage top = {marginTop} sizeOfArena={places.sizeOfArea} type = {places.stage} left = {getMinX()/2} classNameList={["user-side-right-stage"]} isVertical = {true} /> : ""}
-         {places.stage == 4 ? <Stage top = {marginTop} sizeOfArena={places.sizeOfArea} type = {places.stage} left = {getMinX()/2} classNameList={["user-side-bottom-stage"]} /> : "" }
-    </div>
-    </div>*/

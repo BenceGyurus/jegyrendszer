@@ -13,9 +13,38 @@ const GoogleSchemaEvents = ({events}:typeOfGoogleSchemaEvents)=>{
                     return {
                         '@type': 'Event',
                         name: event.title,
-                        startDate: event.date,
-                        url: `http://localhost:3000/rendezveny/${event.id}`,
-                        location : "Agora"
+                        startDate: new Date(event.date),
+                        url: `${window.location.origin}/rendezveny/${event.id}`,
+                        place : event.location,
+                        description : event.description,
+                        endDate : new Date(event.end),
+                        image :`${window.location.origin}${event.imageName}`,
+                        location: {
+                            "@type": "Place",
+                            name: event.location,
+                            address: {
+                              "@type": "PostalAddress",
+                              name : event.address
+                            }
+                        },
+                        eventStatus: "https://schema.org/EventScheduled",
+                        eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+                        organizer: {
+                            "@type": "Organization",
+                            name: event.organiser.name,
+                            url: event.organiser.website
+                        },
+                        offers : {
+                            "@type": "Offer",
+                            url: `${window.location.origin}/rendezveny/${event.id}`,
+                            price: event.tickets[0].price,
+                            priceCurrency: "HUF",
+                            validFrom: "2024-05-21T12:00"
+                        },
+                        performer: {
+                            "@type": event.performer.isGroupPerformer ? "PerformingGroup" : "Person",
+                            name: event.performer.name
+                          },
                     }
                     }
                 })

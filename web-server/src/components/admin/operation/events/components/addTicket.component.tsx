@@ -114,6 +114,7 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
         return allSelected;
     }
 
+    console.log(datasOfVenue);
 
     return (
         <Window closeFunction = {closeFunction} title = "Jegyek hozzáadása" >
@@ -125,7 +126,7 @@ const AddTicket = ({closeFunction, datasOfVenue, saveFunction, nameOfTicket, pri
             <InputNumber sufix="db" disabled = {!!idsOfSeats.length} title = "Jegyek száma" onChangeFunction={setNumberOfTicket} value = {nOfTicket > 0 ? nOfTicket : "0"} />
             <Button title = "Jegyek kiválasztása" onClickFunction={()=>{setSeats(true)}} />
             {seats ? <ShowSeats closeFunction = {()=>{setSeats(false)} } datasOfVenue = {datasOfVenue} addNewSeat = {select_Seat} seatList = {idsOfSeats} allSelected = {newAllSelected()} /> : ""}
-            <Group_List groups={datasOfVenue.groups} seats = {datasOfVenue.seatsDatas} changeFunction = {appendGroup} seatList = {newAllSelected()}/>
+            <Group_List groups={datasOfVenue.groups} seats = {datasOfVenue.seats} changeFunction = {appendGroup} seatList = {newAllSelected()}/>
             <Button title = "Mentés" onClickFunction={()=>{idOfTicket && editFunction ? editFunction({name : name, price : price, minPrice : minPrice, maxPrice : maxPrice, seats : idsOfSeats, numberOfTicket : nOfTicket}, idOfTicket) : saveFunction({name : name, price : price, minPrice : minPrice, maxPrice : maxPrice, seats : idsOfSeats, numberOfTicket : nOfTicket}); closeFunction()}} />
             </div>
         </Window>

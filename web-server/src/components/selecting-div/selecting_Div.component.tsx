@@ -41,15 +41,17 @@ const SelectDiv = ( { children, selectFunction, className, style, onClick, posFr
         setSelectionBox(null);
     };
 
+    console.log(isSelecting);
+
     return (
         select ? <div onDoubleClick={e=>{if (onClick) onClick(e)}} style={style} className={`selection-container${className ? ` ${className}` : ""}`} onMouseDown={e=>handleMouseDown(e)} onMouseMove={e=>handleMouseMove(e)} onMouseUp={handleMouseUp}>
-            <div className={`selection-box ${isSelecting ? 'active' : ''}`}
+            {isSelecting ? <div className={`selection-box ${isSelecting ? 'active' : ''}`}
                  style={ isSelecting && selectionBox ?{
                    left: selectionBox.left,
                    top: selectionBox.top,
                    width: (selectionBox?.right || 0) - (selectionBox?.left || 0),
                    height: (selectionBox?.bottom || 0) - (selectionBox?.top || 0),
-                 } : {}}></div>
+                 } : {}}></div> : <></>}
             <div>
                 {children}
             </div>

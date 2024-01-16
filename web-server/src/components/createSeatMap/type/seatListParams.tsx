@@ -1,11 +1,11 @@
-import typeOfGroup from "./group"
-import typeOfSeat from "./seat"
+import typeOfSeats from "./seatsType";
 
 type typeOfSeatListParams = {
-    seats : Array<typeOfSeat>,
-    groups : Array<typeOfGroup>,
+    seats : typeOfSeats,
+    selectedSeats : Array<string>,
     onClickFunction : Function,
-    selectedSeats? : Array<string>
+    watchingGroup : string,
+    originalColor : boolean
 }
 
 export default typeOfSeatListParams;

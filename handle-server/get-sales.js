@@ -36,7 +36,14 @@ const Sales = async (userId, external, page, limit, search, filters)=>{
         console.log("UserId couldn't be created ObjectId")
     }
     if (external) conditions.push( { "otherDatas.userData.userId" : userId } );
-    if (search) conditions.push( {$or : [{ "customerDatas.firstname" : {$regex: new RegExp(search, 'g')} }, { "customerDatas.lastname" : {$regex: new RegExp(search, 'g')} }, {eventName : {$regex: new RegExp(search, 'i')}}, { price : {$regex: new RegExp(search, 'i')}}, { "customerDatas.fullName" : {$regex: new RegExp(search, 'i')}}]} )
+    let eventsDatabase = new Date("events");
+    let nameIdsObject = await eventDatabase.collection.find({"eventData.name" : {$regex: new RegExp(search, 'i')}}, {projection : {_id : 1}}).toArray();
+    let nameIds = [];
+    nameIdsObject.forEach(item=>{
+        nameIds.push(item._id);
+    })
+    closeConnection(eventsDatabase.database);
+    if (search) conditions.push( {$or : [{ "customerDatas.firstname" : {$regex: new RegExp(search, 'g')} }, { "customerDatas.lastname" : {$regex: new RegExp(search, 'g')} }, {id : {$in : nameIds}}, { price : {$regex: new RegExp(search, 'i')}}, { "customerDatas.fullName" : {$regex: new RegExp(search, 'i')}}]} )
     let sales = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions]}).sort({ time: -1 }).skip(skipValue).limit(limit).toArray();
     console.log(sales.length);
     let max = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions]}).count();

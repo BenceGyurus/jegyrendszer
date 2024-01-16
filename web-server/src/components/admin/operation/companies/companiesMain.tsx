@@ -14,7 +14,7 @@ const CompaniesMain = ()=>{
     const [addNew, setAddNew] = useState(false);
     const [error, setError] = useState("");
     const [companies, setCompanies]:[Array<typeOfCompany>, Function] = useState([]);
-    const [editCompany, setEditCompany]:[typeOfCompany, Function] = useState({name : "", tax : "", _id : ""});
+    const [editCompany, setEditCompany]:[typeOfCompany, Function] = useState({name : "", tax : "", _id : "", website : ""});
 
 
     const getCompanies = ()=>{
@@ -27,7 +27,6 @@ const CompaniesMain = ()=>{
     useEffect(()=>{
         getCompanies();
     },[]);
-
 
     const deleteCompanyFunction = (id:string)=>{
         postData(`/delete-company/${id}`, {token : ParseLocalStorage("long_token")})
@@ -49,7 +48,7 @@ const CompaniesMain = ()=>{
         <div>
             <Error  open = {error != ""} setOpen={()=>{setError("")}}  message={error}/>
             <h1>Vállalatok</h1>
-            {addNew || editCompany._id ? <AddCompany nameOfCompany={editCompany.name} tax={editCompany.tax} id={editCompany._id} closeWindowFunction={()=>{setAddNew(false); setEditCompany({name : "", tax : "", _id : ""})}} errorFunction = {setError} updateFunction={getCompanies} /> : ""}
+            {addNew || editCompany._id ? <AddCompany website = {editCompany.website} nameOfCompany={editCompany.name} tax={editCompany.tax} id={editCompany._id} closeWindowFunction={()=>{setAddNew(false); setEditCompany({name : "", tax : "", _id : ""})}} errorFunction = {setError} updateFunction={getCompanies} /> : ""}
             {companies.length ? <CompaniesList companies={companies} editFunction={editFunction} deleteFunction={deleteCompanyFunction} /> : <Loader />}
             <AddNewButton onClick={()=>{setAddNew(true)}} />
         </div>

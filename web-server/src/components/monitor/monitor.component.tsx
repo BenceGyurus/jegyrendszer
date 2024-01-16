@@ -143,32 +143,28 @@ const TicketMonitor = ()=>{
         })}
     }, [selected, venue]);
 
+
     const selectSeat = (id:string)=>{
-        let lTicketAmount = venue.tickets;
-        let l:Array<string> = [];
+        let lTicketAmount = [...venue.tickets];
         for (let i = 0; i < lTicketAmount.length; i++){
             if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selected.includes(id)){
-                l = [...selected, id];
+                let l = [...selected, id];
                 setSelected(l);
                 lTicketAmount[i].selected++;
             }
-            else if (selected.includes(id)){
+            else if (lTicketAmount[i].seats.includes(id) && selected.includes(id)){
                 if (lTicketAmount[i].selected > 0){
                     lTicketAmount[i].selected--;
                 }
-                l = [...selected];
+                let l = [...selected];
                 let newList:Array<string> = [];
-                l.forEach((element:string)=>{
-                    if (element != id){
-                        newList.push(element)
-                    }
-                })
+                newList = l.filter(item=>item != id);
                 setSelected(newList);
             }
         }
-        venue.tickets = (lTicketAmount);
-        //console.log(l.length ? l : selectedTickets);
+        venue.tickets = lTicketAmount;
     }
+        //console.log(l.length ? l : selectedTickets);
 
     const getPlacesOfTicket = (places:Array<string>)=>{
         let selectedPlaces = [];

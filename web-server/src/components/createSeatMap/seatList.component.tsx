@@ -1,13 +1,19 @@
 import Seat from "./seat.component";
-import typeOfSeat from "./type/seat";
 import typeOfSeatListParams from "./type/seatListParams";
+import typeOfSeats from "./type/seatType";
 
-const SeatList = ({seats, groups, onClickFunction, selectedSeats}:typeOfSeatListParams)=>{
-    return <> 
-    {seats.map((seat:typeOfSeat)=>{
-        return <Seat isSelected = {selectedSeats?.includes(seat.id)} seat={seat} background={`${ selectedSeats?.includes(seat.id) ? "#82d5ff" : groups ? groups.find(group=>group.id===seat.group)?.color : "black"}`} onClickFunction={onClickFunction} />
-    })}
-    </>
+const SeatList = ({seats, selectedSeats, onClickFunction, watchingGroup, originalColor}:typeOfSeatListParams)=>{
+    return (<div>
+        {
+            seats.map((seatsArray)=>{
+                return seatsArray ? seatsArray?.seats?.map((seatList)=>{
+                    return seatList.map((seat)=>{
+                        return seat != null ? <Seat originalColor = {originalColor} editColor={seatsArray.sector.color} isWatchingGroup={seatsArray.sector.id === watchingGroup} onClickFunction = {onClickFunction} seat={seat} selectedSeats={selectedSeats} /> : <></>
+                    })
+                }) : "";
+            })
+        }
+    </div>)
 }
 
 export default SeatList;

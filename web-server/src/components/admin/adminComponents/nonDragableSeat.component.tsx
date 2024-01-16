@@ -1,16 +1,17 @@
 import "../../../css/seat.css";
 
 type typesOfNonDragableSeatParams = {
-    size : number,
     color : string,
     posX : number,
     posY : number,
+    width : number,
+    height : number
 }
 
 
-const NonDragableSeat = ({size, color, posX, posY}:typesOfNonDragableSeatParams)=>{
+const NonDragableSeat = ({width, height, color, posX, posY}:typesOfNonDragableSeatParams)=>{
     return (
-    <span className = "seat" style={{width : size, height : size, top : posY-size/2, left : posX-size/2, background: color, position:"absolute", display:"inline", borderRadius:Math.ceil(size/3), cursor:"auto"}}>
+    <span className = "seat" style={{width : width, height : height, top : posY-height/2, left : posX-width/2, background: color, position:"absolute", display:"flex", borderRadius:"30%", cursor:"auto"}}>
 
     </span>
     )

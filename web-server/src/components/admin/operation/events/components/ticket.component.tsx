@@ -36,6 +36,7 @@ type typeOfPlace = {
 
 
 const Ticket = ( { ticket, sizeOfSeat,seatsDatas, sizeOfArea,editFunction, deleteFunction }:typesOfTicketParams )=>{
+    console.log(seatsDatas);
     return  (<Card className = "tickets-holder" actions={[<DeleteOutlined onClick={e=>deleteFunction(ticket.id)}  />, <EditOutlined onClick={e=>editFunction(ticket.id)}/>]} cover = {<SmallMap sizeOfArea={sizeOfArea} colorOfBackGround = "white" colorOfSeat="black" seatDatas={seatsDatas} sizeOfSeats = {sizeOfSeat} selectedSeats = {ticket.seats} selectColor = "red" />}>
         <h3>{ticket.name}</h3>
         <span>{ticket.price} Ft</span>

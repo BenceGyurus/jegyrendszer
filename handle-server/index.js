@@ -42,7 +42,6 @@ const GenerateTicket = require("./genrate_ticket.js");
 const Tickets = require("./tickets.js");
 const createZip = require("./createZip.js");
 const NodeCache = require('node-cache');
-const { type, version } = require("os");
 const getContributors = require("./getContributorsOfEvent.js");
 const SimplePayPayment = require("./simple-pay-payment.js");
 const { collectDefaultMetrics, register } = require('prom-client');
@@ -50,6 +49,9 @@ collectDefaultMetrics({ timeout: 5000 });
 const Redis = require('ioredis');
 const setStatus = require("./buy-ticket.js");
 const shortid = require('shortid');
+const controlCreatedSeats = require('./control/controlCreatedSeats.js');
+const seatMatrixToArray = require("./seatMatrixToArray.js");
+var cookieParser = require('cookie-parser')
 var redisOptions = {}
 if (process.env.NODE_ENV == 'production') redisOptions = {port: 6379, host: 'jegyrendszer-redis-headless', username: 'default', password: process.env.REDIS_PASS, db: 0};
 const redis = new Redis(redisOptions);
@@ -106,7 +108,10 @@ let upload = multer({ storage: storage })
 
 const logger = LoggerModule();
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.urlencoded({limit: '50mb'}));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(cookieParser());
 
 //METRICS & HEALTH
 app.get("/health", (req, res) => {
@@ -121,7 +126,7 @@ app.get("/metrics", (req, res) => {
 });
 
 //EVENTS
-app.get("/api/v1/events", async (req,res) =>{
+app.get("/api/v1/events", async (req,res,next)=>{await statsMiddleware(req,res,next)}, async (req,res) =>{
     // const cachedData = await readFromRedisCache('eventstest');
     const cachedData = Cache.get('events');
     if (cachedData) {
@@ -129,21 +134,41 @@ app.get("/api/v1/events", async (req,res) =>{
     } else {
         try{
             let {collection, database} = new Database("events");
-            let datas = await collection.find().toArray();
+            let companiesDatabase = new Database("companies");
+            let datas = await collection.find({}, {projection : {"eventData.name" : 1, "eventData.description" : 1, "eventData.location" : 1, "eventData.position" : 1, "eventData.end_Of_The_Event" : 1, "eventData.readable_event_name" : 1, "eventData.address" : 1, "eventData.objectDateOfRelease" : 1, "eventData.objectDateOfEvent" : 1, "eventData.background" : 1, "eventData.company" : 1, "eventData.tickets" : 1, "eventData.performer" : 1, "eventData.isGroupPerformer" : 1}}).toArray();
             let sendDatas = [];
             let cache = true;
             let cacheTime = getTime("CACHE_TIME")
+            console.log(datas);
             for (let i = 0; i < datas.length; i++){
                 if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
+                    let companyId = datas[i].eventData.company;
+                    try{
+                        companyId = ObjectId(companyId);
+                    }
+                    catch{};
+                    let company = await companiesDatabase.collection.findOne({_id : companyId}, {projection : {name : 1, website :  1}})
                     sendDatas.push({
                         id : datas[i].eventData.readable_event_name,
                         date : datas[i].eventData.objectDateOfEvent,
                         title : datas[i].eventData.name,
                         description : datas[i].eventData.description,
-                        imageName : datas[i].eventData.background
+                        imageName : datas[i].eventData.background,
+                        address : datas[i].eventData.address,
+                        location : datas[i].eventData.location,
+                        position : datas[i].eventData.position,
+                        end : datas[i].eventData.end_Of_The_Event,
+                        organiser : {
+                            name : company ? company.name : "",
+                            website : company ? company.website : ""
+                        },
+                        performer : {
+                            name : datas[i].eventData.performer,
+                            isGroupPerformer : datas[i].eventData.isGroupPerformer
+                        },
+                        tickets : datas[i].eventData.tickets.map(ticket=>{return {name : ticket.name, price : ticket.price}})
                     });
                     datas[i].eventData.objectDateOfEvent.getTime()+cacheTime <= new Date().getTime() ? cache = false : false;
-                    
                 }
                 else if (datas[i].eventData.objectDateOfRelease.getTime() >= new Date().getTime()+cacheTime){
                     cache = false;
@@ -154,6 +179,7 @@ app.get("/api/v1/events", async (req,res) =>{
                 Cache.set('events', sendDatas, cacheTime/1000);
             }
             closeConnection(database);
+            closeConnection(companiesDatabase.database);
             res.status(200).send({events : sendDatas});
         }
         catch{
@@ -162,7 +188,7 @@ app.get("/api/v1/events", async (req,res) =>{
     }
 });
 
-app.get("/api/v1/event/:id", async (req,res)=>{
+app.get("/api/v1/event/:id", async (req,res,next)=>{await statsMiddleware(req,res,next)}, async (req,res)=>{
     let id = req?.params?.id;
     if(id == undefined) return handleError(logger, "400", res);
     const cachedData = await readFromRedisCache(req.params.id);
@@ -228,10 +254,17 @@ app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), asy
             eventDatas = await getTicketByReadableId(eventId);
             if (eventDatas.venue != req.params.id) return handleError(logger, "035", res);
         }
-        let venue = await collection.findOne({_id : objectid}, {projection : { "content.name" : 1, "content.colorOfBackGround" : 1, "content.sizeOfArea" : 1, "content.background" : 1, "content.seatsDatas" : 1, "content.groups" : 1, "content.sizeOfSeat" : 1, "content.colorOfSeat" : 1, "content.stage" : 1 }});
+        let venue = await collection.findOne({_id : objectid}, {projection : { "content.name" : 1, "content.colorOfBackGround" : 1, "content.sizeOfArea" : 1, "content.background" : 1, "content.seats" : 1, "content.groups" : 1, "content.sizeOfSeat" : 1, "content.colorOfSeat" : 1, "content.stages" : 1 }});
         closeConnection(database);
+        let sectors = venue.content.seats;
+        if (venue && venue.content.seats){
+            venue.content.seats = seatMatrixToArray(venue.content.seats);
+        } 
+        else if (!venue){
+            return handleError(logger, "035", res);
+        }
         if (!eventId){
-            return venue ? res.send({venue : venue.content}) : handleError(logger, "400", res);
+            return venue ? res.send({venue : {...venue.content, groups : createArrayOfGroups(sectors)}}) : handleError(logger, "400", res);
         }
         else{
             if (venue && eventDatas){
@@ -316,7 +349,7 @@ app.post("/api/v1/event-datas/:id", (req,res,next)=>parseBodyMiddleeware(req,nex
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
             let event = await getEventDatas(req.params.id);
-            return res.send({_id : event.id, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, location : event.location, position: event.position, localDiscounts : event.localDiscounts, venue : event.venue})
+            return res.send({_id : event.id, media : event.media, id : event.readable_event_name, background : event.background ,title : event.name, description : event.description, date : event.objectDateOfEvent, location : event.location, position: event.position, localDiscounts : event.localDiscounts, venue : event.venue, performer : event.performer, isGroupPerformer : event.isGroupPerformer});
             }
         }
         else{
@@ -804,9 +837,15 @@ app.post("/api/v1/change-password", async (req,res)=>{
 app.post("/api/v1/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
     if (req.params.id && req.body && typeof req.body === TypeOfBody && req.body.token){
         let access = await control_Token(req.body.token, req);
-        if (access && access.includes("edit-rooms") && controlTypesOfVenues(req.body.datas)){
+        if (access && access.includes("edit-rooms") && controlTypesOfVenues(req.body.datas) && controlCreatedSeats(req.body.datas.seats)){
             let { collection, database } = new Database("venue");
-            let id = new ObjectId(req.params.id);
+            let id = "";
+            try{
+                id = new ObjectId(req.params.id);
+            }
+            catch{
+                return handleError(logger, "400", res);
+            }
             let lastVersion = await collection.findOne({_id : id});
             if (lastVersion){
                 // console.log(lastVersion.versions);
@@ -826,9 +865,9 @@ app.post("/api/v1/upload-venue/:id", (req,res,next)=>parseBodyMiddleeware(req,ne
 
 app.post("/api/v1/upload-venue", async (req,res)=>{
     let body = Functions.parseBody(req.body);
-    if (body && typeof body == TypeOfBody && body.token){
+    if (body && typeof body == TypeOfBody && body.token && body.datas){
         let access = await control_Token(body.token, req);
-        if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas)){
+        if (access && access.includes("edit-rooms") && controlTypesOfVenues(body.datas) && controlCreatedSeats(body.datas.seats)){
             let { collection,database } = new Database("venue");
             let datas = await collection.insertOne({content : body.datas, addedBy : await otherData(req, body.token), versions : []});
             if (datas?.insertedId) res.send({id : datas.insertedId});
@@ -854,13 +893,11 @@ app.post("/api/v1/venues", async (req,res)=>{
             for (let i = 0; i < datas.length; i++){
                 sendDatas.push({
                     name : datas[i].content.name,
-                    places : datas[i].content.places,
+                    seats : seatMatrixToArray(datas[i].content.seats),
                     seatsDatas : datas[i].content.seatsDatas,
                     colorOfBackGround : datas[i].content.colorOfBackGround,
                     id : datas[i]._id,
-                    sizeOfSeat : datas[i].content.sizeOfSeat,
-                    colorOfSeat : datas[i].content.colorOfSeat,
-                    sizeOfArea : datas[i].content.sizeOfArea,
+                    
                     addedBy: datas[i].addedBy.userData.username
                 });
             }
@@ -939,14 +976,28 @@ app.post("/api/v1/get-venues-in-array", (req,res,next)=>parseBodyMiddleeware(req
 //EVENTS
 app.post("/api/v1/add-event",async (req,res)=>{
     let body = Functions.parseBody(req.body);
-    // console.log(req.body)
-    if (body && typeof body === TypeOfBody &&body.token){
+    if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
         // console.log(access);
         // console.log(controlTypeOfEvents(body.data))
         if (access && access.includes("edit-events") && body.data && controlTypeOfEvents(body.data)){
             let {collection, database} = new Database("events");
             let userId = (await GetUserDatas(body.token))._id;
+            if (body.data && body.data.tickets && body.data?.tickets.length){
+                body.data.tickets.forEach((tickets, index)=>{
+                        try{
+                            body.data.tickets[index].price = Number(tickets.price);
+                            body.data.tickets[index].minPrice = Number(tickets.minPrice);
+                            body.data.tickets[index].maxPrice = Number(tickets.maxPrice);
+                            body.data.tickets[index].numberOfTicket = Number(tickets.numberOfTicket);
+                        }
+                        catch{
+                        }
+                })
+            }
+            else{
+                return handleError(logger, "500", res);
+            }
             if ((body.data.users && !body.data.users.length && userId) || (userId && !body.data.users.includes(userId))){body.data.users.push(String(userId))}
             let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name),objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)};
             let insert = await collection.insertOne({eventData : insertData, otherDatas : await otherData(req,body.token), versions : []});
@@ -1006,6 +1057,18 @@ app.post("/api/v1/add-event/:id",async (req,res)=>{
             let {collection, database} = new Database("events");
             id = new ObjectId(id);
             let data = await collection.findOne({_id : id});
+            if (body.data && body.data.tickets && body.data?.tickets.length){
+                body.data.tickets.forEach((tickets, index)=>{
+                        try{
+                            body.data.tickets[index].price = Number(tickets.price);
+                            body.data.tickets[index].minPrice = Number(tickets.minPrice);
+                            body.data.tickets[index].maxPrice = Number(tickets.maxPrice);
+                            body.data.tickets[index].numberOfTicket = Number(tickets.numberOfTicket);
+                        }
+                        catch{
+                        }
+                })
+            }
             body.data = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name)};
             let l;
             let userId = (await GetUserDatas(body.token))._id;
@@ -1034,7 +1097,6 @@ app.post("/api/v1/events", async (req,res)=>{
     let page = req.query.page ? req.query.page : 0;
     let limit = req.query.limit ? req.query.limit : 0;
     let search = req.query.search ? req.query.search : false;
-    console.log(search);
     let body = Functions.parseBody(req.body);
     if (body && typeof body === TypeOfBody && body.token){
         let access = await control_Token(body.token, req);
@@ -1107,7 +1169,7 @@ app.post("/api/v1/get-all-event", async (req,res)=>{
                     all_Events[i]?.eventData.users.includes(userId) ? sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent}) : false;
                 }
             }
-            res.send({events : sendList});
+            res.send({events : sendńList});
             closeConnection(database);
             return;
         } else return handleError(logger, "004", res);
@@ -1119,7 +1181,28 @@ app.post("/api/v1/get-all-event", async (req,res)=>{
 app.post("/api/v1/order-ticket", async (req,res)=>{
     let body = Functions.parseBody(req.body);
     if (body && typeof body == TypeOfBody && body.datas && body.datas.length && body.eventId){
-        let {collection, database} = new Database("events");
+        let eventData = await getTicketByReadableId(body.eventId);
+        if (eventData && eventData.tickets && eventData.tickets.length){
+            let error = await controlEvent(body.eventId, body.datas);
+            if (!error.error){
+                let fullPrice = await GetFullPrice(body.datas, body.eventId);
+                if (fullPrice.error) {return handleError(logger, fullPrice.errorCode, res)};
+                let savingDatas = {eventId : body.eventId, tickets : [], time : new Date().getTime(), fullPrice : 0, fullAmount : 0, id : eventData.id, ...fullPrice};
+                let {collection, database} = new Database("buy");
+                let result = await collection.insertOne({...savingDatas, otherDatas : await otherData(req), pending : true, isPayingStarted : false, paymentMethod : "", status : "PENDNG"});
+                return res.send({error : false, token : result.insertedId});
+            }
+            else{
+                return handleError(logger, error.errorCode ? error.errorCode : "400" ,res);
+            }
+            
+        }
+        else{
+            return handleError(logger, "032", res);
+        }
+    } else return handleError(logger, "400", res);
+    /*
+    let {collection, database} = new Database("events");
         let eventDatas = (await collection.findOne({"eventData.readable_event_name" : body.eventId}))
         let savingDatas = {eventId : body.eventId, tickets : [], time : new Date().getTime(), fullPrice : 0, fullAmount : 0, id : eventDatas._id};
         closeConnection(database);
@@ -1145,8 +1228,7 @@ app.post("/api/v1/order-ticket", async (req,res)=>{
             closeConnection(database);
         }
         else return handleError(logger, response.errorCode, res);
-        return;
-    } else return handleError(logger, "400", res);
+        return;*/
 });
 
 app.post("/api/v1/create-ticket", async (req, res) => {
@@ -1224,8 +1306,6 @@ app.get("/api/v1/buy-ticket-details/:token", async (req,res)=>{
 
 
 app.post("/api/v1/ticket-sales", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
-    console.log(req.query);
-    console.log(req.query.eventName);
     let eventName = req.query.eventName;
     let startDate = req.query.from;
     let endDate = req.query.to;
@@ -1431,17 +1511,20 @@ app.post("/api/v1/cancel-local-transaction/:id",(req,res,next)=>parseBodyMiddlee
 });
 
 app.post("/api/v1/buy-local", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    console.log(req.body);
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object" && req.body.token){
         let error = false;
         let access = await control_Token(req.body.token, req);
+        console.log(access);
         if (access && access.includes("local-sale")){
         let {collection, database} = new Database("events");
         let eventDatas = (await collection.findOne({"eventData.readable_event_name" : req.body.datas.eventId}))
         closeConnection(database);
         const userId = String((await GetUserDatas(req.body.token))._id);
+        console.log(userId);
         if (!userId) return handleError(logger, "004", res);
-        console.log(eventDatas);
         if (eventDatas && eventDatas.eventData && eventDatas.eventData.users && eventDatas.eventData.users.includes(userId)){
+            console.log(req.body.datas);
         result = await controlEvent(req.body.datas.eventId, req.body.datas.tickets);
         if (result.error) return handleError(logger, result.errorCode, res);
         price = await GetFullPrice(req.body.datas.tickets, req.body.datas.eventId);
@@ -1498,7 +1581,11 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
     if (req.body && typeof req.body && req.body.datas && typeof req.body.datas === "object"){
         if (req.body.datas.customerData && controlTypeOfBillingAddress(req.body.datas.customerData) && req.params.id){
             let {collection, database} = new Database("buy");
-            let buyingDatas = await collection.findOne({_id : ObjectId(req.params.id)});
+            try{
+                req.params.id = ObjectId(req.params.id);
+            }
+            catch{}
+            let buyingDatas = await collection.findOne({_id : req.params.id});
             //collection.deleteOne({_id : ObjectId(req.params.id)});
             closeConnection(database);
             let ip = Functions.getIp(req);
@@ -1506,6 +1593,7 @@ app.post("/api/v1/payment/:id", (req,res,next)=>parseBodyMiddleeware(req,next) ,
             if (buyingDatas && ip == buyingDatas.otherDatas.ip && browserData.os == buyingDatas.otherDatas.browserData.os && browserData.name == buyingDatas.otherDatas.browserData.name){
                 let error = false;
                 let result = await controlEvent(buyingDatas.eventId, buyingDatas.tickets, buyingDatas._id);
+                if (result.error) return handleError(logger, result.errorCode ? result.errorCode : "400", res);
                 if (!result.error){
                     let saveDatas = {};
                     if (!error){
@@ -1552,7 +1640,7 @@ app.post("/api/v1/new-company", (req,res,next)=>parseBodyMiddleeware(req,next), 
         if (access && access.includes("companies")){
             const {collection, database} = new Database("companies");
             if (req.body.datas.name && req.body.datas.taxNumber){
-                let result = await collection.insertOne({name : req.body.datas.name, tax : req.body.datas.taxNumber, otherDatas : await otherData(req, req.body.token)});
+                let result = await collection.insertOne({name : req.body.datas.name, tax : req.body.datas.taxNumber, website : req.body.datas.website, otherDatas : await otherData(req, req.body.token)});
                 return res.send({error : result.insertedId > 0});
             }
             closeConnection(database);
@@ -1569,7 +1657,7 @@ app.post("/api/v1/get-companies", (req,res,next)=>parseBodyMiddleeware(req,next)
             datas = await collection.find().toArray();
             let sendDatas = [];
             for (let i = 0; i < datas.length; i++){
-                sendDatas.push({name : datas[i].name, tax : datas[i].tax, _id : datas[i]._id});
+                sendDatas.push({website : datas[i].website, name : datas[i].name, tax : datas[i].tax, _id : datas[i]._id});
             }
             closeConnection(database);
             return res.send({datas : sendDatas});
@@ -1598,7 +1686,7 @@ app.post("/api/v1/edit-company/:id", (req,res,next)=>parseBodyMiddleeware(req,ne
         if (access && access.includes("companies")){
             if (req.body.datas.name && req.body.datas.taxNumber){
                 const {collection, database} = new Database("companies");
-                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {name : req.body.datas.name, tax : req.body.datas.taxNumber}});
+                let result = await collection.updateOne({_id : ObjectId(req.params.id)}, {$set : {name : req.body.datas.name, tax : req.body.datas.taxNumber, website : req.body.datas.website}});
                 res.send({error : result.matchedCount == 0});
                 closeConnection(database);
             }
@@ -1878,6 +1966,40 @@ app.post("/api/v1/monitors", (req,res,next)=>parseBodyMiddleeware(req,next), asy
 });
 
 
+//ANALYSTIC
+
+app.post("/api/v1/logs", (req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res)=>{
+    if (req.body && req.body.token){
+        let access = await control_Token(req.body.token, req);
+            if (access && access.includes("statistics")){
+                let {fromDate, toDate, event} = req.query;
+                res.send(await pageLog(fromDate, toDate, event));
+            }else{
+                return handleError(logger, "004");
+            }
+    }else{
+        return handleError(logger, "400", res);
+    }
+});
+
+app.post("/api/v1/all-visitor", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.body && req.body.token){
+        let access = await control_Token(req.body.token, req);
+            if (access && access.includes("statistics")){
+                let {fromDate, toDate} = req.query;
+                res.send(await visitors(fromDate, toDate));
+            }else{
+                return handleError(logger, "004");
+            }
+    }else{
+        return handleError(logger, "400", res);
+    }
+});
+
+app.post("/api/v1/all-income", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    res.send(calcAllOfIncome());
+});
+
 //SIMPLE PAY RESPONSE
 app.use(express.json());
 
@@ -1886,6 +2008,14 @@ app.post("/ipn",(req,res)=>{
     if (body.orderRef && body.status)
     setStatus(body.orderRef, body.status)
 })
+
+app.get("/api/v1/status", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    if (req.query.id){
+        const status = await statusOfPayment(req.query.id);
+        res.send(status ? status : { error : true, message : "Nincs ilyen vásárlás" });
+    }
+    else return handleError(logger, "400", res);
+});
 
 
 const server = require("http").createServer(app);
@@ -1900,6 +2030,13 @@ else{
 }
 
 const { Server } = require("socket.io");
+const createArrayOfGroups = require("./createArrayOfGroup.js");
+const getVenueFromId = require("./getVenue.js");
+const statsMiddleware = require("./stats.js");
+const pageLog = require("./analystic/page-log.js");
+const visitors = require("./analystic/visitors.js");
+const calcAllOfIncome = require("./analystic/income.js");
+const statusOfPayment = require("./getStatusOfPayment.js");
 
 const io = new Server(server, {
     pingInterval : 5000,
@@ -1942,7 +2079,6 @@ io.on("connection",(socket)=>{
             const { collection, database } = new Database("monitor");
             let monitorDatas = await collection.findOne( { connected : socket.id } );
             payload.eventId = payload.eventId.replace("%E2%80%93", "-");
-            console.log("eventId:", payload.eventId);
             //let event = (await getTicketByReadableId(payload.eventId));
             let eventDatabase = new Database("events");
             try{
@@ -1950,7 +2086,6 @@ io.on("connection",(socket)=>{
             }catch{}
             let event = (await eventDatabase.collection.findOne({_id : payload.eventId})).eventData;
             closeConnection(eventDatabase.database);
-            console.log(event);
             let eventDatas = {eventId : event.readable_event_name, venueId : event.venue};
             if (monitorDatas && monitorDatas.socketId){
                 io.to(monitorDatas.socketId).emit( "event-display",  eventDatas);
@@ -2023,7 +2158,6 @@ io.on("connection",(socket)=>{
 });
 
 app.use((req, res, next)=>{
-    console.log(req.url);
     if (req.method === "GET"){
     imageName = req.url.split("/")[req.url.split("/").length-1];
     try{

@@ -10,6 +10,9 @@ type typeOfBoxParams = {
     height : number,
     endFunction? : Function,
     startFunction? : Function,
-    selectingFunction? : Function
+    selectingFunction? : Function,
+    selecting? : boolean,
+    scale? : number,
+    scalePos? : {x : number, y : number}
 }
 export default typeOfBoxParams;

@@ -13,7 +13,7 @@ type typeOfTicket = {
 
 type typeOfTicketList = {
     tickets : Array<typeOfTicket>,
-    seatDatas : typeOfPlace,
+    seatDatas : Array<typeOfPlace>,
     sizeOfSeat : number,
     sizeOfArea : {width: number, height: number},
     deleteFunction : Function,
@@ -21,8 +21,8 @@ type typeOfTicketList = {
 }
 
 type typeOfPlace = {
-    posX : number,
-    posY : number,
+    x : number,
+    y : number,
     name : string,
     title : string,
     id : string,
@@ -30,6 +30,8 @@ type typeOfPlace = {
 }
 
 const TicketList = ( { tickets, sizeOfSeat, sizeOfArea, seatDatas,deleteFunction,editFunction }:typeOfTicketList )=>{
+
+
     return <div className = "ticket">
         {
             tickets.map((ticket)=>{

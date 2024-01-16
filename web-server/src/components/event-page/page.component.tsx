@@ -15,6 +15,7 @@ import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
+import postDataJson from "../connection/postDataJson";
 
 type typeOfTicket = {
     id : string,
@@ -82,7 +83,7 @@ type typeOfPlaces = {
     background : {isImage : boolean, name : "string"},
     colorOfBackground : string,
     colorOfSeat : string,
-    seatsDatas : Array<typeOfSeat>,
+    seats : Array<typeOfSeat>,
     sizeOfArea : {width : number, height : number},
     sizeOfSeat : number,
     stage : number
@@ -93,7 +94,6 @@ type typeOfCenter = {
 }
 
 const Page = ({title, background, description, date, id, media, position, location, address, ticketId, venueId}:typeOfPageParams)=>{
-
 
 
     const genereateTicketAmout = (tickets:Array<typeOfTicket>):Array<typeOfAmountTicket>=>{
@@ -136,7 +136,6 @@ const Page = ({title, background, description, date, id, media, position, locati
         setSelectNotification(true);
         let l = [...ticketsAmount];
         for (let i = 0; i < l.length; i++){
-            console.log(l[i].numberOfFreeTickets, l[i].amount);
             if (l[i].id === id && l[i].numberOfFreeTickets > l[i].amount){
                 l[i].amount++;
             }
@@ -175,7 +174,6 @@ const Page = ({title, background, description, date, id, media, position, locati
         setSelectNotification(false);
         let lTicketAmount = [...ticketsAmount];
         for (let i = 0; i < lTicketAmount.length; i++){
-            console.log(lTicketAmount[i].amount, lTicketAmount[i].selected);
             if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
                 let l = [...selectedTickets, id];
                 setSelectedTickets(l);
@@ -224,9 +222,8 @@ const Page = ({title, background, description, date, id, media, position, locati
             error.push("Kérem adja meg a vásárolni kívánt mennyiséget!");
         }
         if (!error.length){
-            postData("/order-ticket", {datas : sendData, eventId : id})
+            postDataJson("/order-ticket", {datas : sendData, eventId : id})
             .then(async (response)=>{
-                console.log(response)
                 if (response.responseData){
                     response = await response.responseData
                     setErrorNat(response.message);
@@ -243,14 +240,13 @@ const Page = ({title, background, description, date, id, media, position, locati
         setErrorNat(error[0]);
     }
 
-    console.log(ticketsAmount);
 
     return <div className="event-page-div">
         <Error message={errorNat} open = {errorNat!=""} setOpen={()=>setErrorNat("")} />
         <TicketPageItems title = {title} image = {background} description={description} date = {date} media={media} position={position} location={location} address={address}/>
         {ticketsAmount && ticketsAmount.length ? <Tickets tickets={ticketsAmount} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets}/> : <TicketSkeleton />}
-        {placeDatas && placeDatas.seatsDatas && placeDatas.seatsDatas.length ? <Legend /> : ""}
-        {placeDatas && placeDatas.seatsDatas && placeDatas.seatsDatas.length && ticketsAmount && ticketsAmount.length ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
+        {placeDatas && placeDatas.seats && placeDatas.seats.length ? <Legend /> : ""}
+        {placeDatas && placeDatas.seats && placeDatas.seats.length && ticketsAmount && ticketsAmount.length ? <Seats places={placeDatas} tickets={ticketsAmount} seleted={selectedTickets} onClickFunction = {selectSeat} /> : ""}
         <div className = "alert-notification"><Collapse in={selectNotification}>
         <Alert
             severity = "info"

@@ -1,0 +1,74 @@
+.edit-map-field-label{
+    display: block;
+    font-size: 15px;
+    font-weight: 100;
+    margin: 5px;
+    margin-left: 12%;
+}
+
+.edit-map-fields{
+    margin: 5px;
+    padding: 5px;
+}
+
+.edit-map-field-input{
+    padding: 7px;
+    border-radius: 5px;
+    border: 1.5px solid #cccccc;
+    outline: none;
+    width: 70%;
+    margin: 3px auto;
+    display: block;
+    font-size: 13px;
+}
+
+.edit-map-field-input:focus{
+    border: 1.5px solid #4096ff;
+}
+
+.edit-seats-seat-example{
+    position: relative;
+    display: block;
+    margin: 10px auto;
+    width: 30%;
+}
+
+.editing-title{
+    font-weight: 200;
+    font-size: 20px;
+    margin: 10px;
+}
+
+.edit-map-field-select{
+    display: block;
+    width: 70%;
+    margin: 5px auto;
+}
+
+.drawing-selector{
+    transition: .1s;
+    font-size: 18px;
+    margin: 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.active-drawing-sector{
+    /*border: 1px solid #1677ff;*/
+    transition: .2s;
+    box-shadow: 0px 0px 3px rgba(22, 119, 255, .9) !important;
+}
+
+.drawing-selector-header{
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border-radius: 7px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, .3);
+}
+
+.drawing-selector-title{
+    margin-right: 8px;
+}

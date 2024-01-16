@@ -17,7 +17,9 @@ const Datas = {
     address : "string",
     gate_Opening : "string",
     end_Of_The_Event : "string",
-    wardrobe : "boolean"
+    wardrobe : "boolean",
+    isGroupPerformer : "boolean",
+    performer : "string"
 }
 
 const controlTypeOfEvents = (inputs)=>{

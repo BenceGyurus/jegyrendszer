@@ -22,11 +22,11 @@ const Admin = (params:any)=>{
         if (token){
             postData("/get-access", {token : token})
             .then((data)=>{
-                data.access ? setAccess(data.access) : navigate("/admin-login");
+                data.access ? setAccess(data.access) : navigate(`/admin-login?callbackUrl=${window.location.pathname}`);
             });
         }
         else{
-            navigate('/admin-login');
+            navigate(`/admin-login?callbackUrl=${window.location.pathname}`);
         }
     }, []);
 

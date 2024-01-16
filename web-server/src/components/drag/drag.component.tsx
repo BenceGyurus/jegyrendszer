@@ -27,8 +27,6 @@ const Drag = ({width, height, style, startFunction, endFunction, onDragFunction}
         if (endFunction) endFunction({dx : startPos.x-e.pageX, dy : startPos.y-e.pageY, x : e.pageX, y : e.pageY});
     }
 
-    console.log(ondrag);
-
     return (<div 
         onMouseDown={e=>startSelecting(e)}
         onMouseMove={e=>mouseMoveEvent(e)}

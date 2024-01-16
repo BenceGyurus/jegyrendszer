@@ -12,6 +12,7 @@ const Admin = ()=>{
     const [password, setpassword] = useState("");
     const navigate = useNavigate();
     const [error, setError] = useState("");
+    const [navigatetionPage, setNavigationPage] = useState((new URLSearchParams(window.location.search)).get("callbackUrl"));
 
     const login = ()=>{
         postData('/login', { username: username, password: password })
@@ -24,7 +25,7 @@ const Admin = ()=>{
                 return postData("/get-long-token", {token : data.token}).then(async (data)=>{
                     if (data.token){
                         insertCookie("long_token", String(data.token), new Date(new Date().setTime(new Date().getTime())+(data.expires_in)),"/");
-                        navigate('/admin');
+                        navigate(navigatetionPage ? navigatetionPage : "/admin");
                     }
                     else if (data && data.responseData){
                         data = await data.responseData;

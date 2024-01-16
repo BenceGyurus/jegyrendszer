@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SeatVisualization from "../seat-visualization-engine/seats.component";
 import "../../css/monitor-tickets.css";
+import typeOfSeats from "../createSeatMap/type/seatType";
 
 type typeOfDisplayVenueParams = {
     venueId : string,
@@ -35,11 +36,21 @@ const DisplayVenue = ( { venueId, eventId , aTickets,selectEvent, selected }:typ
         })
     }, [])
 
-    console.log(venue && venue.name ? (window.innerHeight-80)/venue.sizeOfArea.height : "");
+    const getSizeOfVenue = ()=>{
+        if (venue && venue.seats && venue.seats.length){
+            let height = 0; let width = 0;
+            venue.seats.forEach((seat:typeOfSeats, index:number)=>{
+                if (index === 0 || seat.x+seat.size.width > width) width = seat.x+seat.size.width;
+                if (index === 0 || seat.y+seat.size.height > height) height = seat.y+seat.size.height;
+            })
+            return {width : width, height : height};
+        }
+        return {width : 0, height : 0};
+    }
 
     return (<div className = "monitor-ticket-selector">
         {
-            venue && venue.name && tickets.length ? <SeatVisualization seatPositions={venue.seatsDatas} sizeOfArea={{height : window.innerHeight-80, width: ((window.innerHeight-80)/venue.sizeOfArea.height)*venue.sizeOfArea.width}} seatSize={((window.innerHeight-80)/venue.sizeOfArea.height)*venue.sizeOfSeat} colorOfSeat={venue.colorOfSeat} stage={getSizeOfStage(venue.stage, {height : window.innerHeight-80, width: ((window.innerHeight-80)/venue.sizeOfArea.height)*venue.sizeOfArea.width})} marginTop={venue.stage == 1 || venue.stage == 4 ? 50 : 0} marginLeft={venue.stage == 3 || venue.stage == 2 ? 50 : 0} tickets={aTickets} selectFunction={selectEvent} selectedSeats={selected} sizeOfScale={(window.innerHeight-80)/venue.sizeOfArea.height} /> : <></>
+            venue && venue.name && tickets.length ? <SeatVisualization seatPositions={venue.seats} sizeOfArea={getSizeOfVenue()} seatSize={0} colorOfSeat={venue.colorOfSeat} marginTop={venue.stage == 1 || venue.stage == 4 ? 50 : 0} marginLeft={venue.stage == 3 || venue.stage == 2 ? 50 : 0} tickets={aTickets} selectFunction={selectEvent} selectedSeats={selected} sizeOfScale={1} /> : <></>
         }
     </div>)
 }

@@ -13,16 +13,18 @@ type typeOfAddCompanyParams = {
     nameOfCompany : string,
     tax : string,
     id : string
+    website : string
 }
 
-const AddCompany = ({ closeWindowFunction, errorFunction, updateFunction, nameOfCompany, tax, id}:typeOfAddCompanyParams)=>{
+const AddCompany = ({ closeWindowFunction, errorFunction, updateFunction, nameOfCompany, tax, id, website}:typeOfAddCompanyParams)=>{
 
     const [name, setName] = useState(nameOfCompany ? nameOfCompany : "");
     const [taxNumber, setTaxNumber] = useState(tax ? tax : "");
+    const [webSite, setWebSite] = useState(website ? website : "");
 
     const save = ()=>{
         if (name && taxNumber){
-            postData(id ? `/edit-company/${id}` : "/new-company", {token : ParseLocalStorage("long_token"), datas : {name : name, taxNumber : taxNumber}})
+            postData(id ? `/edit-company/${id}` : "/new-company", {token : ParseLocalStorage("long_token"), datas : {name : name, taxNumber : taxNumber, website : webSite}})
                 .then(async (response)=>{
                     if (response.responseData){
                         //errorFunction((await response.responseData).message)
@@ -44,6 +46,7 @@ const AddCompany = ({ closeWindowFunction, errorFunction, updateFunction, nameOf
         <div className = "add-company-window-data">
             <InputText value={name} onChangeFunction={setName} title = "Vállalat neve" />
             <InputText value={taxNumber} onChangeFunction={setTaxNumber} title = "Vállalat adószáma" />
+            <InputText value ={webSite} onChangeFunction={setWebSite} title = "Weboldal (pl.: http://agorasavaria.hu)" />
             <Button title = "Mentés" onClickFunction={save} />
         </div>
     </div>

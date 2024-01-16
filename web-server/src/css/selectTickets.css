@@ -13,4 +13,5 @@
     max-width: 80%;
     margin: 10px auto;
     overflow: auto;
+    max-height: calc(100vh - 80px);
 }

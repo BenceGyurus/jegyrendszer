@@ -52,6 +52,18 @@ const ShowSeats = ({datasOfVenue, closeFunction, addNewSeat, seatList, allSelect
     const [venueData, setVenueData]:any = useState(datasOfVenue);
     const [status, setStatus]:[boolean, Function] = useState(false);
    
+    const getWidthOfSeats = ()=>{
+        let maxWidth = -1;
+        let maxHeight = -1;
+        venueData.seats.forEach((seat:any, index:number)=>{
+            if (index === 0 || seat.x > maxWidth) maxWidth = seat.x;
+            if (index === 0 || seat.x > maxHeight) maxHeight = seat.y;
+        })
+        return {
+            height : maxHeight,
+            width : maxWidth
+        }
+    }
 
     //style = {{width : venueData.sizeOfArea.width, height : venueData.sizeOfArea.height}}
 
@@ -59,11 +71,11 @@ const ShowSeats = ({datasOfVenue, closeFunction, addNewSeat, seatList, allSelect
 
         <Window title = "Helyek kiválasztása" closeFunction={closeFunction} >
             <div className = "select-place-div-2">
-            {venueData ? <div className = "select-places-place-div">
+            {venueData ? <div className = "select-places-place-div" style={{...getWidthOfSeats()}}>
             {
-                venueData ? venueData.seatsDatas.map(
+                venueData ? venueData.seats.map(
                     (venue:any)=>{
-                        return !allSelected.includes(venue.id) || seatList.includes(venue.id) ? <span key = {uuid()} onClick={e => {addNewSeat(venue.id); setStatus(!status)}} className = "place" style = {{background:`${seatList.includes(venue.id) ? "red":"black"}`, width : venueData.sizeOfSeat, position: "absolute", top : venue.posY, left : venue.posX, height: venueData.sizeOfSeat}}></span> : "";
+                        return !allSelected.includes(venue.id) || seatList.includes(venue.id) ? <span key = {uuid()} onClick={e => {addNewSeat(venue.id); setStatus(!status)}} className = "place" style = {{ background:`${seatList.includes(venue.id) ? "red":"black"}`, width : venue.size.width, height : venue.size.height, position: "absolute", top : venue.y, left : venue.x}}></span> : "";
                     }
                 ): <Empty />
             }

@@ -2,18 +2,12 @@ const ControlDatas = require("./controlTypesOfDatas")
 
 const Datas = {
     name : "string",
-    places : "number",
-    colorOfBackGround : "string",
-    sizeOfArea : "object",
-    background : "object",
-    seatsDatas : "object",
-    groups : "object",
-    selecttedGroup : "string",
-    sizeOfSeat : "number",
-    colorOfSeat : "string",
-    seatsMode : "boolean",
-    suggestedGroups : "object",
-    stage : "number"
+    background : "string",
+    status : "string",
+    isSector : "boolean",
+    originalColor : "boolean",
+    stages : "object",
+    seats : "object"
 }
 
 const controlTypesOfVenues = (inputs)=>{

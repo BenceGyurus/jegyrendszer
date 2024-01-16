@@ -14,14 +14,15 @@ type typeOfImageUpload = {
     onChangeFunction : Function,
     deleteFunction : Function,
     className? : string,
-    title? : string
+    title? : string,
+    errorFunction? : Function
 }
 
 type typeOfFileType = {
     path : string
 }
 
-const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:typeOfImageUpload)=>{
+const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title, errorFunction}:typeOfImageUpload)=>{
 
     const [image, setImage]:[typeOfFileType, Function] = useState({path : file.fileName});
     const [uploading, setUploading]:[boolean, Function] = useState(false);
@@ -52,6 +53,7 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title}:t
           } catch (error) {
             // Handle errors
             console.error("Error during upload:", error);
+            if (errorFunction) errorFunction("Hiba történt a feltöltés közben");
             setErrorUploading(true)
           }
         }

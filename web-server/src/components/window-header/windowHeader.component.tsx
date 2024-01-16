@@ -1,11 +1,14 @@
+import { useState } from "react";
 import "../../css/windowHeader.css";
 type typeOfWindowHeader = {
     title : string,
     closeWindowFunction? : Function,
-    className? : string
+    className? : string,
+    onDrag? : Function
 }
 
-const WindowHeader = ({title, closeWindowFunction, className}:typeOfWindowHeader)=>{
+const WindowHeader = ({title, closeWindowFunction, className, onDrag}:typeOfWindowHeader)=>{
+
     return (
         <div className={`header ${className}`}>
             <div className="title">{title}</div>

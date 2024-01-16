@@ -13,7 +13,7 @@
     stroke-width: 2;
     stroke: #fff;
     stroke-miterlimit: 10;
-    margin: 10% auto;
+    margin: 20px auto;
     box-shadow: inset 0px 0px 0px #f00c00;
     background-color: #f00c00;
   }
@@ -39,4 +39,12 @@
     100% {
       box-shadow: inset 0px 0px 0px 30px #f00c00;
     }
+  }
+
+  .rejected-buying-title{
+    color: #f00c00;
+    text-align: center;
+    font-size: 10vh;
+    opacity: 1;
+
   }

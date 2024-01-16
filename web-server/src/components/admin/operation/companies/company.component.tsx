@@ -12,6 +12,7 @@ const Company = ({ company, editFunction, deleteFunction }:typeOfCompanyParams)=
         <div className = "company-box">
             <h2 className = "company-name">{company.name}</h2>
             <p className = "tax-number">Adószám: {company.tax}</p>
+            <p className = "web-site">Weboldal: <a target="_blank" href = {company.website}>{company.website}</a></p>
             <div className = "company-buttons">
                 <button className = "edit-button" onClick={e=>{editFunction(company._id)}}>Szerkesztés</button>
                 <button className = "delete-button" onClick={e=>{deleteFunction(company._id)}}>Törlés</button>

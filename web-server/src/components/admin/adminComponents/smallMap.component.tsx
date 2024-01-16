@@ -27,20 +27,22 @@ const SmallMap = ({sizeOfArea, colorOfBackGround, sizeOfSeats, colorOfSeat, seat
             height : Math.floor(expectedWidth/width*height)
         };
     }
+    console.log(selectedSeats);
 
-    const calculateSeatDatas = (width:number, sizeOfSeat:number, posX:number, posY:number)=>{
+    const calculateSeatDatas = (width:number, posX:number, posY:number, seatWidth:number, seatHeight:number)=>{
         let e = expectedWidth/width;
         return {
-            sizeOfSeat : Math.ceil(sizeOfSeat*e),
+            seatWidth : Math.ceil(seatWidth*e),
+            seatHeight : Math.ceil(seatHeight*e),
             posX : Math.floor(posX*e),
             posY : Math.floor(posY*e)
-        }
-    };
+            }
+        };
         return (
             <div className = "map" style={{background : colorOfBackGround, height : getSizeOfArea(sizeOfArea.width, sizeOfArea.height).height , width:getSizeOfArea(sizeOfArea.width, sizeOfArea.height).width, position:"relative" }} key = {uuid()}>
             {seatDatas.map(
                 (element)=>{
-                    return <NonDragableSeat size = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).sizeOfSeat} color = {selectedSeats && selectedSeats.includes(element.id) ? selectColor ? selectColor : "red" : colorOfSeat} posX = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posX} posY = {calculateSeatDatas(sizeOfArea.width, sizeOfSeats, element.posX, element.posY).posY} key = {uuid()} />;
+                    return <NonDragableSeat width={calculateSeatDatas(sizeOfArea.width, element.x, element.y, element.size.width, element.size.height).seatWidth} height = {calculateSeatDatas(sizeOfArea.width, element.x, element.y, element.size.width, element.size.height).seatHeight} color = {selectedSeats && selectedSeats.includes(element.id) ? selectColor : element.color} posX = {calculateSeatDatas(sizeOfArea.width, element.x, element.y, element.size.width, element.size.height).posX} posY = {calculateSeatDatas(sizeOfArea.width, element.x, element.y, element.size.width, element.size.height).posY} key = {uuid()} />;
                 }
             )}
             </div>

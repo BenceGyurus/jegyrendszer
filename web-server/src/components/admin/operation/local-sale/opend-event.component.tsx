@@ -258,30 +258,25 @@ const Local_Sale_Event = ()=>{
 
     const selectSeat = (id:string)=>{
         let lTicketAmount = [...amountTickets];
-        let l:Array<string> = [];
         for (let i = 0; i < lTicketAmount.length; i++){
             if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
-                l = [...selectedTickets, id];
+                let l = [...selectedTickets, id];
                 setSelectedTickets(l);
                 lTicketAmount[i].selected++;
             }
-            else if (selectedTickets.includes(id)){
+            else if (lTicketAmount[i].seats.includes(id) && selectedTickets.includes(id)){
                 if (lTicketAmount[i].selected > 0){
                     lTicketAmount[i].selected--;
                 }
-                l = [...selectedTickets];
+                let l = [...selectedTickets];
                 let newList:Array<string> = [];
-                l.forEach((element:string)=>{
-                    if (element != id){
-                        newList.push(element)
-                    }
-                })
+                newList = l.filter(item=>item != id);
                 setSelectedTickets(newList);
             }
         }
         setAmountTickets(lTicketAmount);
-        //console.log(l.length ? l : selectedTickets);
     }
+
 
 
     const getPlacesOfTicket = (places:Array<string>)=>{
@@ -368,8 +363,8 @@ const Local_Sale_Event = ()=>{
                 <span className = "connect-to-monitor-icon" onClick={e=>{getMonitors()}}><i className={`fas fa-wifi ${connectedToSocketMonitor ? "connected" : "disconnected"}`}></i></span>
                 {eventDatas ? <EventDetails title = {eventDatas.title} description={eventDatas.description} image = {eventDatas.background} /> : ""}
                 {eventDatas && amountTickets ? <Spin tip="Helyek kiválasztása folyamatban..." spinning = {userSelecting}><Tickets tickets = {amountTickets} incrementFunction={incrementAmountOfTickets} decrementFunction={decrementAmountOfTickets} /></Spin> : ""}
-                { venue && venue?.seatsDatas.length ? userSelecting ? <Button className = "user-select-button" icon = {<DisconnectOutlined />} onClick = {e=>closeTicketSelecting()} >Kiválasztás megszakítása</Button> : <Button className = "user-select-button" onClick={e=>sendTicketDatas()} disabled = {!(connectedToSocketMonitor && connectedId && venue && venue.seatsDatas && venue.seatsDatas.length && controlAmountTickets().length)} icon = {<i className="fas fa-share"></i>} >Kiválasztás monitoron</Button> : <></>}
-                {venue && venue?.seatsDatas.length ? <Seats disabled = {userSelecting} places = {venue}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
+                { venue && venue?.seats.length ? userSelecting ? <Button className = "user-select-button" icon = {<DisconnectOutlined />} onClick = {e=>closeTicketSelecting()} >Kiválasztás megszakítása</Button> : <Button className = "user-select-button" onClick={e=>sendTicketDatas()} disabled = {!(connectedToSocketMonitor && connectedId && venue && venue.seats && venue.seats.length && controlAmountTickets().length)} icon = {<i className="fas fa-share"></i>} >Kiválasztás monitoron</Button> : <></>}
+                {venue && venue?.seats.length ? <Seats disabled = {userSelecting} places = {venue}  tickets={amountTickets} seleted={selectedTickets} onClickFunction={selectSeat} /> : ""}
                 {discounts.length ? <DiscountList discounts={discounts} onClikcFunction={selectDiscount} selectedDiscount={selectedDiscount} /> : ""}
                 <div>Végösszeg: {getPrice().toLocaleString('hu-HU', { useGrouping: true, minimumFractionDigits: 0 })}Ft {discounts.length && selectedDiscount ? <span>(<span className = "discount-price">{`- ${(fullPrice-getPrice()).toLocaleString('hu-HU', { useGrouping: true, minimumFractionDigits: 0 })} Ft`}</span>)</span> : ""}</div>
                 <div className = "buy-btn-div"><Button loading = {buying} disabled = {userSelecting} icon = {<GiftTwoTone />}  onClick={()=>buy(true)}>Meghívó nyomtatása</Button></div>

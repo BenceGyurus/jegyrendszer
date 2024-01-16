@@ -21,7 +21,7 @@ type typeOfSeats = {
 }
 
 type typesOfGroup_ListParams = {
-    groups : Array<typeOfGroup>,
+    groups : Array<typeOfGroup> | null,
     changeFunction : Function,
     seats: Array<typeOfSeats>,
     seatList : Array<string>
@@ -50,9 +50,9 @@ const Group_List = ({groups, changeFunction, seats, seatList}:typesOfGroup_ListP
 
     return <div>
         {
-            groups.map((group:typeOfGroup)=>{
+            groups ? groups.map((group:typeOfGroup)=>{
                 return controlGroup(group) ? <Checkbox onChangeFunction={changeFunction} defaultChecked = {false} title = {group.name} params = {[seats.filter(seat=>seat.group == group.id)]} key={group.id} /> : ""
-            })
+            }) : <></>
         }
     </div>
     ;

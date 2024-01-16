@@ -48,3 +48,13 @@
     color: #007bff;
     text-decoration: none;
   }
+
+  .no-event-content{
+    display: flex;
+
+  }
+
+
+  .mty-logo{
+    width: 400px;
+  }

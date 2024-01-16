@@ -28,6 +28,7 @@ import { Statistic,Button, Modal,Radio,TourProps,FloatButton, Tour  } from 'antd
 import insertCookie from "../../../../../cookies/insertCookie";
 import { ExclamationCircleFilled, ExclamationCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import Error from "../../../../notification/error.component";
+import postDataJson from "../../../../connection/postDataJson";
 
 type typeOfGroups = {
     id : string,
@@ -93,7 +94,9 @@ type typeOfEventSettingsParams = {
     end? : string,
     isWardrobe? : boolean,
     versions? : any,
-    readable_event_name? : string
+    readable_event_name? : string,
+    performerIn? : string,
+    isGroupPerformerIn? : boolean
 }
 
 type typeOfMedia = {
@@ -118,7 +121,7 @@ type typeOfUsers = {
     username : string,
     _id : string
 }
-const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList, contributors,addre, open, end, isWardrobe, versions, readable_event_name}:typeOfEventSettingsParams )=>{
+const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOfRelease, venue, mediaDatas, location, company, markerPosition, localD, usersList, contributors,addre, open, end, isWardrobe, versions, readable_event_name, performerIn, isGroupPerformerIn}:typeOfEventSettingsParams )=>{
     const parse_Media_Datas = (mediaDatas:any)=>{
         for (let i = 0; i < Object.keys(mediaDatas).length; i++){
             if (mediaDatas[Object.keys(mediaDatas)[i]]){
@@ -183,7 +186,10 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const ticketsRef = useRef(null);
     const timeLineRef = useRef(null);
     const mediaRef = useRef(null);
+    const performerRef = useRef(null);
     const [errorWindow, setErrorWindow] = useState("");
+    const [performer, setPerformer] = useState(performerIn ? performerIn : "");
+    const [isPerformerGroup, setIsPerformerGroup] = useState(isGroupPerformerIn ? isGroupPerformerIn : false);
 
     const getTickets = ()=>{
         if (readable_event_name){
@@ -300,13 +306,10 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
 
     const getPlaceDatas = (id:string)=>{
         if (id){
-            postData(`/venue/${id}`, {token : ParseLocalStorage("long_token")})
-            .then((data:any)=>{
+            fetch(`/api/v1/venue/${id}`)
+            .then(async (data:any)=>{
                 if (data && !data.error){
-                    for (let i = 0; i < data.seatsDatas.length; i++){
-                        data.seatsDatas[i].colorOfSeat = data.colorOfSeat;
-                    }
-                    setVenueDatas(data);
+                    setVenueDatas((await data.json()).venue);
                 }
                 else{
                     setError(data?.message ? data.message : "Hiba történt a terem adatainak letöltése közben.");
@@ -415,10 +418,14 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             address : address,
             gate_Opening : gateOpening,
             end_Of_The_Event : endOfTheEvent,
-            wardrobe : wardrobe
+            wardrobe : wardrobe,
+            performer : performer,
+            isGroupPerformer : isPerformerGroup
         };
 
-        postData(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
+        console.log(sendData);
+
+        postDataJson(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
         .then(async (data)=>{
             if (data.datas){
                 //
@@ -475,6 +482,21 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         setMedia(l);
     }
 
+    const getSizeOfArea = ()=>{
+        let maxX = 0;
+        let maxY = 0;
+        if (venueDatas && venueDatas.seats && venueDatas.seats.length){
+            venueDatas.seats.forEach((seat:any, index:number)=>{
+                if (index === 0 || seat.x > maxX) maxX = seat.x;
+                if (index === 0 || seat.y > maxY) maxY = seat.y;
+            });
+        }
+        return {
+            width : maxX,
+            height : maxY
+        }
+    }
+
     const changeSelectedUsers = (id:string, status:boolean)=>{
         if (selectedUsers.includes(id) && !status){
             let l = [...selectedUsers];
@@ -529,6 +551,8 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         if (endOfTheEvent && new Date(dateOfEvent) > new Date(endOfTheEvent)) setError("Az eseménynek korábban kell kezdődnie, mint befejeződnie");
     }
 
+    console.log(tickets);
+
     return (
         <div>
         <BackButton url="/admin/rendezvenyek" className = "create-event-back-button" />
@@ -570,6 +594,13 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             </div>
             <div ref = {desciptionRef} className = "event-settings-holder">
             <TextArea onChangeFunction={setDescription} title = "Rendezvény leírása" value = {desciption} disabled = {isLoading} />
+            </div>
+            <div ref = {performerRef} className = "event-settings-holder">
+                <InputText title = "Fellépő neve" onChangeFunction={setPerformer} value = {performer} />
+                <Radio.Group value={isPerformerGroup} onChange={e=>setIsPerformerGroup(e.target.value)} defaultValue="a">
+                    <Radio.Button value={true}>Csoport</Radio.Button>
+                    <Radio.Button value={false}>Személy</Radio.Button>
+                </Radio.Group>
             </div>
             <div ref = {eventDateRef} className = "event-settings-holder">
             <Calendar error = {new Date(dateOfEvent) < new Date(dateOfRelease) || new Date(dateOfEvent) > new Date(endOfTheEvent)} onChangeFunction={setDateOfEvent} value = {dateOfEvent} title="Rendezvény dátuma" disabled = {isLoading} info={{ text : "Ez a dátum fog megjelenni az oldalon. A megadott dátum a rendezvényt már nem lehet rá vásárolni és eltűnik a főoldalról. A megadott dátumtól számított másfél évvel az oldal gyorsasága érdekében a rendezvény autómatikusan törlésre kerül", image : "/images/info/date.png"}} />
@@ -613,7 +644,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             </div>
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
             <div ref = {ticketsRef} className = "event-settings-holder event-settings-tickets">
-            { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {venueDatas.sizeOfArea} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seatsDatas} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
+            { venueDatas ? <TicketList tickets={tickets} sizeOfArea = {getSizeOfArea()} sizeOfSeat = {venueDatas.sizeOfSeat} seatDatas = {venueDatas.seats} deleteFunction = {deleteTicket} editFunction = {edit_Ticket}/> : "" }
             </div>
             {versions ? <div onClick = {e=>setTimeLine(!timeLine)} className = "time-line-collapse">Idővonal <span className = "time-line-open-icon">{ timeLine ? <i className="fas fa-caret-down"></i> : <i className="fas fa-caret-right"></i>}</span></div> : <></>}
             <Collapse in = {timeLine}>
@@ -632,6 +663,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
                 <p>{errorWindow}</p>
             </Modal>}
         </div>
+        {backgroundImage ? <div className = "event-site-background-image-div"> <img className = "event-site-background-image" src = {backgroundImage} /> <div className = "event-site-background-image-gradient"></div> </div> : <></>}
         </div>
     );
 }

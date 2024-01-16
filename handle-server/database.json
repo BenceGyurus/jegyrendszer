@@ -74,5 +74,9 @@
     "ads" : {
         "database" : "ads",
         "collection" : "ads"
-    }
+    },
+    "log" : {
+        "database" : "analytics",
+        "collection" : "log"
+    } 
 }
