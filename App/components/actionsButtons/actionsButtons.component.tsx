@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, useColorScheme } from "react-native"
+import { View, Text, Dimensions, useColorScheme, Pressable } from "react-native"
 import ActionButtonStyle from "./style/actionButtons.style"
 import Theme from "../../theme/defaultSettings"
 

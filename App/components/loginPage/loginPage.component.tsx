@@ -5,9 +5,10 @@ import { Colors } from "react-native/Libraries/NewAppScreen";
 import postData from "../../request/post";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Error from "../error/error.component";
+import typeOfLoginPageParams from "./types/loginPageParams";
 
 
-const LoginPage = ()=>{
+const LoginPage = ({ setToken }:typeOfLoginPageParams)=>{
 
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
@@ -24,6 +25,7 @@ const LoginPage = ()=>{
                         console.log(response);
                         if (response.token) {
                             AsyncStorage.setItem("token", response.token);
+                            if (setToken) setToken(response.token);
                         }
                     }
                 )

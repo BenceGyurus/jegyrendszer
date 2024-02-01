@@ -100,11 +100,25 @@ const LokiTransport = require("winston-loki");
 
 // module.exports = Logger;
 
+
+
 let logger;
+
+const initLocalLogger = ()=>{
+    logger = createLogger({
+        transports: [
+            new transports.Console({
+                format: format.combine(format.simple(), format.colorize())
+            })
+        ]
+    })   
+    console.log('Local logger is initialized');
+}
 const initLogger = () => {
     if(logger) return;
 
     if (process.env.NODE_ENV == 'production'){
+        try{
         logger = createLogger({
             transports: [
                 new LokiTransport({
@@ -118,15 +132,12 @@ const initLogger = () => {
             ]
         })
         console.log('Remote logger is initialized');
+        }catch{
+            console.log("Remote logger couldn't be initialized")
+            initLocalLogger();
+        }
     }else{
-        logger = createLogger({
-            transports: [
-                new transports.Console({
-                    format: format.combine(format.simple(), format.colorize())
-                })
-            ]
-        })   
-        console.log('Local logger is initialized');
+        initLocalLogger();
     }
 
 }

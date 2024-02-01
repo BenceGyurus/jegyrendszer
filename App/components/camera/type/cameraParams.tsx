@@ -1,5 +1,7 @@
 type typeOfCameraParams = {
-    onReadFunction : Function
+    onReadFunction : Function,
+    closeFunction : Function,
+    title? : string
 }
 
 export default typeOfCameraParams;

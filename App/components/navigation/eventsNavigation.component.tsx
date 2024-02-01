@@ -8,12 +8,16 @@ import React from "react";
 import EventNavigationStyle from "./style/eventsNavigation.style";
 import Error from "../error/error.component";
 import Camera from "../camera/camera.component";
+import ReadQrCode from "../qr-code-reading/readQrCode.component";
+import Refund from "../refund/refund.component";
 
 const EventsNavigation = ()=>{
 
     const [events, setEvents]:[Array<typeOfEvent>, Function] = useState([]);
     const [refreshing, setRefreshing] = React.useState(false);
     const [error, setError] = useState("");
+    const [selectedEvent, setSelectedEvent] = useState("");
+    const [refund, setRefund] = useState<boolean>(false);
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -31,6 +35,7 @@ const EventsNavigation = ()=>{
                 .then(response=>{
                     if (response && response.events){
                         setEvents(response.events);
+                        console.log(response.events);
                     }
                     else{
                         setError(response.message ? response.message : "Hiba történt az események betöltése közben.")
@@ -44,14 +49,18 @@ const EventsNavigation = ()=>{
         getEvents();
     }, []);
 
+    console.log(selectedEvent);
+
     return (<View>
         <Error show = {!!error} message = {error} />
-        {events && events.length ? <Camera onReadFunction={console.log} /> : <></>}</View>)
+        {selectedEvent && events && events.length ? <ReadQrCode backFunction={()=>setSelectedEvent("")} id = {selectedEvent} /> : events && events.length ? <ScrollView style = {{...EventNavigationStyle.eventNavigationScrollView}} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>onRefresh()} />}>
+            {refund ? <Refund onClose={()=>setRefund(false)} /> : <EventList setRefund={setRefund} openEvent={setSelectedEvent} refreshFunction={getEvents} events = {events} />}
+        </ScrollView> : <></>}</View>)
 }
 
+//
+
 /*
-<ScrollView style = {{...EventNavigationStyle.eventNavigationScrollView}} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>onRefresh()} />}>
-            <EventList refreshFunction={getEvents} events = {events} />
-        </ScrollView> */
+ */
 
 export default EventsNavigation;

@@ -37,7 +37,7 @@ const GoogleSchemaEvents = ({events}:typeOfGoogleSchemaEvents)=>{
                         offers : {
                             "@type": "Offer",
                             url: `${window.location.origin}/rendezveny/${event.id}`,
-                            price: event.tickets[0].price,
+                            price: event.tickets.length ? event.tickets[0]?.price : 0,
                             priceCurrency: "HUF",
                             validFrom: "2024-05-21T12:00"
                         },

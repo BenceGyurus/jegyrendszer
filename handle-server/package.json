@@ -30,6 +30,7 @@
     "multer": "^1.4.5-lts.1",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.9",
     "parse-bmfont-xml": "^1.1.4",
     "passkit-generator": "^3.1.9",
     "pdfkit": "^0.13.0",

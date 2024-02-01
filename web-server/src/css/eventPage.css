@@ -1,4 +1,6 @@
-
+.event-page-items-div{
+  overflow-x: hidden;
+}
 
 .event-page-image-div{
     width: 105%;
@@ -144,7 +146,7 @@
     left: 12.5%;
   }
 
-  @media screen and (min-width: 900px) {
+  @media only screen and (min-width: 900px) {
       .event-page-image-div{
         width: 100%;
         height: calc(100vh - 80px);

@@ -15,7 +15,7 @@ const getVenueFromId = async (id)=>{
     const {collection, database} = new Database("venue");
     if (collection){
         try{
-            id = new ObjectId(id);
+            if (typeof id != "object") id = new ObjectId(id);
         }catch{}
         let datas = await collection.findOne({_id : id}, {projection : { _id : 1, "content.name" : 1, "content.seats" : 1 }});
         if (datas && datas.content && datas.content.seats){

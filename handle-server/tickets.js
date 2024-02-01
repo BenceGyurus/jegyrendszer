@@ -17,6 +17,7 @@ const Tickets = async (orderId, tickets, venue, eventId, local, id, invited)=>{
             if (tickets[i].places && tickets[i].places[j]){nameOfSeat = (await getNameOfSeat(venue, tickets[i].places[j])).name}
             ticketIds.push((await collection.insertOne({
                 seatName : nameOfSeat,
+                seatId : tickets[i].places[j],
                 price : invited ? 0 : tickets[i].unitPrice,
                 nameOfTicket : tickets[i].name,
                 orderId : orderId,

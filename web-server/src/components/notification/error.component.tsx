@@ -17,6 +17,7 @@ const Error = ( { title, message, open, setOpen }:typeOfErrorParams ) => {
     <div className = "notification-box">
     <Collapse in={open}>
     <Alert
+     className="error-notification"
       severity="error"
       action={
         <IconButton
@@ -30,7 +31,6 @@ const Error = ( { title, message, open, setOpen }:typeOfErrorParams ) => {
           <CloseIcon fontSize="inherit" />
         </IconButton>
       }
-      sx={{ mb: 2 }}
     >
       {title ? <AlertTitle>{title}</AlertTitle> : ""}
       {message}

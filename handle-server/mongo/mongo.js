@@ -10,7 +10,7 @@ class Database{
     this.collectionName = datas.collection; this.databaseName = datas.database;
     this.mongoconfig = {};
     if (!this.mongoconfig) return {error : true};
-    this.client = new MongoClient(config['MONGO_URI']);
+    this.client = new MongoClient(process.env.NODE_ENV == 'production' ? "mongo:27017" : config['MONGO_URI']);
     this.Db();
     let db = this.client.db(this.databaseName);
     this.createCollection();

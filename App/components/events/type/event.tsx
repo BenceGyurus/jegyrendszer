@@ -3,7 +3,8 @@ type typeOfEvent = {
     descrition : string,
     imageName : string,
     date : string,
-    id : string
+    id : string,
+    _id : string
 }
 
 export default typeOfEvent;

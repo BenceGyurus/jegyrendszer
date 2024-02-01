@@ -35,7 +35,11 @@ const CameraStyle = StyleSheet.create({
         textAlign : "center",
         padding : 20,
         borderRadius : 10
-    }
+    },
+    title : {
+        fontSize : 40,
+        textAlign : "center"
+    },
 });
 
 export default CameraStyle;

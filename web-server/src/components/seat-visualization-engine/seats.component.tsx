@@ -75,7 +75,37 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
     scale: 1,
     translation: { x: 0, y: 0 }
   });
+  const animationRef:any = React.useRef(null);
 
+  const animateTransform = (targetTransform:any, startTransform:any) => {
+    cancelAnimationFrame(animationRef.current);
+
+    const duration = 500; // Adjust the animation duration in milliseconds
+    const startTime = performance.now();
+
+    const animate = (currentTime:any) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+
+      const newScale = startTransform.scale + progress * (targetTransform.scale - startTransform.scale);
+      console.log("target",  progress * (targetTransform.translation.x - startTransform.translation.x));
+      const newTranslation = {
+        x: startTransform.translation.x,
+        y: startTransform.translation.y,
+      };
+
+      setState({
+        scale: newScale,
+        translation: newTranslation,
+      });
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  };
   const render = ()=>{
 
   const canvas:any = canvasRef.current;
@@ -131,15 +161,61 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
     let lstate = {...state};
     let area = sizeOfArea;
     if (window.innerHeight < area.height || window.innerWidth < area.width) {
-        lstate.scale =  ((window.innerHeight-80) / area.height) > ((window.innerWidth*.8) / area.width) ? (window.innerWidth*.8) / area.width : (window.innerHeight-80) / area.height;
+        lstate.scale =  ((window.innerHeight-180) / area.height) > ((window.innerWidth*.8) / area.width) ? (window.innerWidth*.8) / area.width : (window.innerHeight-180) / area.height;
     }
     setState(lstate);
 }, []); 
 
+const getMinMaxCoordinatesByGroup = (dataArray: typeOfSeat[]) => {
+  const minMaxCoordinatesByGroup: Record<string, { minX: number; minY: number; maxX: number; maxY: number }> = {};
+
+  dataArray.forEach((item) => {
+    const { group, x, y } = item;
+
+    if (!minMaxCoordinatesByGroup[group]) {
+      // If the group is not yet in the result object, initialize it
+      minMaxCoordinatesByGroup[group] = { minX: x, minY: y, maxX: x, maxY: y };
+    } else {
+      // Update the min/max values if the current item has lower/higher values
+      minMaxCoordinatesByGroup[group].minX = Math.min(minMaxCoordinatesByGroup[group].minX, x);
+      minMaxCoordinatesByGroup[group].minY = Math.min(minMaxCoordinatesByGroup[group].minY, y);
+      minMaxCoordinatesByGroup[group].maxX = Math.max(minMaxCoordinatesByGroup[group].maxX, x);
+      minMaxCoordinatesByGroup[group].maxY = Math.max(minMaxCoordinatesByGroup[group].maxY, y);
+    }
+  });
+
+  return minMaxCoordinatesByGroup;
+  };
+
+  const controlZoom = ({minX, minY, maxX, maxY}:{minX : number, minY : number, maxX : number, maxY : number})=>{
+    let lstate = {...state};
+    let area = sizeOfArea;
+    console.log(maxY-minY, maxX-minX);
+    let width = maxX-minX;
+    let height = maxY-minY;
+    let windowHeight = window.innerHeight-180;
+    let windowWidth = window.innerWidth*.8;
+    if (height < windowHeight || width < windowWidth) {
+        lstate.scale =  ((windowHeight / height) > (windowWidth / width) ? (windowWidth) / width : (windowHeight) / height)*.8;
+    }
+    if (state.scale*2 < lstate.scale || (Math.ceil(-minX*lstate.scale)+Math.ceil(windowWidth-(width*lstate.scale))/2 < state.translation.x-(windowWidth/2) || Math.ceil(-minX*lstate.scale)+Math.ceil(windowWidth-(width*lstate.scale))/2-(windowWidth/2) > state.translation.x)){
+      lstate.translation.x =  Math.ceil(-minX*lstate.scale)+Math.ceil(windowWidth-(width*lstate.scale))/2;
+      lstate.translation.y = Math.ceil(-minY*lstate.scale)+Math.ceil(windowHeight-(height*lstate.scale))/2;
+      let startState = {scale : state.scale, translation : {x : lstate.translation.x, y : lstate.translation.y}};
+      animateTransform(lstate, startState);
+    }
+  }
+
+  console.log(state);
+
   const handleSeatClick = (x:number, y:number) => {
     console.log(x,y, state.scale);
     if (!disabled){
+      let sizeOfGroups:any = (getMinMaxCoordinatesByGroup(seatPositions));
     const clickedSeat = seatPositions.find((seat:any) => seat && seat.x <= x && (x) <= seat.x+(seat.size.width) && seat.y <= (y) && (y) <= seat.y+seat.size.height);
+    if (clickedSeat){
+      //controlZoom(sizeOfGroups[clickedSeat.group])
+    }
     if (clickedSeat && clickedSeat.id) {
       selectFunction(clickedSeat.id);
       //setSelectedSeats((prevSelectedSeats:any) => [...prevSelectedSeats, clickedSeat]);
@@ -149,19 +225,20 @@ const SeatVisualization = ({seatPositions, sizeOfArea, colorOfSeat, seatSize, st
   }
   };
 
-  return   <div ref = {divRef} style={{position : "relative", zIndex : "max", width : window.innerWidth*.8>sizeOfArea.width ? sizeOfArea.width : window.innerWidth*.8, height : window.innerHeight-80>sizeOfArea.height ? sizeOfArea.height : window.innerHeight-80}}><MapInteractionCSS
+  return   <div ref = {divRef} style={{position : "relative", zIndex : "max", width : window.innerWidth*.8>sizeOfArea.width ? sizeOfArea.width : window.innerWidth*.8, height : window.innerHeight-180>sizeOfArea.height ? sizeOfArea.height : window.innerHeight-180}}><MapInteractionCSS
   value={state}
   onChange={(value:any) => setState(value)}
   controlsClass = "zoom-tool-button"
   minScale = {0.3}
   maxScale = {2.5}
+  className = "map-container"
   
   translationBounds = {{xMax : sizeOfArea.width*0.5, 
       yMax : sizeOfArea.height*0.5, 
       xMin : -sizeOfArea.width*(state.scale)*0.9, 
       yMin: -sizeOfArea.height*(state.scale)*0.9}}> 
   
-  {!progress ? <Spin size='large' spinning={disabled ? disabled : false}><div className = "seat-map-canvas-holder" ><canvas onTouchStart={(e:any) => {console.log(document.documentElement.scrollTop,canvasRef.current.getBoundingClientRect().top);handleSeatClick(((e.touches[0].pageX)-(canvasRef.current.getBoundingClientRect().left))*(1/state.scale), (e.touches[0].pageY-(document.documentElement.scrollTop+canvasRef.current.getBoundingClientRect().top))*((1/state.scale)))}} onClick={(e:any) => {handleSeatClick(e.nativeEvent.offsetX, e.nativeEvent.offsetY)}} style={{zIndex : 2000}} ref={canvasRef} width={sizeOfArea.width+2*marginLeft} height={sizeOfArea.height+2*marginTop} />{ disabled ?  <div className="canvas-overlay"></div> : ""}</div></Spin> : <div style={{width : sizeOfArea.width+2*marginLeft, height : sizeOfArea.height+2*marginTop}}><Loader /></div>}
+  {!progress ? <Spin size='large' spinning={disabled ? disabled : false}><div id = "seat-map-canvas-holder" className = "seat-map-canvas-holder" ><canvas onTouchStart={(e:any) => {console.log(document.documentElement.scrollTop,canvasRef.current.getBoundingClientRect().top);handleSeatClick(((e.touches[0].pageX)-(canvasRef.current.getBoundingClientRect().left))*(1/state.scale), (e.touches[0].pageY-(document.documentElement.scrollTop+canvasRef.current.getBoundingClientRect().top))*((1/state.scale)))}} onClick={(e:any) => {handleSeatClick(e.nativeEvent.offsetX, e.nativeEvent.offsetY)}} style={{zIndex : 2000}} ref={canvasRef} width={sizeOfArea.width+2*marginLeft} height={sizeOfArea.height+2*marginTop} />{ disabled ?  <div className="canvas-overlay"></div> : ""}</div></Spin> : <div style={{width : sizeOfArea.width+2*marginLeft, height : sizeOfArea.height+2*marginTop}}><Loader /></div>}
   </MapInteractionCSS></div>
 }
 

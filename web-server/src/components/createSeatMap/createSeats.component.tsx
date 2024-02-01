@@ -20,6 +20,7 @@ const CreateSeats = ({inSeats, inStages, inStatus, inBackground, inName, inIsSec
     const [idOfVenue, setIdOfVenue] = useState<string>(id ? id : "");
     const [watchingGroup, setWatchingGroup] = useState<string>("");
     const [seats, setSeats] = useState<typeOfSeats>(inSeats && inSeats.length ? inSeats : []);
+    const [seatsInLine, setSeatsInLine] = useState<Array<typeOfSeat>>();
     const [background, setBackground] = useState(inBackground ? inBackground : ""); 
     const [status, setStatus] = useState<"move"|"edit"|"create"|"drag">(inStatus ? inStatus : "move");
     const [widthOfSeat, setWidthOfSeat] = useState<number>(10);
@@ -147,20 +148,22 @@ const CreateSeats = ({inSeats, inStages, inStatus, inBackground, inName, inIsSec
 
 
     const deleteSelectedSeats = ()=>{
-        let newSeats:any = [];
-        let lambda = [...seats];
-        lambda.forEach(seatGroups=>{
-            let l:any = [];
-            seatGroups?.seats?.forEach(seatList=>{
-                let lSeats = seatList.filter((seat)=>!selectedSeats.includes(seat.id))
-                if (lSeats.length) l.push(lSeats);
-            })
-            if (l.length) newSeats.push({sector : seatGroups.sector, seats : l});
-        });
-        //let lStages:Array<typeOfStage> = [];
-        let l = stages.filter(stage=>!selectedSeats.includes(stage.id));
-        setSeats(newSeats);
-        setStages(l);
+        if (true){
+            let newSeats:any = [];
+            let lambda = [...seats];
+            lambda.forEach(seatGroups=>{
+                let l:any = [];
+                seatGroups?.seats?.forEach(seatList=>{
+                    let lSeats = seatList.filter((seat)=>!selectedSeats.includes(seat.id))
+                    if (lSeats.length) l.push(lSeats);
+                })
+                if (l.length) newSeats.push({sector : seatGroups.sector, seats : l});
+            });
+            //let lStages:Array<typeOfStage> = [];
+            let l = stages.filter(stage=>!selectedSeats.includes(stage.id));
+            setSeats(newSeats);
+            setStages(l);
+        }
     };
 
     const dragSelectedSeats = ({dx, dy, x, y}:{dx : number, dy : number, x : number, y : number})=>{

@@ -17,6 +17,9 @@ const ControlAccess = ()=>{
                     }
                 })
             }
+            else {
+                resolve(false);
+            }
         })
     })
 }

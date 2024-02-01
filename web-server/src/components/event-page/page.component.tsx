@@ -16,6 +16,7 @@ import Collapse from '@mui/material/Collapse';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import postDataJson from "../connection/postDataJson";
+import PhoneNotification from "../notification/phoneNotification";
 
 type typeOfTicket = {
     id : string,
@@ -172,6 +173,7 @@ const Page = ({title, background, description, date, id, media, position, locati
 
     const selectSeat = (id:string)=>{
         setSelectNotification(false);
+        setErrorNat("");
         let lTicketAmount = [...ticketsAmount];
         for (let i = 0; i < lTicketAmount.length; i++){
             if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
@@ -190,6 +192,14 @@ const Page = ({title, background, description, date, id, media, position, locati
             }
         }
         setTicketsAmount(lTicketAmount);
+    }
+
+    const getTotalAmountOfTickets = ()=>{
+        let fullAmount = 0;
+        ticketsAmount.forEach(ticket=>{
+            fullAmount += ticket.amount;
+        })
+        return fullAmount;
     }
 
     const buy_Ticket = ()=>{
@@ -211,6 +221,8 @@ const Page = ({title, background, description, date, id, media, position, locati
                     }
                     if (selected.length != ticketsAmount[i].amount){
                         error.push("Kérem válassza ki a helyeket");
+                        handleShakeButtonClick();
+                        toSelectTickets();
                     }
                     else{
                         sendData.push({amount : ticketsAmount[i].amount, ticketId : ticketsAmount[i].id, places : selected, eventId : id});
@@ -240,6 +252,43 @@ const Page = ({title, background, description, date, id, media, position, locati
         setErrorNat(error[0]);
     }
 
+    const toOtherInformations = ()=>{
+        const element:any = document?.getElementById('event-page-description');
+        console.log(element);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+            });
+    }
+    }
+
+    const toSelectTickets = ()=>{
+        //
+        const element:any = document?.getElementById('seat-map-canvas-holder');
+        console.log(element);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+            });
+    }
+    }
+
+    const [isShaking, setShaking] = useState(false);
+
+  const handleShakeButtonClick = () => {
+    setShaking(true);
+
+    // Reset shaking state after a short delay
+    setTimeout(() => {
+      setShaking(false);
+    }, 500);
+  };
+
+  console.log(errorNat);
 
     return <div className="event-page-div">
         <Error message={errorNat} open = {errorNat!=""} setOpen={()=>setErrorNat("")} />
@@ -267,7 +316,7 @@ const Page = ({title, background, description, date, id, media, position, locati
           Válassza ki a helyeket a jegy tükrön!
         </Alert>
       </Collapse></div>
-        <BuyButton onClickFunction={buy_Ticket} />
+        <BuyButton error = {!!errorNat} shakeButton = {isShaking} selectTicketsFunction={toSelectTickets} isSeats = {placeDatas && placeDatas.seats && placeDatas.seats.length} otherInformationFunction = {toOtherInformations} amountOfTickets={getTotalAmountOfTickets()} onClickFunction={buy_Ticket} />
     </div>;
 }
 export default Page;

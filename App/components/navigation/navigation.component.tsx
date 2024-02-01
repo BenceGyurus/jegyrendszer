@@ -20,15 +20,15 @@ const Navigation = ()=>{
             setTokenSearching(false);
         })
         .catch((error)=>{
-            console.log(error);
             setError(error.message ? error.message : "Hiba történt a bejelentkezés során.");
             setTokenSearching(false);
         })
     }, [token]);
 
+
     return <>
         <Error show = {!!error} message={error} />
-        {tokenSearching ? <Loader /> : !token ? <LoginPage /> : <EventsNavigation />}
+        {tokenSearching ? <Loader /> : !token ? <LoginPage setToken = {setToken} /> : <EventsNavigation />}
     </>
 
 }

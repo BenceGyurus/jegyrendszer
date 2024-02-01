@@ -15,7 +15,6 @@ const  { ObjectId } = require('mongodb');
 const controlTypeOfEvents = require("./typesOfDatas/events.js");
 const TypeOfBody = "object";
 const controlConnection = require("./controlConnection.js");
-const Control_Seats = require("./control-seats.js");
 const getTicketByReadableId = require("./getTicketByReadableId.js");
 const controlTypeOfCoupon = require("./typesOfDatas/coupons.js");
 const controlTypeOfBillingAddress = require("./typesOfDatas/billingAddress.js");
@@ -32,7 +31,6 @@ const { PKPass } = require('passkit-generator');
 const ControlLoginRequest = require("./loginConrtol.js");
 const cryptoJs = require("crypto-js");
 const ShortUniqueId = require('short-unique-id');
-const getNameOfSeat = require("./getNameOfSeat.js");
 const GetUserDatas = require("./getUserDatas.js");
 const GetFullPrice = require("./getFullPrice.js");
 const controlLocalDiscount = require("./controlLocalDiscount.js");
@@ -52,7 +50,7 @@ const shortid = require('shortid');
 const controlCreatedSeats = require('./control/controlCreatedSeats.js');
 const seatMatrixToArray = require("./seatMatrixToArray.js");
 var cookieParser = require('cookie-parser')
-var redisOptions = {}
+var redisOptions = {port: 6379, host: 'redis', username: 'default', password: process.env.REDIS_PASS, db: 0}
 if (process.env.NODE_ENV == 'production') redisOptions = {port: 6379, host: 'jegyrendszer-redis-headless', username: 'default', password: process.env.REDIS_PASS, db: 0};
 const redis = new Redis(redisOptions);
 const readFromRedisCache = async (key) => {
@@ -188,6 +186,96 @@ app.get("/api/v1/events", async (req,res,next)=>{await statsMiddleware(req,res,n
     }
 });
 
+app.post("/api/v1/get-ticket-information/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    console.log(req.body, req.params.id);
+    if (req.body.token && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access.includes("local-sale")){
+            let id = req.params.id;
+            try{
+                if (typeof req.params.id != "object") id = new ObjectId(req.params.id);
+            }catch{
+                console.log("ObjectId cannot be generated");
+            }
+            const {collection, database} = new Database("tickets");
+            let datas = await collection.findOne({_id : id}, {projection : { price : 1, _id : 1, invited : 1, nameOfTicket : 1, seatName : 1, valid : 1, eId : 1 }});
+            closeConnection(database);
+            if (datas){
+                let eventDatas = await getEventByObjectId(datas.eId);
+                console.log(eventDatas);
+                if (eventDatas){
+                    datas.eventName = eventDatas.eventData.name;
+                }
+                res.send({ticket : datas});
+            }else{
+                return handleError(logger, "400" ,res);
+            }
+        }
+        else{
+            return handleError(logger, "003", res);
+        }
+    }else{
+        return handleError(logger, "400", res);
+    }
+});
+
+app.post("/api/v1/ticket-refund/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    console.log(req.body);
+    if (req.body && typeof req.body === TypeOfBody && req.body.token && req.params.id){
+        let access = await control_Token(req.body.token, req);
+        if (access && access?.includes("local-sale")){
+            let id = req.params.id;
+            try{
+                if (typeof id != "object") id = new ObjectId(id);
+            }catch{
+                console.log("ObjectId couldn't be generated");
+            }
+            const { collection, database } = new Database("tickets");
+            let ticketDatas = await collection.findOne({$and : [{_id : id},{ valid : {$nin : [true]}}]});
+            if (ticketDatas) await collection.deleteOne({$and : [{_id : id},{ valid : {$nin : [true]}}]});
+            closeConnection(database);
+            if (ticketDatas){
+                const buyingDatabase = new Database("buy");
+                let buyingDatas = await (buyingDatabase.collection).findOne({$and : [{_id : ticketDatas.orderId}, {bought : true}]});
+                const cancelledDatabase = new Database("cancelled");
+                let deletedId = await cancelledDatabase.collection.insertOne({ticket : ticketDatas, otherDatas : await otherData(req, req.body.token)});
+                closeConnection(cancelledDatabase);
+                let deleteIndex = -1;
+                if (buyingDatas){
+                    buyingDatas.tickets.forEach((ticket, index)=>{
+                        console.log(ticket.ticketId, ticketDatas.ticketId);
+                        if (ticket.ticketId === ticketDatas.ticketId){
+                            buyingDatas.tickets[index].amount = ticket.amount-1;
+                            if (ticket.places && ticket.places.includes(ticket.seatId)){
+                                buyingDatas.tickets[index].places = Functions.removeByValue(ticket.places, ticket.seatId);
+                            }
+                            if (buyingDatas.tickets[index].amount < 1){
+                                deleteIndex = index;
+                            }
+                        }
+                    });
+                    if (deleteIndex != -1) buyingDatas.tickets.slice(deleteIndex);
+                    if (!buyingDatas.tickets.length) {buyingDatas.status = "CANCELLED";buyingDatas.cancelled = true};
+                    if (buyingDatas.cancelledTickets?.length){
+                        buyingDatas.cancelledTickets.push(deletedId.insertedId);
+                    }else{buyingDatas.cancelledTickets = [deletedId.insertedId]}
+                    buyingDatabase.collection.updateOne({_id : ticketDatas.orderId}, {$set : buyingDatas});
+                    closeConnection(buyingDatas);
+                return handleError(logger, "040", res);
+                }else{
+                    closeConnection(buyingDatas);
+                    return handleError(logger, "500", res);
+                }
+            }else{
+                return handleError(logger, "039", res);
+            }
+    }else{
+        return handleError(logger, "003", res);
+    }
+}
+return handleError(logger, "400", res);
+});
+
 app.get("/api/v1/event/:id", async (req,res,next)=>{await statsMiddleware(req,res,next)}, async (req,res)=>{
     let id = req?.params?.id;
     if(id == undefined) return handleError(logger, "400", res);
@@ -215,7 +303,7 @@ app.post("/api/v1/events-to-sale", (req,res,next)=>parseBodyMiddleeware(req,next
             const userId = String((await GetUserDatas(req.body.token))._id);
             for (let i = 0; i < events.length; i++){
                 if (events[i].eventData.users && events[i].eventData.users.includes(userId)){
-                    sendEvents.push({title : events[i].eventData.name, description : events[i].eventData.description, imageName : events[i].eventData.background, date : events[i].eventData.dateOfEvent, id : events[i].eventData.readable_event_name})
+                    sendEvents.push({_id : events[i]._id, title : events[i].eventData.name, description : events[i].eventData.description, imageName : events[i].eventData.background, date : events[i].eventData.dateOfEvent, id : events[i].eventData.readable_event_name})
                 }
             }
             closeConnection(database);
@@ -306,29 +394,35 @@ app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), asy
 
 
 app.post("/api/v1/ticket-validation/:id", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+    console.log(req.body);
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id && req.body.eventId){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
-            const eventData = await getTicketByReadableId(req.body.eventId);
-            if (eventData){
+                const {collection, database} = new Database("tickets");
                 let idOfTicket = "";
                 try{
-                    idOfTicket = ObjectId(req.params.id)
+                    idOfTicket = new ObjectId(req.params.id);
                 }catch{}
-                const {collection, database} = new Database("tickets");
-                ticketDatas = await collection.findOne({_id : idOfTicket, eventId : req.body.eventId});
+                let eventId = ""
+                try{eventId = new ObjectId(req.body.eventId)}
+                catch{}
+                ticketDatas = await collection.findOne({_id : idOfTicket, eId : eventId});
                 if (ticketDatas && ticketDatas.valid) {
                     closeConnection(database);
-                    return res.send({type : "warn", message : "A jegy már validálva lett."})
+                    return res.send({type : "warn", message : "A jegy már validálva lett.",  seatName : ticketDatas.seatName ? ticketDatas.seatName : "" })
                 }
                 else if (ticketDatas){
                     const buyingDatabase = new Database("buy");
-                    let b = await buyingDatabase.collection.findOne({_id : ObjectId(ticketDatas.orderId)});
+                    let orderId = "";
+                    try{
+                        orderId = ObjectId(ticketDatas.orderId);
+                    }catch{}
+                    let b = await buyingDatabase.collection.findOne({$and : [{_id : orderId}, {bought : true}, {status : true}, {pending : false}]});
                     closeConnection(buyingDatabase.database);
-                    if (b && b.bought && b.status && !b.pending){
+                    if (b){
                         collection.updateOne({_id : idOfTicket}, {$set : {valid : true}});
                         closeConnection(collection);
-                        return res.send({ type : "success" , message : "A jegy aktív" })
+                        return res.send({ type : "success" , message : "A jegy aktív", seatName : ticketDatas.seatName ? ticketDatas.seatName : "" });
                     }
                     else{
                         closeConnection(collection);
@@ -340,7 +434,6 @@ app.post("/api/v1/ticket-validation/:id", (req,res,next)=>parseBodyMiddleeware(r
                 }
             }
         }
-    } 
     return handleError(logger, "500", res);
 });
 
@@ -995,9 +1088,6 @@ app.post("/api/v1/add-event",async (req,res)=>{
                         }
                 })
             }
-            else{
-                return handleError(logger, "500", res);
-            }
             if ((body.data.users && !body.data.users.length && userId) || (userId && !body.data.users.includes(userId))){body.data.users.push(String(userId))}
             let insertData = {...body.data, readable_event_name : Functions.sanitizeingId(body.data.name),objectDateOfEvent : new Date(body.data.dateOfEvent), objectDateOfRelease : new Date(body.data.dateOfRelease)};
             let insert = await collection.insertOne({eventData : insertData, otherDatas : await otherData(req,body.token), versions : []});
@@ -1493,7 +1583,7 @@ const simplesign = (data) => cryptoJs.enc.Base64.stringify(cryptoJs.HmacSHA384(J
 
 //PAYMENT
 
-app.post("/api/v1/cancel-local-transaction/:id",(req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res,)=>{
+app.post("/api/v1/cancel-transaction/:id",(req,res,next)=>parseBodyMiddleeware(req,next) ,async (req,res,)=>{
     if (req.body && typeof req.body == TypeOfBody && req.body.token && req.params.id){
         let access = await control_Token(req.body.token, req);
         if (access && access.includes("local-sale")){
@@ -2037,6 +2127,8 @@ const pageLog = require("./analystic/page-log.js");
 const visitors = require("./analystic/visitors.js");
 const calcAllOfIncome = require("./analystic/income.js");
 const statusOfPayment = require("./getStatusOfPayment.js");
+const { type } = require("os");
+const getEventByObjectId = require("./getEventByObjectId.js");
 
 const io = new Server(server, {
     pingInterval : 5000,

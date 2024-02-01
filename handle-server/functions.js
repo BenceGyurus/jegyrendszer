@@ -129,6 +129,24 @@ class Functions{
         return result;
     }
 
+    static removeByValue(array, value){
+        let index = array.indexOf(value);
+        if (index !== -1) {
+            array.splice(index, 1);
+        }
+        return array;
+    }
+
+    static closeConnection = (database)=>{
+        setTimeout(()=>{
+            try{
+                database.close();
+            }catch{
+                console.log("Database cloudn't be closed");
+            }
+        }, 10000);
+    }
+
     
 }
 

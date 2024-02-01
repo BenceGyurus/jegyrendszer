@@ -1,7 +1,8 @@
 import typeOfEvent from "./event";
 
 type typeOfEventParams = {
-    event : typeOfEvent
+    event : typeOfEvent,
+    onSelectFunction : Function
 }
 
 export default typeOfEventParams;

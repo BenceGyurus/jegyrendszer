@@ -9,7 +9,7 @@ import { RNCamera } from 'react-native-camera';
 import Theme from '../../theme/defaultSettings';
 
 
-const Camera = ({onReadFunction}:typeOfCameraParams)=> {
+const Camera = ({onReadFunction, closeFunction, title}:typeOfCameraParams)=> {
 
 
     const [torch, setTorch] = useState(false);
@@ -19,6 +19,8 @@ const Camera = ({onReadFunction}:typeOfCameraParams)=> {
 
         topContent={
             <View>
+                 <Button title='Vissza' onPress={()=>closeFunction()}/>
+                 {title ? <Text style = {{...CameraStyle.title, color : useColorScheme()==="dark" ? Theme.dark.color : Theme.light.color}}>{title}</Text> : <></>}
                 <Text style = {{color : useColorScheme()==="dark" ? Theme.dark.color : Theme.light.color, ...CameraStyle.cameraTitle}}>QR kód beolvasása</Text>
             </View>
         }
@@ -26,13 +28,12 @@ const Camera = ({onReadFunction}:typeOfCameraParams)=> {
         flashMode={torch ? RNCamera.Constants.FlashMode.torch : RNCamera.Constants.FlashMode.off}
         topViewStyle = {{...CameraStyle.topView}}
         cameraStyle = {{...CameraStyle.camera}}
-        onRead={e=>onReadFunction(e)}
-
+        onRead={e=>onReadFunction(e.data)}
         bottomContent={
-            <View style = {{ backgroundColor : Theme.default.borderColor, ...CameraStyle.button }}>
-                <Pressable>
+            <View style = {{ backgroundColor : Theme.default.borderColor, borderRadius : 30 }}>
+                <Pressable onPress = {()=>{setTorch(prev=>!prev)}} style = {{ backgroundColor : Theme.default.borderColor, ...CameraStyle.button }}>
                     <Text style = {{color : useColorScheme()==="dark" ? Theme.dark.color : Theme.light.color}}>
-                    Kód beírása
+                    Flash light
                     </Text>
                 </Pressable>
             </View>

@@ -78,5 +78,13 @@
     "log" : {
         "database" : "analytics",
         "collection" : "log"
-    } 
+    },
+    "app-ticket" : {
+        "database" : "app",
+        "collection" : "tickets"
+    },
+    "cancelled" : {
+        "database" : "buying",
+        "collection" : "cancelled"
+    }
 }

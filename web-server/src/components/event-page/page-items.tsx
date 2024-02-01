@@ -49,7 +49,7 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
     }
 
     return (
-        <div>
+        <div className = "event-page-items-div">
             <div className = "event-page-title-div">
             <h1 className = "event-page-title">{title}</h1>
             <span className = "date-of-event">
@@ -64,7 +64,7 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
             <button className="buy-ticket-button" onClick={e=>scroll()}>
             Jegyvásárlás
             </button>
-            <p className = "event-page-description">{description}</p>
+            <p className = "event-page-description" id = "event-page-description">{description.split("\n").length ? description.split("\n").map((paragraph:string)=>{return <p>{paragraph}</p>}) : description}</p>
             {media.apple_music || media.spotify || media.facebook || media.instagram || media.youtube ?  <div className = "user-side-media">
                 <div className = "user-side-media-elements">
                 {

@@ -2,3 +2,70 @@
     width: max-content;
     margin: 30px auto;
 }
+
+
+@keyframes animation-in {
+    from {
+        position: fixed;
+        bottom : -140px;
+    }
+    to{
+        position: fixed;
+        bottom : -40px
+    }
+}
+
+@media screen and (max-width : 1000px) {
+
+    .invisible-buy-ticket-button-div{
+        display: none;
+    }
+    .visible-buy-ticket-button-div{
+        animation: animation-in 0.1s;
+        width: 101%;
+        position: fixed;
+        bottom: -40px;
+        height: 100px;
+        z-index: 10000000;
+        display: flex;
+        background-color: #fff;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 4px 2px 5px rgba(0,0,0,0.6);
+        padding: 3%;
+    }
+}
+
+.buy-button-amount-of-tickets{
+    margin: 1px 4px 1px 15px;
+    transition: .1s;
+}
+
+.buy-button-ticket-icon{
+    margin: 3px
+}
+
+.buying-button{
+    transition: .5s;
+    margin: 7px;
+}
+
+.buying-button-other-informations{
+    color : white
+}
+
+.shake-buy-button {
+    animation: shakeAnimation 0.4s ease-in-out;
+  }
+  
+  @keyframes shakeAnimation {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    25%, 75% {
+      transform: translateX(-8px);
+    }
+    50% {
+      transform: translateX(8px);
+    }
+  }

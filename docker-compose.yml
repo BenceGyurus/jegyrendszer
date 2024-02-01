@@ -28,27 +28,17 @@ services:
       - TZ=Europe/Budapest
     stdin_open: true
     tty: true
+    restart: always
   
 
   web-service:
     build : "./web-server"
     image: bencegyurus/web-server:latest
     ports:
-      - 3000:3000
+      - 80:80
     extra_hosts:
     - "host.docker.internal:host-gateway"
-  
-  email-server:
-    build: "./email-server"
-    image: bencegyurus/email-server:latest
-    ports:
-      - 5000:5000
-    volumes:
-      - ./config.json:/config.json
-      - ./data:/data
-    environment:
-      - CONFIGDIR=/
-      - PYPASS=nbdcecfzxgcbnzbe
+
   
   redis:
     image: redis:latest

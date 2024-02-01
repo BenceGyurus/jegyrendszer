@@ -18,11 +18,11 @@ const getNameOfSeat = async (venueId, seatId)=>{
     }
     catch{}
     let venueDatas = await getVenueFromId(venueId);
-    console.log(venueDatas, seatId);
     //let venueDatas = (await collection.findOne({_id : ObjectId(venueId)}, {projection : {content : 1}})).content;
     closeConnection(database);
     if (venueDatas.seats && venueDatas.seats.length){
-        return venueDatas.seats.find(seat=>seat.id == seatId);
+        console.log(seatId);
+        return venueDatas.seats.find(seat=>String(seat.id) == String(seatId));
     }
     return false;
 }

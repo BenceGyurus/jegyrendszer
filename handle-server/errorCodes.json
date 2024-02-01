@@ -163,5 +163,15 @@
         "message" : "Ehhez a jegytípushoz tartorzó jegyek sajnos elfogytak vagy a megadott mennyiségben már nem kapható",
         "type" : "error",
         "responseCode" : 400
+    },
+    "039" : {
+        "message" : "A jegy nem található vagy már validálva lett",
+        "type" : "error",
+        "errorCode" : 400
+    },
+    "040": {
+        "message" : "Sikeres visszaváltás",
+        "type" : "successful",
+        "responseCode" : 200
     }
 }

@@ -15,3 +15,7 @@
     justify-items: center;
     justify-content: center;
   }
+
+.map-container {
+    transition: transform 0.3s ease-in-out; /* Adjust duration and easing as needed */
+  }
