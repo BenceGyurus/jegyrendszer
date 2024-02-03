@@ -14,12 +14,13 @@ type typeOfEventListParams = {
     selectAllFunction : Function
 }
 
+const generateDate = (date:string)=>{
+    let d = new Date(date);
+    return `${d.getFullYear()}.${d.getMonth()+1 > 9 ? d.getMonth()+1 : `0${d.getMonth()+1}`}.${d.getDate() > 9 ? d.getDate() : `0${d.getDate()}`}. ${d.getHours() > 9 ? d.getHours() : `0${d.getHours()}`}:${d.getMinutes() > 9 ? d.getMinutes() : `0${d.getMinutes()}`}`
+}
+
 const EventList = ({events, onClick, selectAllFunction}:typeOfEventListParams)=>{
 
-    const generateDate = (date:string)=>{
-        let d = new Date(date);
-        return `${d.getFullYear()}.${d.getMonth()+1>9 ? d.getMonth()+1 : `0${d.getMonth()+1}`}.${d.getDate()>9 ? d.getDate() : `0${d.getDate()}`}`
-    }
 
     return <div><ul className = "admin-ref-events">
         {events.map((event)=>{

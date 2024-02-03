@@ -5,6 +5,8 @@ import { useState } from "react";
 import Button from "../../../buttons/button.component";
 import postData from "../../../connection/request";
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
+import Window from "../../../window/window.component";
+import IsMoneyTag from "../referals/isMoneyTag.component";
 
 type typeOfAddNewLocalDiscountWindowParams = {
     closeWindowFunction : Function,
@@ -32,16 +34,12 @@ const AddNewLocalDiscountWindow = ({closeWindowFunction, nameOfDiscount, amountO
 
     }
 
-    return <div className = "new-coupon-window">
-        <WindowHeader title = "Új kedvezmény létrehozása" closeWindowFunction={closeWindowFunction} />
+    return <Window title = "Kedvezmény" closeFunction={closeWindowFunction}>
         <InputText value={name} onChangeFunction={setName} title="Kedvezmény neve" />
-        <div className = "discountType">
-            <span className = {`typeOfDiscount procent${!typeOfDiscount ? " selected-type" : ""}`} onClick={e=>setTypeOfDiscount(false)}>%</span>
-            <span className = {`typeOfDiscount cash${typeOfDiscount ? " selected-type" : ""}`} onClick={e=>setTypeOfDiscount(true)}>Ft</span>
-        </div>
+        <IsMoneyTag typeOfDiscount = {typeOfDiscount} onChangeFunction={setTypeOfDiscount} />
         <InputNumber value={amount} onChangeFunction={setAmount} title = "Kedvezmény mértéke" />
         <Button title="Mentés" onClickFunction={save} />
-    </div>
+        </Window>
 }
 
 export default AddNewLocalDiscountWindow;

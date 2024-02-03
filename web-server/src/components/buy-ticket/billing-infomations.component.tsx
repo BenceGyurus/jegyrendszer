@@ -1,5 +1,5 @@
 import "../../css/billing-informations.css";
-
+import { Radio } from 'antd';
 
 type typeOfBillngInformationsParams = {
     firstname : String,
@@ -10,7 +10,9 @@ type typeOfBillngInformationsParams = {
     address2? : string,
     tax? : string,
     mail : string,
-    phone : string
+    phone : string,
+    isCompany : boolean,
+    setIsCompany : Function
 }
 
 const BillingInformations = ({firstname, lastname, zip, city, address, address2, tax, mail, phone}:typeOfBillngInformationsParams)=>{

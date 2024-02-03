@@ -1,10 +1,19 @@
 .datas-of-customer{
+    align-items: center;
+    align-content: center;
     margin: 20px;
     padding: 10px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     background-color: #f5f5f5;
     border-radius: 4px;
     padding: 20px;
+    transition: .4s;
+}
+
+#city-div{
+    width: 62.5%;
+    display: inline-table;
+    margin-left: 2.5%;
 }
 
 @media screen and (width > 1000px) {
@@ -19,6 +28,9 @@
     .datas-of-customer input[type = "email"]{
         margin: 4px 0;
         width: 80%;
+    }
+        #city-div{
+        width: 42.5%;
     }
 }
 
@@ -66,14 +78,13 @@
     width: 100%;
 }
 
-#city-div{
-    width: 60%;
-    display: inline-table;
-    margin-left: 2.5%;
-}
-
 .postal-code-and-city-div{
     width: 45%;
     height: 40px;
     display: inline-table;
+}
+
+
+.is-company-option{
+    margin-bottom: 20px;
 }

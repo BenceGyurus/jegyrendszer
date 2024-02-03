@@ -70,6 +70,7 @@ const BuyTicketMainPage = ()=>{
     const [fetching, setfetching] = useState(false);
     const [step, setStep] = useState(1);
     const [link, setLink] = useState("");
+    const [isCompany, setIsCompany] = useState<boolean>(false);
     const [ticketDatas, setTicketDatas]:[typeOfTicketDatas, Function] = useState({
         eventId : "", 
         tickets : [], 
@@ -161,11 +162,11 @@ const BuyTicketMainPage = ()=>{
         <Error message={error} setOpen={()=>{setError("")}} open = {error != ""} />
         <div style={{margin : 10}}><BuyingStepper active = {step} /></div>
         { step == 1 ? <div><h1>Adatok megadása</h1>
-        <DatasOfCustomer setFirstName={setFirstname} setLastName={setLastname} setPostalCode={setPostCode} setCity={setCity} setAddress={setAddress} setAddress2={setAddress2} setMail={setMail} setPhone={setPhone} setTaxNumber={setTaxNumber} city = {city} firstName={firstname} lastName={lastname} zip = {postCode} tax={taxNumber} mail={mail} phone = {phone} address={address} address2={address2} setInvoiceName={()=>{}} sameInvoiceData={sameInvoiceData} setSameInvoiceData = {setSameInvoiceData} />
+        <DatasOfCustomer isCompany = {isCompany} setIsCompany={setIsCompany} setFirstName={setFirstname} setLastName={setLastname} setPostalCode={setPostCode} setCity={setCity} setAddress={setAddress} setAddress2={setAddress2} setMail={setMail} setPhone={setPhone} setTaxNumber={setTaxNumber} city = {city} firstName={firstname} lastName={lastname} zip = {postCode} tax={taxNumber} mail={mail} phone = {phone} address={address} address2={address2} setInvoiceName={()=>{}} sameInvoiceData={sameInvoiceData} setSameInvoiceData = {setSameInvoiceData} />
         <div className = "deitals">
         {ticketDatas.eventId ? <Details tickets = {ticketDatas.tickets} fullPrice={ticketDatas.fullPrice} nameOfEvent={ticketDatas.eventName} coupon={usedCoupon} /> : <Details />}
         <Coupon onClickFunction={useRefCode} changeReferalCode={setReferalCode} value = {referalCode} />
-        <PaymentMethods methods={[{id : "simple-pay", image : "/images/logos/simple_pay.png"}]} onChangeFunction={()=>{}} />
+        
         <div className = "button-grid"><LoadingButton
           size="small"
           onClick={sendDatas}
@@ -180,7 +181,7 @@ const BuyTicketMainPage = ()=>{
             <h1>Adatok ellenőrzése</h1>
             <h2>Jegy adatai</h2>
             <div className="deitals">{ticketDatas.eventId ? <Details tickets = {ticketDatas.tickets} fullPrice={ticketDatas.fullPrice} nameOfEvent={ticketDatas.eventName} coupon={usedCoupon} /> : <Loader />}</div>
-            <div className="deitals"><BillingInformations firstname={firstname} lastname={lastname} zip={postCode} city={city} address={address} address2 = {address2 == "null" ? undefined : address2} tax={taxNumber == "null" ? undefined : taxNumber} phone={phone} mail={mail} /></div>
+            <div className="deitals"><BillingInformations isCompany = {isCompany} setIsCompany={setIsCompany} firstname={firstname} lastname={lastname} zip={postCode} city={city} address={address} address2 = {address2 == "null" ? undefined : address2} tax={taxNumber == "null" ? undefined : taxNumber} phone={phone} mail={mail} /></div>
             <LoadingButton
           size="small"
           onClick={pay}

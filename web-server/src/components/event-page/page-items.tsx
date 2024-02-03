@@ -60,7 +60,6 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
             {window.innerWidth >= 700 ? <div className = "image-gradient-top"></div> : ""}
             <div className = "image-gradient-bottom"></div>
             </div>
-            <Share />
             <button className="buy-ticket-button" onClick={e=>scroll()}>
             Jegyvásárlás
             </button>

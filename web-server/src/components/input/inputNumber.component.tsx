@@ -27,7 +27,7 @@ const InputNumber = ({ title,onChangeFunction,value,disabled,functionParams, mon
         <div className="input-container">
         <div>
             {title ? <label htmlFor={id} className = "inputLabel">{title}</label> : <></>}
-            <Input size = {size ? size : "large"} ref={numberInputRef} disabled = {disabled} type='number' placeholder={title} addonAfter = {money ? "Ft" : sufix ? sufix : ""} onChange={e => {onChangeFunction(e.target.value)}} value={value} suffix={info && info.text ? 
+            <Input size = {size ? size : "large"} ref={numberInputRef} disabled = {disabled} type='number' placeholder={title} addonAfter = {money ? "Ft" : sufix ? sufix : ""} onChange={e => {onChangeFunction(Number(e.target.value))}} value={value} suffix={info && info.text ? 
             <Tooltip title={info.text} zIndex={9999999}>
               <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
             </Tooltip> : ""

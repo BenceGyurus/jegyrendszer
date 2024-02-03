@@ -192,6 +192,7 @@ const TicketMonitor = ()=>{
         return isFull
     }
 
+    console.log(ads, adsList);
 
     controlTickets()
     //`linear-gradient(45deg, ${topBackgroundColor}, ${topBackgroundColorRight}, ${bottomBackgroundColor}, ${bottomBackgroundColorRight})`
@@ -202,7 +203,7 @@ const TicketMonitor = ()=>{
         </div> : ""}
         <ConnectionStatus connected = {connectionStatus} connecting = {connecting} />   
         {error403 ?  <Result status="403" title="403" subTitle="Hibás azonosítás" extra={<Button type="primary">Vissza főoldalra</Button>}/> : ""}
-        {event && selected && venue ? <DisplayVenue venueId={venue.venueId} eventId={venue.eventId}aTickets={venue.tickets} selectEvent={selectSeat} selected={selected} /> : event && selected && !venue ? <EventPage event={event} />: ads  ? <></> : <Ads />}
+        {event && selected && venue ? <DisplayVenue venueId={venue.venueId} eventId={venue.eventId}aTickets={venue.tickets} selectEvent={selectSeat} selected={selected} /> : event && selected && !venue ? <EventPage event={event} /> : ads  ? <Ads ads={adsList} /> : <></>}
         { venue ? <button onClick={e=>ready()} className = {`ready-button ${venue && venue.tickets && !controlTickets() ? " disabled-ready-button" : ""}`} disabled = {venue && venue.tickets && !controlTickets()} >Kész</button> : <></>} 
     </div>
 

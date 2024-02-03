@@ -68,11 +68,13 @@ const Admin = (params:any)=>{
         <Content>
         <Layout style={{ background: colorBgContainer, borderRadius : 10, zIndex: 2 }}>
           <Sider style={{ background: colorBgContainer }} width={250}>
-          <Menu
+          {access ? <Menu
+          expandIcon = {<i className="fas fa-bars"></i>}
+          inlineCollapsed = {true}
           style={{ width: 250, minHeight : "calc( 100vh - 80px )", maxHeight : "calc( 100vh - 80px )", overflow : "auto" }}
           mode="inline"
           items={createItems()}
-          />
+          /> : <AccessSkeletons />}
           </Sider>
             <Content style={{minHeight: "calc( 100vh - 80px )", maxHeight : "calc( 100vh - 80px )", position: "relative", overflow : "auto", padding : "10px" }}>
             <AdminUserComponent />

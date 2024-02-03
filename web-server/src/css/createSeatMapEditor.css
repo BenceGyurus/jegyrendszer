@@ -5,7 +5,7 @@
 }
 
 .create-seat-map-editor-container{
-    height: calc( 100vh - 80px );
+    height: calc( 100vh - 170px );
     overflow-y: auto;
     overflow-x: hidden;
     padding-left: 5px;

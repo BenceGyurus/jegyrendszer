@@ -20,13 +20,14 @@
 }
 
 .event-map-border-radius{
-  width: 90%;
+  width: 85%;
   height: 200px;
   overflow: hidden;
   border-radius: 0px;
   margin: 5px auto 20px auto;
   justify-content: center;
   border-radius: 20px;
+  margin-bottom: 40px;
 }
 
 .location-icon{

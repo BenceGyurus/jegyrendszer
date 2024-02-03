@@ -5,6 +5,7 @@ import Button from "../../../buttons/button.component";
 import { useState } from "react";
 import postData from "../../../connection/request";
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
+import Window from "../../../window/window.component";
 
 type typeOfAddCompanyParams = {
     closeWindowFunction : Function,
@@ -41,15 +42,12 @@ const AddCompany = ({ closeWindowFunction, errorFunction, updateFunction, nameOf
     }
 
     return (
-    <div className = "add-company-window">
-        <WindowHeader closeWindowFunction={closeWindowFunction} title = "Vállalatok hozzáadása" />
-        <div className = "add-company-window-data">
+        <Window closeFunction={closeWindowFunction} title = "Vállalatok hozzáadása">
             <InputText value={name} onChangeFunction={setName} title = "Vállalat neve" />
             <InputText value={taxNumber} onChangeFunction={setTaxNumber} title = "Vállalat adószáma" />
             <InputText value ={webSite} onChangeFunction={setWebSite} title = "Weboldal (pl.: http://agorasavaria.hu)" />
             <Button title = "Mentés" onClickFunction={save} />
-        </div>
-    </div>
+        </Window>
     )
 };
 

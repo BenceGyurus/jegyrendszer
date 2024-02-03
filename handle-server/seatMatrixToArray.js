@@ -1,4 +1,4 @@
-const seatMatrixToArray = (seats)=>{
+const seatMatrixToArray = (seats, stages)=>{
     let min = {x : false, y : false};
     let seatsArray = [];
     seats.forEach(groups => {
@@ -11,11 +11,21 @@ const seatMatrixToArray = (seats)=>{
             });
         })
     });
+    if (stages && stages.length){
+        stages.forEach(stage=>{
+            if ((!min.x && min.x!==0) || stage.x < min.x) min.x = stage.x;
+            if ((!min.y && min.y!==0) || stage.y < min.y) min.y = stage.y;
+        });
+        stages.forEach(stage=>{
+            stage.x -= min.x;
+            stage.y -= min.y;
+        })
+    }
     seatsArray.forEach(seat=>{
         seat.x -= min.x;
-        seat.y -= min.y
+        seat.y -= min.y;
     });
-    return seatsArray;
+    return {seats : seatsArray, stages : stages};
 }
 
 module.exports = seatMatrixToArray;

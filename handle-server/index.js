@@ -50,7 +50,7 @@ const shortid = require('shortid');
 const controlCreatedSeats = require('./control/controlCreatedSeats.js');
 const seatMatrixToArray = require("./seatMatrixToArray.js");
 var cookieParser = require('cookie-parser')
-var redisOptions = {port: 6379, host: 'redis', username: 'default', password: process.env.REDIS_PASS, db: 0}
+var redisOptions = {port: 6379, host: '192.168.1.83', username: 'default', password: process.env.REDIS_PASS, db: 0}
 if (process.env.NODE_ENV == 'production') redisOptions = {port: 6379, host: 'jegyrendszer-redis-headless', username: 'default', password: process.env.REDIS_PASS, db: 0};
 const redis = new Redis(redisOptions);
 const readFromRedisCache = async (key) => {
@@ -346,7 +346,9 @@ app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), asy
         closeConnection(database);
         let sectors = venue.content.seats;
         if (venue && venue.content.seats){
-            venue.content.seats = seatMatrixToArray(venue.content.seats);
+            let {stages, seats} = seatMatrixToArray(venue.content.seats, venue.content.stages);
+            venue.content.stages = stages;
+            venue.content.seats = seats;
         } 
         else if (!venue){
             return handleError(logger, "035", res);
@@ -372,22 +374,7 @@ app.get("/api/v1/venue/:id", (req,res,next)=>parseBodyMiddleeware(req,next), asy
             return handleError(logger, "400", res);
             
         }
-        /*
-            if (Object.keys(place).length){
-                placesOfEvent = [];
-                place = {sizeOfArea : place.content.sizeOfArea, background : place.content.background, sizeOfSeat : place.content.sizeOfSeat, colorOfBackGround : place.content.colorOfBackGround, colorOfSeat : place.content.colorOfSeat, seatsDatas : place.content.seatsDatas, stage : place.content.stage};
-                for (let i = 0; i < event.tickets.length; i++){
-                    for (let j = 0; j < event.tickets[i].seats.length; j++){
-                        for (let k = 0; k < place.seatsDatas.length; k++){
-                            if (place.seatsDatas[k].id == event.tickets[i].seats[j]){
-                                placesOfEvent.push(place.seatsDatas[k]);
-                            }
-                        }
-                    }
-                }
-            }else logger.warn(`Place not found with id ${event.venue}`)
-            place.seatsDatas = placesOfEvent;
-        */
+
     }
     return handleError(logger, "400", res);
 });
@@ -984,9 +971,11 @@ app.post("/api/v1/venues", async (req,res)=>{
             }
             let sendDatas = [];
             for (let i = 0; i < datas.length; i++){
+                let {stages, seats} = seatMatrixToArray(datas[i].content.seats, datas[i].content.stages);
                 sendDatas.push({
                     name : datas[i].content.name,
-                    seats : seatMatrixToArray(datas[i].content.seats),
+                    seats : seats,
+                    stages : stages,
                     seatsDatas : datas[i].content.seatsDatas,
                     colorOfBackGround : datas[i].content.colorOfBackGround,
                     id : datas[i]._id,
@@ -1259,7 +1248,7 @@ app.post("/api/v1/get-all-event", async (req,res)=>{
                     all_Events[i]?.eventData.users.includes(userId) ? sendList.push({name : all_Events[i].eventData.name, id : all_Events[i].eventData.readable_event_name, eventDate : all_Events[i].eventData.objectDateOfEvent}) : false;
                 }
             }
-            res.send({events : sendńList});
+            res.send({events : sendList});
             closeConnection(database);
             return;
         } else return handleError(logger, "004", res);
@@ -1451,14 +1440,12 @@ app.post("/api/v1/get-coupons", async (req,res)=>{
         let access = await control_Token(body.token, req);
         if (access && access.includes("ref")){
             let {collection, database} = new Database("coupons");
-            let sendDatas = [];
-            let datas = await collection.find().toArray();
+            let sendDatas = await collection.find().toArray();
             if(!datas){
                 logger.error(`Failed to read db coupons`);
                 closeConnection(database);
                 return handleError(logger, "500", res);
             }
-            datas.forEach(element => new Date(element.validity).getTime() >= new Date().getTime() ? sendDatas.push(element) : false);
             res.send({coupons : sendDatas});
             closeConnection(database);
             return;
@@ -2145,9 +2132,12 @@ io.on("connection",(socket)=>{
         //let result = await collection.updateOne({ id : payload.token, used : false, disconnected : false }, { $set : { used : true, connected : new Date().getTime(), socketId : socket.id} });
         closeConnection(database);
         if (result.insertedId){
+            let adsDatabase = new Database("ads"); 
+            let ads = await adsDatabase.collection.find({}, {projection : {_id : 1, website : 1, name : 1, src : 1, type : 1}}).toArray();
+            closeConnection(adsDatabase.database);
             socket.join(`${socket.id}-M`);
             socket.emit("connection-status", {error : result.insertedId == "", id : result.insertedId, connected : result.insertedId != "", connectedMonitor : false});
-            socket.emit("ads", {ads : true, adsList : []});
+            socket.emit("ads", {ads : true, adsList : ads ? ads : []});
         }
     });
 

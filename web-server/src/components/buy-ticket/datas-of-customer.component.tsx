@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Input } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import PhoneInput from "antd-phone-input";
+import { Radio } from 'antd';
 
 
 type typeOfDatasOfCustormerParams = {
@@ -29,10 +30,12 @@ type typeOfDatasOfCustormerParams = {
     phone : string,
     setInvoiceName : Function,
     sameInvoiceData : boolean,
-    setSameInvoiceData : Function
+    setSameInvoiceData : Function,
+    isCompany : boolean,
+    setIsCompany : Function
 }
 
-const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, setAddress, setAddress2, setTaxNumber, setMail, setPhone, city, firstName, lastName, zip, address, address2, tax, mail, phone, setInvoiceName, sameInvoiceData, setSameInvoiceData}:typeOfDatasOfCustormerParams)=>{
+const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, setAddress, setAddress2, setTaxNumber, setMail, setPhone, city, firstName, lastName, zip, address, address2, tax, mail, phone, setInvoiceName, sameInvoiceData, setSameInvoiceData, isCompany, setIsCompany}:typeOfDatasOfCustormerParams)=>{
 
     const getCity = (zipcode:string)=>{
         if (zipcode){
@@ -49,14 +52,22 @@ const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, set
 
 
     return <div className = "datas-of-customer">
+        <div className = "is-company-option">
+        <Radio.Group optionType="button" options={[{ label: 'Magánszemély', value: false }, { label: 'Cég', value: true }]} onChange={e=>setIsCompany(e.target.value)} value={isCompany} />
+        </div>
         <h2>Számlázási adatok:</h2>
-        <label htmlFor="lastName">Vezetéknév</label>
+        { !isCompany ? <div><label htmlFor="lastName">Vezetéknév</label>
         <br />
         <Input className = "input" size="large" type="text" id = "lastName" defaultValue={firstName} onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
         <br />
         <label htmlFor="firstname">Keresznév</label>
         <br />
         <Input size="large" type="text" id = "firstname" defaultValue={lastName} onChange={e=>setLastName(e.target.value)} autoComplete="given-name" />
+        </div> :
+         (<div><label htmlFor="lastName">Név</label>
+         <br />
+         <Input className = "input" size="large" type="text" id = "lastName" defaultValue={firstName} onChange={e=>{setFirstName(e.target.value)}} autoComplete="family-name" />
+         <br /></div>)}
         <div className = "customer-data-component">
             <h3>Számlázási cím</h3>
             <div className = "post-code-and-city">
@@ -77,9 +88,11 @@ const DatasOfCustomer = ({setFirstName, setLastName, setPostalCode, setCity, set
             <br />
             <Input size="large" type="text" id = "address2" defaultValue={address2} onChange={e=>{setAddress2(e.target.value)}}/>
         </div>
-        <label htmlFor="tax-number">Adószám (magánszemélynek nem kötelező)</label>
+       {isCompany ? <div><label htmlFor="tax-number">Adószám (magánszemélynek nem kötelező)</label>
         <br />
         <Input size="large" type="text" id = "tax-number" defaultValue={tax} onChange={e=>{setTaxNumber(e.target.value)}}/>
+        </div>
+        : <></>}
         <div className = "contact customer-data-component">
             <h3>Kapcsolattartás</h3>
             <label htmlFor="email">E-mail cím</label>

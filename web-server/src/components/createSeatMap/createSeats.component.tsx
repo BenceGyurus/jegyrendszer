@@ -240,11 +240,11 @@ const CreateSeats = ({inSeats, inStages, inStatus, inBackground, inName, inIsSec
                     newSeats.push({sector : seatGroup.sector, seats : s});
                     newSeats[newSeats.length-1].sector.direction = direction;
                 }
-                else if (direction === "bottom" && (seatGroup.sector.direction === "left" || seatGroup.sector.direction === "right")){
+                else if ((seatGroup.sector.direction === "left" || seatGroup.sector.direction === "right")){
                     if (seatGroup.sector.rotated-90===0) seatGroup.sector.rotated = 0; else seatGroup.sector.rotated+= -90;
                     newSeats.push({sector : seatGroup.sector, seats : (seatGroup.sector.rotated%270===0 && seatGroup.sector.rotated%540!==0 || seatGroup.sector.rotated%360===0) ? rotateSeatsToRight(seatGroup.seats, seatGroup.sector) : rotateSeatsToLeft(seatGroup.seats, seatGroup.sector)});
                 }
-                else if (direction === "top" && (seatGroup.sector.direction === "left" || seatGroup.sector.direction === "right")){
+                else if ((seatGroup.sector.direction === "left" || seatGroup.sector.direction === "right")){
                     if (seatGroup.sector.rotated+90===360) seatGroup.sector.rotated = 0; else seatGroup.sector.rotated+= 90;
                     newSeats.push({sector : seatGroup.sector, seats : (seatGroup.sector.rotated%90===0 && seatGroup.sector.rotated%180!==0) ? rotateSeatsToLeft(seatGroup.seats, seatGroup.sector) : rotateSeatsToRight(seatGroup.seats, seatGroup.sector)});
                 }

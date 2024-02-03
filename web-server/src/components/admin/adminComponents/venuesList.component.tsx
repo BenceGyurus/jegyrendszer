@@ -7,6 +7,8 @@ import { Card, Tag } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import StringAvatar from "../../avatar/avatar.component";
 import Meta from "antd/es/card/Meta";
+import EventSkeleton from "../operation/events/components/event_Skeleton.component";
+import { Skeleton } from "@mui/material";
 
 type typeOfSeats = {
     name : string,
@@ -62,8 +64,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
     }
     
 
-    return(<div className = "venue-list"> {venues.map((element, index)=>{
-        console.log(element);
+    return(<div className = "venue-list"> {venues.length ? venues.map((element, index)=>{
         return (
             <Card bordered = {true} cover = {
               element.seats.length ? <SmallMap sizeOfArea={getSizeOfArea(element.seats)} colorOfBackGround = {element.colorOfBackGround} sizeOfSeats = {element.sizeOfSeat} colorOfSeat = {element.colorOfSeat} seatDatas = {element.seats} /> : <img className = "card-logo" src="/images/logo.png" alt="agora logo" />
@@ -82,7 +83,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
                 </div>
             </div>
             </Card>
-        );})}
+        );}) : <Skeleton height={500} style={{marginTop: 0}}></Skeleton>}
         </div>)
 }
 export default VenueList;

@@ -4,6 +4,7 @@ import Loader from '../loader/loader.component';
 import "../../css/seat-engine.css";
 import { Spin } from 'antd';
 import { MapInteractionCSS } from "react-map-interaction";
+import typeOfStage from './types/typeOfStage';
 
 type typeOfSeatPostions = {
   x : number,
@@ -62,7 +63,8 @@ type typeOfSeatVisualizationParams = {
     selectedSeats : Array<string>,
     selectFunction : Function,
     sizeOfScale? : number,
-    disabled? : boolean
+    disabled? : boolean,
+    stages? : Array<typeOfStage>
 }
 
 
@@ -206,12 +208,11 @@ const getMinMaxCoordinatesByGroup = (dataArray: typeOfSeat[]) => {
     }
   }
 
-  console.log(state);
 
   const handleSeatClick = (x:number, y:number) => {
     console.log(x,y, state.scale);
     if (!disabled){
-      let sizeOfGroups:any = (getMinMaxCoordinatesByGroup(seatPositions));
+      //let sizeOfGroups:any = (getMinMaxCoordinatesByGroup(seatPositions));
     const clickedSeat = seatPositions.find((seat:any) => seat && seat.x <= x && (x) <= seat.x+(seat.size.width) && seat.y <= (y) && (y) <= seat.y+seat.size.height);
     if (clickedSeat){
       //controlZoom(sizeOfGroups[clickedSeat.group])

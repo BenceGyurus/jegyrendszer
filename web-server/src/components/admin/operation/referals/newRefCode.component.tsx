@@ -9,6 +9,9 @@ import InputNumber from "../../../input/inputNumber.component";
 import Calendar from "../../../calendar/calendar.component";
 import Button from "../../../buttons/button.component";
 import WindowHeader from "../../../window-header/windowHeader.component";
+import postDataJson from "../../../connection/postDataJson";
+import Window from "../../../window/window.component";
+import IsMoneyTag from "./isMoneyTag.component";
 
 type typeOfEvents = {
     name : string,
@@ -63,7 +66,7 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
     }
 
     useEffect(()=>{
-        postData("/get-all-event", {token : ParseLocalStorage("long_token")})
+        postDataJson("/get-all-event", {token : ParseLocalStorage("long_token")})
         .then(response=>{
             if (response.events){
                 let pushEvents = [];
@@ -100,32 +103,29 @@ const AddNewRefCode = ({closeFunction, gotEvents, name, tofDiscound, amount, val
             events : useEvents
         }
         if (eventId){
-            postData(`/edit-coupon/${eventId}`, {token: ParseLocalStorage("long_token"), datas : sendData})
+            postDataJson(`/edit-coupon/${eventId}`, {token: ParseLocalStorage("long_token"), datas : sendData})
             .then(response=> {if (response.error){};refresh();});
         }
         else{
-            postData("/new-coupon", {token: ParseLocalStorage("long_token"), datas : sendData})
+            postDataJson("/new-coupon", {token: ParseLocalStorage("long_token"), datas : sendData})
             .then(response=> {refresh()});
         }
 
         closeFunction();
     }
 
-    return (<div className = "new-coupon-window">
-        <WindowHeader closeWindowFunction={closeFunction} title = "Új kupon létrehozása"  className = "new-ref-code-window-header"/>
+    return (
+        <Window closeFunction={closeFunction} title = "Új kupon létrehozása">
         <h3>Új létrehozása</h3>
         <InputText title="Kuponkód" onChangeFunction={setNameOfCoupon} value = {refName} />
         <h3>Események kiválasztása</h3>
         {events.length ? <EventList events={events} onClick = {selectEvents} selectAllFunction = {selectAllEvents} /> : ""}
         <Select value = {typeOfCoupon} onChangeFunction={setTypeOfCoupon} options = {[{title : "Korlátlanul felhasználható", value : "0"}, {title : "Egy eseményhez egyszer használható", value : "1"}, {title : "Csak egyszer használható", value : "2"}]} title = "Felhasználás" />
-        <div className = "discountType">
-            <span className = {`typeOfDiscount procent${!typeOfDiscount ? " selected-type" : ""}`} onClick={e=>setTypeOfDiscount(false)}>%</span>
-            <span className = {`typeOfDiscount cash${typeOfDiscount ? " selected-type" : ""}`} onClick={e=>setTypeOfDiscount(true)}>Ft</span>
-        </div>
+        <IsMoneyTag typeOfDiscount = {typeOfDiscount} onChangeFunction={setTypeOfDiscount} />
         <InputNumber sufix={typeOfDiscount ? "Ft" : "%"} title = "Kedvezmény mértéke" onChangeFunction={changeAmountOfDiscount} value={amountOfDiscount} />
         <Calendar title = "Érvényességi ideje" onChangeFunction={setValidity} value = {validity} />
         <Button onClickFunction={saveFunction} title = "Létrehozás" />
-    </div>);
+        </Window>);
 }
 
 export default AddNewRefCode;

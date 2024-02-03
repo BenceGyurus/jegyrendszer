@@ -4,21 +4,13 @@ import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 import Media from "../media/media.component";
 import "../../css/monitor-ads.css";
 import QR from "../qrCode/qrCode.component";
+import typeOfAdsParams from "./types/typeOfAdsParams";
 
-const Ads = ()=>{
 
-    const [ads, setAds]:[any, Function] = useState();
+const Ads = ({ads}:typeOfAdsParams)=>{
+
     const [index, setIndex] = useState(0);
     const [intervalVar, setIntervalVar]:[any, Function] = useState();
-
-    useEffect(()=>{
-        postData("/ads", {token : ParseLocalStorage("long_token")})
-        .then(response=>{
-            if (response && response.ads){
-                setAds(response.ads);
-            }
-        })
-    }, []);
 
     useEffect(()=>{
         if (intervalVar) clearInterval(intervalVar);
@@ -27,11 +19,10 @@ const Ads = ()=>{
         }, 15000));
     }, [ads, index]);
 
-    console.log(index);
-
     return <div>
         <div className = "qr-codes-left">
             <QR url="https://www.facebook.com/agora.savaria" color = "black" icon = "/images/logos/facebook-logo.png" size = {150} />
+            {ads && ads[index] && ads[index]?.website ? <QR url={ads[index].website} color = "black" size = {150} /> : <></>}
         </div>
         { ads && ads.length ? <Media file = {ads[index].src} autoPlay = {true} loop = {true} controls = {false}  /> : ""}
     </div>;

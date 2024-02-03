@@ -11,5 +11,5 @@
     "edit-aszf" : ["ÁSZF szerkesztése", "admin/edit-aszf", "far fa-edit"],
     "edit-letter" : ["Email szerkesztése", "admin/edit-email", "far fa-envelope"],
     "local-discount" : ["Helyi kedvezmények", "admin/helyi-kedvezmenyek", "fas fa-street-view"],
-    "monitor" : ["Jegy monitor", "admin/monitor", "fas fa-tv"]
+    "monitor" : ["Hirdetések", "admin/monitor", "fas fa-tv"]
 }
