@@ -137,7 +137,6 @@ app.get("/api/v1/events", async (req,res,next)=>{await statsMiddleware(req,res,n
             let sendDatas = [];
             let cache = true;
             let cacheTime = getTime("CACHE_TIME")
-            console.log(datas);
             for (let i = 0; i < datas.length; i++){
                 if (datas[i].eventData.objectDateOfRelease.getTime() <= new Date().getTime() && datas[i].eventData.objectDateOfEvent.getTime() >= new Date().getTime()){
                     let companyId = datas[i].eventData.company;
