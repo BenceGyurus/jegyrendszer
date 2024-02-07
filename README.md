@@ -1,6 +1,8 @@
 # API Documentaion
 ## Open API
 ### Events:
+`GET`
+
 ```api/v1/events```
 ```[
     {
@@ -36,19 +38,21 @@
 | key  | type | desciption |
 | ------------- | ------------- | ------------- |
 | id  | `string`  | esemény id-ja |
-| date  | `string`  | esemény kezdetének időpontja e.g "2024-05-05T15:00" | 
-| description  | `string`  | esemény leírása | 
-| imageName  | `string`  | az esemény borítójának az url-e | 
-| address  | `string`  | az esemény helyszínének a címe | 
-| location  | `string`  | az esemény helyszínének a neve pl. AGORA MSH | 
-| position  | `{ lat : number, lng : number }`  | az esemény helyszínének a koordinátája | 
-| end  | `string`  | esemény vége | 
-| organiser  | `{ name : string, website : string }`  | az esemény szervezője | 
-| performer  | `{ name : string, isGroupPerformer : string }`  | az eseény szereplő(i) | 
-| tickets  | `Array<{ name : string, price : number }>`  | megvásárolható jegyek az eseményhez | 
+| date  | `string`  | esemény kezdetének időpontja e.g "2024-05-05T15:00" |
+| description  | `string`  | esemény leírása |
+| imageName  | `string`  | az esemény borítójának az url-e |
+| address  | `string`  | az esemény helyszínének a címe |
+| location  | `string`  | az esemény helyszínének a neve pl. AGORA MSH |
+| position  | `{ lat : number, lng : number }`  | az esemény helyszínének a koordinátája |
+| end  | `string`  | esemény vége |
+| organiser  | `{ name : string, website : string }`  | az esemény szervezője |
+| performer  | `{ name : string, isGroupPerformer : string }`  | az eseény szereplő(i) |
+| tickets  | `Array<{ name : string, price : number }>`  | megvásárolható jegyek az eseményhez |
 
 ### Event
-`/api/v1/event/:id`
+`GET`
+
+`/api/v1/event/:readable-id`
 ```
 {
     media : {
@@ -63,7 +67,7 @@
     description : string,
     date : Date,
     location : string,
-    position : { 
+    position : {
         lat : number
         lng : number
     },
@@ -75,12 +79,48 @@
 | key  | type | desciption |
 | ------------- | ------------- | ------------- |
 | media  | `{ spotify? : string, youtube? : string, facebook? : string, apple_music? : string }`  | esemény média platformjai |
-| date  | `string`  | esemény kezdetének időpontja e.g "2024-05-05T15:00" | 
-| description  | `string`  | esemény leírása | 
-| background  | `string`  | az esemény borítójának az url-e | 
-| address  | `string`  | az esemény helyszínének a címe | 
-| location  | `string`  | az esemény helyszínének a neve pl. AGORA MSH | 
-| position  | `{ lat : number, lng : number }`  | az esemény helyszínének a koordinátája | 
-| id  | `string`  | esemény azonosítója | 
-| title  | `string`  | az esemény neve | 
+| date  | `string`  | esemény kezdetének időpontja e.g "2024-05-05T15:00" |
+| description  | `string`  | esemény leírása |
+| background  | `string`  | az esemény borítójának az url-e |
+| address  | `string`  | az esemény helyszínének a címe |
+| location  | `string`  | az esemény helyszínének a neve pl. AGORA MSH |
+| position  | `{ lat : number, lng : number }`  | az esemény helyszínének a koordinátája |
+| id  | `string`  | esemény azonosítója |
+| title  | `string`  | az esemény neve |
 | venue  | `string`  | terem azonosítója |
+
+### Tickets to the event
+
+`GET`
+
+
+`/api/v1/tickets/:readable-id`
+
+- Params:
+| name | value | description |
+| ------------- | ------------- | ------------- |
+| reserved | boolean | foglalt helyek |
+
+```
+Array<{
+    name : string,
+    price : number,
+    seats : Array<string> // ids of seats
+    numberOfTicket : number,
+    id : string,
+    pendingPlaces : Array<string>   // reserved == true
+    boughtPlaces : Array<string>
+    numberOfFreeTickets : number
+}>
+```
+
+| key | type | description |
+| ------------- | ------------- | ------------- |
+| name | `string` | jegy neve |
+| price | `number` | jegy ára |
+| seats | `Array [string]` | a jegyhez tartozó ülőhelyek id-ja |
+| numberOfTicket | `number` | az összes jegy száma |
+| id | `string` | jegy id-ja |
+| pendingPlaces | `Array [string]` | a vásárlás alatt álló ülőhelyek id-ja |
+| boughtPlaces | `Array [string]` | már megvásárolt ülőhelyek id-ja |
+| numberOfFreeTickets | `number` | megvásárolható jegyek száma |

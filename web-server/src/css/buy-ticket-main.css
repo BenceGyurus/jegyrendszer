@@ -1,30 +1,65 @@
-@media screen and (width > 1000px) {
-    .deitals{
-        width: 45%;
-        display: inline-table;
+@media screen and (width >= 1000px) {
+    .details-holder {
+        display: flex;
+        margin: 5px;
     }
-    .payingButton{
+    .payingButton {
         float: right;
         display: inline !important;
         margin: 10px !important;
     }
+    .details-1st-step {
+        max-width: 60%;
+    }
+    .first-step-details-holder {
+        width: 100%;
+        display: flex;
+    }
+    .button-grid {
+        display: flex;
+        width: 90%;
+        justify-content: flex-end;
+        margin: 10px auto;
+    }
+    .details {
+        width: 50%;
+    }
+    .details-1st-step {
+        width: 47%;
+        margin: 1.25%;
+    }
 }
 
-.payingButton{
+.payingButton {
     font-size: 15px;
-    margin: 10px auto;
+    margin: 30px;
     padding: 5px;
     outline: none;
     border: none;
-    display:  block;
+    display: block;
     cursor: pointer;
-    background: #3ad60f;
     display: block;
 }
 
+.paying-action-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
 @media screen and (width < 1000px) {
-    .button-grid{
-        width : max-content;
-        margin : 10px auto;
+    .details {
+        width: 90%;
+        margin: 10px auto;
+    }
+    .button-grid {
+        width: max-content;
+        margin: 10px auto;
+    }
+    .paying-action-buttons {
+        width: 80%;
+        display: flex;
+        justify-content: space-between;
+        margin: 20px auto;
     }
 }

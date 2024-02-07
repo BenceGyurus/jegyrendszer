@@ -1,6 +1,12 @@
 // const {WebClient} = require('@slack/web-api')
 
-const { Logger, createLogger, format, transport, transports } = require("winston");
+const {
+  Logger,
+  createLogger,
+  format,
+  transport,
+  transports,
+} = require("winston");
 const LokiTransport = require("winston-loki");
 
 // class Logger {
@@ -100,51 +106,48 @@ const LokiTransport = require("winston-loki");
 
 // module.exports = Logger;
 
-
-
 let logger;
 
-const initLocalLogger = ()=>{
-    logger = createLogger({
-        transports: [
-            new transports.Console({
-                format: format.combine(format.simple(), format.colorize())
-            })
-        ]
-    })   
-    console.log('Local logger is initialized');
-}
+const initLocalLogger = () => {
+  logger = createLogger({
+    transports: [
+      new transports.Console({
+        format: format.combine(format.simple(), format.colorize()),
+      }),
+    ],
+  });
+  console.log("Local logger is initialized");
+};
 const initLogger = () => {
-    if(logger) return;
+  if (logger) return;
 
-    if (process.env.NODE_ENV == 'production'){
-        try{
-        logger = createLogger({
-            transports: [
-                new LokiTransport({
-                    host: process.env.LOKI_URL,
-                    labels: {app: 'handle'},
-                    json: true,
-                    format: format.json(),
-                    replaceTimestamp: true,
-                    onConnectionError: (err) => console.error(err),
-                }),
-            ]
-        })
-        console.log('Remote logger is initialized');
-        }catch{
-            console.log("Remote logger couldn't be initialized")
-            initLocalLogger();
-        }
-    }else{
-        initLocalLogger();
+  if (process.env.NODE_ENV == "production") {
+    try {
+      logger = createLogger({
+        transports: [
+          new LokiTransport({
+            host: process.env.LOKI_URL,
+            labels: { app: "handle" },
+            json: true,
+            format: format.json(),
+            replaceTimestamp: true,
+            onConnectionError: (err) => console.error(err),
+          }),
+        ],
+      });
+      console.log("Remote logger is initialized");
+    } catch {
+      console.log("Remote logger couldn't be initialized");
+      initLocalLogger();
     }
-
-}
+  } else {
+    initLocalLogger();
+  }
+};
 
 const getLogger = () => {
-    initLogger();
-    return logger;
-}
+  initLogger();
+  return logger;
+};
 
 module.exports = getLogger;

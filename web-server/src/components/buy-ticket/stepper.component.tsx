@@ -1,30 +1,31 @@
-import Box from '@mui/material/Box';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
+import Box from "@mui/material/Box";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import Stepper from "@mui/material/Stepper";
 
 const steps = [
-    "Jegyek kiválasztása",
-    "Adatok megadása",
-    "Adatok ellenőrzése",
-    "Fizetés"
-]
+  "Jegyek kiválasztása",
+  "Adatok megadása",
+  "Adatok ellenőrzése",
+  "Fizetés",
+];
 
 type typeOfBuyingStepperParams = {
-    active : number
-}
+  active: number;
+};
 
-const BuyingStepper = ({active}:typeOfBuyingStepperParams)=>{
-
-    return <Box sx={{ width: '100%' }}>
-    <Stepper activeStep={active} alternativeLabel>
-      {steps.map((label, index) => (
-        <Step key={label} completed = {index < active}>
-          <StepLabel>{label}</StepLabel>
-        </Step>
+const BuyingStepper = ({ active }: typeOfBuyingStepperParams) => {
+  return (
+    <Box sx={{ width: "100%" }}>
+      <Stepper activeStep={active} alternativeLabel>
+        {steps.map((label, index) => (
+          <Step key={label} completed={index < active}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
         ))}
-    </Stepper>
-  </Box>
-}
+      </Stepper>
+    </Box>
+  );
+};
 
 export default BuyingStepper;

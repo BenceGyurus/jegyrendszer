@@ -16,10 +16,11 @@ type typeOfBuyButtonParams = {
     isSeats? : boolean,
     selectTicketsFunction : Function,
     shakeButton : boolean,
-    error : boolean
+    error : boolean,
+    isLoading? : boolean
 }
 
-const BuyButton = ({onClickFunction, amountOfTickets, tickets, otherInformationFunction, isSeats, selectTicketsFunction, shakeButton, error}:typeOfBuyButtonParams)=>{
+const BuyButton = ({onClickFunction, amountOfTickets, tickets, otherInformationFunction, isSeats, selectTicketsFunction, shakeButton, error, isLoading}:typeOfBuyButtonParams)=>{
     const [minSizeOfWindow, setMinSizeOfWindow] = useState(1000);
     const [visible, setIsVisible] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
@@ -52,7 +53,7 @@ const BuyButton = ({onClickFunction, amountOfTickets, tickets, otherInformationF
         </div>
         <div>
         {amountOfTickets && isSeats ? <Button className = {shakeButton ? `shake-buy-button` : ""} onClick={()=>selectTicketsFunction()} type = "primary" ><span className = "buying-button-other-informations">Jegyek kiválasztása</span></Button> : <Button onClick = {()=>{otherInformationFunction()}} size="middle" type="primary" className = "buying-button"><span className = "buying-button-other-informations">További információk</span></Button>}
-        <Button danger = {error} size="middle" className = "buying-button" disabled = {isDisabled} onClick={()=>onClickFunction()}>Vásárlás {amountOfTickets ? <span className = "buy-button-amount-of-tickets">{amountOfTickets}<span className = "buy-button-ticket-icon"><i className="fas fa-ticket-alt"></i></span></span> : <></>}</Button>
+        <Button loading = {isLoading} danger = {error} size="middle" className = "buying-button" disabled = {isDisabled} onClick={()=>onClickFunction()}>Vásárlás {amountOfTickets ? <span className = "buy-button-amount-of-tickets">{amountOfTickets}<span className = "buy-button-ticket-icon"><i className="fas fa-ticket-alt"></i></span></span> : <></>}</Button>
         </div>
     </div>)
 }

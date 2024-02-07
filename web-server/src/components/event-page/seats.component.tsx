@@ -3,6 +3,7 @@ import "../../css/selectTickets.css"
 import Stage from "./stage.component";
 import { useEffect, useState } from "react";
 import SeatVisualization from "../seat-visualization-engine/seats.component";
+import typeOfStage from "../seat-visualization-engine/types/typeOfStage";
 
 type typeOfSeat = {
     group : string,
@@ -25,7 +26,7 @@ type typeOfPlaces = {
     seats : Array<typeOfSeat>,
     sizeOfArea : {width : number, height : number},
     sizeOfSeat : number,
-    stage : number,
+    stages : Array<typeOfStage>,
 }
 
 type typeOfAmountTicket = {
@@ -72,6 +73,12 @@ const Seats = ({places, tickets, seleted,onClickFunction, disabled}:typeOfSeatsP
                 if (index === 0 || maxX < seat.x+seat.size.width){maxX = seat.x+seat.size.width};
                 if (index === 0 || maxY < seat.y){maxY = seat.y};
             })
+            if (places.stages){
+                places.stages.forEach((stage, index)=>{
+                    if (maxX === 0 || maxX < stage.x+stage.width){maxX = stage.x+stage.width};
+                    if (maxY === 0 || maxY < stage.y){maxY = stage.y};
+                });
+            }
         }
         return {
             width : maxX,
@@ -91,7 +98,7 @@ const Seats = ({places, tickets, seleted,onClickFunction, disabled}:typeOfSeatsP
 
 
     return (<div className = "select-ticket-main-div">
-            <SeatVisualization disabled = {disabled} tickets = {tickets} seatPositions={places.seats} sizeOfArea={getSizeOfArea()} colorOfSeat={places.colorOfSeat} seatSize={places.sizeOfSeat} stage={getSizeOfStage(places.stage, getSizeOfArea())} marginTop={places.stage == 1 || places.stage == 4 ? 50 : 0} marginLeft={places.stage == 3 || places.stage == 2 ? 50 : 0} selectedSeats={seleted} selectFunction={onClickFunction} />
+            <SeatVisualization stages={places.stages} disabled = {disabled} tickets = {tickets} seatPositions={places.seats} sizeOfArea={getSizeOfArea()} colorOfSeat={places.colorOfSeat} seatSize={places.sizeOfSeat} selectedSeats={seleted} selectFunction={onClickFunction} />
         </div>);
 }
 

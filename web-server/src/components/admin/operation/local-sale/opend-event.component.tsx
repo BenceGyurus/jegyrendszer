@@ -184,8 +184,12 @@ const Local_Sale_Event = ()=>{
     const [userSelecting, setUserSelecting]:[boolean, Function] = useState(false);
     const [buying, setBuying] = useState(false);
 
+    console.log(eventDatas);
+
     useEffect(()=>{
-        let id = window.location.pathname.split("/")[3]
+        const url = new URL(window.location.href);
+        let id = url.pathname.split("/")[3]
+        console.log(id);
         setSocketIO(SocketCommunication(socketIO));
         postData(`/event-datas/${id}`, {token : ParseLocalStorage("long_token")})
         .then(async (response)=>{
@@ -303,7 +307,7 @@ const Local_Sale_Event = ()=>{
             socketIO.on("disconnect", () => {});
             let sendTickets = controlAmountTickets();
             postFile("/buy-local", {token : ParseLocalStorage("long_token"), datas : {
-                eventId : window.location.pathname.split("/")[3],
+                eventId : eventDatas.id,
                 discount : selectedDiscount,
                 tickets : sendTickets,
                 invitation : !!invitation

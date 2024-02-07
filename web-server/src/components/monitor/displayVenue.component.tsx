@@ -50,7 +50,7 @@ const DisplayVenue = ( { venueId, eventId , aTickets,selectEvent, selected }:typ
 
     return (<div className = "monitor-ticket-selector">
         {
-            venue && venue.name && tickets.length ? <SeatVisualization seatPositions={venue.seats} sizeOfArea={getSizeOfVenue()} seatSize={0} colorOfSeat={venue.colorOfSeat} marginTop={venue.stage == 1 || venue.stage == 4 ? 50 : 0} marginLeft={venue.stage == 3 || venue.stage == 2 ? 50 : 0} tickets={aTickets} selectFunction={selectEvent} selectedSeats={selected} sizeOfScale={1} /> : <></>
+            venue && venue.name && tickets.length ? <SeatVisualization seatPositions={venue.seats} sizeOfArea={getSizeOfVenue()} seatSize={0} stages={venue.stages} colorOfSeat={venue.colorOfSeat} tickets={aTickets} selectFunction={selectEvent} selectedSeats={selected} sizeOfScale={1} /> : <></>
         }
     </div>)
 }

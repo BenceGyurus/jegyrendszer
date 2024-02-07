@@ -31,6 +31,7 @@
     }
         #city-div{
         width: 42.5%;
+        margin-left: 2.5%
     }
 }
 
@@ -78,10 +79,10 @@
     width: 100%;
 }
 
-.postal-code-and-city-div{
-    width: 45%;
-    height: 40px;
-    display: inline-table;
+.post-code-and-city-div{
+    width: 100%;
+    margin: 10px auto;
+    display: flex;
 }
 
 
