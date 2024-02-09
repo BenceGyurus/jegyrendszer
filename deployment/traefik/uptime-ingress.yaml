@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: grafana-ingress
+  name: uptime-kuma-ingress
   labels:
-    name: grafana-ingress
+    name: uptime-kuma-ingress
 spec:
   rules:
-  - host: grafana.jegyrendszer.local
+  - host: uptime.jegyrendszer.local
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: grafana-release
+            name: uptime-kuma-service
             port: 
-              number: 80
+              number: 3001

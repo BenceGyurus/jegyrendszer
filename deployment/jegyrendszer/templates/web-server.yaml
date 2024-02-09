@@ -4,16 +4,20 @@ metadata:
   name: web-server-deployment
   labels:
     app: web-server
+    pod-security.kubernetes.io/audit: baseline
 spec:
   replicas: {{.Values.replication.web}}
   selector:
     matchLabels:
       app: web-server
+  strategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
         app: web-server
     spec:
+      serviceAccountName: web-svc-a
       imagePullSecrets:
         - name: gcp-ar-login
       hostAliases:
@@ -22,7 +26,7 @@ spec:
         - "api.jegyrendszer.local"
       containers:
       - name: web-server
-        image: europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/web-server:latest
+        image: "europe-west3-docker.pkg.dev/agora-jegyrendszer/jegyrendszer/web-server:{{.Values.versions.web_tag}}"
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -77,3 +81,9 @@ spec:
                 name: handle-server-svc
                 port:
                   number: 8080
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web-svc-a
+  namespace: default

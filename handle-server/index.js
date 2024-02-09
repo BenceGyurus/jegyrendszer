@@ -56,7 +56,7 @@ var redisOptions = {
 if (process.env.NODE_ENV == "production")
   redisOptions = {
     port: 6379,
-    host: "jegyrendszer-redis-headless",
+    host: "redis-release-master.service.svc.cluster.local",
     username: "default",
     password: process.env.REDIS_PASS,
     db: 0,

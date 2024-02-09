@@ -1,0 +1,24 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jegyrendszer-release
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: ./helm/jegyrendszer
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: GitRepository
+        name: jegyrendszer-repo
+  interval: 10m0s
+  values:
+    handle:
+      storageClass: nfs
+    replication:
+      web: 2
+      handle: 2
+    versions:
+      handle_tag: 1.11 # {"$imagepolicy": "flux-system:handle:tag"}
+      web_tag: 1.0 # {"$imagepolicy": "flux-system:web:tag"}

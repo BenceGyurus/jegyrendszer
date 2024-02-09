@@ -8,4 +8,5 @@ COPY package* .
 RUN npm install
 COPY . .
 CMD [ "node", "index.js" ]
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=10 CMD [ "curl -f http://localhost/" ]
 EXPOSE 3001

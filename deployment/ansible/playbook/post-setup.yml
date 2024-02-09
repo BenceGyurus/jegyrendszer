@@ -1,0 +1,22 @@
+- hosts: ['worker']
+  become: true
+  tasks:
+    - name: set network settings
+
+    - name: upgrade apt
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: yes
+    - name: install default packages
+      ansible.builtin.apt:
+        name:
+          - vim
+          - nfs-common
+          - qemu-guest-agent
+          - keepalived
+        upgrade: yes
+    - name: start guest qemu-guest-agent
+      service:
+        name: qemu-guest-agent
+        state: started
+        enabled: yes
