@@ -84,7 +84,6 @@ handle:
 replication:
   web: 2
   handle: 2
-
 loki:
   commonConfig:
     replication_factor: 1
@@ -92,3 +91,6 @@ loki:
     type: 'filesystem'
 singleBinary:
   replicas: 1
+versions:
+  handle_tag: latest
+  web_tag: latest

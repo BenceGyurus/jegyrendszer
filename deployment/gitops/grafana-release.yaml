@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana-release
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: grafana/grafana
+      version: '7.0.x'
+      sourceRef:
+        kind: HelmRepository
+        name: grafana-repo
+        namespace: flux-system
+      interval: 1m
+  values:
+    replicas: 1
+    service:
+      type: LoadBalancer
+      port: 5000
+    persistence:
+      enabled: true
+      annotations:
+        helm.sh/resource-policy: "keep"
