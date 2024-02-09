@@ -97,6 +97,7 @@
 `/api/v1/tickets/:readable-id`
 
 - Params:
+
 | name | value | description |
 | ------------- | ------------- | ------------- |
 | reserved | boolean | foglalt helyek |

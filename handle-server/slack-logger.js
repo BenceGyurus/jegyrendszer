@@ -109,14 +109,18 @@ const LokiTransport = require("winston-loki");
 let logger;
 
 const initLocalLogger = () => {
-  logger = createLogger({
-    transports: [
-      new transports.Console({
-        format: format.combine(format.simple(), format.colorize()),
-      }),
-    ],
-  });
-  console.log("Local logger is initialized");
+  try {
+    logger = createLogger({
+      transports: [
+        new transports.Console({
+          format: format.combine(format.simple(), format.colorize()),
+        }),
+      ],
+    });
+    console.log("Local logger is initialized");
+  } catch {
+    console.log("Local logger couldn't be initalized");
+  }
 };
 const initLogger = () => {
   if (logger) return;
