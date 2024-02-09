@@ -125,7 +125,7 @@ const initLocalLogger = () => {
 const initLogger = () => {
   if (logger) return;
 
-  if (process.env.NODE_ENV == "production") {
+  if (process.env.NODE_ENV == "production" && process.env.LOKI_ENABLED == "true") {
     try {
       logger = createLogger({
         transports: [
