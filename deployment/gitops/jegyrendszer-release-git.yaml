@@ -20,5 +20,5 @@ spec:
       web: 2
       handle: 2
     versions:
-      handle_tag: 1.0 # {"$imagepolicy": "flux-system:handle:tag"}
+      handle_tag: 1.11 # {"$imagepolicy": "flux-system:handle:tag"}
       web_tag: 1.0 # {"$imagepolicy": "flux-system:web:tag"}
