@@ -1,6 +1,9 @@
 ---
 name: Build and push WEB SERVER to GCP
-on: workflow_dispatch
+on: 
+  push:
+    paths:
+      - web-server/**
 jobs:
   build-push-gcr:
     name: Build and Push to GCP

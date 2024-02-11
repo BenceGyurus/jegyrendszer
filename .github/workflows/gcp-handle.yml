@@ -1,6 +1,9 @@
 ---
 name: Build and push HANDLE SERVER to GCP
-on: workflow_dispatch
+on: 
+  push:
+    paths:
+      - handle-server/**
 jobs:
   build-push-gcr:
     name: Build and Push to GCP
