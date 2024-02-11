@@ -3014,6 +3014,35 @@ app.get(
   },
 );
 
+app.post(
+  "/api/v1/feedback",
+  (req, res, next) => parseBodyMiddleeware(req, next),
+  async (req, res) => {
+    if (req.body && typeof req.body === TypeOfBody) {
+      if (req.body.description) {
+        const { collection, database } = new Database("feedback");
+        let result = await collection.insertOne({
+          otherDatas: await otherData(req),
+          description: req.body.description,
+          url: req.body.url,
+        });
+        closeConnection(database);
+        if (result.insertedId)
+          return res.send({
+            error: false,
+            message: "Visszajelzését sikeresen rögzítettük",
+          });
+      } else {
+        return res.send({
+          error: true,
+          message: "Hiba történ a visszajelzés rögzítése közben",
+        });
+      }
+    }
+    return handleError(logger, "400", res);
+  },
+);
+
 const server = require("http").createServer(app);
 
 if (controlConnection()) {

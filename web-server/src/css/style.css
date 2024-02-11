@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap");
 
-.MuiAvatarGroup-root{
+.MuiAvatarGroup-root {
     justify-content: center;
 }
 
-*{
+* {
     font-family: "Rubik", sans-serif;
     color: #7d7d7d;
 }
 
-#root{
+#root {
     padding-top: 80px;
 }
 /*html {
@@ -22,36 +22,35 @@ body {
     height: 100%;
     overflow: auto;
 }*/
-body{
+body {
     padding: 0px;
     margin: 0px;
     background-color: #f2f2f2;
 }
 
-.event-image{
+.event-image {
     width: 300px;
     border-radius: 5px;
     padding: 0px;
     margin: 0px;
 }
 
-#loading img{
+#loading img {
     width: 50px;
     position: absolute;
     top: 50%;
     left: 50%;
 }
 
-
 /*load animation*/
 
 @keyframes loadEvents {
-    0%{
+    0% {
         opacity: 0;
         position: relative;
         top: -1000px;
     }
-    100%{
+    100% {
         opacity: 1;
         position: relative;
         top: 0px;
@@ -60,24 +59,24 @@ body{
 
 /*details button animation*/
 
-.event-divs:hover .getEventButton{
+.event-divs:hover .getEventButton {
     opacity: 1;
     cursor: pointer;
     transition: 0.4s;
 }
 
-.getEventButton:hover{
-    color: rgba(169,206,21,255);
+.getEventButton:hover {
+    color: rgba(169, 206, 21, 255);
     background-color: white;
     transition: 0.4s;
 }
 
-.main{
+.main {
     width: max-content;
     margin: 10px auto;
 }
 
-.mainDiv{
+.mainDiv {
     min-height: 75vh;
 }
 
@@ -87,9 +86,8 @@ apple-pay-button {
     --apple-pay-button-border-radius: 3px;
     --apple-pay-button-padding: 0px 0px;
     --apple-pay-button-box-sizing: border-box;
-  }
+}
 
-
-  .selected{
+.selected {
     background: rgba(22, 119, 255, 1) !important;
-  }
+}

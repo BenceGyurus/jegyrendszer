@@ -1,90 +1,94 @@
 {
-    "admin" : {
-        "database" : "users",
-        "collection" : "admin-users"
-    },
-    "short-token" : {
-        "database": "connected-users",
-        "collection" : "login-token-users"
-    },
-    "long-token" : {
-        "database" : "connected-users",
-        "collection" : "long-token"
-    },
-    "events" : {
-        "database" : "event",
-        "collection" : "event"
-    },
-    "venue" : {
-        "database" : "event",
-         "collection" : "venue"
-    },
-    "new-user" : {
-        "database" : "users",
-        "collection" : "pending-new-user"
-    },
-    "deleted-venues" : {
-        "database" : "deleted",
-        "collection" : "venues"
-    },
-    "deleted-users" : {
-        "database" : "deleted",
-        "collection" : "deleted-users"
-    },
-    "deleted-events" : {
-        "database" : "deleted",
-        "collection" : "deleted-events"
-    },
-    "pre-buying" : {
-        "database" : "buying",
-        "collection" : "pre-buying"
-    },
-    "coupons" : {
-        "database" : "coupons",
-         "collection" : "active" 
-    },
-    "buy" : {
-        "database" : "buying",
-        "collection" : "buying"
-    },
-    "companies" : {
-        "database" : "users",
-        "collection" : "companies"
-    },
-    "login-tried" : {
-        "database" : "users",
-        "collection" : "try"
-    },
-    "banned" : {
-        "database" : "users",
-        "collection" : "banned"
-    },
-    "local-discount" : {
-        "database" : "coupons",
-        "collection" : "local" 
-    },
-    "tickets" : {
-        "database" : "event",
-        "collection" : "tickets"
-    },
-    "monitor" : {
-        "database" : "users",
-        "collection" : "monitor"
-    },
-    "ads" : {
-        "database" : "ads",
-        "collection" : "ads"
-    },
-    "log" : {
-        "database" : "analytics",
-        "collection" : "log"
-    },
-    "app-ticket" : {
-        "database" : "app",
-        "collection" : "tickets"
-    },
-    "cancelled" : {
-        "database" : "buying",
-        "collection" : "cancelled"
-    }
+  "admin": {
+    "database": "users",
+    "collection": "admin-users"
+  },
+  "short-token": {
+    "database": "connected-users",
+    "collection": "login-token-users"
+  },
+  "long-token": {
+    "database": "connected-users",
+    "collection": "long-token"
+  },
+  "events": {
+    "database": "event",
+    "collection": "event"
+  },
+  "venue": {
+    "database": "event",
+    "collection": "venue"
+  },
+  "new-user": {
+    "database": "users",
+    "collection": "pending-new-user"
+  },
+  "deleted-venues": {
+    "database": "deleted",
+    "collection": "venues"
+  },
+  "deleted-users": {
+    "database": "deleted",
+    "collection": "deleted-users"
+  },
+  "deleted-events": {
+    "database": "deleted",
+    "collection": "deleted-events"
+  },
+  "pre-buying": {
+    "database": "buying",
+    "collection": "pre-buying"
+  },
+  "coupons": {
+    "database": "coupons",
+    "collection": "active"
+  },
+  "buy": {
+    "database": "buying",
+    "collection": "buying"
+  },
+  "companies": {
+    "database": "users",
+    "collection": "companies"
+  },
+  "login-tried": {
+    "database": "users",
+    "collection": "try"
+  },
+  "banned": {
+    "database": "users",
+    "collection": "banned"
+  },
+  "local-discount": {
+    "database": "coupons",
+    "collection": "local"
+  },
+  "tickets": {
+    "database": "event",
+    "collection": "tickets"
+  },
+  "monitor": {
+    "database": "users",
+    "collection": "monitor"
+  },
+  "ads": {
+    "database": "ads",
+    "collection": "ads"
+  },
+  "log": {
+    "database": "analytics",
+    "collection": "log"
+  },
+  "app-ticket": {
+    "database": "app",
+    "collection": "tickets"
+  },
+  "cancelled": {
+    "database": "buying",
+    "collection": "cancelled"
+  },
+  "feedback": {
+    "database": "beta",
+    "collection": "feedback"
+  }
 }
