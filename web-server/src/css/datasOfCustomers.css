@@ -1,23 +1,24 @@
-.datas-of-customer{
+.datas-of-customer {
     align-items: center;
     align-content: center;
     margin: 20px;
-    padding: 10px;
+    padding: 20px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    background-color: #f5f5f5;
+    background-color: #fff;
     border-radius: 4px;
     padding: 20px;
-    transition: .4s;
+    transition: 0.4s;
+    border-radius: 10px;
 }
 
-#city-div{
+#city-div {
     width: 62.5%;
     display: inline-table;
     margin-left: 2.5%;
 }
 
 @media screen and (width > 1000px) {
-    .datas-of-customer{
+    .datas-of-customer {
         width: 45%;
         display: inline-table;
         margin: 20px;
@@ -25,17 +26,17 @@
 
     .datas-of-customer input[type="text"],
     .datas-of-customer input[type="phone"],
-    .datas-of-customer input[type = "email"]{
+    .datas-of-customer input[type="email"] {
         margin: 4px 0;
         width: 80%;
     }
-        #city-div{
+    #city-div {
         width: 42.5%;
-        margin-left: 2.5%
+        margin-left: 2.5%;
     }
 }
 
-.customer-data-component{
+.customer-data-component {
     margin: 40px 0;
 }
 
@@ -64,28 +65,26 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }*/
 
-
-#postal-code-div{
+#postal-code-div {
     width: 35%;
     display: inline-table;
     margin: 0;
 }
 
-#postal-code-div input{
+#postal-code-div input {
     width: 100%;
 }
 
-#city-div input{
+#city-div input {
     width: 100%;
 }
 
-.post-code-and-city-div{
+.post-code-and-city-div {
     width: 100%;
     margin: 10px auto;
     display: flex;
 }
 
-
-.is-company-option{
+.is-company-option {
     margin-bottom: 20px;
 }

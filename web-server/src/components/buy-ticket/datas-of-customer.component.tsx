@@ -80,7 +80,7 @@ const DatasOfCustomer = ({
       </div>
       <h2>Számlázási adatok:</h2>
       {!isCompany ? (
-        <div>
+        <div className="user-datas-name">
           <label htmlFor="lastName">Vezetéknév</label>
           <br />
           <Input

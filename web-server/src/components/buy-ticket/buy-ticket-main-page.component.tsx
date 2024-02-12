@@ -68,6 +68,7 @@ const BuyTicketMainPage = () => {
   const [step, setStep] = useState(1);
   const [link, setLink] = useState("");
   const [isCompany, setIsCompany] = useState<boolean>(false);
+  const [checkCoupon, setCheckCoupon] = useState<boolean>(false);
   const [ticketDatas, setTicketDatas]: [typeOfTicketDatas, Function] = useState(
     {
       eventId: "",
@@ -89,12 +90,13 @@ const BuyTicketMainPage = () => {
   );
 
   const useRefCode = () => {
-    console.log(referalCode);
     if (referalCode) {
+      setCheckCoupon((prev) => true);
       postData("/control-coupon-code", {
         code: referalCode,
         eventId: ticketDatas.eventId,
       }).then((response) => {
+        setCheckCoupon((prev) => false);
         if (response.used) {
           setUsedCoupon({
             name: referalCode,
@@ -236,6 +238,7 @@ const BuyTicketMainPage = () => {
                 <Details />
               )}
               <Coupon
+                checkCoupon={checkCoupon}
                 onClickFunction={useRefCode}
                 changeReferalCode={setReferalCode}
                 value={referalCode}

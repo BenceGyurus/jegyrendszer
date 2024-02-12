@@ -1,16 +1,19 @@
 import { useRef } from "react";
 import "../../css/user-side-coupon-activate.css";
+import { Input, Button } from "antd";
 
 type typeOfCoupnParams = {
   changeReferalCode: Function;
   onClickFunction: Function;
   value: string;
+  checkCoupon: boolean;
 };
 
 const Coupon = ({
   changeReferalCode,
   onClickFunction,
   value,
+  checkCoupon,
 }: typeOfCoupnParams) => {
   const codeRef: any = useRef(null);
 
@@ -23,18 +26,21 @@ const Coupon = ({
   return (
     <div className="buy-ticket-coupon-div">
       <h2>Kupon beváltása</h2>
-      <input
+      <Input
         className="coupon-input"
         id="coupon"
         onChange={(e) => changeReferalCode(e.target.value.toUpperCase())}
         value={value}
       />
-      <input
+      <Button
+        size="large"
         className="coupon-button"
-        type="button"
-        value="Beváltás"
-        onClick={(e) => onClickFunction()}
-      />
+        onClick={() => onClickFunction()}
+        type="primary"
+        loading={checkCoupon}
+      >
+        Beváltás
+      </Button>
     </div>
   );
 };

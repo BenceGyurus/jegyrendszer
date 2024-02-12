@@ -2603,7 +2603,10 @@ app.post(
         let files = await GenerateTicket(ticketIds);
         let sysConfig = readConfig();
         for (let i = 0; i < files.length; i++) {
-          files[i] = __dirname + sysConfig["NODE_SHARE"] + `/${files[i]}`;
+          files[i] =
+            process.env.NODE_ENV === "production"
+              ? `/uploads/${files[i]}`
+              : __dirname + sysConfig["NODE_SHARE"] + `/${files[i]}`;
         }
         zip = await createZip(files, `${req.params.id}.zip`);
         res.writeHead(200, {
@@ -3237,7 +3240,7 @@ app.use((req, res, next) => {
   if (req.method === "GET") {
     imageName = req.url.split("/")[req.url.split("/").length - 1];
     try {
-      return res.sendFile(`${__dirname}/uploads/${imageName}`);
+      return res.sendFile(`/share/uploads/${imageName}`);
     } catch {
       next();
     }

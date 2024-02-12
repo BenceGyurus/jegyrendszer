@@ -1,24 +1,24 @@
-.overview{
-    background-color: #f5f5f5;
+.overview {
+    background-color: #fff;
     border-radius: 4px;
-    padding: 20px;
+    padding: 25px;
     margin: 20px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
-.name-of-event{
+.name-of-event {
     font-size: 24px;
     margin-bottom: 30px;
 }
 
-
-.full-price{
+.full-price {
     font-size: 18px;
     font-weight: bold;
     margin-top: 10px;
 }
 
-.buy-ticket-overview-price{
+.buy-ticket-overview-price {
     float: right;
     margin-right: 10px;
 }
