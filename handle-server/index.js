@@ -95,7 +95,7 @@ const storage = multer.diskStorage({
         file.mimetype.split("/")[1].toUpperCase(),
       )
     ) {
-      callBack(null, "uploads");
+      callBack(null, "/uploads");
     }
   },
   filename: (req, file, callBack) => {
@@ -2645,7 +2645,7 @@ app.post(
         let width = 0;
         let height = 0;
         try {
-          let jimage = await Jimp.read(`${__dirname}/${file.path}`);
+          let jimage = await Jimp.read(`/uploads/${file.path}`);
           width = jimage.bitmap.width;
           height = jimage.bitmap.height;
         } catch {}
@@ -2686,7 +2686,7 @@ app.post(
       let access = await control_Token(req.body.token, req);
       if (access && access.includes("edit-aszf")) {
         try {
-          let aszf = fs.readFileSync(`${__dirname}/local/aszf.html`);
+          let aszf = fs.readFileSync(`/uploads/local/aszf.html`);
           return res.send({ error: false, aszf: aszf.toString() });
         } catch {
           return handleError(logger, "000", res);
@@ -2706,10 +2706,7 @@ app.post(
       if (access && access.includes("edit-aszf")) {
         try {
           if (req.body.datas && req.body.datas.aszf) {
-            fs.writeFileSync(
-              `${__dirname}/local/aszf.html`,
-              req.body.datas.aszf,
-            );
+            fs.writeFileSync(`/uploads/local/aszf.html`, req.body.datas.aszf);
             return res.send({ error: false });
           } else {
             return res.send({ error: true });
@@ -2725,7 +2722,7 @@ app.post(
 
 app.get("/api/v1/aszf", async (req, res) => {
   try {
-    let aszf = fs.readFileSync(`${__dirname}/local/aszf.html`);
+    let aszf = fs.readFileSync(`/uploads/local/aszf.html`);
     return res.send({ error: false, aszf: aszf.toString() });
   } catch {
     handleError(logger, "000", res);
@@ -2740,7 +2737,7 @@ app.post(
       let access = await control_Token(req.body.token, req);
       if (access && access.includes("edit-letter")) {
         try {
-          let mail = fs.readFileSync(`${__dirname}/local/mail.html`);
+          let mail = fs.readFileSync(`/uploads/local/mail.html`);
           return res.send({ error: false, mail: mail.toString() });
         } catch {
           return handleError(logger, "000", res);
@@ -2760,10 +2757,7 @@ app.post(
       if (access && access.includes("edit-letter")) {
         try {
           if (req.body.datas && req.body.datas.mail) {
-            fs.writeFileSync(
-              `${__dirname}/local/mail.html`,
-              req.body.datas.mail,
-            );
+            fs.writeFileSync(`/uploads/local/mail.html`, req.body.datas.mail);
             return res.send({ error: false });
           } else {
             return res.send({ error: true });
