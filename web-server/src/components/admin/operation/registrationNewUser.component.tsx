@@ -1,12 +1,13 @@
 import WindowHeader from "../../window-header/windowHeader.component";
 import InputText from "../../input/inputText.component";
-import Password from "../../input/password.component";
+import Password from "antd/es/input/Password";
 import Button from "../../buttons/button.component";
 import "../../../css/registration.css"
 import Error from "../../notification/error.component";
 import { useState, useRef } from "react";
 import Success from "../../notification/success.component";
 import postData from "../../connection/request";
+import { Input } from "antd";
 const Registration = ()=>{
 
     const [username, setUsername] = useState("");
@@ -67,9 +68,9 @@ const Registration = ()=>{
         <div className = "reg-conteiner">
             <WindowHeader title = "Regisztráció" />
             <div>
-                <InputText title = "Felhasználónév" onChangeFunction={setUsername}/>
-                <Password value = {password} title = "Jelszó" onChangeFunction={setPassword} />
-                <Password value = {rePassword} title = "Jelszó újra" onChangeFunction={setRepassword} />
+                <Input autoComplete="username" title = "Felhasználónév" onChange={e=>setUsername(e.target.value)}/>
+                <Password autoComplete="new-password" value = {password} title = "Jelszó" onChange={e=>setPassword(e.target.value)} />
+                <Password autoComplete="new-password" value = {rePassword} title = "Jelszó újra" onChange={e=>setRepassword(e.target.value)} />
                 <Button title = "Regisztráció" onClickFunction={Control} />
                 <Error message={errors} setOpen={()=>{setErrors("")}} open = {errors != ""} />
             </div>
