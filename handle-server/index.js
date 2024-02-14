@@ -2350,7 +2350,7 @@ app.post(
             let files = await GenerateTicket(tickets);
             let sysConfig = readConfig();
             for (let i = 0; i < files.length; i++) {
-              files[i] = __dirname + sysConfig["NODE_SHARE"] + `/${files[i]}`;
+              files[i] = `/uploads/${files[i]}`;
             }
             zip = await createZip(files, `${result.insertedId}.zip`);
             res.writeHead(200, {
