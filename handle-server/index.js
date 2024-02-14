@@ -78,7 +78,7 @@ const parseBodyMiddleeware = (req, next) => {
 const readConfig = () => {
   try {
     let config = JSON.parse(
-      fs.readFileSync(`${process.env.CONFIGDIR}/config.json`),
+      fs.readFileSync(`${process.env.NODE_ENV === "production" ? "/etc/config" : process.env.CONFIGDIR}/config.json`),
     );
     return config;
   } catch (err) {

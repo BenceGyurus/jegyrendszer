@@ -1,1 +1,1 @@
-export CONFIGDIR=.. && export SLACK_TOKEN=xoxb-3311554582775-5527680742470-dsGI5oX5IXNlZ0CHZQDDhPc4 && export PYPASS=nbdcecfzxgcbnzbe && export MERCHANT_KEY=FxDa5w314kLlNseq2sKuVwaqZshZT5d6 && export NODE_ENV=development
+export PRODUCTION_CONFIGDIR=/etc/config && export CONFIGDIR=.. && export SLACK_TOKEN=xoxb-3311554582775-5527680742470-dsGI5oX5IXNlZ0CHZQDDhPc4 && export PYPASS=nbdcecfzxgcbnzbe && export MERCHANT_KEY=FxDa5w314kLlNseq2sKuVwaqZshZT5d6 && export NODE_ENV=development
