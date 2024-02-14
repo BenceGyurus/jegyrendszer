@@ -2350,14 +2350,14 @@ app.post(
             let files = await GenerateTicket(tickets);
             let sysConfig = readConfig();
             for (let i = 0; i < files.length; i++) {
-              files[i] = `/uploads/${files[i]}`;
+              files[i] = `/uploads/${config["NODE_SHARE"]}/${files[i]}`;
             }
             zip = await createZip(files, `${result.insertedId}.zip`);
             res.writeHead(200, {
-              "Content-Disposition": `attachment; filename="${result.insertedId}.zip"`,
+              "Content-Disposition": `attachment; filename = "${result.insertedId}.zip"`,
               "Content-Type": "application/zip",
             });
-            return res.end(zip); //fs.readFileSync(`${__dirname}/${sysConfig["ZIP_DIR"]}/${result.insertedId}.zip`)
+            return res.end(zip); //fs.readFileSync(`${ __dirname } /${sysConfig["ZIP_DIR"]}/${ result.insertedId }.zip`)
             //return res.send({error : !result.insertedId, id : saveDatas.salt});
           }
         }
@@ -2428,7 +2428,7 @@ app.post(
                 fullPrice: fullPrice.fullPrice,
                 customerDatas: {
                   ...req.body.datas.customerData,
-                  fullName: `${req.body?.datas?.customerData?.firstname} ${req.body?.datas?.customerData?.lastname}`,
+                  fullName: `${req.body?.datas?.customerData?.firstname} ${req.body?.datas?.customerData?.lastname} `,
                 },
                 time: new Date().getTime(),
                 coupon: !error ? name : false,
@@ -2605,12 +2605,12 @@ app.post(
         for (let i = 0; i < files.length; i++) {
           files[i] =
             process.env.NODE_ENV === "production"
-              ? `/uploads/${files[i]}`
-              : __dirname + sysConfig["NODE_SHARE"] + `/${files[i]}`;
+              ? `/uploads/${sysConfig["NODE_SHARE"]}/${files[i]}`
+              : __dirname + sysConfig["NODE_SHARE"] + `/${files[i]} `;
         }
         zip = await createZip(files, `${req.params.id}.zip`);
         res.writeHead(200, {
-          "Content-Disposition": `attachment; filename="${req.params.id}.zip"`,
+          "Content-Disposition": `attachment; filename = "${req.params.id}.zip"`,
           "Content-Type": "application/zip",
         });
         closeConnection(database);
@@ -3044,7 +3044,7 @@ const server = require("http").createServer(app);
 
 if (controlConnection()) {
   console.log(
-    `The connection is successfully, the app is listening on PORT ${process.env.PORT || 3001}`,
+    `The connection is successfully, the app is listening on PORT ${process.env.PORT || 3001} `,
   );
   server.listen(process.env.PORT || 3001);
 } else {
@@ -3093,7 +3093,7 @@ io.on("connection", (socket) => {
         )
         .toArray();
       closeConnection(adsDatabase.database);
-      socket.join(`${socket.id}-M`);
+      socket.join(`${socket.id} -M`);
       socket.emit("connection-status", {
         error: result.insertedId == "",
         id: result.insertedId,
@@ -3113,14 +3113,14 @@ io.on("connection", (socket) => {
           { $and: [{ socketId: payload.id }, { connected: false }] },
           { $set: { connected: socket.id } },
         );
-        await socket.join(`${monitor.socketId}-M`);
+        await socket.join(`${monitor.socketId} -M`);
         message = {
           connected: monitor.modifiedCount > 0,
           connectedMonitor: true,
           error: monitor.modifiedCount === 0,
           id: monitor.acknowledged ? payload.id : "",
         };
-        io.to(`${monitor.socketId}`).emit("connection-status", message);
+        io.to(`${monitor.socketId} `).emit("connection-status", message);
         socket.emit("connection-status", message);
         closeConnection(database);
       }
@@ -3149,7 +3149,7 @@ io.on("connection", (socket) => {
         io.to(monitorDatas.socketId).emit("event-display", eventDatas);
         //socket.emit( "event-display" ,{ error : false, status : true, message : "Esemény megjelenítve." } );
       } else {
-        //io.to(`${monitorDatas.socketId}`).emit("event-display" , { error : true, message : "Esemény megjelenítése sikertelen." });
+        //io.to(`${ monitorDatas.socketId } `).emit("event-display" , { error : true, message : "Esemény megjelenítése sikertelen." });
         socket.emit("event-display", {
           error: false,
           status: true,
