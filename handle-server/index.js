@@ -3235,7 +3235,7 @@ app.use((req, res, next) => {
   if (req.method === "GET") {
     imageName = req.url.split("/")[req.url.split("/").length - 1];
     try {
-      return res.sendFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SAHRE"]}${imageName}` : `${__dirname}/uploads/${imageName}`);
+      return res.sendFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}${imageName}` : `${__dirname}/uploads/${imageName}`);
     } catch {
       next();
     }
