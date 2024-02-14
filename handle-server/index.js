@@ -3234,7 +3234,7 @@ app.use((req, res, next) => {
   if (req.method === "GET") {
     imageName = req.url.split("/")[req.url.split("/").length - 1];
     try {
-      return res.sendFile(`/share/uploads/${imageName}`);
+      return res.sendFile(`/uploads/${imageName}`);
     } catch {
       next();
     }
