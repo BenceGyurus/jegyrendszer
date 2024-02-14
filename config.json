@@ -24,6 +24,6 @@
     "ZIP_DIR" : "../data/zips",
     "ACCEPTED_IMAGE_EXTENSIONS" : ["PNG", "JPG", "JFIF", "JPEG", "MOV", "MP4"],
     "MAX_PAGINATOR_LIMIT" : 30,
-    "TICKET_NODE_SHARE" : "/pdfs/",
-    "IMAGES_NODE_SHARE" : "/uploads/"
+    "TICKET_NODE_SHARE" : "/pdfs",
+    "IMAGES_NODE_SHARE" : "/uploads"
 }

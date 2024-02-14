@@ -53,7 +53,7 @@ const GenerateTicket = async (ticketsIds) => {
           : false;
         fs.writeFileSync(
           process.env.NODE_ENV === "production"
-            ? `${sysConfig["TICKET_NODE_SHARE"]}${String(ticketData._id)}.pdf`
+            ? `${sysConfig["TICKET_NODE_SHARE"]}/${String(ticketData._id)}.pdf`
             : `${__dirname}/${sysConfig["NODE_SHARE"]}/${String(ticketData._id)}.pdf`,
           await createTicket(
             eventData.name,
