@@ -95,7 +95,7 @@ const storage = multer.diskStorage({
         file.mimetype.split("/")[1].toUpperCase(),
       )
     ) {
-      callBack(null, "/uploads");
+      callBack(null, process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : "/uploads");
     }
   },
   filename: (req, file, callBack) => {
@@ -3235,7 +3235,7 @@ app.use((req, res, next) => {
   if (req.method === "GET") {
     imageName = req.url.split("/")[req.url.split("/").length - 1];
     try {
-      return res.sendFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}${imageName}` : `${__dirname}/uploads/${imageName}`);
+      return res.sendFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${imageName}` : `${__dirname}/uploads/${imageName}`);
     } catch {
       next();
     }
