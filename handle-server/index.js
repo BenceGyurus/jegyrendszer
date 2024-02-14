@@ -95,7 +95,7 @@ const storage = multer.diskStorage({
         file.mimetype.split("/")[1].toUpperCase(),
       )
     ) {
-      callBack(null, "/uploads");
+      callBack(null, process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : "/uploads");
     }
   },
   filename: (req, file, callBack) => {
@@ -2350,7 +2350,7 @@ app.post(
             let files = await GenerateTicket(tickets);
             let sysConfig = readConfig();
             for (let i = 0; i < files.length; i++) {
-              files[i] = `/uploads/${config["NODE_SHARE"]}/${files[i]}`;
+              files[i] = process.env.NODE_ENV === "production" ? `${sysConfig["TICKET_NODE_SHARE"]}${files[i]}` : `${__dirname}/${sysConfig["NODE_SHARE"]}/${files[i]}`;
             }
             zip = await createZip(files, `${result.insertedId}.zip`);
             res.writeHead(200, {
@@ -2605,7 +2605,7 @@ app.post(
         for (let i = 0; i < files.length; i++) {
           files[i] =
             process.env.NODE_ENV === "production"
-              ? `/uploads/${sysConfig["NODE_SHARE"]}/${files[i]}`
+              ? `${sysConfig["TICKET_NODE_SHARE"]}${files[i]}`
               : __dirname + sysConfig["NODE_SHARE"] + `/${files[i]} `;
         }
         zip = await createZip(files, `${req.params.id}.zip`);
@@ -2627,6 +2627,7 @@ app.post(
   async (req, res, next) => {
     const token = req.params.token;
     if (token) {
+      let sysConfig = readConfig();
       let access = await control_Token(token, req);
       if (
         access &&
@@ -2645,7 +2646,7 @@ app.post(
         let width = 0;
         let height = 0;
         try {
-          let jimage = await Jimp.read(`/uploads/${file.path}`);
+          let jimage = await Jimp.read(`${sysConfig["IMAGES_NODE_SHARE"]}${file.path}`);
           width = jimage.bitmap.width;
           height = jimage.bitmap.height;
         } catch {}
@@ -3234,7 +3235,7 @@ app.use((req, res, next) => {
   if (req.method === "GET") {
     imageName = req.url.split("/")[req.url.split("/").length - 1];
     try {
-      return res.sendFile(`/uploads/${imageName}`);
+      return res.sendFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SAHRE"]}${imageName}` : `${__dirname}/uploads/${imageName}`);
     } catch {
       next();
     }
