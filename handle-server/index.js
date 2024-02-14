@@ -95,7 +95,7 @@ const storage = multer.diskStorage({
         file.mimetype.split("/")[1].toUpperCase(),
       )
     ) {
-      callBack(null, process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : "/uploads");
+      callBack(null, "/uploads");
     }
   },
   filename: (req, file, callBack) => {
