@@ -24,6 +24,10 @@ editbale in `./config.json` file
 
 - **The App have never been test on other os except on ios**
 
+- admin default login
+username : admin
+password : admin
+
 **The whole application includes several issues and bugs**
 
 
