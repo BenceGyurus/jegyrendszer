@@ -1,3 +1,33 @@
+# ARCHIVED
+
+## THIS PROJECT HAVE BEEN ARCHIVED FOR AN UNKWOND PREIOD OF TIME
+
+## TEST RUN
+
+- run handle server
+`cd handle-server && npm install && node index.js`
+
+- run web server
+`cd web-server && npm install && npm start`
+
+- handle server host:
+`localhost:3001`
+
+- web server host:
+`localhost:3000`
+
+- redish host:
+editable in `handle-server/index.js` file
+
+- mongodb host:
+editbale in `./config.json` file
+
+- **The App have never been test on other os except on ios**
+
+**The whole application includes several issues and bugs**
+
+
+
 # API Documentaion
 ## Open API
 ### Events:
