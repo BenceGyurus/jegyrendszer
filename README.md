@@ -1,8 +1,8 @@
-# ARCHIVED
+# ARCHIVED PROJECT
 
-## THIS PROJECT HAVE BEEN ARCHIVED FOR AN UNKWOND PREIOD OF TIME
+**THIS PROJECT HAS BEEN ARCHIVED FOR AN UNKNOWN PERIOD OF TIME**
 
-## TEST RUN
+## Test run
 
 - run handle server
 `cd handle-server && npm install && node index.js`
@@ -16,21 +16,21 @@
 - web server host:
 `localhost:3000`
 
-- redish host:
+- redis host:
 editable in `handle-server/index.js` file
 
 - mongodb host:
-editbale in `./config.json` file
+editable in `./config.json` file
 
-- **The App have never been test on other os except on ios**
+- **The App has never been tested on anything except iOS**
 
-- admin default login
+- default login for admin user:
 username : admin
 password : admin
 
-**The whole application includes several issues and bugs**
+- The application is designed to be contaninerized, after building the images you can use `docker-compose up -d` to start all services
 
-
+**The application includes several issues and bugs, only use it on your own responsibility**
 
 # API Documentaion
 ## Open API
