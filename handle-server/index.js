@@ -48,7 +48,7 @@ const seatMatrixToArray = require("./seatMatrixToArray.js");
 var cookieParser = require("cookie-parser");
 var redisOptions = {
   port: 6379,
-  host: "192.168.1.83",
+  host: "localhost",
   username: "default",
   password: process.env.REDIS_PASS,
   db: 0,
@@ -2059,7 +2059,7 @@ app.post("/api/v1/get-coupons", async (req, res) => {
     if (access && access.includes("ref")) {
       let { collection, database } = new Database("coupons");
       let sendDatas = await collection.find().toArray();
-      if (!datas) {
+      if (!sendDatas) {
         logger.error(`Failed to read db coupons`);
         closeConnection(database);
         return handleError(logger, "500", res);

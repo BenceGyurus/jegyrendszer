@@ -1,8 +1,4 @@
 .success-box {
-    background-color: #68f78e;
-    color: #00ba32;
-    border: 1px solid #25f55c;
-    padding: 10px;
-    border-radius: 5px;
+    position: absolute;
   }
   

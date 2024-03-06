@@ -2,7 +2,7 @@
     "PY_DIR": "../data/email",
     "NODE_SHARE": "/pdfs",
     "EMAIL_SERVER": "http://192.168.1.216:5000",
-    "MONGO_URI": "mongodb://192.168.1.83:27017/",
+    "MONGO_URI": "mongodb://localhost:27017/",
     "REDIS_URI": "",
     "TIMES" : "./times.json",
     "PDF_FONT_FAMILY" : "media/fonts/Rubik/static/Rubik-Regular.ttf",

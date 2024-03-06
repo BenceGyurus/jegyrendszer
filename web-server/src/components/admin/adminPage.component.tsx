@@ -16,6 +16,7 @@ const Admin = (params:any)=>{
     token: { colorBgContainer },
   } = theme.useToken();
     const [access, setAccess]:[any, Function] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
     const navigate = useNavigate();
     useEffect(()=>{
         let token = ParseLocalStorage("long_token");
@@ -67,11 +68,11 @@ const Admin = (params:any)=>{
         <Layout className = "admin-page">
         <Content>
         <Layout style={{ background: colorBgContainer, borderRadius : 10, zIndex: 2 }}>
-          <Sider style={{ background: colorBgContainer }} width={250}>
+          <Sider theme="light" collapsed = {collapsed} onCollapse={e=>setCollapsed(!collapsed)} collapsible={true} style={{ background: colorBgContainer }} width={collapsed ? 50 : 250}>
           {access ? <Menu
           expandIcon = {<i className="fas fa-bars"></i>}
           inlineCollapsed = {true}
-          style={{ width: 250, minHeight : "calc( 100vh - 80px )", maxHeight : "calc( 100vh - 80px )", overflow : "auto" }}
+          style={{ minHeight : "calc( 100vh - 80px )", maxHeight : "calc( 100vh - 80px )", overflow : "auto" }}
           mode="inline"
           items={createItems()}
           /> : <AccessSkeletons />}

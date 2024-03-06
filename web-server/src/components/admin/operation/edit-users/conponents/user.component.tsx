@@ -1,7 +1,8 @@
 import "../../../../../css/user.css";
 import { v4 as uuid } from 'uuid';
 import StringAvatar from "../../../../avatar/avatar.component";
-import { Badge, Tag } from "antd";
+import { Badge, Popconfirm, Tag } from "antd";
+import { useState } from "react";
 type typeOfUser = {
     username : string,
     access : any,
@@ -17,6 +18,8 @@ type typeOfUserParams = {
 
 
 const User = ({ user,deleteEvent, editEvent }:typeOfUserParams)=>{
+
+    const [openPopConfirm, setOpenPopConfirm] = useState(false);
 
     return (
         <li className = "user-list-element" key = {user.id}>
@@ -37,7 +40,15 @@ const User = ({ user,deleteEvent, editEvent }:typeOfUserParams)=>{
             </ul>
             <div className="user-actions">
                 <span onClick={e=>{if (!user.cantEdit) editEvent(user)}}><i className="fas fa-pen"></i></span>
-                <span onClick={e=>{if (!user.cantEdit) deleteEvent(user.id)}}><i className="fas fa-trash"></i></span>
+                <Popconfirm
+                    title="Title"
+                    description="Open Popconfirm with async logic"
+                    open={openPopConfirm}
+                    onConfirm={()=>{if (!user.cantEdit) deleteEvent(user.id)}}
+                    onCancel={()=>setOpenPopConfirm(false)}
+                >
+                <span onClick={e=>{setOpenPopConfirm(true)}}><i className="fas fa-trash"></i></span>
+                </Popconfirm>
             </div>
         </div>
         </li>

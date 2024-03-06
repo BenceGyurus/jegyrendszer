@@ -1,5 +1,6 @@
 import React from "react";
 import "../../css/success.css";
+import { Alert } from "antd";
 
 type typeOfErrorParams = {
     title? : string,
@@ -10,10 +11,8 @@ type typeOfErrorParams = {
 
 const Success = ( { title, message,closeFunction }:typeOfErrorParams ) => {
     return (
-      <div className="success-box">
-        {closeFunction ? <i style={{cursor: "pointer"}} onClick={e => closeFunction()} className ="fas fa-times"></i> : ""}
-          {title ? <h1>{title}</h1> : ""}
-        <p>{message}</p>
+      <div className="notification-box">
+        <Alert description = {message} message = {title} closable showIcon type="success" onClose={e=>{if (closeFunction) closeFunction(false)}} />
       </div>
     );
   };

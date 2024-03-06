@@ -3,12 +3,14 @@ import SmallMap from "./smallMap.component"
 import postData from "../../connection/request";
 import ParseLocalStorage from "../../../cookies/ParseLocalStorage";
 import Tooltip from "../../tooltip/tooltip.component";
-import { Card, Tag } from "antd";
+import { Card, Popconfirm, Tag } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import StringAvatar from "../../avatar/avatar.component";
 import Meta from "antd/es/card/Meta";
 import EventSkeleton from "../operation/events/components/event_Skeleton.component";
 import { Skeleton } from "@mui/material";
+import { useState } from "react";
+import Venue from "./venue.component";
 
 type typeOfSeats = {
     name : string,
@@ -20,7 +22,7 @@ type typeOfSeats = {
     height : number
 }
 
-type typeOfVenueDatas = {
+export type typeOfVenueDatas = {
     name : string,
     seats : Array<typeOfSeats>
     places : number,
@@ -38,6 +40,8 @@ type typeOfVenueListParams = {
     newRequest : Function
 }
 const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
+
+    const [openPopConfirm, setOpenPopConfirm] = useState<boolean>(false);
 
     const handleDeleteFunction = (id:string)=>{
         postData(`/delete-venue/${id}`, {token : ParseLocalStorage("long_token")})
@@ -66,23 +70,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
 
     return(<div className = "venue-list"> {venues.length ? venues.map((element, index)=>{
         return (
-            <Card bordered = {true} cover = {
-              element.seats.length ? <SmallMap sizeOfArea={getSizeOfArea(element.seats)} colorOfBackGround = {element.colorOfBackGround} sizeOfSeats = {element.sizeOfSeat} colorOfSeat = {element.colorOfSeat} seatDatas = {element.seats} /> : <img className = "card-logo" src="/images/logo.png" alt="agora logo" />
-            }
-            actions={[<DeleteOutlined onClick = {event=>handleDeleteFunction(element.id)} />, <EditOutlined onClick = {e => {handleEditFunction(element.id)}} />]}>
-            <div className = "venue-list-venue-body">
-                <StringAvatar username={element.addedBy} />
-                <div className = "venue-datas-holder">
-                    <Tag bordered = {true} color={element.seats.length ? "blue" : "magenta"}>
-                        {element.seats.length ? "ülő" : "álló"}
-                    </Tag>
-                    { element.seats.length ? <Tag bordered = {true} color = "red">
-                        {element.seats.length} ülőhely
-                    </Tag> : <></>}
-                    <h3 className = "venue-name">{element.name}</h3>
-                </div>
-            </div>
-            </Card>
+            <Venue size={getSizeOfArea(element.seats)} element={element} handleDeleteFunction={handleDeleteFunction} handleEditFunction={handleEditFunction} />
         );}) : <Skeleton height={500} style={{marginTop: 0}}></Skeleton>}
         </div>)
 }

@@ -1,13 +1,13 @@
 import WindowHeader from "../../window-header/windowHeader.component";
 import InputText from "../../input/inputText.component";
 import Password from "antd/es/input/Password";
-import Button from "../../buttons/button.component";
 import "../../../css/registration.css"
 import Error from "../../notification/error.component";
 import { useState, useRef } from "react";
 import Success from "../../notification/success.component";
 import postData from "../../connection/request";
-import { Input } from "antd";
+import { Alert, Button, Input } from "antd";
+import { WarningFilled } from "@ant-design/icons";
 const Registration = ()=>{
 
     const [username, setUsername] = useState("");
@@ -44,6 +44,9 @@ const Registration = ()=>{
                         else if (!d.error){
                             setErrors("");
                             setSuccessRegistration(true);
+                            setTimeout(()=>{
+                                window.location.pathname = "/admin"
+                            }, 2000);
                         }
                     }
                     
@@ -66,13 +69,23 @@ const Registration = ()=>{
     return (
 
         <div className = "reg-conteiner">
-            <WindowHeader title = "Regisztráció" />
+            <h2 className = "registration-title">Regisztráció</h2>
             <div>
-                <Input autoComplete="username" title = "Felhasználónév" onChange={e=>setUsername(e.target.value)}/>
-                <Password autoComplete="new-password" value = {password} title = "Jelszó" onChange={e=>setPassword(e.target.value)} />
-                <Password autoComplete="new-password" value = {rePassword} title = "Jelszó újra" onChange={e=>setRepassword(e.target.value)} />
-                <Button title = "Regisztráció" onClickFunction={Control} />
+                <div className = "registration-form-holder-div">
+                    <label htmlFor="username">Felhasználónév</label>
+                    <Input size="large" id = "username" autoComplete="username" title = "Felhasználónév" onChange={e=>setUsername(e.target.value)}/>
+                </div>
+                <div className = "registration-form-holder-div">
+                    <label htmlFor="password">Jelszó</label>
+                    <Password size="large" id = "password" autoComplete="new-password" value = {password} title = "Jelszó" onChange={e=>setPassword(e.target.value)} />
+                </div>
+                <div className = "registration-form-holder-div">
+                    <label htmlFor="re-password">Jelszó újra</label>
+                    <Password size="large" autoComplete="new-password" id = "re-password" value = {rePassword} title = "Jelszó újra" onChange={e=>setRepassword(e.target.value)} />
+                </div>
+                <Button danger = {!!errors} size="large" onClick={e=>Control()}>Regisztráció</Button>
                 <Error message={errors} setOpen={()=>{setErrors("")}} open = {errors != ""} />
+                {successRegistration ? <Success message="Sikeres regisztráció!" /> : <></>}
             </div>
         </div>
 
@@ -81,5 +94,3 @@ const Registration = ()=>{
 }
 
 export default Registration;
-
-//successRegistration ? <Success message="Sikeres regisztráció!" />

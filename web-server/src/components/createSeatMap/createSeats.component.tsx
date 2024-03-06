@@ -168,6 +168,7 @@ const CreateSeats = ({
         setError(request.message);
       } else {
         setSuccess("Sikeres mentés");
+        window.location.href = `/admin/terem-szerkesztes/${request.id}`;
       }
       setSaveing(false);
     });
