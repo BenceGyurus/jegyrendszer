@@ -187,8 +187,18 @@ const CreateSeats = ({
     };
   }, [seats, selectedSeats, stages]);
 
+  const generateSeatsByName = (sector:any)=>{
+    console.log(sector)
+      sector.seats?.forEach((row:any, i:number) => {
+        row?.forEach((seat:any,j:number)=>{
+          seat.name = `${sector.sector.name} ${sector.sector.rowType ? romanize(i + 1) : i + 1}. ${sector.sector.rowName} ${sector.sector.seatType ? romanize(j + startCounting) : j + startCounting}. ${sector.sector.seatName}`
+        })
+      });
+      return sector.seats;
+  }
+
   const newSeats = (rows: number, columns: number) => {
-    if (!watchingGroup) {
+    if (!seats.find(e=>e.sector.id === watchingGroup)) {
       if (isSector) {
         let l: typeOfSeats = [...seats];
         let seat: Array<Array<typeOfSeat>> = [];
@@ -262,7 +272,7 @@ const CreateSeats = ({
   };
 
   const deleteSelectedSeats = () => {
-    if (true) {
+    if (!seats.find(e=>e.sector.id === watchingGroup)) {
       let newSeats: any = [];
       let lambda = [...seats];
       lambda.forEach((seatGroups) => {
@@ -311,6 +321,18 @@ const CreateSeats = ({
       }
       setSeats(l);
     }
+  };
+
+  const editSelectedSector = (value:{name? : string, rowName? : string, rowType? : boolean, seatName? : string, seatType? : boolean}, id:string)=>{
+    let l = [...seats];
+    l.forEach((item:any)=>{
+      if (item.sector.id === id){
+        item.sector = {...item.sector, ...value};
+        console.log(item);
+        item.seats = generateSeatsByName(item);
+      }
+    });
+    setSeats(l);
   };
 
   const selectSeat = ({ id }: { id: string }) => {
@@ -483,7 +505,7 @@ const CreateSeats = ({
       <div className="status-changer">
         <Radio.Group
           defaultValue={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => {setStatus(e.target.value)}}
         >
           <Radio.Button value="create">
             <i className="fas fa-th"></i>
@@ -583,6 +605,7 @@ const CreateSeats = ({
         seats={seats}
       />
       <CreateSeatsEditor
+        editSector={editSelectedSector}
         saveing={saveing}
         save={save}
         nameOfArea={nameOfArea}

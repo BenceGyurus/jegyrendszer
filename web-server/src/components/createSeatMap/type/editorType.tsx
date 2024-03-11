@@ -40,7 +40,8 @@ type typeOfEditorTypeParams = {
     nameOfArea : string,
     setNameOfArea : Function,
     save : Function,
-    saveing : boolean
+    saveing : boolean,
+    editSector : Function
 }
 
 export default typeOfEditorTypeParams;

@@ -13,7 +13,7 @@ const WindowHeader = ({title, closeWindowFunction, className, onDrag}:typeOfWind
         <div className={`header ${className}`}>
             <div className="title">{title}</div>
             <div className = "controls">
-                {closeWindowFunction ? <div onClick = {event => closeWindowFunction()} className = "close-button"></div> : ""}
+                {closeWindowFunction ? <div onClick = {event => closeWindowFunction()} className = "close-button">X</div> : ""}
             </div>
         </div>
     );

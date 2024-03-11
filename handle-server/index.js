@@ -515,7 +515,6 @@ app.get(
         },
       );
       closeConnection(database);
-      let sectors = venue.content.seats;
       if (venue && venue.content.seats) {
         let { stages, seats } = seatMatrixToArray(
           venue.content.seats,
@@ -526,7 +525,8 @@ app.get(
       } else if (!venue) {
         return handleError(logger, "035", res);
       }
-      if (!eventId) {
+      if (!eventId && venue) {
+        let sectors = venue.content.seats;
         return venue
           ? res.send({
               venue: { ...venue.content, groups: createArrayOfGroups(sectors) },

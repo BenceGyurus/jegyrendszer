@@ -14,7 +14,8 @@ type typeOfGroupParams = {
     color : {red : number, blue : number, green : number},
     setDirectionOfSeats : Function,
     originalColor : boolean,
-    rotated : number
+    rotated : number,
+    editSector : Function
 };
 
 export default typeOfGroupParams;

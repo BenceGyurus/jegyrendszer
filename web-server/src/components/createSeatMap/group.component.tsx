@@ -4,7 +4,7 @@ import Window from "../window/window.component";
 import EditSectorWindow from "./editSectorWindow.component";
 
 
-const Group = ({name, id, watchingGroup, setWatchingGroup, seatName, seatType, rowName, rowType, changeStairs, direction, numberOfSeats, type, color,  setDirectionOfSeats, rotated}:typeOfGroupParams)=>{
+const Group = ({name, id, watchingGroup, setWatchingGroup, seatName, seatType, rowName, rowType, changeStairs, direction, numberOfSeats, type, color,  setDirectionOfSeats, rotated,editSector}:typeOfGroupParams)=>{
     return (<div className = "group-div" key = {id}>
         <div className = "group-div-header" style={{borderLeft : `10px solid rgb(${color.red}, ${color.blue}, ${color.green})`}}>
             <div>
@@ -13,7 +13,7 @@ const Group = ({name, id, watchingGroup, setWatchingGroup, seatName, seatType, r
             </div>
             <Tag className="group-tag" color={type == "seat" ? "magenta" : "cyan"} >{type == "seat" ? "Szektor" : "Színpad"}</Tag>
         </div>
-        <EditSectorWindow rotated={rotated} name={name} id={id} seatName={seatName} rowName={rowName} seatType = {seatType} rowType={rowType} changeStairs={changeStairs} direction={direction} setWatchingGroup={setWatchingGroup} open = {watchingGroup===id} type={type} setDirectionOfSeats={setDirectionOfSeats} />
+        <EditSectorWindow rotated={rotated} name={name} id={id} seatName={seatName} rowName={rowName} seatType = {seatType} rowType={rowType} changeStairs={changeStairs} direction={direction} setWatchingGroup={setWatchingGroup} open = {watchingGroup===id} type={type} setDirectionOfSeats={setDirectionOfSeats} editSector = {editSector} />
     </div>)
 }
 

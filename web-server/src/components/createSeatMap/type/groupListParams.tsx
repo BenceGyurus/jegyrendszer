@@ -9,7 +9,8 @@ type typeOfGroupListParams = {
     originalColor : boolean,
     setOriginalColor : Function,
     stages : Array<typeOfStage>,
-    setDirectionOfSeats : Function
+    setDirectionOfSeats : Function,
+    editSector : Function
 };
 
 export default typeOfGroupListParams;

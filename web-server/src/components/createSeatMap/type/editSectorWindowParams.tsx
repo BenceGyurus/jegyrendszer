@@ -11,7 +11,8 @@ type typeOfEditSectorParams = {
     type : "seat" | "stage",
     setDirectionOfSeats : Function,
     id : string,
-    rotated : number
+    rotated : number,
+    editSector : Function
 }
 
 export default typeOfEditSectorParams

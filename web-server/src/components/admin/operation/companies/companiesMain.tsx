@@ -31,7 +31,6 @@ const CompaniesMain = ()=>{
     const deleteCompanyFunction = (id:string)=>{
         postData(`/delete-company/${id}`, {token : ParseLocalStorage("long_token")})
         .then((response)=>{
-            console.log(response);
             getCompanies();
         });
     }
@@ -39,7 +38,7 @@ const CompaniesMain = ()=>{
     const editFunction = (id:string)=>{
         for (let i = 0; i < companies.length; i++){
             if (companies[i]._id == id){
-                setEditCompany({name : companies[i].name, tax : companies[i].tax, _id : companies[i]._id});
+                setEditCompany({name : companies[i].name, tax : companies[i].tax, _id : companies[i]._id, website : companies[i].website});
             }
         }
     }
@@ -48,7 +47,7 @@ const CompaniesMain = ()=>{
         <div>
             <Error  open = {error != ""} setOpen={()=>{setError("")}}  message={error}/>
             <h1>Vállalatok</h1>
-            {addNew || editCompany._id ? <AddCompany website = {editCompany.website} nameOfCompany={editCompany.name} tax={editCompany.tax} id={editCompany._id} closeWindowFunction={()=>{setAddNew(false); setEditCompany({name : "", tax : "", _id : ""})}} errorFunction = {setError} updateFunction={getCompanies} /> : ""}
+            {addNew || editCompany._id ? <AddCompany website = {editCompany.website} nameOfCompany={editCompany.name} tax={editCompany.tax} id={editCompany._id} closeWindowFunction={()=>{setAddNew(false); setEditCompany({name : "", tax : "", _id : "", website : ""})}} errorFunction = {setError} updateFunction={getCompanies} /> : ""}
             {companies.length ? <CompaniesList companies={companies} editFunction={editFunction} deleteFunction={deleteCompanyFunction} /> : <Loader />}
             <AddNewButton onClick={()=>{setAddNew(true)}} />
         </div>
