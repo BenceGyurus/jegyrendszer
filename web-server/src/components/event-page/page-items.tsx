@@ -4,6 +4,7 @@ import Brand from "../brand/embed-brand.component";
 import Map from "../map/map.component";
 import OpenMapLink from "../openMap/openMap.component";
 import Share from "../share/share.component";
+import { Button } from "antd";
 
 type typeOfMedia = {
     apple_music? : string,
@@ -47,6 +48,17 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
             });
     }
     }
+    
+    const scrollToInformation = ()=>{
+        const element: any = document?.getElementById("event-page-description");
+        if (element) {
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "nearest",
+          });
+        }
+    }
 
     return (
         <div className = "event-page-items-div">
@@ -60,9 +72,10 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
             {window.innerWidth >= 700 ? <div className = "image-gradient-top"></div> : ""}
             <div className = "image-gradient-bottom"></div>
             </div>
-            <button className="buy-ticket-button" onClick={e=>scroll()}>
-            Jegyvásárlás
-            </button>
+            <div className = "ticket-buying-scroll-buttons">
+            <Button size = "large" className="ticket-buying-scroll-button" onClick={e=>scroll()}>Vásárlás</Button>
+            <Button type="primary" className = "buy-ticket-scroll-button ticket-buying-scroll-button" onClick={()=>scrollToInformation()} size = "large">További információk</Button>
+            </div>
             <p className = "event-page-description" id = "event-page-description">{description.split("\n").length ? description.split("\n").map((paragraph:string)=>{return <p>{paragraph}</p>}) : description}</p>
             {media.apple_music || media.spotify || media.facebook || media.instagram || media.youtube ?  <div className = "user-side-media">
                 <div className = "user-side-media-elements">

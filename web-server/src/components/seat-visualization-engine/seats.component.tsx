@@ -84,6 +84,37 @@ const SeatVisualization = ({
     translation: { x: 0, y: 0 },
   });
   const animationRef: any = React.useRef(null);
+  const [startTouch, setStartTouch] = useState({ x: 0, y: 0 });
+  const [currentTouch, setCurrentTouch] = useState({ x: 0, y: 0 });
+  const [isZoomingOrMoving, setIsZoomingOrMoving] = useState(false);
+  const [touchEvent, setTouchEvent] = useState<any>(null);
+
+  const handleTouchStart = (e:any) => {
+    setStartTouch({ x: state.translation.x, y: state.translation.y });
+    setTouchEvent(e);
+  };
+  const handleTouchMove = (e:any) => {
+    setCurrentTouch({ x: state.translation.x, y: state.translation.y });
+
+    const deltaX = currentTouch.x - startTouch.x;
+    const deltaY = currentTouch.y - startTouch.y;
+
+    const threshold = 30;
+
+    if (Math.abs(deltaX) > threshold || Math.abs(deltaY) > threshold) {
+      setIsZoomingOrMoving(true);
+    }
+  };
+
+  // onTouchEnd handler
+  const handleTouchEnd = (handleClick:Function) => {
+    setStartTouch({ x: 0, y: 0 });
+    setCurrentTouch({ x: 0, y: 0 });
+    setIsZoomingOrMoving(false);
+    if (!isZoomingOrMoving) {
+      handleClick(touchEvent);
+    }
+  };
 
   const animateTransform = (targetTransform: any, startTransform: any) => {
     cancelAnimationFrame(animationRef.current);
@@ -339,11 +370,9 @@ const SeatVisualization = ({
           <Spin size="large" spinning={disabled ? disabled : false}>
             <div id="seat-map-canvas-holder" className="seat-map-canvas-holder">
               <canvas
-                onTouchStart={(e: any) => {
-                  console.log(
-                    document.documentElement.scrollTop,
-                    canvasRef.current.getBoundingClientRect().top,
-                  );
+                onTouchStart={e=>handleTouchStart(e)}
+                onTouchMove={e=>handleTouchMove(e)}
+                onTouchEnd={e=>handleTouchEnd((e: any) => {
                   handleSeatClick(
                     (e.touches[0].pageX -
                       canvasRef.current.getBoundingClientRect().left) *
@@ -352,8 +381,7 @@ const SeatVisualization = ({
                       (document.documentElement.scrollTop +
                         canvasRef.current.getBoundingClientRect().top)) *
                       (1 / state.scale),
-                  );
-                }}
+                  )})}
                 onClick={(e: any) => {
                   handleSeatClick(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
                 }}

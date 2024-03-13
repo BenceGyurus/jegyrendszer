@@ -284,7 +284,6 @@ const Page = ({
 
   const toOtherInformations = () => {
     const element: any = document?.getElementById("event-page-description");
-    console.log(element);
     if (element) {
       element.scrollIntoView({
         behavior: "smooth",
