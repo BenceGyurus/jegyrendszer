@@ -1702,25 +1702,22 @@ app.post("/api/v1/events", async (req, res) => {
                   "eventData.description": { $regex: new RegExp(search, "i") },
                 },
               ],
-            })
-            .toArray()
-        : await collection.find().toArray();
+            }).sort( { "eventData.objectDateOfEvent": -1 } ).toArray()
+        : await collection.find().sort( { "eventData.objectDateOfEvent": -1 } ).toArray();
       if (!datas) {
         logger.error(`Failed to read db edit-events`);
         return handleError(logger, "500", res);
       }
       let events = [];
       let userId = String((await GetUserDatas(body.token))._id);
-      datas.forEach((element) =>
-        element.eventData.users.includes(userId)
-          ? events.push({
+      datas.forEach((element) =>events.push({
               eventData: element.eventData,
               addedBy: element.otherDatas.userData,
               id: element._id,
               versions: element.versions,
               otherDatas: element.otherDatas,
+              isAccess : element.eventData.users.includes(userId)
             })
-          : false,
       );
       let numberOfPages =
         events.length && limit ? Math.ceil(events.length / limit) : 0;
@@ -1811,6 +1808,7 @@ app.post("/api/v1/get-all-event", async (req, res) => {
 //TICKETS
 app.post("/api/v1/order-ticket", async (req, res) => {
   let body = Functions.parseBody(req.body);
+  console.log(body);
   if (
     body &&
     typeof body == TypeOfBody &&
@@ -2371,6 +2369,7 @@ app.post(
   "/api/v1/payment/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
+    console.log(req.body);
     if (
       req.body &&
       typeof req.body &&
@@ -2410,6 +2409,7 @@ app.post(
               res,
             );
           if (!result.error) {
+            let simpleBody = {};
             let saveDatas = {};
             if (!error) {
               let { price, error, name } = await controlCoupon(
@@ -2447,15 +2447,19 @@ app.post(
                 { $set: saveDatas },
               );
               closeConnection(l.database);
-              SimplePayPayment(
+              const simpleDatabase = new Database("simplePay");
+              simpleBody = await SimplePayPayment(
                 uuid,
                 req.params.id,
                 req.body.datas.customerData,
                 buyingDatas.tickets,
                 buyingDatas.fullPrice,
               );
+              closeConnection(simpleDatabase.database);
+            }else{
+              return handleError(logger, "400", res);
             }
-            return res.send({ link: "http://localhost:3000" });
+            return res.send({ link: "http://link.bnbdevelopment.cloud:8080/1yhga", datas :  simpleBody});
           } else {
             return handleError(
               logger,
@@ -2771,6 +2775,25 @@ app.post(
     handleError(logger, "004", res);
   },
 );
+
+//EXPORT
+
+app.post("/api/v1/export-venue", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+  let id = req.query.id;
+  let access = await control_Token(req.body.token, req);
+      if (access && access.includes("venue")) {
+  if (id){
+    let objectId = Functions.createObjectId(id);
+    const {collection, database} = new Database("venue");
+    let result = await collection.findOne({_id : objectId});
+    closeConnection(database);
+    return res.send({content : result.content});
+  }else{
+
+  }
+  }
+  return handleError(logger, "", res);
+})
 
 //ADS
 

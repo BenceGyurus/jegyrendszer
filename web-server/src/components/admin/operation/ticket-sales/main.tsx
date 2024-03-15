@@ -60,9 +60,6 @@ const TicketSalesMain = () => {
             onChange={(e) => setSearchValue(e.target.value)}
             className="ticket-sales-search-field"
           />
-          <Button onClick={() => setRedemptionWindow(true)}>
-            Jegy visszaváltás
-          </Button>
         </div>
         {ticketDatas.length ? (
           <TicketStats datas={ticketDatas} />

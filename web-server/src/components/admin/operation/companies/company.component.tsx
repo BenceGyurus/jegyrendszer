@@ -1,5 +1,7 @@
+import { Card } from "antd";
 import "../../../../css/company.css";
 import typeOfCompany from "./type/company";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 type typeOfCompanyParams = {
     company : typeOfCompany,
@@ -9,15 +11,15 @@ type typeOfCompanyParams = {
 
 const Company = ({ company, editFunction, deleteFunction }:typeOfCompanyParams)=>{
     return (
-        <div className = "company-box">
-            <h2 className = "company-name">{company.name}</h2>
+        <Card title={company.name} className = "company-box" bordered={false} style={{ width: 300 }} actions={
+            [
+                <DeleteOutlined key="setting" onClick={e=>{deleteFunction(company._id)}} />,
+                <EditOutlined key="edit" onClick={e=>{editFunction(company._id)}} />,
+              ]
+        }>
             <p className = "tax-number">Adószám: {company.tax}</p>
             <p className = "web-site">Weboldal: <a target="_blank" href = {company.website}>{company.website}</a></p>
-            <div className = "company-buttons">
-                <button className = "edit-button" onClick={e=>{editFunction(company._id)}}>Szerkesztés</button>
-                <button className = "delete-button" onClick={e=>{deleteFunction(company._id)}}>Törlés</button>
-            </div>
-        </div>
+        </Card>
     );
 }
 

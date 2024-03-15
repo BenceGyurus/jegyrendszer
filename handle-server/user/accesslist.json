@@ -1,15 +1,15 @@
 {
     "edit-users" : ["Felhasználók szerkesztése","admin/felhasznalok", "fas fa-users-cog"],
-    "edit-events" : ["Rendezvények", "admin/rendezvenyek", "far fa-calendar-check"],
-    "edit-rooms" : ["Termek", "admin/termek", "far fa-map"],
+    "edit-events" : ["Rendezvények", "admin/rendezvenyek", "fas fa-theater-masks"],
+    "edit-rooms" : ["Termek", "admin/termek", "fas fa-layer-group"],
     "statistics" : ["Statisztika", "admin/statisztika", "fas fa-chart-bar"],
-    "profile" : ["Profil" , "admin/profil", "far fa-address-card"],
+    "profile" : ["Profil" , "admin/profil", "fas fa-user"],
     "ticket-sells" : ["Jegy eladások", "admin/jegy-eladasok", "fas fa-ticket-alt"],
     "ref" : ["Kuponok", "admin/kuponok", "fas fa-percent"],
     "local-sale" : ["Helyi eladás", "admin/helyi-eladas", "fas fa-ticket-alt"],
     "companies" : ["Cégek szerkesztése", "admin/cegek", "fas fa-building"],
     "edit-aszf" : ["ÁSZF szerkesztése", "admin/edit-aszf", "far fa-edit"],
     "edit-letter" : ["Email szerkesztése", "admin/edit-email", "far fa-envelope"],
-    "local-discount" : ["Helyi kedvezmények", "admin/helyi-kedvezmenyek", "fas fa-street-view"],
-    "monitor" : ["Hirdetések", "admin/monitor", "fas fa-tv"]
+    "local-discount" : ["Helyi kedvezmények", "admin/helyi-kedvezmenyek", "fas fa-user-tag"],
+    "monitor" : ["Hirdetések", "admin/monitor", "fas fa-ad"]
 }

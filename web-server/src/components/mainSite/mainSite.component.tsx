@@ -4,6 +4,7 @@ import NoEvent from "../../components/event/NoEvent.component";
 import LoadingAnimation from "../load-animation/loadAnimation.component";
 import Notification from "../notification/notification.component";
 import Error from "../notification/error.component";
+import { EventSkeletonList } from "./eventSkeletonList.component";
 
 const App = ()=>{
     const [events, setEvents] = useState([]);
@@ -13,13 +14,26 @@ const App = ()=>{
     useEffect(
         ()=>{
             fetch("/api/v1/events")
-            .then(async (response:any)=>{try{response =  await response.json()}catch{setError("Hiba történet az események betöltése közben"); response = {error : true, responseData : response}};response.status === 404 ? setTimeout(()=>{setIsItLoad(true)}, 2500) : response.error ? setIsItLoad(true) : setTimeout(()=>{setEvents(response.events); setIsItLoad(true)}, 2500);});
+            .then(async (response:any)=>{
+                
+                try{response =  await response.json()}catch{setError("Hiba történet az események betöltése közben"); 
+                response = {error : true, responseData : response}};
+                if (response.status === 404){
+                    setIsItLoad(true);
+                }
+                else if (response.error){
+                    setIsItLoad(true);
+                }
+                else{
+                    setEvents(response.events); setIsItLoad(true)
+                }
+            });
         },[]
     );
 
 
     if (!events.length && !isItLoad){
-        return <LoadingAnimation />;
+        return <EventSkeletonList />;
     }
     return events.length && isItLoad ? (<EventList events = {events} />) : error ? <Error message={error} setOpen={()=>{setError("")}} open = {error != ""} /> : <NoEvent />;
 }

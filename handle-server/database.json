@@ -90,5 +90,9 @@
   "feedback": {
     "database": "beta",
     "collection": "feedback"
+  },
+  "simplePay" : {
+    "database" : "payments",
+    "collection" : "simplePay"
   }
 }

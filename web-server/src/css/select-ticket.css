@@ -104,10 +104,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 30px;
+  padding: 20px;
   border-radius: 15px;
   background-color: #fff;
-  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--event-page-box-shadow);
   width: 100%;
 }
 
@@ -125,13 +125,14 @@
 }
 
 .ticket-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   margin-bottom: 5px;
 }
 
 .ticket-price {
-  font-size: 16px;
+  font-size: 13px;
+  color: var(--ligther-color) !important;
 }
 
 .quantity-selector {
@@ -140,8 +141,8 @@
 }
 
 .quantity-btn {
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -150,7 +151,7 @@
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 15px;
   margin: 0 5px;
   transition: background-color 0.2s ease;
 }
@@ -160,13 +161,13 @@
 }
 
 .ticket-quantity {
-  width: 30px;
-  height: 30px;
+  width: 27px;
+  height: 27px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 600;
   background-color: #f7f7f7;
   border: 2px solid #007bff;
   border-radius: 50%;
@@ -205,7 +206,7 @@
 }
 
 .total-price {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: bold;
   margin-top: 20px;
   text-align: right;

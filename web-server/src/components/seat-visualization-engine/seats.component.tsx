@@ -99,7 +99,7 @@ const SeatVisualization = ({
     const deltaX = currentTouch.x - startTouch.x;
     const deltaY = currentTouch.y - startTouch.y;
 
-    const threshold = 30;
+    const threshold = 10;
 
     if (Math.abs(deltaX) > threshold || Math.abs(deltaY) > threshold) {
       setIsZoomingOrMoving(true);
@@ -324,10 +324,13 @@ const SeatVisualization = ({
           seat.y <= y &&
           y <= seat.y + seat.size.height,
       );
+      console.log(clickedSeat);
       if (clickedSeat) {
         //controlZoom(sizeOfGroups[clickedSeat.group])
       }
       if (clickedSeat && clickedSeat.id) {
+        let ticket = tickets.find(ticket=>ticket.seats.includes(clickedSeat.id));
+        if (!ticket?.pendingPlaces.includes(clickedSeat.id) && !ticket?.boughtPlaces.includes(clickedSeat.id))
         selectFunction(clickedSeat.id);
         //setSelectedSeats((prevSelectedSeats:any) => [...prevSelectedSeats, clickedSeat]);
       }

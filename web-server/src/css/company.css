@@ -2,27 +2,13 @@
     width: 30%;
     background-color: rgb(255, 255, 255);
     display: inline-table;
-    height: 200px;
+    height: 250px;
     margin: 20px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     padding: 0px 10px;
     overflow-y: auto;
 }
-
-.company-name{
-    text-align: center;
-    font-weight: 500;
-    width: 90%;
-    margin: 15px auto;
-}
-
-.company-buttons{
-    width: max-content;
-    margin: 3px auto;
-    display: block;
-}
-
 .tax-number{
     font-size: 12px;
     text-align: center;

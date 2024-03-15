@@ -29,6 +29,7 @@ const Map = ({center, zoomLevel, title, className}:typeOfMapParams)=>{
      return (
         <MapContainer ref = {mapRef} center={center} zoom={zoomLevel} className = {`map ${className}`} zoomAnimation = {true} zoomControl = {false}>
                 <TileLayer
+                    className='map-title-layer'
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />

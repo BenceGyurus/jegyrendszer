@@ -14,30 +14,19 @@ const drawSeat = (
   const cornerRadius = 2;
 
   const gradient = ctx.createLinearGradient(x, y, x, y + seatHeight);
-  if (isSelected) {
-    gradient.addColorStop(0, "#3DA4FF"); // Blue for available, red for occupied
-    gradient.addColorStop(1, "#3496E2");
+  if (isSelected) { // Blue for available, red for occupied
+    gradient.addColorStop(1, "#7dafff");
   } else {
     gradient.addColorStop(
       0,
       pending
-        ? "#f1f58c"
+        ? "#f5f5a2"
         : isAvailable
           ? disabled
-            ? "grey"
+            ? "#bfbfbf"
             : colorOfSeat
-          : "#FF6767",
+          : "#ff8785",
     ); // Blue for available, red for occupied
-    gradient.addColorStop(
-      1,
-      pending
-        ? "#f1f58c"
-        : isAvailable
-          ? disabled
-            ? "grey"
-            : "rgba(0,0,0,0.9)"
-          : "#FF5E5E",
-    ); // Slightly darker shade
   }
 
   ctx.beginPath();

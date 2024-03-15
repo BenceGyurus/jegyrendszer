@@ -25,6 +25,8 @@ type typeOfDatasOfCustormerParams = {
   setSameInvoiceData: Function;
   isCompany: boolean;
   setIsCompany: Function;
+  acceptTermsFunction : Function,
+  isTermsAccespted : boolean
 };
 
 const DatasOfCustomer = ({
@@ -51,6 +53,8 @@ const DatasOfCustomer = ({
   setSameInvoiceData,
   isCompany,
   setIsCompany,
+  acceptTermsFunction,
+  isTermsAccespted
 }: typeOfDatasOfCustormerParams) => {
   const getCity = (zipcode: string) => {
     if (zipcode) {
@@ -69,6 +73,7 @@ const DatasOfCustomer = ({
     <div className="datas-of-customer">
       <div className="is-company-option">
         <Radio.Group
+          size="middle"
           optionType="button"
           options={[
             { label: "Magánszemély", value: false },
@@ -85,7 +90,7 @@ const DatasOfCustomer = ({
           <br />
           <Input
             className="input"
-            size="large"
+            size="middle"
             type="text"
             id="lastName"
             defaultValue={firstName}
@@ -98,7 +103,7 @@ const DatasOfCustomer = ({
           <label htmlFor="firstname">Keresznév</label>
           <br />
           <Input
-            size="large"
+            size="middle"
             type="text"
             id="firstname"
             defaultValue={lastName}
@@ -112,7 +117,7 @@ const DatasOfCustomer = ({
           <br />
           <Input
             className="input"
-            size="large"
+            size="middle"
             type="text"
             id="lastName"
             defaultValue={firstName}
@@ -130,7 +135,7 @@ const DatasOfCustomer = ({
           <div id="postal-code-div">
             <label htmlFor="postCode">Irányítószám</label>
             <Input
-              size="large"
+              size="middle"
               type="text"
               id="postCode"
               defaultValue={zip}
@@ -146,7 +151,7 @@ const DatasOfCustomer = ({
           <div id="city-div">
             <label htmlFor="city">Település név</label>
             <Input
-              size="large"
+              size="middle"
               type="text"
               id="city"
               value={city}
@@ -160,7 +165,7 @@ const DatasOfCustomer = ({
         <label htmlFor="address">Cím</label>
         <br />
         <Input
-          size="large"
+          size="middle"
           type="text"
           id="address"
           defaultValue={address}
@@ -173,7 +178,7 @@ const DatasOfCustomer = ({
         <label htmlFor="address2">Emelet, lépcsőház stb. (nem kötelező)</label>
         <br />
         <Input
-          size="large"
+          size="middle"
           type="text"
           id="address2"
           defaultValue={address2}
@@ -189,7 +194,7 @@ const DatasOfCustomer = ({
           </label>
           <br />
           <Input
-            size="large"
+            size="middle"
             type="text"
             id="tax-number"
             defaultValue={tax}
@@ -206,7 +211,7 @@ const DatasOfCustomer = ({
         <label htmlFor="email">E-mail cím</label>
         <br />
         <Input
-          size="large"
+          size="middle"
           type="email"
           id="email"
           defaultValue={mail}
@@ -219,7 +224,7 @@ const DatasOfCustomer = ({
         <label htmlFor="phone">Telefonszám</label>
         <br />
         <Input
-          size="large"
+          size="middle"
           type="phone"
           id="phone"
           defaultValue={phone}
@@ -228,13 +233,15 @@ const DatasOfCustomer = ({
         />
       </div>
       <br />
-      <input type="checkbox" id="accept" />
+      <div className = "accept-term-and-conditions">
+      <input type="checkbox" id="accept" checked = {isTermsAccespted} onChange={e=>acceptTermsFunction(e.target.checked)} />
       <label htmlFor="accept">
         Elfogadom az{" "}
         <a href="/aszf" target="_blank">
           Általános szerződési feltételeket
         </a>
       </label>
+      </div>
     </div>
   );
 };

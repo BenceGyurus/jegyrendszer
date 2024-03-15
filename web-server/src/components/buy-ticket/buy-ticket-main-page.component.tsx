@@ -69,6 +69,7 @@ const BuyTicketMainPage = () => {
   const [link, setLink] = useState("");
   const [isCompany, setIsCompany] = useState<boolean>(false);
   const [checkCoupon, setCheckCoupon] = useState<boolean>(false);
+  const [terms, setTerms] = useState<boolean>(false);
   const [ticketDatas, setTicketDatas]: [typeOfTicketDatas, Function] = useState(
     {
       eventId: "",
@@ -113,6 +114,7 @@ const BuyTicketMainPage = () => {
   };
 
   const sendDatas = () => {
+    if (terms){
     if (
       firstname &&
       lastname &&
@@ -139,6 +141,7 @@ const BuyTicketMainPage = () => {
       };
       let token = window.location.pathname.split("/")[2];
       postData(`/payment/${token}`, { datas: datas }).then((response) => {
+        console.log(response.datas)
         if (response.link) {
           setStep(2);
           getDatas();
@@ -147,12 +150,15 @@ const BuyTicketMainPage = () => {
         setfetching(false);
       });
     }
+  }else{
+    setError("A továbblépéshez el kell fogadnia a felhasználási feltételeket")
+  }
   };
 
   const pay = () => {
     if (link) {
       window.location.href = link;
-    } else {
+    } else{
       setError("Hiba történt a fizetés során");
     }
   };
@@ -199,9 +205,11 @@ const BuyTicketMainPage = () => {
       </div>
       {step === 1 ? (
         <div>
-          <h1>Adatok megadása</h1>
+          <h1 className = "ticket-buying-main-title">Adatok megadása</h1>
           <div className="first-step-details-holder">
             <DatasOfCustomer
+              isTermsAccespted={terms}
+              acceptTermsFunction={setTerms}
               isCompany={isCompany}
               setIsCompany={setIsCompany}
               setFirstName={setFirstname}

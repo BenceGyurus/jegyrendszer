@@ -7,6 +7,7 @@ import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import Success from "../../../notification/success.component";
 import Error from "../../../notification/error.component";
 import Password from "../../../input/password.component";
+import { Input } from "antd";
 const EditProfileMain = () => {
   const [userData, setUserData] = useState({ username: "", id: "" });
   const [username, setUsername] = useState("");
@@ -89,7 +90,7 @@ const EditProfileMain = () => {
       />
       <h1>Profil szerkesztése</h1>
       <label htmlFor="username">Új Felhasználónév:</label>
-      <input
+      <Input
         type="text"
         id="username"
         name="username"
@@ -97,14 +98,14 @@ const EditProfileMain = () => {
       />
       <button onClick={(e) => changeUsername()}>Mentés</button>
       <label htmlFor="oldPassword">Régi jelszó</label>
-      <input
+      <Input
         type="password"
         id="oldPassword"
         name="oldPassword"
         onChange={(e) => setOldPass(e.target.value)}
       />
       <label htmlFor="newPassword">Új jelszó</label>
-      <input
+      <Input
         type="password"
         autoComplete="new-password"
         id="newPassword"
@@ -112,7 +113,7 @@ const EditProfileMain = () => {
         onChange={(e) => setPass1(e.target.value)}
       />
       <label htmlFor="confirmPassword">Új jelszó mégegyszer</label>
-      <input
+      <Input
         autoComplete="new-password"
         type="password"
         id="confirmPassword"

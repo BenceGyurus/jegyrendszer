@@ -4,8 +4,8 @@
     max-width: 500px;
     margin: 20px auto;
     padding: 20px;
-    border-radius: 20px;
-    box-shadow: 2px 1px 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: var(--event-page-box-shadow);
     width: 80%;
     align-items: center;
     justify-content: center;
@@ -26,4 +26,5 @@
 
 .legend-label{
     text-align: center;
+    font-size: 14px;
 }

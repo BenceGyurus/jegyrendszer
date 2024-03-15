@@ -100,7 +100,7 @@ const TicketPageItems = ({title, description, date, image, media, location, posi
                 <div className = "event-location-and-date">
                 <div className="event-location-name">
                     <p>
-                    <span className = "location-icon"><i style={{fontSize : 25}} className="fas fa-map-marker-alt"></i></span>
+                    <span className = "location-icon"><i style={{fontSize : 20}} className="fas fa-map-marker-alt"></i></span>
                         <OpenMapLink address={address} text={location} className = "location-name-map-link" />
                     </p>
                 </div>

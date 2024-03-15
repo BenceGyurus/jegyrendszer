@@ -3,19 +3,9 @@ const Functions = require("./functions.js");
 const handleError = require("./handleError.js");
 const Logger = require("./slack-logger.js");
 const getTime = require("./getTime.js");
+const { closeConnection } = require("./closeConnection.js");
 
 const logger = Logger();
-
-const closeConnection = (database)=>{
-    try{
-    setTimeout(()=>{
-        database.close();
-    },10000);
-    }
-    catch{
-        //error handle
-    }
-}
 
 const ControlLoginRequest = async (req, res)=>{
     let browserData = Functions.getBrowerDatas(req);
@@ -51,6 +41,7 @@ const ControlLoginRequest = async (req, res)=>{
             else{
                 collection.insertOne({ip : ip, browserData : browserData, time : new Date().getTime()});
                 closeConnection(database)
+                closeConnection(bannedUsersDatabase.database);
                 return true;
     }
     }

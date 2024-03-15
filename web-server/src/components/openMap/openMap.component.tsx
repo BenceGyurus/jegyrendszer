@@ -20,9 +20,12 @@ const OpenMapLink = ({ address, text, className, style }:typeOfOpenMapLinkParams
     };
   
     return (
-      <a href="#" onClick={openMap} className = {className} style={{...style}}>
-        {text}
-      </a>
+      <div className = "event-map-titles">
+        <span className = {className}>{text}</span>
+        <a href="#" onClick={openMap} className = "open-map-link-by-event" style={{...style}}>
+        Térkép <i className="fas fa-external-link-alt"></i>
+        </a>
+      </div>
     );
   };
 

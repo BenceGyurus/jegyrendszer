@@ -33,7 +33,7 @@ const Coupon = ({
         value={value}
       />
       <Button
-        size="large"
+        size="middle"
         className="coupon-button"
         onClick={() => onClickFunction()}
         type="primary"

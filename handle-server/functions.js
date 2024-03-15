@@ -1,6 +1,7 @@
 const uuid = require("uuid");
 const fs = require("fs");
 var browser = require("browser-detect");
+const { ObjectId } = require("mongodb");
 
 const databaseNames = JSON.parse(fs.readFileSync(`${__dirname}/database.json`));
 
@@ -196,6 +197,16 @@ class Functions {
       }
     }, 10000);
   };
+
+  static createObjectId = (id)=>{
+    let objectId = "";
+    try{
+      objectId = new ObjectId(id);
+    }catch{
+      objectId = id;
+    }
+    return objectId;
+  }
 }
 
 module.exports = Functions;

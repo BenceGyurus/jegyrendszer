@@ -15,30 +15,31 @@
 
 .event-map{
   width: 100%;
-  height: 100%;
-  border-radius: 20px;
+  height: 150px;
+  border-radius: 12px;
+  margin: 0;
 }
 
 .event-map-border-radius{
-  width: 85%;
-  height: 200px;
-  overflow: hidden;
-  border-radius: 0px;
-  margin: 5px auto 20px auto;
-  justify-content: center;
-  border-radius: 20px;
-  margin-bottom: 40px;
+  width: 45%;
+  max-width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  margin: 5%;
 }
 
 .location-icon{
-  width: 10%;
-  margin-right: 5px;
+  width: 7%;
+  margin-top: 5%;
+  margin-right: 5%;
   display: inline-table !important;
   height: 30px;
 }
 
 .event-location-and-date{
-  width: 100%;
+  width: 47%;
+  margin: 3%;
+  display: flex;
 }
 .event-location-name span{
   font-size: 13px;
@@ -66,11 +67,12 @@
 .event-location-name{
   width: 100%;
   padding: 20px;
+  display: flex;
 }
 
 .event-location-name p{
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
   text-align: center;
   font-weight: 200;
@@ -80,19 +82,22 @@
   width: 80%;
   text-decoration: none;
   text-align: left;
-  margin: 4px;
+  font-size: 15px;
 }
 
 .event-map-div{
   width: 80%;
   max-width: 500px;
-  display: block;
+  display: flex;
   margin: 10px auto;
   height: max-content;
   background-color: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--event-page-box-shadow);
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px;
 }
 
 .event-page-div{
@@ -200,6 +205,25 @@
         top: 10px;
         left: -37%;
       }
+      .location-name-map-link{
+        font-size: 17px !important;
+      }
+  }
+
+  @media screen and (width < 500px) {
+    .event-map{
+      width: 100%;
+      height: 100px;
+      border-radius: 12px;
+    }
+    
+    .event-map-border-radius{
+      width: 45%;
+      max-width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      margin: 5%;
+    } 
   }
 
 
@@ -237,6 +261,7 @@
 
 .user-side-media{
   display: inline-table;
+  margin: 0 10px;
 }
 
 .user-side-media-elements{
@@ -274,4 +299,24 @@
 
 .ticket-buying-scroll-button{
   margin: 5px;
+}
+
+.open-map-link-by-event{
+  color: #adadad !important;
+  text-decoration: underline;
+  font-size: 10px;
+  font-weight: 100;
+}
+
+.open-map-link-by-event i {
+  color: #adadad !important;
+}
+
+.event-map-titles{
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+  align-items: flex-start;
+  margin-left: 5%;
+  width: 85%;
 }

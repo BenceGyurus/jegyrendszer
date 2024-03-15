@@ -63,3 +63,27 @@
         margin: 20px auto;
     }
 }
+
+.ticket-buying-main-title{
+    margin: 10px;
+}
+
+.datas-of-customer label{
+    font-size: 13px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.datas-of-customer h3{
+    margin: 15px 0;
+    font-size: 18px;
+}
+
+.datas-of-customer h2{
+    margin: 15px 0;
+    font-size: 20px;
+}
+
+.accept-term-and-conditions label{
+    margin-left: 5px;
+}

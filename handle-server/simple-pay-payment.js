@@ -72,7 +72,9 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
             .catch(()=>{
                 reject({error : true, response : result});
             })*/
-    })
+
+            resolve(config);
+    });
 
 
     }
