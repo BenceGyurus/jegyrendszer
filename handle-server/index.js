@@ -2655,7 +2655,7 @@ app.post(
         let smallImageFileName = `${Functions.genrateToken()}.${file.path.split(".")[file.path.split(".").length-1]}`;
         try {
           const scale = 400;
-          let imageBuffer = fs.readFileSync(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}${file.path}` : `${file.path}`);
+          let imageBuffer = fs.readFileSync(process.env.NODE_ENV === "production" ? `${file.path}` : `${file.path}`);
           let jimage = await Jimp.read(imageBuffer);
           width = jimage.bitmap.width;
           height = jimage.bitmap.height;
