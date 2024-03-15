@@ -190,6 +190,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
     const [errorWindow, setErrorWindow] = useState("");
     const [performer, setPerformer] = useState(performerIn ? performerIn : "");
     const [isPerformerGroup, setIsPerformerGroup] = useState(isGroupPerformerIn ? isGroupPerformerIn : false);
+    const [smallerImage, setSmallerImage] = useState<string>("");
 
     const getTickets = ()=>{
         if (readable_event_name){
@@ -420,7 +421,8 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             end_Of_The_Event : endOfTheEvent,
             wardrobe : wardrobe,
             performer : performer,
-            isGroupPerformer : isPerformerGroup
+            isGroupPerformer : isPerformerGroup,
+            smallBackground : smallerImage
         };
 
         console.log(sendData);
@@ -640,7 +642,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             {users.length ? <UsersList selectedUsers={selectedUsers} userDatas={users} onChangeFunction={changeSelectedUsers} /> : ""}
             </div>
             <div ref = {backgroundRef} className = "event-settings-holder">
-            <ImageUpload onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
+            <ImageUpload setSmallerImage={setSmallerImage} smallerImage={smallerImage} onChangeFunction={(path:string)=>{setBackgroundImage(path)}} file = {{fileName : backgroundImage}} deleteFunction = {()=>{setBackgroundImage("")}} className = "create-event-upload-image" title = "Borítókép feltöltése" />
             </div>
             {(addWindow || editTicket) && venueDatas ? <AddTicket closeFunction={()=>{setAddWindow(false); setEditTicket(false)}} idOfVenue = {selectedVenue} datasOfVenue = {venueDatas} saveFunction = {addNewTickets} allSelected = {all_Selected} nameOfTicket={editTicket ? editTicket.name : ""} priceOfTicket={editTicket ? editTicket.price : ""} minPriceOfTicket={editTicket ? editTicket.minPrice : ""} maxPriceOfTicket={editTicket ? editTicket.maxPrice : ""} seatsOfTicket={editTicket ? editTicket.seats : ""} id={editTicket ? editTicket.id : ""} editFunction={saveEditedTicket} numberOfTicket={editTicket ? editTicket.numberOfTicket : 0} /> : ""}
             <div ref = {ticketsRef} className = "event-settings-holder event-settings-tickets">

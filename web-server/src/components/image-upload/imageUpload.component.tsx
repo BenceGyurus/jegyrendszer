@@ -15,16 +15,18 @@ type typeOfImageUpload = {
     deleteFunction : Function,
     className? : string,
     title? : string,
-    errorFunction? : Function
+    errorFunction? : Function,
+    setSmallerImage? : Function,
+    smallerImage? : string
 }
 
 type typeOfFileType = {
     path : string
 }
 
-const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title, errorFunction}:typeOfImageUpload)=>{
+const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title, errorFunction, setSmallerImage, smallerImage}:typeOfImageUpload)=>{
 
-    const [image, setImage]:[typeOfFileType, Function] = useState({path : file.fileName});
+    const [image, setImage]:[typeOfFileType, Function] = useState({path : smallerImage ? smallerImage : file.fileName});
     const [uploading, setUploading]:[boolean, Function] = useState(false);
     const [percent, setPercent]:[number, Function] = useState(0);
     const [errorUploading, setErrorUploading]:[boolean, Function] = useState(false);
@@ -46,8 +48,9 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title, e
             // Successful upload
             if (response.data && response.data.path){
                 setTimeout(()=>{setUploading(false)}, 100)
-                setImage({path : response.data.path});
+                setImage({path : response.data.smallPath});
                 onChangeFunction(response.data.path);
+                if (setSmallerImage){setSmallerImage(response.data.smallPath)}
             }
             setErrorUploading(false);
           } catch (error) {

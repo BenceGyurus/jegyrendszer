@@ -41,6 +41,7 @@ const getContributors = require("./getContributorsOfEvent.js");
 const SimplePayPayment = require("./simple-pay-payment.js");
 const { collectDefaultMetrics, register } = require("prom-client");
 collectDefaultMetrics({ timeout: 5000 });
+const sharp = require('sharp');
 const Redis = require("ioredis");
 const setStatus = require("./buy-ticket.js");
 const controlCreatedSeats = require("./control/controlCreatedSeats.js");
@@ -95,7 +96,7 @@ const storage = multer.diskStorage({
         file.mimetype.split("/")[1].toUpperCase(),
       )
     ) {
-      callBack(null, process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : "/uploads");
+      callBack(null, process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads`);
     }
   },
   filename: (req, file, callBack) => {
@@ -167,6 +168,7 @@ app.get(
                 "eventData.tickets": 1,
                 "eventData.performer": 1,
                 "eventData.isGroupPerformer": 1,
+                "eventData.smallBackground" : 1
               },
             },
           )
@@ -194,7 +196,7 @@ app.get(
               date: datas[i].eventData.objectDateOfEvent,
               title: datas[i].eventData.name,
               description: datas[i].eventData.description,
-              imageName: datas[i].eventData.background,
+              imageName: datas[i].eventData.smallBackground ? datas[i].eventData.smallBackground : datas[i].eventData.background,
               address: datas[i].eventData.address,
               location: datas[i].eventData.location,
               position: datas[i].eventData.position,
@@ -2651,15 +2653,22 @@ app.post(
         }
         let width = 0;
         let height = 0;
+        let smallImageFileName = `${Functions.genrateToken()}.${file.path.split(".")[file.path.split(".").length-1]}`;
         try {
-          let jimage = await Jimp.read(`${sysConfig["IMAGES_NODE_SHARE"]}/${file.path}`);
+          const scale = 400;
+          let imageBuffer = fs.readFileSync(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}${file.path}` : `${file.path}`);
+          let jimage = await Jimp.read(imageBuffer);
           width = jimage.bitmap.width;
           height = jimage.bitmap.height;
+          sharp(imageBuffer)
+          .resize(Math.ceil((scale/height)*width), scale)
+          .toFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${smallImageFileName}` : `${__dirname}/uploads/${smallImageFileName}`, (err, info) => {});
         } catch {}
         res.send({
-          path: `/api/v1${newFilePath}`,
+          path: `/api/v1${newFilePath}`, 
           width: width,
           height: height,
+          smallPath : `/api/v1/${smallImageFileName}`
         });
       } else return handleError(logger, "500", res);
     } else return handleError(logger, "004", res);

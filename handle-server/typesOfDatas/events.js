@@ -19,7 +19,8 @@ const Datas = {
     end_Of_The_Event : "string",
     wardrobe : "boolean",
     isGroupPerformer : "boolean",
-    performer : "string"
+    performer : "string",
+    smallBackground : "string"
 }
 
 const controlTypeOfEvents = (inputs)=>{
