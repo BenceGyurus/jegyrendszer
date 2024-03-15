@@ -2451,7 +2451,6 @@ app.post(
                 { $set: saveDatas },
               );
               closeConnection(l.database);
-              const simpleDatabase = new Database("simplePay");
               simpleBody = await SimplePayPayment(
                 uuid,
                 req.params.id,
@@ -2463,7 +2462,7 @@ app.post(
             }else{
               return handleError(logger, "400", res);
             }
-            return res.send({ link: "http://link.bnbdevelopment.cloud:8080/1yhga", datas :  simpleBody});
+            return res.send({ link: "http://link.bnbdevelopment.cloud:8080/1yhga"});
           } else {
             return handleError(
               logger,
