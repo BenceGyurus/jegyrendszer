@@ -2458,11 +2458,10 @@ app.post(
                 buyingDatas.tickets,
                 buyingDatas.fullPrice,
               );
-              closeConnection(simpleDatabase.database);
             }else{
               return handleError(logger, "400", res);
             }
-            return res.send({ link: "http://link.bnbdevelopment.cloud:8080/1yhga"});
+            return res.send({ link: "http://link.bnbdevelopment.cloud:8080/1yhga", datas :  simpleBody});
           } else {
             return handleError(
               logger,
