@@ -41,7 +41,6 @@ const getContributors = require("./getContributorsOfEvent.js");
 const SimplePayPayment = require("./simple-pay-payment.js");
 const { collectDefaultMetrics, register } = require("prom-client");
 collectDefaultMetrics({ timeout: 5000 });
-const sharp = require('sharp');
 const Redis = require("ioredis");
 const setStatus = require("./buy-ticket.js");
 const controlCreatedSeats = require("./control/controlCreatedSeats.js");
@@ -2660,9 +2659,10 @@ app.post(
           let jimage = await Jimp.read(imageBuffer);
           width = jimage.bitmap.width;
           height = jimage.bitmap.height;
-          sharp(imageBuffer)
+          await jimage.scale(scale/height).write(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${smallImageFileName}` : `${__dirname}/uploads/${smallImageFileName}`);
+          /*sharp(imageBuffer)
           .resize(Math.ceil((scale/height)*width), scale)
-          .toFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${smallImageFileName}` : `${__dirname}/uploads/${smallImageFileName}`, (err, info) => {});
+          .toFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${smallImageFileName}` : `${__dirname}/uploads/${smallImageFileName}`, (err, info) => {});*/
         } catch {}
         res.send({
           path: `/api/v1${newFilePath}`, 

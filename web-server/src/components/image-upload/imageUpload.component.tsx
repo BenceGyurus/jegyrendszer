@@ -48,7 +48,8 @@ const ImageUpload = ({file, onChangeFunction, deleteFunction, className,title, e
             // Successful upload
             if (response.data && response.data.path){
                 setTimeout(()=>{setUploading(false)}, 100)
-                setImage({path : response.data.smallPath});
+                let imageResponse = await fetch(response.data.smallPath);
+                setImage({path : imageResponse.status === 200 || imageResponse.status === 304 ? response.data.smallPath : response.data.path});
                 onChangeFunction(response.data.path);
                 if (setSmallerImage){setSmallerImage(response.data.smallPath)}
             }
