@@ -36,7 +36,7 @@ const Event = ( { name, description, background, editFunction, deleteFunction,id
     actions={isAccess ? [
       <DeleteOutlined onClick = {e=>deleteFunction(id)} />,
       <EditOutlined onClick = {e=>editFunction(id)} />
-    ] : [<Tooltip title = "Nincs  hozzáférésed az esemény szerkesztéséhez"><InfoCircleFilled /></Tooltip>]}
+    ] : [<Tooltip title = "Nincs hozzáférésed az esemény szerkesztéséhez"><InfoCircleFilled /></Tooltip>]}
   >
     <div className = "card-spaceing">
     <AvatarGroup total={contributors.length} max={3} className="avatar-group" id = {id}>

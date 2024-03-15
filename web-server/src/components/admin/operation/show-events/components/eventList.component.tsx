@@ -21,8 +21,7 @@ type typeOfEvent = {
     dateOfRelease : string,
     tickets : Array<typeOfTickets>,
     venue : string,
-    readable_event_name : string,
-    isAccess : boolean
+    readable_event_name : string
 };
 
 type typeOfEventDatas = {
@@ -30,7 +29,8 @@ type typeOfEventDatas = {
     addedBy : {username : string, userId : string, readableid : string},
     id : string,
     contributor : Array<string>,
-    isActive : boolean
+    isActive : boolean,
+    isAccess : boolean
 }
 
 type typeOfEventListParams = {
@@ -45,11 +45,13 @@ type typeOfEventListParams = {
 
 const EventList = ( { events, editFunction,deleteFunction, numberOfPages, page, handleChange }:typeOfEventListParams )=>{
 
+    console.log(events);
+
     return <div className = "admin-event-list" key = {uuid()}>
         <div className = "event-list-grid" key = {uuid()}>
         {
             events.map((element)=>{
-                return <Event eventKey={uuid()} isAccess = {element.eventData.isAccess} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} isActive = {element.isActive} />
+                return <Event eventKey={uuid()} isAccess = {element.isAccess} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} isActive = {element.isActive} />
             })
         }
         </div>

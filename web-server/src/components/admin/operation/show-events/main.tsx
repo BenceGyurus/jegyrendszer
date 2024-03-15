@@ -29,7 +29,6 @@ type typeOfEvent = {
     tickets : Array<typeOfTickets>,
     venue : string,
     readable_event_name : string,
-    isAccess : boolean
 };
 
 type typeOfEventDatas = {
@@ -37,7 +36,8 @@ type typeOfEventDatas = {
     addedBy : {username : string, userId : string, readableid : string},
     id : string,
     contributor : Array<string>,
-    isActive : boolean
+    isActive : boolean,
+    isAccess : boolean
 }
 
 const Show_Events_Main = ()=>{

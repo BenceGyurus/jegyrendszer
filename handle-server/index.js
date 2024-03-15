@@ -1719,7 +1719,7 @@ app.post("/api/v1/events", async (req, res) => {
               id: element._id,
               versions: element.versions,
               otherDatas: element.otherDatas,
-              isAccess : element.eventData.users.includes(userId)
+              isAccess : element.eventData.users.includes(userId),
             })
       );
       let numberOfPages =
@@ -1735,6 +1735,7 @@ app.post("/api/v1/events", async (req, res) => {
             isActive:
               new Date(events[i].eventData.dateOfEvent) > new Date() &&
               new Date(events[i].eventData.dateOfRelease) < new Date(),
+            isAccess : events[i].isAccess
           };
         }
       } else {
