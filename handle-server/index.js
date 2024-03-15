@@ -515,6 +515,10 @@ app.get(
         },
       );
       closeConnection(database);
+      if (venue && venue.content.seats){
+        let sectors = venue.content.seats;
+        venue.content.groups = createArrayOfGroups(sectors);
+      }
       if (venue && venue.content.seats) {
         let { stages, seats } = seatMatrixToArray(
           venue.content.seats,
@@ -526,11 +530,10 @@ app.get(
         return handleError(logger, "035", res);
       }
       if (!eventId && venue) {
-        let sectors = venue.content.seats;
         return venue
-          ? res.send({
-              venue: { ...venue.content, groups: createArrayOfGroups(sectors) },
-            })
+          ? res.send(
+              {venue : {...venue.content}}
+            )
           : handleError(logger, "400", res);
       } else {
         if (venue && eventDatas) {

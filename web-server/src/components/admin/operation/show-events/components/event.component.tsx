@@ -2,8 +2,8 @@ import "../../../../../css/show-admin-event.css";
 import AvatarGroup from '@mui/material/AvatarGroup';
 import StringAvatar from "../../../../avatar/avatar.component";
 import { v4 as uuid } from 'uuid';
-import { Badge, Avatar, Card  } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Badge, Avatar, Card, Tooltip  } from "antd";
+import { DeleteOutlined, EditOutlined, InfoCircleFilled } from "@ant-design/icons";
 
 
 type typeOfEventParams = {
@@ -15,10 +15,11 @@ type typeOfEventParams = {
     id : string,
     contributors : Array<string>,
     eventKey? : string,
-    isActive? : boolean
+    isActive? : boolean,
+    isAccess? : boolean
 }
 
-const Event = ( { name, description, background, editFunction, deleteFunction,id, contributors,eventKey, isActive }:typeOfEventParams )=>{
+const Event = ( { name, description, background, editFunction, deleteFunction,id, contributors,eventKey, isActive, isAccess }:typeOfEventParams )=>{
 
   const getUsersInList = (users:Array<string>)=>{
     return users.map((user, index)=>{
@@ -32,10 +33,10 @@ const Event = ( { name, description, background, editFunction, deleteFunction,id
       cover={
         <img alt="esemény képe" src={background}/>
     }
-    actions={[
+    actions={isAccess ? [
       <DeleteOutlined onClick = {e=>deleteFunction(id)} />,
       <EditOutlined onClick = {e=>editFunction(id)} />
-    ]}
+    ] : [<Tooltip title = "Nincs  hozzáférésed az esemény szerkesztéséhez"><InfoCircleFilled /></Tooltip>]}
   >
     <div className = "card-spaceing">
     <AvatarGroup total={contributors.length} max={3} className="avatar-group" id = {id}>

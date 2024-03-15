@@ -21,7 +21,8 @@ type typeOfEvent = {
     dateOfRelease : string,
     tickets : Array<typeOfTickets>,
     venue : string,
-    readable_event_name : string
+    readable_event_name : string,
+    isAccess : boolean
 };
 
 type typeOfEventDatas = {
@@ -48,7 +49,7 @@ const EventList = ( { events, editFunction,deleteFunction, numberOfPages, page, 
         <div className = "event-list-grid" key = {uuid()}>
         {
             events.map((element)=>{
-                return <Event eventKey={uuid()} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} isActive = {element.isActive} />
+                return <Event eventKey={uuid()} isAccess = {element.eventData.isAccess} name = {element.eventData.name} description={element.eventData.description} background={element.eventData.background} deleteFunction={deleteFunction} editFunction={editFunction} id = {element.id} contributors = {element.contributor} isActive = {element.isActive} />
             })
         }
         </div>

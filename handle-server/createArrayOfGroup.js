@@ -8,7 +8,6 @@ const create2DMatrixToArray = (matrix)=>{
 }
 
 const createArrayOfGroups = (seats)=>{
-    console.log(seats);
     let groups = [];
         seats.forEach( group => {
             if (group && group.sector){

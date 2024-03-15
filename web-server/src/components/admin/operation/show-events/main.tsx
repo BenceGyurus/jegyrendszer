@@ -28,7 +28,8 @@ type typeOfEvent = {
     dateOfRelease : string,
     tickets : Array<typeOfTickets>,
     venue : string,
-    readable_event_name : string
+    readable_event_name : string,
+    isAccess : boolean
 };
 
 type typeOfEventDatas = {
