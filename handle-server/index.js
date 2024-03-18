@@ -45,6 +45,8 @@ const Redis = require("ioredis");
 const setStatus = require("./buy-ticket.js");
 const controlCreatedSeats = require("./control/controlCreatedSeats.js");
 const seatMatrixToArray = require("./seatMatrixToArray.js");
+const RedisMiddleware = require("./redishMiddleware.js");
+const zlib = require('node:zlib');
 var cookieParser = require("cookie-parser");
 var redisOptions = {
   port: 6379,
@@ -3097,6 +3099,7 @@ const statusOfPayment = require("./getStatusOfPayment.js");
 const { type } = require("os");
 const getEventByObjectId = require("./getEventByObjectId.js");
 const { closeConnection } = require("./closeConnection.js");
+const RedishMiddleware = require("./redishMiddleware.js");
 
 const io = new Server(server, {
   pingInterval: 5000,
@@ -3265,12 +3268,17 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use((req, res, next) => {
+app.use(async (req,res,next)=>{await RedisMiddleware(req,res,redis, next)}, async (req, res, next) => {
   if (req.method === "GET") {
     imageName = req.url.split("/")[req.url.split("/").length - 1];
+    console.log(imageName)
     try {
-      return res.sendFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${imageName}` : `${__dirname}/uploads/${imageName}`);
-    } catch {
+        let buffer = fs.readFileSync(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${imageName}` : `${__dirname}/uploads/${imageName}`);
+        redis.set(req.url, zlib.deflateSync(buffer).toString("base64"));
+        redis.expire(req.url, getTime("CACHE_TIME") / 1000);
+        return res.send(buffer);      
+    } catch (err){
+      console.log(err);
       next();
     }
   }
