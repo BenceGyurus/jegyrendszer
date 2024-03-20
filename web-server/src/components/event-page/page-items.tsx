@@ -3,7 +3,6 @@ import "../../css/eventPage.css";
 import Brand from "../brand/embed-brand.component";
 import Map from "../map/map.component";
 import OpenMapLink from "../openMap/openMap.component";
-import Share from "../share/share.component";
 import { Button } from "antd";
 
 type typeOfMedia = {

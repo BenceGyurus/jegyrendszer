@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import SeatVisualization from "../seat-visualization-engine/seats.component";
 import "../../css/monitor-tickets.css";
-import typeOfSeats from "../createSeatMap/type/seatType";
+import typeOfSeats from "../event-page/types/seatType";
 
 type typeOfDisplayVenueParams = {
     venueId : string,

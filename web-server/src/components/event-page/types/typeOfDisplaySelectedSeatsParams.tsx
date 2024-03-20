@@ -1,4 +1,4 @@
-import typeOfSeats from "../../createSeatMap/type/seatsType";
+import typeOfSeats from "./seatsType";
 
 type typeOfDisplaySelectedSeatsParams = {
   seats: typeOfSeats;

@@ -2461,6 +2461,7 @@ app.post(
                 buyingDatas.tickets,
                 buyingDatas.fullPrice,
               );
+              console.log(simpleBody);
             }else{
               return handleError(logger, "400", res);
             }
@@ -2993,7 +2994,7 @@ app.post(
         let { fromDate, toDate, event } = req.query;
         res.send(await pageLog(fromDate, toDate, event));
       } else {
-        return handleError(logger, "004");
+        return handleError(logger, "004", resweb-server/package.json);
       }
     } else {
       return handleError(logger, "400", res);

@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
-import EventList from "../../components/event-list/eventList.component";
-import NoEvent from "../../components/event/NoEvent.component";
+import EventList from "../event-list/eventList.component";
+import NoEvent from "../event/NoEvent.component";
 import LoadingAnimation from "../load-animation/loadAnimation.component";
 import Notification from "../notification/notification.component";
 import Error from "../notification/error.component";
