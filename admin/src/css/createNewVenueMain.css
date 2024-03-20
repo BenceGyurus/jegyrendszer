@@ -1,0 +1,11 @@
+.back-button-locate-div{
+    margin: 10px;
+    position: fixed;
+    top: 90px;
+    left: 25px;
+    z-index: 1001;
+}
+.error-natification-div{
+    max-width: 500px;
+    margin: 10px auto;
+}

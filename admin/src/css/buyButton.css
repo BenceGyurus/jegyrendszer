@@ -1,0 +1,22 @@
+.buy-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  /* Modern buy button styles */
+  .buy-btn {
+    color: #fff !important;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease;
+  }
+  
+  .buy-btn:hover {
+    background-color: #0056b3;
+  }
+  
+
+.white-color-buy-button span{
+    color : white !important;
+  } 

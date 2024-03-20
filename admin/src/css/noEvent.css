@@ -1,0 +1,60 @@
+.no-event-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .no-event-logo {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  .no-event-message {
+    text-align: center;
+    font-size: 20px;
+    color: #888888;
+    margin-bottom: 40px;
+  }
+
+  .no-event-graphic {
+    font-size: 100px;
+    margin-bottom: 30px;
+  }
+
+  .no-event-cta-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #007bff;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .no-event-cta-button:hover {
+    background-color: #0056b3;
+  }
+
+  .no-event-footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #888888;
+  }
+
+  .no-event-footer a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .no-event-content{
+    display: flex;
+
+  }
+
+
+  .mty-logo{
+    width: 400px;
+  }

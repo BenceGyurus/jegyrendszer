@@ -1,0 +1,40 @@
+/* Global styles */
+.no-venue-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+}
+  
+  /* Heading styles */
+.no-venue-container h1 {
+    font-size: 36px;
+    margin: 0 0 20px;
+  }
+  
+  /* Paragraph styles */
+.no-venue-container p {
+    margin: 0 0 20px;
+  }
+  
+  /* Link styles */
+.no-venue-container ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+.no-venue-container li {
+    display: inline-block;
+    margin-right: 20px;
+}
+  
+.no-venue-container a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+  
+.no-venue-container a:hover {
+    color: #007bff;
+  }
+  

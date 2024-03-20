@@ -1,0 +1,14 @@
+.notification{
+    width : 100%;
+    position: fixed;
+    top: 100px;
+    z-index: 100000;
+    display: block;
+    margin: auto;
+}
+
+.notification-core-div{
+    max-width: 500px;
+    width: 80%;
+    margin: auto;
+}

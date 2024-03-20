@@ -1,0 +1,66 @@
+/* Coupon container */
+.coupon {
+    border: 1px dashed #ccc;
+    background-color: #fff;
+    padding: 20px;
+    max-width: 300px;
+    display: inline-table;
+    margin: 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Coupon code section */
+  .coupon-code {
+    margin-bottom: 15px;
+  }
+  
+  .coupon-code .code {
+    font-weight: bold;
+    font-size: 24px;
+    color: #FF0000;
+  }
+  
+  /* Coupon details section */
+  .coupon-details p {
+    margin: 10px 0;
+  }
+  
+  .coupon-details .discount-amount {
+    font-weight: bold;
+  }
+  
+  /* Coupon actions section */
+  .coupon-actions {
+    margin-top: 15px;
+  }
+  
+  .coupon-actions button {
+    margin: 0 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .coupon-actions button:hover {
+    background-color: #45a049;
+  }
+  
+
+  /* Coupon validity section */
+.coupon-validity {
+    margin-top: 15px;
+  }
+  
+  .coupon-validity .validity-date {
+    font-style: italic;
+    color: #888;
+  }
+  
+  

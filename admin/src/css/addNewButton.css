@@ -1,0 +1,45 @@
+.add-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    font-size: 20px;
+    border: none;
+    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+.add-button:hover {
+    background-color: #007bff;
+    color : white;
+    fill: white;
+    transform: scale(1.1);
+  }
+  
+.add-button:focus {
+    outline: none;
+  }
+  
+.add-button i {
+    display: inline-block;
+    margin-top: 8px;
+  }
+  
+@media only screen and (max-width: 767px) {
+    .add-button {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+    }
+    .add-button i {
+      margin-top: 6px;
+    }
+  }

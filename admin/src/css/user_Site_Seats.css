@@ -1,0 +1,29 @@
+.user-site-place-area{
+    position: relative;
+    margin: 10px auto;
+}
+
+.user-site-place{
+    border-radius: 20%;
+    cursor: pointer;
+    text-align: center;
+    justify-content: center;
+}
+
+.user-site-place-area-div{
+    width: 100%;
+    overflow: auto;
+}
+
+
+.disabled{
+    cursor:not-allowed;
+}
+
+.avaiable{
+    background-color: green;
+}
+
+.selected{
+    background-color: blue !important;
+}

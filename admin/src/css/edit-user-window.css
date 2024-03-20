@@ -1,0 +1,21 @@
+.user-edit-window-main-div{
+    width: 50%;
+    position: fixed;
+    left: 25%;
+    top: 20%;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: white;
+}
+
+.user-edit-checkbox-span{
+    float: right;
+    margin-right: 5px;
+}
+
+.user-edit-accesslist{
+    margin-top: 8px;
+    cursor: pointer;
+    list-style: none;
+}

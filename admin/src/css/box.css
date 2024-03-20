@@ -1,0 +1,5 @@
+.selected-area{
+    background-color: rgba(0, 195, 255, 0.5);
+    border: 1px solid #0092bf;
+    position: absolute;
+}

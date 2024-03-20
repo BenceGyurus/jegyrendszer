@@ -1,0 +1,12 @@
+.create-seat-main-div{
+    height: calc( 100vh - 100px );
+    display: flex;
+}
+
+.status-changer{
+    position: absolute;
+    width: max-content;
+    right: 31%;
+    top: calc(80px + 1%);
+    z-index: 5;
+}

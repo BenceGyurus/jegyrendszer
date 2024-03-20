@@ -1,0 +1,24 @@
+
+.local-sale-event-div img{
+    width: 100%;
+    margin-bottom: 5px;
+    backface-visibility: hidden;
+    object-fit: cover;
+}
+
+.local-sale-image{
+    height: 200px;
+}
+
+.local-sale-event-title{
+    max-width: 100%;
+    text-align: center;
+}
+
+.local-sale-event-list-holder{
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(30%, 1fr)); 
+    width: 100%;
+    padding: 0;
+    grid-gap: 1%;
+}

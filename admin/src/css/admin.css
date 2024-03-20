@@ -1,0 +1,38 @@
+.accessListUl{
+    margin-left: 0px;
+    min-width: 200px;
+    width: 18%;
+    height: calc(93% - 200px);
+    overflow-y: auto;
+    padding: 0;
+}
+
+.container{
+    width: 100%;
+    padding-left: 220px;
+}
+
+.container h1{
+    margin: 10px 0;
+}
+
+.admin{
+    height: 100%;
+}
+
+.admin-page{
+    z-index: 3;
+}
+
+.background-style{
+    height: calc(100vh - 80px);
+    width: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 80px;
+}
+
+.bread-crumb-admin{
+    color : "white" !important;
+    z-index: 3; 
+}

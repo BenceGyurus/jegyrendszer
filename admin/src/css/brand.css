@@ -1,0 +1,9 @@
+.shared-link{
+    width: max-content;
+}
+
+.shared-link-image{
+    height: 25px;
+    margin: 20px;
+    z-index: 1000001;
+}

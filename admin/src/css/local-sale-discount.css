@@ -1,0 +1,60 @@
+.discounts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .local-discount-card {
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px;
+    width: 200px;
+    cursor: pointer;
+    border: 2px solid #fff;
+  }
+  
+  .discount-name {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 10px;
+    width: 77%;
+  }
+  
+  .discount-amount {
+    color: #ff5733;
+    font-size: 24px;
+  }
+  
+  /* Style for the selected discount */
+  .selected-discount-card {
+    border-color: #007bff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 200px;
+  }
+  
+  .selected-discount-name {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .selected-discount-amount {
+    color: #ff5733;
+    font-size: 24px;
+  }
+
+  .local-discount-card-title{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .local-discount-card-check-circle svg{
+    fill: #007bff !important;
+  }

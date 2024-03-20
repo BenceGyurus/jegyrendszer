@@ -1,0 +1,26 @@
+@keyframes phoneNotificationBoxAnimation {
+    from {
+        bottom : -100vh;
+    }
+    to{
+        bottom: -40px;
+    }
+}
+
+.phone-notification-box{
+    animation: phoneNotificationBoxAnimation 0.3s;
+    height: 100px;
+    position: fixed;
+    top: 100px;
+    padding: 20px 40px;
+    background-color: #fff;
+    border-radius: 10px 10px 10px 10px;
+    width: 80%;
+    z-index: 10000000;
+    left: 10%;
+    box-shadow: 2px 0px 10px rgba(0,0,0,0.1);
+}
+
+.error-notification{
+    background-color: rgb(229, 115, 115);
+}

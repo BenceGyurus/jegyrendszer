@@ -1,0 +1,20 @@
+.add-media-window{
+    width: 50%;
+    max-height: 450px;
+    position: fixed;
+    left: 25%;
+    background-color: white;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    top: 100px;
+    overflow: auto;
+    z-index: 1000000;
+}
+
+.add-media-window .window-elements{
+    padding: 10px;
+}
+
+.warn-p{
+    margin: 3px 0 20px 10px;
+}

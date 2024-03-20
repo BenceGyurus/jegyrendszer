@@ -1,0 +1,147 @@
+.event {
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+    background-color: #fff;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    overflow-y: none;
+    max-width: 700px;
+    margin: 50px auto;
+    height: 300px;
+    padding: 0;
+    border-radius: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .event-list-div{
+    width : 95%;
+    margin: 10px auto;
+  }
+
+  @media screen and (min-width: 1000px) {
+    .event {
+        display: inline-table;
+        width: 28%;
+        margin: 2%;
+    }
+    .event:hover .event-image img{
+      transform: scale(1.05);
+      border-radius: 30px;
+    }
+  }
+
+  
+
+  .getEventButton{
+    border: none;
+    outline: none;
+    border-radius: 0px;
+    padding: 8px;
+    margin: 10px;
+    float: right;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.getEventButton:active{
+    transition: 0.1s;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+}
+  
+  .event-date {
+    font-weight: bold;
+    margin-bottom: 0px;
+  }
+  
+  .event-image{
+    width: 100%;
+    margin: 0;
+    height: 300px;
+  }
+
+  .event-image img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    -webkit-user-drag: none;
+    user-select: none;
+    position: relative;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform .5s ease;
+    backface-visibility: hidden;
+  }
+  
+  .event-details {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 10px;
+    position: relative;
+  }
+  
+  .event-title {
+    transition: 0.3s;
+    font-size: 20px;
+    position: relative;
+    width: 100%;
+    padding: 100px 20px 25px 20px;
+    margin: 0;
+    border-radius: 10px 10px 30px 30px;
+    cursor: pointer;
+    color: white;
+  }
+
+  .event-description {
+    font-size: 15px;
+    padding-bottom: 10px;
+    text-align:justify;
+  }
+  
+  .event-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .event-button:hover {
+    background-color: #666;
+  }
+
+  .calendar{
+    float: right;
+    position: absolute;
+    z-index: 1;
+    margin: 15px 0 0 15px;
+  }
+
+  .text-overlay{
+    padding-top: 130px;
+    background-image: linear-gradient(to top, rgba(0, 0, 0,0.75), rgba(255,255,255,0));
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 10px 10px 29px 29px;
+  }
+
+  .event-list-div{
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+
+  .event{
+    cursor: pointer;
+    outline: none;
+    overflow: hidden;
+  }

@@ -1,0 +1,19 @@
+.window-component{
+    position: fixed;
+    height: 50vh;
+    bottom: 30%;
+    width: 50%;
+    left: 25%;
+    background-color: white;
+    box-shadow: 4px 7px 9px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    z-index: 99999999;
+}
+
+.window-content{
+    margin: 3px 10px;
+    overflow-y: auto;
+    overflow-x: auto;
+    height: calc( 100% - 26px );
+    padding: 5px;
+}

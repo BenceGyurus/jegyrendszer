@@ -1,0 +1,31 @@
+.feedback-icon {
+    width: 35px;
+    height: 35px;
+    background-color: #fff;
+    box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.2);
+    z-index: 999999;
+    border-radius: 100%;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.feedback-icon:hover {
+    transition: 0.2s;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.feedback-icon-tooltip {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+}

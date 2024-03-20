@@ -1,0 +1,45 @@
+.aszf-body{
+    margin: 30px 50px;
+}
+
+.aszf-body ul{
+    margin: 10px 0px 10px 30px;
+}
+
+.aszf-body li{
+    margin: 5px 0;
+}
+
+.aszf-body p{
+    margin: 7px 10px;
+}
+
+.aszf-body h1{
+    margin: 20px 0;
+    font-weight: 600;
+    color: rgba(171, 207, 39, 1);
+}
+
+.aszf-body h2{
+    margin: 13px 0;
+    font-weight: 300;
+    color: rgba(171, 207, 39, 1);
+}
+
+.aszf-body h3{
+    margin: 10px 0;
+    font-weight: 300;
+    color: rgba(171, 207, 39, 1);
+}
+
+.aszf-body h4{
+    margin: 10px 0;
+    font-weight: 300;
+    color: rgba(171, 207, 39, 1);
+}
+
+.aszf-body h5{
+    margin: 10px 0;
+    font-weight: 300;
+    color: rgba(171, 207, 39, 1);
+}

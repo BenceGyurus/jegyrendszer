@@ -1,0 +1,21 @@
+.textarea {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    transition: all 0.3s ease;
+    resize: vertical;
+    width: 100%;
+    resize: none;
+  }
+  
+.textarea:focus {
+    outline: none;
+  }
+
+  
+  .textarea-div{
+    width: 100%;
+  }

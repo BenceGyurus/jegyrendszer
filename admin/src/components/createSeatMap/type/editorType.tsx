@@ -1,0 +1,47 @@
+import typeOfSeats from "./seatsType";
+import typeOfStage from "./stage";
+
+type typeOfEditorTypeParams = {
+    background : string,
+    setBackground : Function,
+    deleteBackground : Function,
+    setStatus : Function,
+    widthOfSeats : number,
+    setWidthOfSeats : Function,
+    heightOfSeats : number,
+    setHeightOfSeats : Function,
+    spaceUnderTheSeats : number,
+    setSpaceUnderTheSeats : Function,
+    spaceBetweenTheSeats : number,
+    setSpaceBetweenTheSeats : Function,
+    seatName : string,
+    setSeatName : Function,
+    typeOfSeatNumber : boolean,
+    setTypeOfSeatNumber : Function,
+    typeOfRowNumber : boolean,
+    setTypeOfRowNumber : Function,
+    rowName : string,
+    setRowName : Function,
+    sector : string,
+    setSector : Function,
+    seats : typeOfSeats,
+    watchingGroup : string,
+    setWatchingGroup : Function,
+    changeStairs : Function,
+    isSector : boolean,
+    setIsSector : Function,
+    originalColor : boolean,
+    setOriginalColor : Function,
+    stages : Array<typeOfStage>,
+    setDirectionOfSeats : Function,
+    setError : Function,
+    startCounting : number,
+    setStartCounting : Function,
+    nameOfArea : string,
+    setNameOfArea : Function,
+    save : Function,
+    saveing : boolean,
+    editSector : Function
+}
+
+export default typeOfEditorTypeParams;

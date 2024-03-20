@@ -1,0 +1,23 @@
+.settings-holder{
+    height: max-content;
+    overflow-y:  auto;
+    overflow-x: none;
+    margin: 20px;
+}
+
+.sizeOfSeats{
+    width: 90%;
+    margin: 10px auto;
+}
+
+.example-seat-holder{
+    width : 10px auto;
+    width : 90%;
+}
+
+.example-seat{
+    background-color: black;
+    width : max-content;
+    margin: 10px auto;
+    border-radius: 20%;
+}

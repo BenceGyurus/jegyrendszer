@@ -1,0 +1,49 @@
+.toggle-switch {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 20px;
+    cursor: pointer;
+  }
+  
+  .toggle-switch input[type="checkbox"] {
+    display: none;
+  }
+  
+  .slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 20px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .slider:before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #fff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  input[type="checkbox"]:checked + .slider {
+    background-color: #007bff;
+  }
+  
+  input[type="checkbox"]:checked + .slider:before {
+    transform: translateX(20px);
+  }
+
+  .checkBoxLabel{
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    
+  }

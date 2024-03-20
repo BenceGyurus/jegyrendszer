@@ -1,0 +1,15 @@
+.datasAboutVenueDiv{
+    width: 30%;
+    min-width: 500px;
+    margin: 80px auto;
+}
+
+.getDatasDiv{
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.type-of-venue-selector{
+    width:max-content;
+    margin: 10px 0;
+}

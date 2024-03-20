@@ -1,0 +1,41 @@
+
+.payment-container{
+    width: 90%;
+    margin: 10px auto;
+}
+
+.payment-methods h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .payment-methods {
+    width: 100%;
+  }
+
+  .payment-method img{
+    height: 15px;
+  }
+
+  .payment-method{
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    cursor: pointer;
+    border: 2px solid #fff;
+    width: max-content;
+    padding: 10px;
+  }
+
+  .checked-payment-method{
+    border-color: #007bff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    width: max-content;
+    padding: 10px;
+  }
+
+

@@ -1,0 +1,23 @@
+.example-sector{
+    width: 150px;
+    height: 50px;
+    background-color: #2e2e2e;
+    border-radius: 0px 0px 50% 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0px -15px 40px rgba(0,0,0, 1);
+    margin: 70px 30px;
+    transition: 0.5s;
+}
+
+.flip-direction-of-seats{
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    transition: 0.4s;
+}
+
+.sector-rotation-button{
+    border: none;
+}

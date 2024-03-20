@@ -1,0 +1,19 @@
+.ttip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Tooltip text */
+  .ttip .ttiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #b8b8b8;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+  }
+  .ttip:hover .ttiptext {
+    visibility: visible;
+  }
