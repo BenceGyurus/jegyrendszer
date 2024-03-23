@@ -173,5 +173,10 @@
         "message" : "Sikeres visszaváltás",
         "type" : "successful",
         "responseCode" : 200
+    },
+    "050" : {
+        "message" : "A vásárlás már megkezdődött",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

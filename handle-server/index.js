@@ -2455,18 +2455,22 @@ app.post(
                 { $set: saveDatas },
               );
               closeConnection(l.database);
+              if (!buyingDatas.bought && !buyingDatas.isPayingStarted){
               simpleBody = await SimplePayPayment(
-                uuid,
-                req.params.id,
-                req.body.datas.customerData,
-                buyingDatas.tickets,
-                buyingDatas.fullPrice,
-              );
+                  uuid,
+                  req.params.id,
+                  req.body.datas.customerData,
+                  buyingDatas.tickets,
+                  buyingDatas.fullPrice,
+                );
+              }else{
+                return handleError(logger, "050", res);
+              }
               console.log(simpleBody);
             }else{
               return handleError(logger, "400", res);
             }
-            return res.send({ link: "http://link.bnbdevelopment.cloud:8080/1yhga", datas :  simpleBody});
+            return res.send({ link: "https://jegy.bnbdevelopment.cloud", datas :  simpleBody});
           } else {
             return handleError(
               logger,
