@@ -19,7 +19,7 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
         let body = {
             salt: salt,
             merchant: process.env.MERCHANT,
-            orderRef: orderRef,
+            orderRef: String(orderRef),
             currency: 'HUF',
             customerEmail: customerDatas.mail,
             language: 'HU',
@@ -31,7 +31,7 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
             timeout: new Date(new Date().getTime() + getTime("PAYMENT_DELAY")).toISOString(),
             url: '',
             invoice: {
-                    name: `${customerDatas.firstname} ${customerDatas.lastname}`,
+                    name: customerDatas.isCompany ? customerDatas.firstname : `${customerDatas.firstname} ${customerDatas.lastname}`,
                     company: 'hu',
                     //state: ,
                     city: customerDatas.city,
@@ -53,7 +53,7 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
                     ]
                 }
 
-            const sign = signWithCryptoJS(JSON.stringify(body));
+            const sign = signWithCryptoJS(body);
 
             let config = {
                     method: 'post',

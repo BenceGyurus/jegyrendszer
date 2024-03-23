@@ -2430,12 +2430,13 @@ app.post(
               );
               const uid = new ShortUniqueId({ length: 32 });
               let uuid = uid();
+              console.log(req.body.datas.customerData?.isCompany);
               saveDatas = {
                 price: price ? price : buyingDatas.fullPrice,
                 fullPrice: fullPrice.fullPrice,
                 customerDatas: {
                   ...req.body.datas.customerData,
-                  fullName: `${req.body?.datas?.customerData?.firstname} ${req.body?.datas?.customerData?.lastname} `,
+                  fullName: req.body.datas.customerData?.isCompany ? req.body.datas.customerData?.firstname : `${req.body.datas.customerData?.firstname} ${req.body.datas.customerData?.lastname} `,
                 },
                 time: new Date().getTime(),
                 coupon: !error ? name : false,

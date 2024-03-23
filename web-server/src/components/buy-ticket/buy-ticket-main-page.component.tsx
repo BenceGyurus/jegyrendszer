@@ -12,6 +12,7 @@ import Coupon from "./buy-ticket-coupon.component";
 import Details from "./buy-ticket-details.component";
 import DatasOfCustomer from "./datas-of-customer.component";
 import BuyingStepper from "./stepper.component";
+import postDataJson from "../connection/postDataJson";
 
 type typeOfBillAddress = {
   firstname: string;
@@ -117,18 +118,18 @@ const BuyTicketMainPage = () => {
     if (terms){
     if (
       firstname &&
-      lastname &&
+      (lastname || isCompany) &&
       String(postCode).length === 4 &&
       city &&
       address &&
       phone &&
-      mail
+      mail && (!isCompany || taxNumber)
     ) {
       setfetching(true);
       let datas = {
         customerData: {
           firstname: firstname,
-          lastname: lastname,
+          lastname: isCompany ? "" : lastname,
           postalCode: postCode,
           city: city,
           address: address,
@@ -136,12 +137,12 @@ const BuyTicketMainPage = () => {
           taxNumber: taxNumber ? taxNumber : "null",
           phone: phone,
           mail: mail,
+          isCompany : isCompany
         },
         coupon: usedCoupon.name,
       };
       let token = window.location.pathname.split("/")[2];
-      postData(`/payment/${token}`, { datas: datas }).then((response) => {
-        console.log(response.datas)
+      postDataJson(`/payment/${token}`, { datas: datas }).then((response) => {
         if (response.link) {
           setStep(2);
           getDatas();
@@ -150,8 +151,11 @@ const BuyTicketMainPage = () => {
         setfetching(false);
       });
     }
+    else{
+      setError("Kérem minden kötelező mezőt töltsön ki");
+    }
   }else{
-    setError("A továbblépéshez el kell fogadnia a felhasználási feltételeket")
+    setError("A továbblépéshez el kell fogadnia a felhasználási feltételeket");
   }
   };
 
@@ -170,6 +174,7 @@ const BuyTicketMainPage = () => {
       .then((data) => {
         if (!data.error) {
           if (data.customerDatas) {
+            setIsCompany(data.customerDatas.isCompany);
             setFirstname(data.customerDatas.firstname);
             setLastname(data.customerDatas.lastname);
             setPostCode(data.customerDatas.postalCode);
