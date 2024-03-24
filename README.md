@@ -1,5 +1,6 @@
 
 https://jegy.bnbdevelopment.cloud
+https://jegy.bnbdevelopment.cloud/admin
 
 ## Test run
 
