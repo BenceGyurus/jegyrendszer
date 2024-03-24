@@ -3106,7 +3106,6 @@ const { type } = require("os");
 const getEventByObjectId = require("./getEventByObjectId.js");
 const { closeConnection } = require("./closeConnection.js");
 const RedishMiddleware = require("./redishMiddleware.js");
-var socketRedis = require('socket.io-ioredis');
 const { createAdapter } = require("@socket.io/redis-streams-adapter");
 
 
