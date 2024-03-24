@@ -3106,10 +3106,14 @@ const { type } = require("os");
 const getEventByObjectId = require("./getEventByObjectId.js");
 const { closeConnection } = require("./closeConnection.js");
 const RedishMiddleware = require("./redishMiddleware.js");
+var socketRedis = require('socket.io-ioredis');
+const { createAdapter } = require("@socket.io/redis-streams-adapter");
+
 
 const io = new Server(server, {
   pingInterval: 5000,
   pingTimeout: 5000,
+  adapter : createAdapter(redis)
 });
 
 io.on("connection", (socket) => {

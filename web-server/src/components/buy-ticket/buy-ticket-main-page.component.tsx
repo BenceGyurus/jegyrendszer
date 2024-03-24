@@ -68,7 +68,7 @@ const BuyTicketMainPage = () => {
   const [fetching, setfetching] = useState(false);
   const [step, setStep] = useState(1);
   const [link, setLink] = useState("");
-  const [isCompany, setIsCompany] = useState<boolean>(false);
+  const [isCompany, setIsCompany] = useState(false);
   const [checkCoupon, setCheckCoupon] = useState<boolean>(false);
   const [terms, setTerms] = useState<boolean>(false);
   const [ticketDatas, setTicketDatas]: [typeOfTicketDatas, Function] = useState(
@@ -153,7 +153,7 @@ const BuyTicketMainPage = () => {
     }
     else{
       setError("Kérem minden kötelező mezőt töltsön ki");
-    }
+    } 
   }else{
     setError("A továbblépéshez el kell fogadnia a felhasználási feltételeket");
   }

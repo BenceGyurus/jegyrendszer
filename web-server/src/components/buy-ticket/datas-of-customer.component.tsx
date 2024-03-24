@@ -56,6 +56,7 @@ const DatasOfCustomer = ({
   acceptTermsFunction,
   isTermsAccespted
 }: typeOfDatasOfCustormerParams) => {
+  console.log("isCompany", isCompany);
   const getCity = (zipcode: string) => {
     if (zipcode) {
       fetch(`https://hur.webmania.cc/zips/${zipcode}.json`).then(
@@ -69,6 +70,16 @@ const DatasOfCustomer = ({
     }
   };
 
+  const getValueOfCompany = ()=>{
+    if (isCompany !== undefined){
+      return isCompany;
+    }
+    else{
+      setIsCompany(false);
+      return false
+    }
+  }
+
   return (
     <div className="datas-of-customer">
       <div className="is-company-option">
@@ -80,7 +91,7 @@ const DatasOfCustomer = ({
             { label: "Cég", value: true },
           ]}
           onChange={(e) => setIsCompany(e.target.value)}
-          value={isCompany}
+          value = {getValueOfCompany()}
         />
       </div>
       <h2>Számlázási adatok:</h2>
