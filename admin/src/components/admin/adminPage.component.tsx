@@ -27,7 +27,7 @@ const Admin = (params:any)=>{
             });
         }
         else{
-            navigate(`/admin-login?callbackUrl=${window.location.pathname}`);
+            navigate(`/admin/login?callbackUrl=${window.location.pathname}`);
         }
     }, []);
 
