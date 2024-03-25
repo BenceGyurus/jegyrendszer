@@ -1,6 +1,6 @@
-# ARCHIVED PROJECT
 
-**THIS PROJECT HAS BEEN ARCHIVED FOR AN UNKNOWN PERIOD OF TIME**
+- https://jegy.bnbdevelopment.cloud
+- https://jegy.bnbdevelopment.cloud/admin
 
 ## Test run
 
