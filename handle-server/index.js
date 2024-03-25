@@ -243,7 +243,6 @@ app.post(
   "/api/v1/get-ticket-information/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
-    console.log(req.body, req.params.id);
     if (req.body.token && req.params.id) {
       let access = await control_Token(req.body.token, req);
       if (access && access.includes("local-sale")) {
@@ -272,7 +271,6 @@ app.post(
         closeConnection(database);
         if (datas) {
           let eventDatas = await getEventByObjectId(datas.eId);
-          console.log(eventDatas);
           if (eventDatas) {
             datas.eventName = eventDatas.eventData.name;
           }
@@ -293,7 +291,6 @@ app.post(
   "/api/v1/ticket-refund/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
-    console.log(req.body);
     if (
       req.body &&
       typeof req.body === TypeOfBody &&
@@ -331,17 +328,12 @@ app.post(
           let deleteIndex = -1;
           if (buyingDatas) {
             buyingDatas.tickets.forEach((ticket, index) => {
-              console.log(ticket.ticketId, ticketDatas.ticketId);
               if (ticket.ticketId === ticketDatas.ticketId) {
                 buyingDatas.tickets[index].amount = ticket.amount - 1;
                 if (
                   ticket.places &&
                   ticket.places.includes(ticketDatas.seatId)
                 ) {
-                  console.log(
-                    Functions.removeByValue(ticket.places, ticketDatas.seatId),
-                  );
-                  console.log(ticket.places);
                   buyingDatas.tickets[index].places = Functions.removeByValue(
                     ticket.places,
                     ticket.seatId,
@@ -568,7 +560,6 @@ app.post(
   "/api/v1/ticket-validation/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
-    console.log(req.body);
     if (
       req.body &&
       typeof req.body == TypeOfBody &&
@@ -1815,7 +1806,6 @@ app.post("/api/v1/get-all-event", async (req, res) => {
 //TICKETS
 app.post("/api/v1/order-ticket", async (req, res) => {
   let body = Functions.parseBody(req.body);
-  console.log(body);
   if (
     body &&
     typeof body == TypeOfBody &&
@@ -2376,7 +2366,6 @@ app.post(
   "/api/v1/payment/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
-    console.log(req.body);
     if (
       req.body &&
       typeof req.body &&
@@ -2430,7 +2419,6 @@ app.post(
               );
               const uid = new ShortUniqueId({ length: 32 });
               let uuid = uid();
-              console.log(req.body.datas.customerData?.isCompany);
               saveDatas = {
                 price: price ? price : buyingDatas.fullPrice,
                 fullPrice: fullPrice.fullPrice,
@@ -2466,7 +2454,6 @@ app.post(
               }else{
                 return handleError(logger, "050", res);
               }
-              console.log(simpleBody);
             }else{
               return handleError(logger, "400", res);
             }
@@ -3260,7 +3247,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", async () => {
-    console.log("disconnected");
     const { database, collection } = new Database("monitor");
     datas = await collection.findOne({ socketId: socket.id });
     if (datas && datas.connected)
@@ -3280,7 +3266,6 @@ io.on("connection", (socket) => {
 app.use(async (req,res,next)=>{await RedisMiddleware(req,res,redis, next)}, async (req, res, next) => {
   if (req.method === "GET") {
     imageName = req.url.split("/")[req.url.split("/").length - 1];
-    console.log(imageName)
     try {
         let buffer = fs.readFileSync(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${imageName}` : `${__dirname}/uploads/${imageName}`);
         redis.set(req.url, zlib.deflateSync(buffer).toString("base64"));

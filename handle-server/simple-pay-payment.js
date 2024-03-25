@@ -54,7 +54,6 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
                 }
 
             const sign = signWithCryptoJS(body);
-            console.log(sign);
 
             let config = {
                     method: 'post',
