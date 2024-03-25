@@ -2698,7 +2698,7 @@ app.post(
       if (access && access.includes("edit-aszf")) {
         try {
           Functions.createFolder(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}`);
-          let aszf = fs.readFileSync(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}/aszf.html`);
+          let aszf = fs.readFileSync(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads`}/local/aszf.html`);
           return res.send({ error: false, aszf: aszf.toString() });
         } catch {
           return handleError(logger, "000", res);
@@ -2719,7 +2719,7 @@ app.post(
         try {
           if (req.body.datas && req.body.datas.aszf) {
             Functions.createFolder(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}`);
-            fs.writeFileSync(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}/aszf.html`, req.body.datas.aszf);
+            fs.writeFileSync(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads`}/local/aszf.html`, req.body.datas.aszf);
             return res.send({ error: false });
           } else {
             return res.send({ error: true });
