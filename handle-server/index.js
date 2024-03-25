@@ -125,8 +125,15 @@ app.use(cookieParser());
 
 //METRICS & HEALTH
 app.get("/health", (req, res) => {
-  logger.info("Health check requested");
+  // logger.info("Health check requested");
   return res.send("Up");
+});
+app.get("/testloki", (req, res) => {
+  logger.info("Info test requested");
+  logger.debug("Debug test requested");
+  logger.warn("Warn test requested");
+  logger.error("Error test requested");
+  return res.send("");
 });
 app.get("/metrics", (req, res) => {
   res.set("Content-Type", register.contentType);
