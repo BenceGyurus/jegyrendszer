@@ -2697,7 +2697,8 @@ app.post(
       let access = await control_Token(req.body.token, req);
       if (access && access.includes("edit-aszf")) {
         try {
-          let aszf = fs.readFileSync(`/uploads/local/aszf.html`);
+          Functions.createFolder(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}`);
+          let aszf = fs.readFileSync(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}/aszf.html`);
           return res.send({ error: false, aszf: aszf.toString() });
         } catch {
           return handleError(logger, "000", res);
@@ -2717,7 +2718,8 @@ app.post(
       if (access && access.includes("edit-aszf")) {
         try {
           if (req.body.datas && req.body.datas.aszf) {
-            fs.writeFileSync(`/uploads/local/aszf.html`, req.body.datas.aszf);
+            Functions.createFolder(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}`);
+            fs.writeFileSync(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}/aszf.html`, req.body.datas.aszf);
             return res.send({ error: false });
           } else {
             return res.send({ error: true });
@@ -2733,7 +2735,8 @@ app.post(
 
 app.get("/api/v1/aszf", async (req, res) => {
   try {
-    let aszf = fs.readFileSync(`/uploads/local/aszf.html`);
+    Functions.createFolder(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads/local`}`);
+    let aszf = fs.readFileSync(`${process.env.NODE_ENV === "production" ? config["IMAGES_NODE_SHARE"] : `${__dirname}/uploads`}/local/aszf.html`);
     return res.send({ error: false, aszf: aszf.toString() });
   } catch {
     handleError(logger, "000", res);

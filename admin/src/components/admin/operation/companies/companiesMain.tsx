@@ -8,6 +8,7 @@ import ParseLocalStorage from "../../../../cookies/ParseLocalStorage";
 import CompaniesList from "./companiesList.component";
 import Loader from "../../../loader/loader.component";
 import typeOfCompany from "./type/company";
+import { Empty } from "antd";
 
 const CompaniesMain = ()=>{
 
@@ -15,11 +16,13 @@ const CompaniesMain = ()=>{
     const [error, setError] = useState("");
     const [companies, setCompanies]:[Array<typeOfCompany>, Function] = useState([]);
     const [editCompany, setEditCompany]:[typeOfCompany, Function] = useState({name : "", tax : "", _id : "", website : ""});
+    const [gotResponse, setGotResponse] = useState<boolean>(false);
 
 
     const getCompanies = ()=>{
         postData("/get-companies", {token : ParseLocalStorage("long_token")})
         .then((response)=>{
+            setGotResponse(true);
             setCompanies(response.datas);
         })
     }
@@ -48,7 +51,7 @@ const CompaniesMain = ()=>{
             <Error  open = {error != ""} setOpen={()=>{setError("")}}  message={error}/>
             <h1>Vállalatok</h1>
             {addNew || editCompany._id ? <AddCompany website = {editCompany.website} nameOfCompany={editCompany.name} tax={editCompany.tax} id={editCompany._id} closeWindowFunction={()=>{setAddNew(false); setEditCompany({name : "", tax : "", _id : "", website : ""})}} errorFunction = {setError} updateFunction={getCompanies} /> : ""}
-            {companies.length ? <CompaniesList companies={companies} editFunction={editFunction} deleteFunction={deleteCompanyFunction} /> : <Loader />}
+            {companies.length ? <CompaniesList companies={companies} editFunction={editFunction} deleteFunction={deleteCompanyFunction} /> : !companies.length && gotResponse ? <Empty /> : <Loader />}
             <AddNewButton onClick={()=>{setAddNew(true)}} />
         </div>
     );

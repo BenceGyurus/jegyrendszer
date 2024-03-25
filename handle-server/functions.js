@@ -207,6 +207,16 @@ class Functions {
     }
     return objectId;
   }
+
+  static createFolder = (folderName)=>{
+    try {
+      if (!fs.existsSync(folderName)) {
+        fs.mkdirSync(folderName);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }
 
 module.exports = Functions;
