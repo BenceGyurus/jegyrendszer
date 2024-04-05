@@ -23,7 +23,7 @@ const Venues = ()=>{
             });
         }
         else{
-            navigate('/admin-login');
+            navigate('/admin/login');
         }
     }
 
