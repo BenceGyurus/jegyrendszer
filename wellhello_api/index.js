@@ -13,7 +13,7 @@ const createDatabase = async ()=>{
         const Tickets = mongoose.model('Tickets', ticketSchema);
         listOfTickets = await Tickets.find();
         if (!(listOfTickets.length)){
-            console.log("Createing tickets...")
+            console.log("Creating tickets...")
             for (let i = 1; i <= 1350; i++){
                 console.log(`Ticket with id ${i} have been created`);
                 let newTicket = new Tickets({ id: i, status : false, time : new Date() });
@@ -31,7 +31,8 @@ const createDatabase = async ()=>{
 };
 
 async function main() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/tickets');
+    if (process.env.NODE_ENV == "production") await mongoose.connect(`${process.env.MONGO_URI}/tickets`);
+    else await mongoose.connect('mongodb://127.0.0.1:27017/tickets');
 }
 
 app.get('/activate-ticket', async (req, res) => {
