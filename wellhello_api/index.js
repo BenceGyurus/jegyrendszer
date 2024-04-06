@@ -4,6 +4,8 @@ const ticketSchema = require("./schemas/tickets_schema.schema");
 
 const mongoose = require('mongoose');
 
+const QUERY_KEY = "text";
+
 main().catch(err => console.log(err));
 
 const createDatabase = async ()=>{
@@ -33,7 +35,7 @@ async function main() {
 }
 
 app.get('/activate-ticket', async (req, res) => {
-    const id = req.query.id;
+    const id = req.query[QUERY_KEY];
     const Tickets = mongoose.model('Tickets', ticketSchema);
     if (id){
     let ticket = await Tickets.findOne({$and : [{id : id}, {status : false}]});
@@ -62,5 +64,37 @@ app.get('/activate-ticket', async (req, res) => {
         })
     }
 })
+
+app.get("/deactivate-ticket", async (req,res)=>{
+    const id = req.query[QUERY_KEY];
+    const Tickets = mongoose.model('Tickets', ticketSchema);
+    if (id){
+    let ticket = await Tickets.findOne({$and : [{id : id}, {status : true}]});
+    if (ticket){
+        update = (await Tickets.updateOne({id : id}, {status : false, time : new Date()}));
+        if (update.matchedCount){
+            res.send({error : false, message : "A jegyet sikeresen deakitválta"});
+        }else{
+            res.send({
+                error : true,
+                message : "Something went wrong"
+            })
+        }
+
+    }
+    else{
+        res.send({
+            error : true,
+            message : "A jegy nem található vagy még nem lett aktiválva",
+        })
+    }
+    }else{
+        res.send({
+            error : true,
+            message : "Hibás adatok"
+        })
+    }
+});
+
 createDatabase();
 app.listen(3000);
