@@ -24,7 +24,7 @@ services:
       - ./handle-server/uploads:/uploads
     environment:
       - CONFIGDIR=/
-      - SLACK_TOKEN=xoxp-3311554582775-3326149485602-5558132480816-b99feeab07cc6134360f9e4800c9d18b
+      - SLACK_TOKEN=<<SLACK_TOKEN>
       - TZ=Europe/Budapest
     stdin_open: true
     tty: true
