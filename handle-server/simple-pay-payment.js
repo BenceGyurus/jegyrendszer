@@ -37,7 +37,7 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
                     city: customerDatas.city,
                     zip: customerDatas.postalCode,
                     address: customerDatas.address,
-                    address2: customerDatas.address2 == 'null' ? null : req.body.datas.customerDatas.address2,
+                    address2: customerDatas.address2 == 'null' ? null : customerDatas.address2,
                     phone: customerDatas.phone
                 },
                 items: [

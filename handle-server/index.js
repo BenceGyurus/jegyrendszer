@@ -2445,20 +2445,23 @@ app.post(
                 otherDatas: await otherData(req),
               };
               let l = new Database("buy");
-              result = await l.collection.updateOne(
-                { _id: ObjectId(req.params.id) },
-                { $set: saveDatas },
-              );
-              closeConnection(l.database);
+              
               if (!buyingDatas.bought && !buyingDatas.isPayingStarted){
-              simpleBody = await SimplePayPayment(
-                  uuid,
-                  req.params.id,
-                  req.body.datas.customerData,
-                  buyingDatas.tickets,
-                  buyingDatas.fullPrice,
-                );
+                simpleBody = await SimplePayPayment(
+                    uuid,
+                    req.params.id,
+                    req.body.datas.customerData,
+                    buyingDatas.tickets,
+                    buyingDatas.fullPrice,
+                  );
+                  l.collection.updateOne({_id: ObjectId(req.params.id)}, {$set : {...saveDatas, isPayingStarted : simpleBody ? true : false}});
+                  closeConnection(l.database);
               }else{
+                result = await l.collection.updateOne(
+                  { _id: ObjectId(req.params.id) },
+                  { $set: saveDatas },
+                );
+                closeConnection(l.database);
                 return handleError(logger, "050", res);
               }
             }else{
