@@ -80,17 +80,6 @@ spec:
         - "api.jegyrendszer.local"
 ---
 apiVersion: v1
-kind: Secret
-metadata:
-  name: handle-server-secretmap
-type: Opaque
-data:
-  SLACK_TOKEN: eG94cC0zMzExNTU0NTgyNzc1LTMzMjYxNDk0ODU2MDItNTU1ODEzMjQ4MDgxNi1iOTlmZWVhYjA3Y2M2MTM0MzYwZjllNDgwMGM5ZDE4Ygo=
-  REDIS_PASS: cm9vdAo=
-  APPLE_PASS_IDENTIFIER: ""
-  MERCHANT: ""
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: backend-uploads-pvc
