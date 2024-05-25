@@ -21,6 +21,7 @@ import TicketSalesMain from "../components/admin/operation/ticket-sales/main";
 import Aszf from "../components/aszf/aszf.component";
 import LoadSeatMap from "../components/createSeatMap/loadSeatMap.component";
 import ErrorPage from "../components/error-page/error-page";
+import ReportComponent from "../components/admin/operation/report/report.component";
 
 function Navigation() {
   return (
@@ -93,6 +94,10 @@ function Navigation() {
           <Route
             path="/admin/statisztika"
             element={<AdminPage component={<Statistics />} />}
+          />
+          <Route
+            path="/admin/report/*"
+            element={<AdminPage component={<ReportComponent />} />}
           />
         </Routes>
       </BrowserRouter>

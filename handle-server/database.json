@@ -94,5 +94,9 @@
   "simplePay" : {
     "database" : "payments",
     "collection" : "simplePay"
+  },
+  "reports" : {
+    "database" : "report",
+    "collection" : "report"
   }
 }

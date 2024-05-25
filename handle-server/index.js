@@ -49,8 +49,8 @@ const RedisMiddleware = require("./redishMiddleware.js");
 const zlib = require('node:zlib');
 var cookieParser = require("cookie-parser");
 var redisOptions = {
-  port: 6379,
-  host: "localhost",
+  port: 30036, //6379,
+  host: "192.168.1.81", //localhost,
   username: "default",
   password: process.env.REDIS_PASS,
   db: 0,
@@ -2005,6 +2005,8 @@ app.post(
     const skipValue = (pageNumber - 1) * pageSize;
     const results = db.collectionName.find({}).skip(skipValue).limit(pageSize);
     */
+   let local = req.query.local == "1"
+   let web = req.query.web == "1"
 
     if (req.body && typeof req.body == TypeOfBody && req.body.token) {
       let access = await control_Token(req.body.token, req);
@@ -2018,12 +2020,89 @@ app.post(
             page,
             limit,
             req.query.search,
+            { local : local,
+            web : web}
           ),
         );
       }
+      else{
+        handleError(logger, "004", res);
+      }
+    }
+    else{
+      handleError(logger, "400", res);
     }
   },
 );
+
+app.post("/api/v1/create-report", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+  let startDate = new Date(req.query.startDate);
+  let endDate = new Date(req.query.endDate);
+  let justLocal = req.query.justLocal == "true";
+  if (req.body && typeof req.body == TypeOfBody && req.body.token && startDate && endDate) {
+    let access = await control_Token(req.body.token, req);
+    if (access && access.includes("ticket-sells")) {
+      if (startDate && endDate) return res.send(await createReport(startDate, endDate, justLocal, req));
+      else{
+        return handleError(logger, "400", res);
+      }
+    }
+    else{
+      return handleError(logger, "004", res);
+    }
+  }
+  else{
+    return handleError(logger, "400", res);
+  }
+});
+
+app.post("/api/v1/get-report/:reportId", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+  if (req.body && typeof req.body == TypeOfBody && req.body.token) {
+    let access = await control_Token(req.body.token, req);
+    if (access && access.includes("ticket-sells")) {
+      const {collection, database} = new Database("reports");
+      const id = Functions.createObjectId(req.params.reportId);
+      if (id){
+        report = await collection.findOne({_id : id}, {projection : {report : 1}});
+        Functions.closeConnection(database);
+        return res.send({report : report ? report.report : false});
+      }
+      else{
+        return handleError(logger, "400", res);
+      }
+    }
+    else{
+      return handleError(logger, "004", res);
+    }
+  }
+  else{
+    return handleError(logger, "400", res);
+  }
+});
+
+app.post("/api/v1/download-report/:reportId", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+  if (req.body && typeof req.body == TypeOfBody && req.body.token) {
+    let access = await control_Token(req.body.token, req);
+    if (access && access.includes("ticket-sells")) {
+      const {collection, database} = new Database("reports");
+      const id = Functions.createObjectId(req.params.reportId);
+      if (id){
+        report = await collection.findOne({_id : id}, {projection : {report : 1}});
+        Functions.closeConnection(database);
+        return res.send({report : report ? report.report : false});
+      }
+      else{
+        return handleError(logger, "400", res);
+      }
+    }
+    else{
+      return handleError(logger, "004", res);
+    }
+  }
+  else{
+    return handleError(logger, "400", res);
+  }
+});
 
 //COUPONS
 app.post("/api/v1/new-coupon", async (req, res) => {
@@ -2999,7 +3078,7 @@ app.post(
         let { fromDate, toDate, event } = req.query;
         res.send(await pageLog(fromDate, toDate, event));
       } else {
-        return handleError(logger, "004", resweb-server/package.json);
+        return handleError(logger, "004", res);
       }
     } else {
       return handleError(logger, "400", res);
@@ -3107,6 +3186,7 @@ const getEventByObjectId = require("./getEventByObjectId.js");
 const { closeConnection } = require("./closeConnection.js");
 const RedishMiddleware = require("./redishMiddleware.js");
 const { createAdapter } = require("@socket.io/redis-streams-adapter");
+const createReport = require("./createReport.js");
 
 
 const io = new Server(server, {

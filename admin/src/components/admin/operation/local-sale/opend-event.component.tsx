@@ -100,7 +100,7 @@ const Local_Sale_Event = ()=>{
         if (!userSelecting){
         let l = [...amountTickets];
         for (let i = 0; i < l.length; i++){
-            if (l[i].id === id && l[i].amount < l[i].numberOfTicket){
+            if (l[i].id === id && l[i].amount < l[i].numberOfFreeTickets){
                 l[i].amount++;
             }
         }
@@ -184,7 +184,7 @@ const Local_Sale_Event = ()=>{
     const [userSelecting, setUserSelecting]:[boolean, Function] = useState(false);
     const [buying, setBuying] = useState(false);
 
-    console.log(eventDatas);
+    console.log(amountTickets);
 
     useEffect(()=>{
         const url = new URL(window.location.href);
