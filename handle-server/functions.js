@@ -14,7 +14,7 @@ class Functions {
   }
   static getIp(req) {
     try {
-      return process.env.NODE_ENV === "production" ? req.headers["CF-Connecting-IP"] : req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+      return process.env.NODE_ENV === "production" ? req.headers["Cf-Connecting-Ip"] : req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     } catch {
       try {
         return (
