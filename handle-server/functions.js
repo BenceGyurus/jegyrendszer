@@ -14,12 +14,12 @@ class Functions {
   }
   static getIp(req) {
     console.log("req", req.handshake);
-    try {
+    if (req.headers){
       return process.env.NODE_ENV === "production" ? req.headers["cf-connecting-ip"] : req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    } catch {
+    }else {
       try {
         return (
-          req.handshake.address.address
+          req.handshake.headers["cf-connecting-ip"]
         );
       } catch {
         return "";
