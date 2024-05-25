@@ -13,13 +13,12 @@ class Functions {
     return uuid.v4();
   }
   static getIp(req) {
-    console.log("req", req.headers);
+    console.log("req", req.handshake);
     try {
       return process.env.NODE_ENV === "production" ? req.headers["cf-connecting-ip"] : req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     } catch {
       try {
         return (
-          req.handshake.headers["x-forwarded-for"] ||
           req.handshake.address.address
         );
       } catch {
