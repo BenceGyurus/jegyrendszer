@@ -766,7 +766,7 @@ app.post("/api/v1/login", async (req, res) => {
   let body = Functions.parseBody(req.body);
   if (body && typeof body == TypeOfBody && body.username && body.password) {
     if (!(await ControlLoginRequest(req, res))) {
-      return;
+      return handleError(logger, "400", res);
     }
     let { collection, database } = new Database("admin");
     let user = await collection.findOne({
