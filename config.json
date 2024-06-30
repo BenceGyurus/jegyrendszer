@@ -2,7 +2,7 @@
     "PY_DIR": "../data/email",
     "NODE_SHARE": "/pdfs",
     "EMAIL_SERVER": "http://192.168.1.216:5000",
-    "MONGO_URI": "mongodb://192.168.1.81:27017/",
+    "MONGO_URI": "mongodb://192.168.1.70:27017/",
     "REDIS_URI": "",
     "TIMES" : "./times.json",
     "PDF_FONT_FAMILY" : "media/fonts/Rubik/static/Rubik-Regular.ttf",
@@ -23,5 +23,18 @@
     "ACCEPTED_IMAGE_EXTENSIONS" : ["PNG", "JPG", "JFIF", "JPEG", "MOV", "MP4"],
     "MAX_PAGINATOR_LIMIT" : 30,
     "TICKET_NODE_SHARE" : "/pdfs",
-    "IMAGES_NODE_SHARE" : "/uploads"
+    "IMAGES_NODE_SHARE" : "/uploads",
+    "CSV_HEADER" : [{
+        "id" : "event",
+        "title" : "Esemény neve" 
+    },
+    {
+        "id" : "fullPrice",
+        "title" : "Fizetett összes"
+    },
+    {
+        "id" : "time",
+        "title" : "Vásárlás időpontja"
+    }
+]
 }

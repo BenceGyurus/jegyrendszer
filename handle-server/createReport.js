@@ -15,7 +15,6 @@ const createReport = async (startDate, endDate, justLocal, req)=>{
         catch{
             event = false;
         }
-        console.log(event);
         report[i].event = event ? event.eventData.name : "";
         if (event){
             for (let j = 0; j < report[i].tickets.length; j++){
@@ -28,12 +27,11 @@ const createReport = async (startDate, endDate, justLocal, req)=>{
     report.startDate = startDate;
     report.endDate = endDate;
     const reportDatabase = new Database("reports");
-    id = (await reportDatabase.collection.insertOne({report : report, otherDatas : otherData(req, req.body.token)})).insertedId;
+    id = (await reportDatabase.collection.insertOne({report : report, otherDatas : otherData(req, req.body.token), startDate : startDate, endDate : endDate})).insertedId;
     Functions.closeConnection(reportDatabase.database);
     Functions.closeConnection(eventDatabase.database);
     Functions.closeConnection(database);
-    console.log(report, id);
-    return {report : report, id : String(id)}
+    return {id : String(id)}
  }
 
 module.exports = createReport;

@@ -348,7 +348,7 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         }
         postData("/get-companies-in-array", {token : ParseLocalStorage("long_token")})
         .then(response=>{
-            if (!response.error && !response.resposeData){
+            if (!response.error && !response.resposeData){
                 let list = [];
                 for (let i = 0; i < response.companies.length; i++){
                     list.push({value : response.companies[i]._id, title : response.companies[i].name});
@@ -425,7 +425,6 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
             smallBackground : smallerImage
         };
 
-        console.log(sendData);
 
         postDataJson(`/add-event${id ? `/${id}` : ""}`, {data : sendData, token : ParseLocalStorage("long_token")})
         .then(async (data)=>{
@@ -488,11 +487,11 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         let maxX = 0;
         let maxY = 0;
         if (venueDatas && venueDatas.seats && venueDatas.seats.length){
-            venueDatas.seats.forEach((seat:any, index:number)=>{
-                if (index === 0 || seat.x > maxX) maxX = seat.x;
-                if (index === 0 || seat.y > maxY) maxY = seat.y;
-            });
+            console.log(venueDatas);
+            maxX = Math.max(...venueDatas.seats.map((seat:any) => {return seat.x + (seat.size.width)}));
+            maxY = Math.max(...venueDatas.seats.map((seat:any) => {return seat.y + (seat.size.height)}));
         }
+        console.log(maxX, maxY);
         return {
             width : maxX,
             height : maxY
@@ -553,7 +552,6 @@ const EventSettings = ( { name, description, tickets_, background, dOfEvent, dOf
         if (endOfTheEvent && new Date(dateOfEvent) > new Date(endOfTheEvent)) setError("Az eseménynek korábban kell kezdődnie, mint befejeződnie");
     }
 
-    console.log(tickets);
 
     return (
         <div>

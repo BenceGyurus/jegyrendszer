@@ -47,10 +47,12 @@ const controlCreatedSeats = require("./control/controlCreatedSeats.js");
 const seatMatrixToArray = require("./seatMatrixToArray.js");
 const RedisMiddleware = require("./redishMiddleware.js");
 const zlib = require('node:zlib');
+const { Buffer } = require('buffer');
+const { createObjectCsvStringifier } = require('csv-writer');
 var cookieParser = require("cookie-parser");
 var redisOptions = {
   port: 30036, //6379,
-  host: "192.168.1.81", //localhost,
+  host: "192.168.1.70", //localhost,
   username: "default",
   password: process.env.REDIS_PASS,
   db: 0,
@@ -2063,9 +2065,9 @@ app.post("/api/v1/get-report/:reportId", (req,res,next)=>parseBodyMiddleeware(re
       const {collection, database} = new Database("reports");
       const id = Functions.createObjectId(req.params.reportId);
       if (id){
-        report = await collection.findOne({_id : id}, {projection : {report : 1}});
+        report = await collection.findOne({_id : id}, {projection : {report : 1, startDate : 1, endDate : 1}});
         Functions.closeConnection(database);
-        return res.send({report : report ? report.report : false});
+        return res.send({report});
       }
       else{
         return handleError(logger, "400", res);
@@ -2089,7 +2091,16 @@ app.post("/api/v1/download-report/:reportId", (req,res,next)=>parseBodyMiddleewa
       if (id){
         report = await collection.findOne({_id : id}, {projection : {report : 1}});
         Functions.closeConnection(database);
-        return res.send({report : report ? report.report : false});
+        if (report.report){
+          let keys = config.CSV_HEADER;
+          let csvStringifier = createObjectCsvStringifier({
+            header: keys
+          })
+          const csvString = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(report.report);
+          const buffer = Buffer.from(csvString, 'utf-8');
+          res.set('Content-Type', 'text/csv');
+          res.send(buffer);
+        }
       }
       else{
         return handleError(logger, "400", res);

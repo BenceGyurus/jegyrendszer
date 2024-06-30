@@ -357,7 +357,7 @@ const SeatVisualization = ({
     >
       <MapInteractionCSS
         value={state}
-        onChange={(value: any) => setState(value)}
+        onChange={(value: any) => {if (!disabled) setState(value)}}
         controlsClass="zoom-tool-button"
         minScale={0.3}
         maxScale={2.5}

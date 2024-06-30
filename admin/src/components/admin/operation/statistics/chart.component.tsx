@@ -2,6 +2,7 @@ import typeOfChartParams from "./type/chartParams";
 //import { Line } from '@ant-design/plots';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+
 const Chart = ({datas, titleY, titleX,}:typeOfChartParams)=>{
     let d = datas.map((data,index)=>{return {"timePeriod" : index+1, "value" : data}});
         const config = {

@@ -56,15 +56,17 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
 
 
     const getSizeOfArea = (seats:Array<typeOfSeats>)=>{
-        const max = seats.reduce((acc, obj) => {
-            acc.x = Math.max(acc.x, obj.x);
-            acc.y = Math.max(acc.y, obj.y);
-            return acc;
-        }, { x: -Infinity, y: -Infinity });
-        
-        if (max.x && max.y) return {width : max.x, height : max.y};
-    
-        return {width : 0, height : 0};
+        let maxX = 0;
+        let maxY = 0;
+        if (seats && seats.length){
+            maxX = Math.max(...seats.map((seat:any) => {return seat.x + (seat.size.width/2)}));
+            maxY = Math.max(...seats.map((seat:any) => {return seat.y + (seat.size.height/2)}));
+        }
+        console.log(maxX, maxY);
+        return {
+            width : maxX,
+            height : maxY
+        }
     }
     
 

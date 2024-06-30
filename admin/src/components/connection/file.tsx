@@ -16,9 +16,11 @@ async function postFile(url = '', data = {}, redirect = '') {
         let blob = await response.blob();
         var file = window.URL.createObjectURL(blob);
         window.location.assign(file);
-        setTimeout(()=>{
-            window.location.pathname = redirect;
-        },2000);
+        if (redirect){
+            setTimeout(()=>{
+                window.location.pathname = redirect;
+            },2000);
+        }
         return {error : false, message : "Sikeres vásárlás, a jegyek letöltés hamarosan elindul"};
     }
     try{

@@ -17,7 +17,6 @@ async function control_Token(token, req) {
       let { collection, database } = new Database("admin");
       user = await collection.findOne({ _id: datas.userData.id });
       Functions.closeConnection(database);
-      console.log("user", user);
       return user ? user.access : false;
     }
   }

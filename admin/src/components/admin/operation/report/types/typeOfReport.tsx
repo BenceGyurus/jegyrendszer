@@ -9,4 +9,6 @@ export default interface typeOfReport{
     eventId : string,
     id : string,
     event : string
+    startDate : Date,
+    endDate : Date
 }

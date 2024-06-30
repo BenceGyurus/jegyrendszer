@@ -35,7 +35,7 @@ const TicketList = ( { tickets, sizeOfSeat, sizeOfArea, seatDatas,deleteFunction
     return <div className = "ticket">
         {
             tickets.map((ticket)=>{
-                return <Ticket ticket = {ticket} sizeOfSeat = {sizeOfSeat} sizeOfArea = {sizeOfArea} seatsDatas = {seatDatas} deleteFunction = {deleteFunction} editFunction = {editFunction} key={uuid()} />
+                return <Ticket ticket = {ticket} sizeOfSeat = {sizeOfSeat} sizeOfArea = {sizeOfArea} seatsDatas = {[...seatDatas]} deleteFunction = {deleteFunction} editFunction = {editFunction} key={uuid()} />
             }
             )
         }

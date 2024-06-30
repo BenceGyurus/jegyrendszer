@@ -13,7 +13,7 @@ type typeOfDatas = {
     buyId : string,
     customerName : string,
     cusotmerEmail : string,
-    phoneNumber : string
+    phoneNumber : string,
 }
 
 export default typeOfDatas

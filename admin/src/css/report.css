@@ -1,0 +1,31 @@
+.report-card-data{
+    width: 25%;
+    min-width: 350px;
+    margin: 2%;
+    height: 200px;
+}
+
+.report-cards-container{
+    width: 95%;
+    margin:10px auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.report-download-button-container{
+    width: 95%;
+    margin: 10px;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.report-warn-container{
+    margin: 10px;
+    width: 95%;
+}
+
+.report-date-range-span{
+    
+}
+

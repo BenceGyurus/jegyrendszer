@@ -1,0 +1,37 @@
+.sales-search-filter-container{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    margin: 10px;
+    max-width: 400px;
+}
+
+.sales-search-filter-check-box-container{
+    display: flex;
+}
+
+.sales-search-filter-check-box-container div {
+    margin: 0 10px 10px 10px;
+}
+.sales-search-filter-check-box-container div label {
+    margin: 0 4px;
+}
+
+.create-report-div{
+    max-width: 300px;
+}
+
+.create-report-div .create-report-containers{
+    margin: 7px;
+    padding: 3px;
+}
+
+.ticket-sales-search-header{
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+}
+
+#create-report-range-picker{
+    z-index: 1000000000 !important;
+}

@@ -161,15 +161,11 @@ const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTa
     return <Table bordered = {true} key={uuid()} columns={expandedColumns} dataSource={data} pagination={false} />;
   };
 
-  const header = ()=>{
-    return <div><div><h2>Jegyeladások</h2></div><Button onClick = {e=>{}}>Herunterladen (.csv)</Button></div>
-  }
 
   return (
       <Table
         className = "ads-table"
         bordered = {true}
-        title={()=>header()}
         columns={columns}
         dataSource={getDatas()}
         expandable={{expandedRowRender: (record) => rowRender(record.tickets)}}

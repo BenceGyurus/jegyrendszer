@@ -8,23 +8,15 @@ import typeOfDatas from "./types/tableData";
 import Search from "antd/es/input/Search";
 import TicketRedemptionWindow from "./ticket-redemption-window.component";
 import type { MenuProps } from 'antd';
-import dayjs from 'dayjs';
 import Report from "./report.component";
 import Notification from "../../../notification/notification.component";
 import Error from "../../../notification/error.component";
+import "../../../../css/ticket-sales.css";
+import Window from "../../../window/window.component";
+
+
 const { RangePicker } = DatePicker;
 
-
-
-type typeOfTicket = {
-  name: string;
-  price: number;
-  unitPrice: number;
-  amount: number;
-  ticketId: string;
-  places: Array<string>;
-  eventId: string;
-};
 
 const dateFormat = 'YYYY/MM/DD';
 
@@ -80,6 +72,7 @@ const TicketSalesMain = () => {
   const [endDate, setEndDate] = useState();
   const [justLocal, setJustLocal] = useState(false);
   const [error, setError] = useState<string>("");
+  const [createReportWindow, setCreateReportWindow] = useState<Boolean>(false);
 
   const getSales = () => {
     setIsResponse(false);
@@ -102,7 +95,7 @@ const TicketSalesMain = () => {
     if (endDate && startDate){
     postData(`/create-report?startDate=${startDate}&endDate=${endDate}&justLocal=${justLocal}`, {token : ParseLocalStorage("long_token")})
       .then(response=>{
-        console.log(response);
+        if (response && !response.error && response.id) window.location.pathname = `/admin/report/${response.id}`; else setError(response.message ? response.message : "Hiba történt a jelentés legenerálása közben.");
       })
     }else{
       setError("Kérem adjon meg intervallumot a lekérdezéshez");
@@ -121,33 +114,41 @@ const TicketSalesMain = () => {
       <h1>Jegyeladások</h1>
       <div>
       <div>
+        <div className = "ticket-sales-search-header">
         <div>
-          <Search
-            value={searchValue}
-            onSearch={(e) => getSales()}
-            onChange={(e) => setSearchValue(e.target.value)}
-            className="ticket-sales-search-field"
-          />
-          <div>
-            <div>
-              <label htmlFor="local-sales">Helyi eldások</label>
-              <Checkbox id = "local-sales" defaultChecked = {local} checked={local} onChange={e=>{setLocal(e.target.checked)}} />
+            <Search
+              value={searchValue}
+              onSearch={(e) => getSales()}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="ticket-sales-search-field"
+            />
+            <div className = "sales-search-filter-container">
+              <div className = "sales-search-filter-check-box-container">
+                <div>
+                  <label htmlFor="local-sales">Helyi eldások</label>
+                  <Checkbox id = "local-sales" defaultChecked = {local} checked={local} onChange={e=>{setLocal(e.target.checked)}} />
+                </div>
+                <div>
+                  <label htmlFor="web-sales">Webes eldások</label>
+                  <Checkbox id = "web-sales" defaultChecked = {web} checked={web} onChange={e=>{setWeb(e.target.checked)}} />
+                </div>
+              </div>
             </div>
-            <div>
-              <label htmlFor="web-sales">Webes eldások</label>
-              <Checkbox id = "web-sales" defaultChecked = {web} checked={web} onChange={e=>{setWeb(e.target.checked)}} />
-            </div>
-            <Button onClick = {()=>getSales()}>Keresés</Button>
           </div>
-        </div>
-        <div>
-          <h3>Jelentés készítése</h3>
-          <RangePicker defaultValue={[startDate, endDate]} format={dateFormat} onChange={(date:any, dateString)=>{if (date && date.length) {setStartDate(date[0]["$d"]); setEndDate(date[1]["$d"])} else{setStartDate(undefined); setEndDate(undefined)}}} />
-          <br />
-          <label htmlFor="just-local-checkbox">Csak helyi eladás</label>
-          <Checkbox id = "just-local-checkbox" defaultChecked={justLocal} onChange={e=>{setJustLocal(e.target.checked)}}  />
-          <br />
-          <Button onClick={()=>getReport()}>Jelentés készítés</Button>
+          {createReportWindow ? <Window title="Jelentés készítése" closeFunction={()=>setCreateReportWindow(false)}>
+            <div className = "create-report-div">
+              <h3>Jelentés készítése</h3>
+              <div className = "create-report-containers"><RangePicker id = "create-report-range-picker" defaultValue={[startDate, endDate]} format={dateFormat} onChange={(date:any, dateString)=>{if (date && date.length) {setStartDate(date[0]["$d"]); setEndDate(date[1]["$d"])} else{setStartDate(undefined); setEndDate(undefined)}}} /></div>
+              <div className = "create-report-containers">
+                <label htmlFor="just-local-checkbox">Csak helyi eladás</label>
+                <Checkbox id = "just-local-checkbox" defaultChecked={justLocal} onChange={e=>{setJustLocal(e.target.checked)}}  />
+              </div>
+              <div className = "create-report-containers">
+                <Button onClick={()=>getReport()}>Jelentés készítés</Button>
+              </div>
+            </div>
+          </Window> : <></>}
+          <Button onClick={()=>setCreateReportWindow(true)}>Jelentés</Button>
         </div>
         </div>
         {ticketDatas.length ? (
