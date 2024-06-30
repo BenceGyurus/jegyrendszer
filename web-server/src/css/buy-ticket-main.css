@@ -42,7 +42,7 @@
 }
 
 .paying-action-buttons {
-    width: 100%;
+    width: calc(100% - 20px);
     display: flex;
     justify-content: flex-end;
 }
