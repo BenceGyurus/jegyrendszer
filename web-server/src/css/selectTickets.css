@@ -10,8 +10,9 @@
 
 .select-ticket-main-div{
     width: max-content;
-    max-width: 80%;
+    max-width: 500px;
     margin: 10px auto;
     overflow: auto;
     max-height: calc(100vh - 80px);
+    width: 80%;
 }

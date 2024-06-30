@@ -68,6 +68,7 @@ const Seats = ({places, tickets, seleted,onClickFunction, disabled}:typeOfSeatsP
     const getSizeOfArea = ()=>{
         let maxX = 0;
         let maxY = 0;
+        let widthOfArea = window.innerWidth*0.8 > 500 ? 500 : window.innerWidth*0.8;
         if (places){
             places.seats.forEach((seat:any, index:number)=>{
                 if (index === 0 || maxX < seat.x+seat.size.width){maxX = seat.x+seat.size.width};

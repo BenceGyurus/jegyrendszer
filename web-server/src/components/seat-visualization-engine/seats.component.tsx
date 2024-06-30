@@ -204,22 +204,13 @@ const SeatVisualization = ({
   useEffect(() => {
     let lstate = { ...state };
     let area = sizeOfArea;
-    if (window.innerHeight < area.height || window.innerWidth < area.width) {
       lstate.scale =
         (window.innerHeight - 180) / area.height >
         (window.innerWidth * 0.8) / area.width
           ? (window.innerWidth * 0.8) / area.width
           : (window.innerHeight - 180) / area.height;
-      lstate.translation.x =
-        ((window.innerWidth * 0.8 < area.width
-          ? window.innerWidth * 0.8
-          : area.width - area.width * lstate.scale) /
-          2) *
-        lstate.scale;
-      lstate.translation.y =
-        ((window.innerHeight - 180 - area.height * lstate.scale) / 2) *
-        lstate.scale;
-    }
+          lstate.translation.x = ((window.innerWidth*0.8<500?window.innerWidth*0.8:500) - lstate.scale*area.width)/2;
+          console.log(((window.innerWidth*0.8<500?window.innerWidth*0.8:500) - lstate.scale*area.width)/2);
     setState(lstate);
   }, []);
 
@@ -339,16 +330,20 @@ const SeatVisualization = ({
     }
   };
 
+  /*
+  width:
+          window.innerWidth * 0.8 > sizeOfArea.width
+            ? sizeOfArea.width
+            : window.innerWidth * 0.8,*/
+
   return (
     <div
+      className = "map-holder-div"
       ref={divRef}
       style={{
         position: "relative",
         zIndex: "max",
-        width:
-          window.innerWidth * 0.8 > sizeOfArea.width
-            ? sizeOfArea.width
-            : window.innerWidth * 0.8,
+        
         height:
           window.innerHeight - 180 > sizeOfArea.height
             ? sizeOfArea.height
@@ -363,8 +358,8 @@ const SeatVisualization = ({
         maxScale={2.5}
         className="map-container"
         translationBounds={{
-          xMax: sizeOfArea.width * 0.5,
-          yMax: sizeOfArea.height * 0.5,
+          xMax: sizeOfArea.width * 1.5,
+          yMax: sizeOfArea.height * 1.5,
           xMin: -sizeOfArea.width * state.scale * 0.9,
           yMin: -sizeOfArea.height * state.scale * 0.9,
         }}

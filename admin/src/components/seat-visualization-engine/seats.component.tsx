@@ -339,16 +339,18 @@ const SeatVisualization = ({
     }
   };
 
+  /*
+  window.innerWidth * 0.8 > sizeOfArea.width
+            ? sizeOfArea.width
+            : window.innerWidth * 0.8,*/
+
   return (
     <div
       ref={divRef}
       style={{
         position: "relative",
         zIndex: "max",
-        width:
-          window.innerWidth * 0.8 > sizeOfArea.width
-            ? sizeOfArea.width
-            : window.innerWidth * 0.8,
+        width: window.innerWidth*0.8,
         height:
           window.innerHeight - 180 > sizeOfArea.height
             ? sizeOfArea.height
