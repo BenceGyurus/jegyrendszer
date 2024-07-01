@@ -204,13 +204,14 @@ const SeatVisualization = ({
   useEffect(() => {
     let lstate = { ...state };
     let area = sizeOfArea;
+    let windowWidth = window.innerWidth * .8 < 500 ? window.innerWidth * .8 : 500;
       lstate.scale =
         (window.innerHeight - 180) / area.height >
-        (window.innerWidth * 0.8) / area.width
-          ? (window.innerWidth * 0.8) / area.width
+        windowWidth / area.width
+          ? windowWidth / area.width
           : (window.innerHeight - 180) / area.height;
-          lstate.translation.x = ((window.innerWidth*0.8<500?window.innerWidth*0.8:500) - lstate.scale*area.width)/2;
-          console.log(((window.innerWidth*0.8<500?window.innerWidth*0.8:500) - lstate.scale*area.width)/2);
+          lstate.translation.x = (windowWidth - lstate.scale*area.width)/2;
+          console.log((windowWidth - lstate.scale*area.width)/2);
     setState(lstate);
   }, []);
 
@@ -268,11 +269,10 @@ const SeatVisualization = ({
   }) => {
     let lstate = { ...state };
     let area = sizeOfArea;
-    console.log(maxY - minY, maxX - minX);
     let width = maxX - minX;
     let height = maxY - minY;
     let windowHeight = window.innerHeight - 180;
-    let windowWidth = window.innerWidth * 0.8;
+    let windowWidth = window.innerWidth * 0.8 < 500 ? window.innerWidth * 0.8 : 500;
     if (height < windowHeight || width < windowWidth) {
       lstate.scale =
         (windowHeight / height > windowWidth / width
