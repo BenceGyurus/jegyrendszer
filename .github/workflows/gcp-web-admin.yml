@@ -41,13 +41,3 @@ jobs:
         docker tag $IMAGE_NAME:latest europe-west3-docker.pkg.dev/$PROJECT_ID/jegyrendszer/$IMAGE_NAME:1.20.$GIT_TAG
         docker push europe-west3-docker.pkg.dev/$PROJECT_ID/jegyrendszer/$IMAGE_NAME:latest
         docker push europe-west3-docker.pkg.dev/$PROJECT_ID/jegyrendszer/$IMAGE_NAME:1.20.$GIT_TAG
-
-    # - name: Change Chart values
-    #   run: |
-    #     cd deployment/jegyrendszer
-    #     sed 's/web_tag: .*/web_tag: '${{ github.run_number }}'/' values.yaml > temp.yaml && mv temp.yaml values.yaml
-    #     git config --global user.name 'GitHub Actions'
-    #     git config --global user.email 'actions@github.com'
-    #     git add values.yaml
-    #     git commit -m "Change release tag in values.yaml"
-    #     git push
