@@ -1,13 +1,7 @@
 import "../../../css/venuesStyle.css";
-import SmallMap from "./smallMap.component"
 import postData from "../../connection/request";
 import ParseLocalStorage from "../../../cookies/ParseLocalStorage";
-import Tooltip from "../../tooltip/tooltip.component";
-import { Card, Popconfirm, Tag } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import StringAvatar from "../../avatar/avatar.component";
-import Meta from "antd/es/card/Meta";
-import EventSkeleton from "../operation/events/components/event_Skeleton.component";
+import { Empty } from "antd";
 import { Skeleton } from "@mui/material";
 import { useState } from "react";
 import Venue from "./venue.component";
@@ -37,9 +31,10 @@ export type typeOfVenueDatas = {
 
 type typeOfVenueListParams = {
     venues : Array<typeOfVenueDatas>,
-    newRequest : Function
+    newRequest : Function,
+    loaded : Boolean
 }
-const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
+const VenueList = ({ venues, newRequest, loaded }:typeOfVenueListParams):any=>{
 
     const [openPopConfirm, setOpenPopConfirm] = useState<boolean>(false);
 
@@ -70,7 +65,7 @@ const VenueList = ({ venues, newRequest }:typeOfVenueListParams):any=>{
     }
     
 
-    return(<div className = "venue-list"> {venues.length ? venues.map((element, index)=>{
+    return(!venues.length && loaded ? <div className = "center-div"><Empty /></div> : <div className = "venue-list"> {venues.length ? venues.map((element, index)=>{
         return (
             <Venue size={getSizeOfArea(element.seats)} element={element} handleDeleteFunction={handleDeleteFunction} handleEditFunction={handleEditFunction} />
         );}) : <Skeleton height={500} style={{marginTop: 0}}></Skeleton>}

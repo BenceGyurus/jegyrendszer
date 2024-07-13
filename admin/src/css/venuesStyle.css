@@ -104,3 +104,8 @@
   width: 80%;
   opacity: .9;
 }
+
+.center-div{
+  width: max-content;
+  margin: 10px auto;
+}

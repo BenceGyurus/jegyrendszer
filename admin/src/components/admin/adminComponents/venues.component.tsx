@@ -11,12 +11,14 @@ const Venues = ()=>{
 
     const [rooms, setRooms] = useState([]);
     const navigate = useNavigate();
+    const [loaded, setLoaded] = useState<Boolean>(false);
 
     const load = ()=>{
         let token = ParseLocalStorage("long_token");
         if (token){
             postData("/venues", {token : token})
             .then((datas)=>{
+                setLoaded(true);
                 if (datas.venues){
                     setRooms(datas.venues);
                 }
@@ -37,7 +39,7 @@ const Venues = ()=>{
         <div key = {uuid()}>
             <h1 className = "venues-title">Helyszínek</h1>
             <AddNewButton onClick={()=>{navigate("/admin/uj-terem")}} />
-            <VenueList venues={rooms} newRequest = {load}/>
+            <VenueList loaded = {loaded} venues={rooms} newRequest = {load}/>
         </div>
     )
 }

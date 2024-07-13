@@ -41,7 +41,7 @@ const Sales = async (userId, external, page, limit, search, filters)=>{
     let nameIds = [];
     nameIdsObject.forEach(item=>{
         nameIds.push(item._id);
-    })
+    });
     let localFilter = filters.web && filters.local ? {} : filters.web ? {local : false} : filters.local ? {local : true} : { $or : [{local : true }, {local : false}]};
     closeConnection(eventsDatabase.database);
     if (search) conditions.push( {$or : [{ "customerDatas.firstname" : {$regex: new RegExp(search, 'g')} }, { "customerDatas.lastname" : {$regex: new RegExp(search, 'g')} }, {id : {$in : nameIds}}, { price : {$regex: new RegExp(search, 'i')}}, { "customerDatas.fullName" : {$regex: new RegExp(search, 'i')}}]} )

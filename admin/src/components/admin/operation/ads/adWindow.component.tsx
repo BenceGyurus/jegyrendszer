@@ -5,6 +5,7 @@ import Window from "../../../window/window.component"
 import { useState } from "react"
 import postData from "../../../connection/request"
 import ParseLocalStorage from "../../../../cookies/ParseLocalStorage"
+import "../../../../css/addWindow.css";
 
 type typeOfAdsWindow = {
     closeFunction : Function,
@@ -41,13 +42,14 @@ const AdsWindow = ( { closeFunction, setError, updateFunction, nameE, fileE, web
             })
         }
     }
+
     console.log(file);
 
     return (<Window closeFunction={closeFunction} title="Új hírdetés létrehozása">
             <InputText onChangeFunction={setNameOfAd} value={nameOfAd} title = "Hírdetés neve" info={{text : "Ez nem fog megjelenni a hirdetésben. Később ezzel tudják a felhaszálók azonosítani a hirdetésts."}} />
-            <FileUpload fileName={file} onChangeFunction={setFile} />
+            <FileUpload deleteFileFunction={()=>setFile("")} fileName={file} onChangeFunction={setFile} />
             <InputText title="Weboldal" value={website} onChangeFunction={setWebsite} website = {true} info={{text : "A hirdetéshez weboldal csatolása lehetséges, ez qr-ban fog megjelenni."}} />
-            <Button onClick={e=>save()}>Mentés</Button>
+            <Button className = "add-window-button" onClick={e=>save()}>Mentés</Button>
         </Window> )
 }
 

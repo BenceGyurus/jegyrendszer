@@ -6,10 +6,11 @@ import ParseLocalStorage from "../../cookies/ParseLocalStorage";
 
 type typeOfFileUploadParams = {
     fileName : string,
-    onChangeFunction : Function
+    onChangeFunction : Function,
+    deleteFileFunction : Function
 }
 
-function FileUpload( { fileName, onChangeFunction }:typeOfFileUploadParams ) {
+function FileUpload( { fileName, onChangeFunction, deleteFileFunction }:typeOfFileUploadParams ) {
   
   const [selectedFile, setSelectedFile]:[any, Function] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -21,6 +22,7 @@ function FileUpload( { fileName, onChangeFunction }:typeOfFileUploadParams ) {
   const handleFileUpload = async (event:any) => {
     setFileUploading(true);
     let file = event.target.files[event.target.files.length-1];
+    console.log(file);
     if (file) {
         setSelectedFile(file);
       const formData = new FormData();
@@ -33,10 +35,9 @@ function FileUpload( { fileName, onChangeFunction }:typeOfFileUploadParams ) {
             setUploadProgress(progress);
           },
         });
-
-        // Successful upload
         if (response.data && response.data.path){
             onChangeFunction(response.data.path);
+            setFileUploading(false);
         }
         setUploadError(false);
       } catch (error) {
@@ -49,11 +50,14 @@ function FileUpload( { fileName, onChangeFunction }:typeOfFileUploadParams ) {
 
 
   return (
-    <div>
-        <label htmlFor="upload-file" className = "upload-file-label">Fájl feltöltése</label>
+    <div className = "file-upload-div">
+        <div className = "file-uploading-actions-buttons">
+          <label htmlFor="upload-file" className = "upload-file-label">{selectedFile ? "Új fájl feltöltése" : "Fájl feltöltése"}</label>
+          <span className = "file-uploading-delete-button" onClick = {()=>{setSelectedFile(""); deleteFileFunction()}}><i className="fas fa-trash"></i></span>
+        </div>
         <input type="file" id = "upload-file" className = "file-uploader" onChange={e=>handleFileUpload(e)} />
         {
-            fileName && (fileName.split(".")[fileName.split(".").length-1].toUpperCase() == "MOV" || fileName.split(".")[fileName.split(".").length-1].toUpperCase() == "MP4") ? <video controls autoPlay = {false}><source src={fileName} type={`video/${fileName.split(".")[fileName.split(".").length-1]}`} /></video> : <img src = {fileName} />
+            fileName && (fileName.split(".")[fileName.split(".").length-1].toUpperCase() == "MOV" || fileName.split(".")[fileName.split(".").length-1].toUpperCase() == "MP4") ? <video className = "file-upload-image" controls autoPlay = {false}><source src={fileName} type={`video/${fileName.split(".")[fileName.split(".").length-1]}`} /></video> : fileName ? <img className = "file-upload-image" src = {fileName} /> : <label htmlFor="upload-file" className = "file-upload-backgound"><i className="fas fa-file-upload"></i></label>
         }
         <div className = "process-holder">{ fileUploading ? <Progress percent={uploadProgress} status={uploadError ? "exception" : "active" } /> : ""}</div>
         

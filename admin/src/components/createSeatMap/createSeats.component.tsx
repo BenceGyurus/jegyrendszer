@@ -405,6 +405,7 @@ const CreateSeats = ({
           seatGroup.sector.direction === "left" ||
           seatGroup.sector.direction === "right"
         ) {
+          /*
           if (seatGroup.sector.rotated - 90 === 0) seatGroup.sector.rotated = 0;
           else seatGroup.sector.rotated += -90;
           newSeats.push({
@@ -430,7 +431,12 @@ const CreateSeats = ({
               seatGroup.sector.rotated % 180 !== 0
                 ? rotateSeatsToLeft(seatGroup.seats, seatGroup.sector)
                 : rotateSeatsToRight(seatGroup.seats, seatGroup.sector),
-          });
+          });*/
+          console.log(seatGroup);
+          seatGroup.sector.rotated += direction === "bottom" ? -90 : 90;
+          seatGroup.seats = direction === "bottom" ? (rotateSeatsToLeft(seatGroup.seats, seatGroup.sector)) : rotateSeatsToRight(seatGroup.seats, seatGroup.sector);
+          newSeats.push(seatGroup);
+          
         } else {
           newSeats.push(seatGroup);
         }
