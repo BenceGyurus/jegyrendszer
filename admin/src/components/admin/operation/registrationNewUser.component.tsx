@@ -26,7 +26,7 @@ const Registration = ()=>{
     const Control = ()=>{
         if (username.length > 3 && password.length > 5 && rePassword.length > 5){
             if ( password == rePassword) {
-                postData(`/create-profile/${window.location.pathname.split("/")[2]}`, {username : username, password : password})
+                postData(`/create-profile/${window.location.pathname.split("/")[3]}`, {username : username, password : password})
                 .then(
                     async (data)=>{
                         let d;

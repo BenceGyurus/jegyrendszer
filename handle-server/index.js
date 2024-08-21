@@ -935,7 +935,7 @@ app.post(
               status: false,
               access: Functions.merge_Access(datas[i].access),
               token: datas[i].token,
-              url: "/uj-profil/",
+              url: "/admin/uj-profil/",
               external: datas[i].externalSeller,
             });
           }
@@ -2544,7 +2544,7 @@ app.post(
                     buyingDatas.tickets,
                     buyingDatas.fullPrice,
                   );
-                  l.collection.updateOne({_id: ObjectId(req.params.id)}, {$set : {...saveDatas, isPayingStarted : simpleBody ? true : false}});
+                  l.collection.updateOne({_id: ObjectId(req.params.id)}, {$set : {...saveDatas}});
                   closeConnection(l.database);
               }else{
                 result = await l.collection.updateOne(
