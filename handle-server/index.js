@@ -471,6 +471,7 @@ app.get(
   "/api/v1/tickets/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
+    console.log(req.params.c);
     if (req.params && req.params.id) {
       let reserved = req.query.reserved == "true";
       let tickets = reserved

@@ -42,7 +42,7 @@ const LoginPage = ({ setToken }:typeOfLoginPageParams)=>{
         .then(username=>{
             if (username) setUserName(username);
         })
-    })
+    }, []);
 
     return <View style = {{ backgroundColor :  useColorScheme()=== "dark" ? Colors.darker : Colors.lighter, width : "100%", height : "100%"}}>
         <Error show = {error !== ""} message={error} />
