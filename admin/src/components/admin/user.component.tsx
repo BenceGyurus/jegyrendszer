@@ -5,6 +5,12 @@ import "../../css/admin-user.css";
 import StringAvatar from "../avatar/avatar.component";
 import SkeletonUser from "./skeletonUser.component";
 import { Button} from 'antd';
+import { LogoutOutlined } from "@ant-design/icons";
+
+const logOutFunction = ()=>{
+    window.localStorage.removeItem("long_token");
+    window.location.pathname = "/";
+};
 
 
 const AdminUserComponent = ()=>{
@@ -24,6 +30,7 @@ const AdminUserComponent = ()=>{
         {userName ? <div className = "admin-user-element">
         <a href = "/admin/profil"><StringAvatar username = {userName} width = {30} height = {30} /></a>
         <span className = "admin-username">{userName}</span>
+        <button className = "logout-button" onClick={logOutFunction}><LogoutOutlined /></button>
     </div> : <SkeletonUser />}
 </div>);
 

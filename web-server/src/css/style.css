@@ -124,3 +124,7 @@ apple-pay-button {
 .selected {
     background: rgba(22, 119, 255, 1) !important;
 }
+
+button span{
+    color: #fff;
+}
