@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import "../../css/admin-user.css";
 import StringAvatar from "../avatar/avatar.component";
 import SkeletonUser from "./skeletonUser.component";
-import { Button} from 'antd';
 import { LogoutOutlined } from "@ant-design/icons";
 
 const logOutFunction = ()=>{

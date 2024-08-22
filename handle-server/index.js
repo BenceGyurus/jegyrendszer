@@ -537,6 +537,7 @@ app.get(
       } else if (!venue) {
         return handleError(logger, "035", res);
       }
+      console.log(eventId);
       if (!eventId && venue) {
         return venue
           ? res.send(
@@ -546,17 +547,18 @@ app.get(
       } else {
         if (venue && eventDatas) {
           placesOfEvent = [];
-          if (venue.content.seatsDatas && venue.content.seatsDatas.length) {
+          if (venue.content.seats && venue.content.seats.length) {
             for (let i = 0; i < eventDatas.tickets.length; i++) {
               for (let j = 0; j < eventDatas.tickets[i].seats.length; j++) {
                 placesOfEvent.push(
-                  venue.content.seatsDatas.find(
+                  venue.content.seats.find(
                     (seat) => eventDatas.tickets[i].seats[j] == seat.id,
                   ),
                 );
               }
             }
-            venue.content.seatsDatas = placesOfEvent;
+            venue.content.seats = placesOfEvent;
+            console.log("placesOfEvent", placesOfEvent);
             return res.send({ venue: venue.content });
           }
           venue.content.seatsDatas = false;
