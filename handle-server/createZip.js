@@ -1,4 +1,6 @@
-const fs = require("fs");
+const PDFDocument = require('pdfkit');
+const { PDFDocument: PDFLibDocument } = require('pdf-lib');
+const fs = require('fs');
 const archiver = require("archiver");
 
 const readConfig = async () => {
@@ -13,7 +15,7 @@ const readConfig = async () => {
 };
 
 function createZip(files) {
-  return new Promise(async (resolve, reject) => {
+  /*return new Promise(async (resolve, reject) => {
     try {
       config = await readConfig();
       const outputBuffer = [];
@@ -52,6 +54,19 @@ function createZip(files) {
     } catch (error) {
       reject(error);
     }
+  });*/
+  return new Promise(async (resolve, reject)=>{
+      const mergedPdf = await PDFLibDocument.create();
+  
+      for (const pdfPath of files) {
+          const existingPdfBytes = fs.readFileSync(pdfPath);
+          const existingPdf = await PDFLibDocument.load(existingPdfBytes);
+          const copiedPages = await mergedPdf.copyPages(existingPdf, existingPdf.getPageIndices());
+          copiedPages.forEach((page) => mergedPdf.addPage(page));
+      }
+  
+      const mergedPdfBytes = await mergedPdf.save();
+      resolve(mergedPdfBytes)
   });
 }
 

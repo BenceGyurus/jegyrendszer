@@ -132,8 +132,6 @@ async function createTicket(
 
     doc.end();
 
-    return buffer;
-
     });
 }
 

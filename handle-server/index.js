@@ -2468,8 +2468,8 @@ app.post(
             }
             zip = await createZip(files, `${result.insertedId}.zip`);
             res.writeHead(200, {
-              "Content-Disposition": `attachment; filename = "${result.insertedId}.zip"`,
-              "Content-Type": "application/zip",
+              "Content-Disposition": `attachment; filename = "${result.insertedId}.pdf"`,
+              "Content-Type": "application/pdf",
             });
             return res.end(zip); //fs.readFileSync(`${ __dirname } /${sysConfig["ZIP_DIR"]}/${ result.insertedId }.zip`)
             //return res.send({error : !result.insertedId, id : saveDatas.salt});
@@ -2727,18 +2727,15 @@ app.post(
         let files = await GenerateTicket(ticketIds);
         let sysConfig = readConfig();
         for (let i = 0; i < files.length; i++) {
-          files[i] =
-            process.env.NODE_ENV === "production"
-              ? `${sysConfig["TICKET_NODE_SHARE"]}/${files[i]}`
-              : __dirname + sysConfig["NODE_SHARE"] + `/${files[i]} `;
-        }
-        zip = await createZip(files, `${req.params.id}.zip`);
-        res.writeHead(200, {
-          "Content-Disposition": `attachment; filename = "${req.params.id}.zip"`,
-          "Content-Type": "application/zip",
-        });
-        closeConnection(database);
-        return res.end(zip);
+            files[i] = process.env.NODE_ENV === "production" ? `${sysConfig["TICKET_NODE_SHARE"]}/${files[i]}` : `${__dirname}/${sysConfig["NODE_SHARE"]}/${files[i]}`;
+          }
+          zip = await createZip(files, `${String(objectId)}.pdf`);
+          res.writeHead(200, {
+            "Content-Disposition": `attachment; filename = "${String(objectId)}.pdf"`,
+            "Content-Type": "application/pdf",
+          });
+          return res.end(zip); //fs.readFileSync(`${ __dirname } /${sysConfig["ZIP_DIR"]}/${ result.insertedId }.zip`)
+            //return res.send({error : !result.insertedId, id : saveDatas.salt});
       }
     }
   },

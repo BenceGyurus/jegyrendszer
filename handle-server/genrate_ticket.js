@@ -26,8 +26,9 @@ const createDateToJson = (date) => {
   };
 };
 
-const GenerateTicket = async (ticketsIds) => {
-  let sysConfig = readConfig();
+const GenerateTicket = (ticketsIds) => {
+  return new Promise(async (resolve, reject)=>{
+    let sysConfig = readConfig();
   const ticketsDatabase = new Database("tickets");
   const saleDatabase = new Database("buy");
   const eventDatabse = new Database("events");
@@ -76,8 +77,10 @@ const GenerateTicket = async (ticketsIds) => {
   closeConnection(ticketsDatabase.database);
   closeConnection(saleDatabase.database);
   closeConnection(eventDatabse.database);
-  return pdfs;
+  resolve(pdfs);
 
+  })
+  
   /*.then((response) => {
   console.log(JSON.stringify(response.data));
 })
