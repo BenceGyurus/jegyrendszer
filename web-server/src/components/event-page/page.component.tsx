@@ -13,6 +13,7 @@ import Seats from "./seats.component";
 import TicketSkeleton from "./ticket-skeleton.component";
 import Tickets from "./tickets.component";
 import Cookies from 'universal-cookie';
+import Schema from "./schema";
 
 type typeOfTicket = {
   id: string;
@@ -53,6 +54,9 @@ type typeOfPageParams = {
   address: string;
   ticketId: string;
   venueId: string;
+  performer : string,
+  isGroup : boolean,
+  endDate : string
 };
 type typeOfAmount = {
   id: string;
@@ -101,6 +105,9 @@ const Page = ({
   address,
   ticketId,
   venueId,
+  performer,
+  isGroup,
+  endDate
 }: typeOfPageParams) => {
 
   const [cookies, setCookiesFunction] = useState(new Cookies(null, { path: window.location.pathname }));
@@ -115,6 +122,8 @@ const Page = ({
     console.log(newList);
    setTicketsAmount(newList);
   }
+
+  console.log(ticketsAmount);
 
   const genereateTicketAmout = (
     tickets: Array<typeOfTicket>,
@@ -363,10 +372,12 @@ const Page = ({
     }, 500);
   };
 
-  console.log(ticketsAmount);
 
   return (
     <div className="event-page-div">
+      { ticketsAmount ? 
+        <Schema title={title} description={description} startDate={date} endDate = {endDate} ticketPrice={ticketsAmount.length ? ticketsAmount[0].price : 0} image={`${window.location.origin}${background}`} performer={performer} isGroup = {isGroup} placeName={location} />
+      : <></>}
       <Error
         message={errorNat}
         open={errorNat != ""}

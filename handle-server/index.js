@@ -407,6 +407,9 @@ app.get(
       position: event.position,
       address: event.address,
       venue: event.venue,
+      performer : event.performer,
+      isGroup : event.isGroupPerformer,
+      endDate : event.end_Of_The_Event
     };
     let cacheTime = getTime("CACHE_TIME");
     if (event && eventDatas && req.params.id) {

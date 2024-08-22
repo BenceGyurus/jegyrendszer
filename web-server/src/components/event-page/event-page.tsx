@@ -37,7 +37,10 @@ type typeOfEventDatas = {
     title : string,
     position : typeOfCenter,
     location : string,
-    address : string
+    address : string,
+    isGroup : boolean,
+    performer : string,
+    endDate : string
 }
 
 type typeOfCenter = {
@@ -78,7 +81,7 @@ const EventPage = (params:any)=>{
    return (
     <div>
         {
-            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} placeDatas = {eventDatas.places} media = {parseMedia(eventDatas.media)} position = {eventDatas.position} location ={eventDatas.location} address = {eventDatas.address} ticketId={(window.location.pathname.split("/")[window.location.pathname.split("/").length-1])} venueId={eventDatas.venue} /></div> : ""
+            !responsed ? <Loader /> : eventDatas ? <div><Page title = {eventDatas.title} background={eventDatas.background} description={eventDatas.description} id = {eventDatas.id} date = {eventDatas.date} placeDatas = {eventDatas.places} media = {parseMedia(eventDatas.media)} position = {eventDatas.position} location ={eventDatas.location} address = {eventDatas.address} ticketId={(window.location.pathname.split("/")[window.location.pathname.split("/").length-1])} venueId={eventDatas.venue} performer={eventDatas.performer} isGroup={eventDatas.isGroup} endDate={eventDatas.endDate} /></div> : ""
         }
     </div>
 )
