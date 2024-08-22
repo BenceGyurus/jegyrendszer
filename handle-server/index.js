@@ -2120,8 +2120,11 @@ app.post("/api/v1/download-report/:reportId", (req,res,next)=>parseBodyMiddleewa
           })
           const csvString = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(report.report);
           const buffer = Buffer.from(csvString, 'utf-8');
-          res.set('Content-Type', 'text/csv');
-          res.send(buffer);
+          res.writeHead(200, {
+            "Content-Disposition": `attachment; filename = "report.csv"`,
+            "Content-Type": "text/csv",
+          });
+          res.end(buffer);
         }
       }
       else{
