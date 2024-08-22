@@ -12,6 +12,7 @@ import TicketPageItems from "./page-items";
 import Seats from "./seats.component";
 import TicketSkeleton from "./ticket-skeleton.component";
 import Tickets from "./tickets.component";
+import Cookies from 'universal-cookie';
 
 type typeOfTicket = {
   id: string;
@@ -101,20 +102,61 @@ const Page = ({
   ticketId,
   venueId,
 }: typeOfPageParams) => {
-  const genereateTicketAmout = (
-    tickets: Array<typeOfTicket>,
-  ): Array<typeOfAmountTicket> => {
+
+  const [cookies, setCookiesFunction] = useState(new Cookies(null, { path: window.location.pathname }));
+  const [ticketsAmount, setTicketsAmount]: [Array<any>, Function] = useState(
+    [],
+  );
+  const genereateTicketAmoutWithOutCookie = (tickets:Array<typeOfTicket>)=>{
     let newList: Array<typeOfAmountTicket> = [];
     for (let i = 0; i < tickets.length; i++) {
       newList.push({ ...tickets[i], amount: 0, selected: 0 });
     }
-    return newList;
+    console.log(newList);
+   setTicketsAmount(newList);
+  }
+
+  const genereateTicketAmout = (
+    tickets: Array<typeOfTicket>,
+  ) => {
+    let objectId = cookies.get('orderId');
+    let newList: Array<typeOfAmountTicket> = [];
+    if (objectId){
+      fetch(`/api/v1/buy-ticket-details/${objectId}`).then(async (response)=>{
+        let data = await response.json();
+        if (data && !data.error){
+          for (let i = 0; i < tickets.length; i++) {
+            let amount = data.tickets.find((ticket:any)=>ticket.ticketId==tickets[i].id)?.amount ? data.tickets.find((ticket:any)=>ticket.ticketId==tickets[i].id)?.amount : 0;
+            newList.push({ ...tickets[i], amount: amount ? amount : 0, selected: amount ? amount : 0 });
+          }
+          
+          setTicketsAmount(newList)
+          let l:Array<string> = [];
+          data.tickets.forEach((ticket:any)=>{
+            l.push(...ticket.places);
+          })
+          setSelectedTickets(l);
+          //setSelectedTickets(ps);
+        }
+        else{
+          genereateTicketAmoutWithOutCookie(tickets);
+      }
+      }).catch(()=>{
+        genereateTicketAmoutWithOutCookie(tickets);
+      })
+    }else{
+      genereateTicketAmoutWithOutCookie(tickets);
+    }
   };
+
+  /*
+  if (objectId){
+      
+    }*/
   //const [tickets, setTickets]:[typeOfTicket, Function] = useState();
   const [placeDatas, setPlaceDatas]: [any, Function] = useState([]);
-  const [ticketsAmount, setTicketsAmount]: [Array<any>, Function] = useState(
-    [],
-  );
+
+  console.log(ticketsAmount);
   const [selectedTickets, setSelectedTickets]: [Array<string>, Function] =
     useState([]);
   const [errorNat, setErrorNat]: [string, Function] = useState("");
@@ -122,11 +164,13 @@ const Page = ({
   const [isLoading, setIsloading] = useState<boolean>(false);
 
   useEffect(() => {
-    fetch(`/api/v1/tickets/${ticketId}?reserved=true`).then(
+    let objectId = cookies.get('orderId');
+    
+    fetch(`/api/v1/tickets/${ticketId}?reserved=true${objectId ? `&c=${objectId}` : ""}`).then(
       async (response) => {
         let t = await response.json();
         if (t.length && !t.error) {
-          setTicketsAmount(genereateTicketAmout(t));
+          genereateTicketAmout(t);
         }
       },
     );
@@ -263,13 +307,15 @@ const Page = ({
     }
     if (!error.length) {
       setIsloading((prev) => true);
-      postDataJson("/order-ticket", { datas: sendData, eventId: id }).then(
+      let orderId = cookies.get('orderId');
+      postDataJson(`/order-ticket${orderId ? `?c=${orderId}` : ""}`, { datas: sendData, eventId: id }).then(
         async (response) => {
           setIsloading(false);
           if (response.responseData) {
             response = await response.responseData;
             setErrorNat(response.message);
           } else if (!response.error && response.token) {
+            cookies.set('orderId', response.token, {expires : response.expires});
             window.location.pathname = `/jegyvasarlas/${response.token}`;
           }
         },
@@ -317,7 +363,7 @@ const Page = ({
     }, 500);
   };
 
-  console.log(errorNat);
+  console.log(ticketsAmount);
 
   return (
     <div className="event-page-div">
@@ -393,7 +439,7 @@ const Page = ({
         selectTicketsFunction={toSelectTickets}
         isSeats={placeDatas && placeDatas.seats && placeDatas.seats.length}
         otherInformationFunction={toOtherInformations}
-        amountOfTickets={getTotalAmountOfTickets()}
+        amountOfTickets={ticketsAmount ? getTotalAmountOfTickets() : 0}
         onClickFunction={buy_Ticket}
       />
     </div>

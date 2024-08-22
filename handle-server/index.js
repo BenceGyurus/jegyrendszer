@@ -471,11 +471,11 @@ app.get(
   "/api/v1/tickets/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
-    console.log(req.params.c);
+    console.log("req.query.c", req.query.c);
     if (req.params && req.params.id) {
       let reserved = req.query.reserved == "true";
       let tickets = reserved
-        ? (await getEventDatas(req.params.id)).tickets
+        ? (await getEventDatas(req.params.id, req.query ? req.query.c : false)).tickets
         : (await getTicketByReadableId(req.params.id)).tickets;
       return res.send(tickets ? tickets : []);
     }
@@ -1815,6 +1815,7 @@ app.post("/api/v1/get-all-event", async (req, res) => {
 
 //TICKETS
 app.post("/api/v1/order-ticket", async (req, res) => {
+  let orderId = req.query.c;
   let body = Functions.parseBody(req.body);
   if (
     body &&
@@ -1825,7 +1826,7 @@ app.post("/api/v1/order-ticket", async (req, res) => {
   ) {
     let eventData = await getTicketByReadableId(body.eventId);
     if (eventData && eventData.tickets && eventData.tickets.length) {
-      let error = await controlEvent(body.eventId, body.datas);
+      let error = await controlEvent(body.eventId, body.datas, orderId);
       if (!error.error) {
         let fullPrice = await GetFullPrice(body.datas, body.eventId);
         if (fullPrice.error) {
@@ -1841,16 +1842,31 @@ app.post("/api/v1/order-ticket", async (req, res) => {
           ...fullPrice,
         };
         let { collection, database } = new Database("buy");
-        let result = await collection.insertOne({
-          ...savingDatas,
-          otherDatas: await otherData(req),
-          pending: true,
-          isPayingStarted: false,
-          paymentMethod: "",
-          status: "PENDNG",
-        });
+        let result;
+        if (orderId){
+          orderId = Functions.createObjectId(orderId);
+          if (orderId) result = await collection.updateOne({ $and : [{ _id : orderId}, {time: {$gt: new Date().getTime() - getTime("RESERVATION_TIME")}}]}, {
+            $set : {...savingDatas,
+            otherDatas: await otherData(req),
+            pending: true,
+            isPayingStarted: false,
+            paymentMethod: "",
+            status: "PENDNG"
+            }
+          });
+        }
+        if (!result || (result && !result.modifiedCount)){
+          result = await collection.insertOne({
+            ...savingDatas,
+            otherDatas: await otherData(req),
+            pending: true,
+            isPayingStarted: false,
+            paymentMethod: "",
+            status: "PENDNG",
+          });
+      }
         closeConnection(database);
-        return res.send({ error: false, token: result.insertedId });
+        return res.send({ error: false, token: result.insertedId ? result.insertedId : orderId, expire: new Date().getTime()+getTime("RESERVATION_TIME")});
       } else {
         return handleError(
           logger,

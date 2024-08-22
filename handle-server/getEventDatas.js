@@ -1,8 +1,9 @@
+const Functions = require("./functions.js");
 const { closeConnection } = require("./functions.js");
 const getTime = require("./getTime.js");
 const Database = require("./mongo/mongo.js");
 
-const getEventDatas = async (eventId) => {
+const getEventDatas = async (eventId, objectId) => {
   let { collection, database } = new Database("events");
   let eventDatas = await collection.findOne({
     "eventData.readable_event_name": eventId,
@@ -25,6 +26,7 @@ const getEventDatas = async (eventId) => {
       }
     }
     const boughtDatabase = new Database("buy");
+    objectId = Functions.createObjectId(objectId);
     let boughtDatas = await boughtDatabase.collection
       .find({
         $and: [
@@ -39,6 +41,7 @@ const getEventDatas = async (eventId) => {
                     },
                   },
                   { pending: true },
+                  { _id : { $ne : objectId }}
                 ],
               },
               { bought: true },

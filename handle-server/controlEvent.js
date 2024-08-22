@@ -3,10 +3,12 @@ const getTime = require("./getTime.js");
 const getVenueFromId = require("./getVenue.js");
 require("mongodb");
 const { closeConnection } = require("./functions.js");
+const Functions = require("./functions.js");
 
-const controlEvent = async (eventId, ticketIds, thisEventId) => {
+const controlEvent = async (eventId, ticketIds, thisEventId, orderId) => {
   // ticketIds is an Array
   let result = { error: false, errorCode: "" };
+  let objectId = Functions.createObjectId(orderId);
   if (eventId) {
     const { collection, database } = new Database("events");
     const buyingDatabase = new Database("buy");
@@ -38,6 +40,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId) => {
                         $gt: new Date().getTime() - getTime("RESERVATION_TIME"),
                       },
                     },
+                    { _id : { $ne : objectId } }
                   ],
                 },
               ],
