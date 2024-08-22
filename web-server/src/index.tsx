@@ -30,7 +30,6 @@ root.render(
       <Cookies />
       <div className="mainDiv">
         <Navigation />
-        <FeedBack />
       </div>
       <Footer />
     </div>
