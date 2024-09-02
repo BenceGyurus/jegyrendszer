@@ -13,7 +13,7 @@ import { DbService } from './services/db.service';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(`${process.env.MONGO}/mails`),
+    MongooseModule.forRoot(process.env.MONGO),
     MongooseModule.forFeature([{ name: Mail.name, schema: MailSchema }]),
     BullModule.forRoot({
       connection: {
@@ -23,8 +23,8 @@ import { DbService } from './services/db.service';
             : process.env.REDIS,
         port: 6379,
         db: 1,
-        // username: 'default',
-        // password: process.env.REDIS_PASS,
+        username: 'default',
+        password: process.env.REDIS_PASS,
       },
       defaultJobOptions: {
         delay: 2000,
