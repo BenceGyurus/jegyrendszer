@@ -49,7 +49,7 @@ const RedisMiddleware = require("./redishMiddleware.js");
 const zlib = require('node:zlib');
 const { Buffer } = require('buffer');
 const { createObjectCsvStringifier } = require('csv-writer');
-import { Queue } from 'bullmq';
+const { Queue } = require('bullmq');
 var cookieParser = require("cookie-parser");
 var redisOptions = {
   port: 30036, //6379,
