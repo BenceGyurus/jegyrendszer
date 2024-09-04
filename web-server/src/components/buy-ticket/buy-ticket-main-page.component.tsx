@@ -39,6 +39,7 @@ type typeOfTickets = {
   places: Array<string> | boolean;
   amount: number;
   price: number;
+  types : any
 };
 
 type typeOfCoupon = {

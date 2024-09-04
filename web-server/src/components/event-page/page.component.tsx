@@ -14,6 +14,7 @@ import TicketSkeleton from "./ticket-skeleton.component";
 import Tickets from "./tickets.component";
 import Cookies from 'universal-cookie';
 import Schema from "./schema";
+import TypeOfTicketType from "./types/TypeOfTicketType";
 
 type typeOfTicket = {
   id: string;
@@ -25,7 +26,16 @@ type typeOfTicket = {
   pendingPlaces: Array<string>;
   numberOfFreeTickets: number;
   boughtPlaces: Array<string>;
+  types : Array<TypeOfTicketType>;
+  selected? : number
 };
+
+type typeOfAmountTicketType ={
+  id : string,
+  amount : number,
+  price : number,
+  seats : Array<string>
+}
 
 type typeOfAmountTicket = {
   id: string;
@@ -34,11 +44,12 @@ type typeOfAmountTicket = {
   price: number;
   name: string;
   ticketId: string;
-  amount: number;
-  selected: number;
   pendingPlaces: Array<string>;
   numberOfFreeTickets: number;
   boughtPlaces: Array<string>;
+  types? : Array<typeOfAmountTicketType>,
+  amount : number,
+  selected: number
 };
 
 type typeOfPageParams = {
@@ -93,6 +104,14 @@ type typeOfCenter = {
   lng: number;
 };
 
+const sumAmountOfAllTypes = (types:Array<typeOfAmountTicketType>)=>{
+  let sum = 0;
+  types.forEach(type=>{
+    sum += type.amount;
+  });
+  return sum
+};
+
 const Page = ({
   title,
   background,
@@ -114,29 +133,39 @@ const Page = ({
   const [ticketsAmount, setTicketsAmount]: [Array<any>, Function] = useState(
     [],
   );
+  const [loadingTickets, setLoadingTickets] = useState<boolean>(false);
   const genereateTicketAmoutWithOutCookie = (tickets:Array<typeOfTicket>)=>{
-    let newList: Array<typeOfAmountTicket> = [];
+    let newList: Array<any> = [];
     for (let i = 0; i < tickets.length; i++) {
-      newList.push({ ...tickets[i], amount: 0, selected: 0 });
+      tickets[i].types = tickets[i].types.map((type)=> {return {...type, amount : 0}});
+      tickets[i].selected = 0;
+      newList.push({ ...tickets[i]});
     }
-    console.log(newList);
    setTicketsAmount(newList);
   }
 
   console.log(ticketsAmount);
 
+
   const genereateTicketAmout = (
     tickets: Array<typeOfTicket>,
   ) => {
     let objectId = cookies.get('orderId');
-    let newList: Array<typeOfAmountTicket> = [];
+    let newList: Array<any> = [];
     if (objectId){
       fetch(`/api/v1/buy-ticket-details/${objectId}`).then(async (response)=>{
         let data = await response.json();
         if (data && !data.error){
           for (let i = 0; i < tickets.length; i++) {
-            let amount = data.tickets.find((ticket:any)=>ticket.ticketId==tickets[i].id)?.amount ? data.tickets.find((ticket:any)=>ticket.ticketId==tickets[i].id)?.amount : 0;
-            newList.push({ ...tickets[i], amount: amount ? amount : 0, selected: amount ? amount : 0 });
+            //let amount = data.tickets.find((ticket:any)=>ticket.ticketId==tickets[i].id)?.amount ? data.tickets.find((ticket:any)=>ticket.ticketId==tickets[i].id)?.amount : 0;
+            tickets[i].types = tickets[i].types.map((type)=> {return {...type, amount : data.tickets.find((ticket:any)=>ticket.ticketId === tickets[i].id)?.types?.find((t:any)=>type.id === t.id)?.amount ? data.tickets.find((ticket:any)=>ticket.ticketId === tickets[i].id)?.types?.find((t:any)=>type.id === t.id)?.amount : 0}});
+            tickets[i].selected = 0;
+            tickets[i].types.forEach(type=>{
+              let typeAmount = data.tickets.find((ticket:any)=>ticket.ticketId === tickets[i].id)?.types?.find((t:any)=>type.id === t.id)?.amount;
+              console.log(typeAmount ? typeAmount : 0);
+              tickets[i].selected += typeAmount ? typeAmount : 0;
+            });
+            newList.push({ ...tickets[i]});
           }
           
           setTicketsAmount(newList)
@@ -165,7 +194,6 @@ const Page = ({
   //const [tickets, setTickets]:[typeOfTicket, Function] = useState();
   const [placeDatas, setPlaceDatas]: [any, Function] = useState([]);
 
-  console.log(ticketsAmount);
   const [selectedTickets, setSelectedTickets]: [Array<string>, Function] =
     useState([]);
   const [errorNat, setErrorNat]: [string, Function] = useState("");
@@ -174,13 +202,14 @@ const Page = ({
 
   useEffect(() => {
     let objectId = cookies.get('orderId');
-    
+    setLoadingTickets(true);
     fetch(`/api/v1/tickets/${ticketId}?reserved=true${objectId ? `&c=${objectId}` : ""}`).then(
       async (response) => {
         let t = await response.json();
         if (t.length && !t.error) {
           genereateTicketAmout(t);
         }
+        setLoadingTickets(false);
       },
     );
     fetch(`/api/v1/venue/${venueId}?event=${ticketId}`).then(
@@ -193,29 +222,32 @@ const Page = ({
     );
   }, []);
 
-  const incrementAmountOfTickets = (id: String) => {
+
+  const incrementAmountOfTickets = (id: string, typeId:string) => {
     let l = [...ticketsAmount];
     for (let i = 0; i < l.length; i++) {
-      if (l[i].id === id && l[i].numberOfFreeTickets > l[i].amount) {
-        if (!selectNotification && placeDatas.seats?.length)
-          setSelectNotification(true);
-        l[i].amount++;
+      if (l[i].id === id && sumAmountOfAllTypes(l[i].types) < l[i].numberOfFreeTickets) {
+        if (!selectNotification && placeDatas.seats?.length) setSelectNotification(true);
+        let thisType = l[i].types.find((k:typeOfAmountTicketType)=>k.id==typeId);
+        thisType.amount++;
+        l[i].types = [...l[i].types.filter((type:typeOfAmountTicketType)=> type.id != typeId), thisType];
       }
     }
     setTicketsAmount(l);
   };
 
-  const decrementAmountOfTickets = (id: string) => {
+
+  const decrementAmountOfTickets = (id: string, typeId: string) => {
     let l = [...ticketsAmount];
     let newList: Array<string> = [];
     for (let i = 0; i < l.length; i++) {
-      if (l[i].id === id && l[i].amount > 0) {
-        l[i].amount--;
-        if (l[i].selected > 0) {
-          l[i].selected--;
-        }
+      if (l[i].id === id && sumAmountOfAllTypes(l[i].types) > 0) {
+        let thisType = l[i].types.find((k:typeOfAmountTicketType)=>k.id==typeId);
+        thisType.amount--;
+        l[i].types = [...l[i].types.filter((type:typeOfAmountTicketType)=> type.id != typeId), thisType];
         let deleted = false;
-        if (l[i].selected >= l[i].amount) {
+        if (l[i].selected >= sumAmountOfAllTypes(l[i].types)) {
+          l[i].selected--;
           let lamdba = [...selectedTickets];
           for (let j = lamdba.length - 1; j >= 0; j--) {
             if (!l[i].seats.includes(lamdba[j]) || deleted) {
@@ -239,7 +271,7 @@ const Page = ({
     for (let i = 0; i < lTicketAmount.length; i++) {
       if (
         lTicketAmount[i].seats.includes(id) &&
-        lTicketAmount[i].amount > lTicketAmount[i].selected &&
+        sumAmountOfAllTypes(lTicketAmount[i].types) > lTicketAmount[i].selected &&
         !selectedTickets.includes(id)
       ) {
         let l = [...selectedTickets, id];
@@ -274,14 +306,15 @@ const Page = ({
     let error = [];
     let control = false;
     for (let i = 0; i < ticketsAmount.length; i++) {
-      if (ticketsAmount[i].amount > 0) {
+      if (sumAmountOfAllTypes(ticketsAmount[i].types) > 0) {
         control = true;
         if (
           !ticketsAmount[i].seats.length &&
           ticketsAmount[i].numberOfTicket > 0
         ) {
           sendData.push({
-            amount: ticketsAmount[i].amount,
+            types : ticketsAmount[i].types,
+            amount: sumAmountOfAllTypes(ticketsAmount[i].types),
             ticketId: ticketsAmount[i].id,
             places: false,
             eventId: id,
@@ -296,13 +329,14 @@ const Page = ({
               selected.push(selectedTickets[j]);
             }
           }
-          if (selected.length != ticketsAmount[i].amount) {
+          if (selected.length != sumAmountOfAllTypes(ticketsAmount[i].types)) {
             error.push("Kérem válassza ki a helyeket");
             handleShakeButtonClick();
             toSelectTickets();
           } else {
             sendData.push({
-              amount: ticketsAmount[i].amount,
+              types : ticketsAmount[i].types,
+              amount: sumAmountOfAllTypes(ticketsAmount[i].types),
               ticketId: ticketsAmount[i].id,
               places: selected,
               eventId: id,
@@ -351,7 +385,6 @@ const Page = ({
   const toSelectTickets = () => {
     //
     const element: any = document?.getElementById("seat-map-canvas-holder");
-    console.log(element);
     if (element) {
       element.scrollIntoView({
         behavior: "smooth",
@@ -372,6 +405,7 @@ const Page = ({
     }, 500);
   };
 
+  console.log(ticketsAmount);
 
   return (
     <div className="event-page-div">
@@ -400,12 +434,12 @@ const Page = ({
           decrementFunction={decrementAmountOfTickets}
         />
       ) : (
-        <TicketSkeleton />
+        loadingTickets ? <TicketSkeleton /> : <></>
       )}
       {placeDatas && placeDatas.seats && placeDatas.seats.length ? (
         <Legend />
       ) : (
-        ""
+        <></>
       )}
       {placeDatas &&
       placeDatas.seats &&
@@ -419,7 +453,7 @@ const Page = ({
           onClickFunction={selectSeat}
         />
       ) : (
-        ""
+        <></>
       )}
       <div className="alert-notification">
         <Collapse in={selectNotification}>

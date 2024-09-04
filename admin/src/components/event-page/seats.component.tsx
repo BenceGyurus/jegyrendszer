@@ -39,7 +39,8 @@ type typeOfAmountTicket = {
     amount : number,
     selected : number,
     pendingPlaces : Array<string>,
-    boughtPlaces : Array<string>
+    boughtPlaces : Array<string>,
+    types : {name : string, id : string, price : number, amount : number}
 }
 
 type typeOfSeatsParams = {

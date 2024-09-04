@@ -18,6 +18,7 @@ const Company = ({ company, editFunction, deleteFunction }:typeOfCompanyParams)=
               ]
         }>
             <p className = "tax-number">Adószám: {company.tax}</p>
+            <p className = "company-address">Székhely : {company.address}</p>
             <p className = "web-site">Weboldal: <a target="_blank" href = {company.website}>{company.website}</a></p>
         </Card>
     );

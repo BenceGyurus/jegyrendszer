@@ -18,3 +18,24 @@
 .add-ticket-div{
     padding: 20px;
 }
+
+.is-public-radio-button{
+    display: block;
+    margin: 10px;
+}
+
+.add-new-ticket-type-button{
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    border: 1px solid #f0f0f0;
+    background-color: white;
+    margin: 13px auto;
+    cursor: pointer;
+    font-size: 20px;
+}

@@ -14,29 +14,33 @@ const Tickets = async (
   const { collection, database } = new Database("tickets");
   let ticketIds = [];
   for (let i = 0; i < tickets.length; i++) {
-    for (let j = 0; j < tickets[i].amount; j++) {
-      let nameOfSeat = "";
-      if (tickets[i].places && tickets[i].places[j]) {
-        nameOfSeat = (await getNameOfSeat(venue, tickets[i].places[j])).name;
-        console.log(nameOfSeat);
+    index = 0;
+    for (let k = 0; k < tickets[i].types.length; k++){
+      for (let j = 0; j < tickets[i].types[k].amount; j++){
+        let nameOfSeat = "";
+        if (tickets[i].places && tickets[i].places[index]) {
+          nameOfSeat = (await getNameOfSeat(venue, tickets[i].places[index])).name;
+        }
+        ticketIds.push(
+          (
+            await collection.insertOne({
+              seatName: nameOfSeat,
+              seatId: tickets[i].places[index],
+              price: invited ? 0 : tickets[i].types[k].unitPrice,
+              nameOfTicket: tickets[i].types[k].name,
+              orderId: orderId,
+              eventId: eventId,
+              local: local,
+              ticketId: tickets[i].ticketId,
+              typeId : tickets[i].types[k].id,
+              eId: id,
+              invited: invited,
+            })
+          ).insertedId,
+        );
+        index++;
       }
-      ticketIds.push(
-        (
-          await collection.insertOne({
-            seatName: nameOfSeat,
-            seatId: tickets[i].places[j],
-            price: invited ? 0 : tickets[i].unitPrice,
-            nameOfTicket: tickets[i].name,
-            orderId: orderId,
-            eventId: eventId,
-            local: local,
-            ticketId: tickets[i].ticketId,
-            eId: id,
-            invited: invited,
-          })
-        ).insertedId,
-      );
-    }
+      }
   }
   Functions.closeConnection(database);
   return ticketIds;

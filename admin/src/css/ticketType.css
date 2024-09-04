@@ -1,0 +1,12 @@
+.ticket-type-card-body{
+    display: flex;
+    justify-content: space-between;
+}
+
+.ticket-type-price{
+    font-size: 17px;
+}
+
+.ticket-type-card{
+    margin-top: 10px;
+}

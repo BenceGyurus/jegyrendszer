@@ -51,8 +51,8 @@ const { Buffer } = require('buffer');
 const { createObjectCsvStringifier } = require('csv-writer');
 var cookieParser = require("cookie-parser");
 var redisOptions = {
-  port: 30036, //6379,
-  host: "192.168.1.70", //localhost,
+  port: 6379 , //30036,
+  host: "localhost", //192.168.1.70,
   username: "default",
   password: process.env.REDIS_PASS,
   db: 0,
@@ -470,19 +470,64 @@ app.post(
   },
 );
 
+const getPublicTickets = (tickets)=>{
+  let newTickets = [];
+  tickets.forEach(ticket=>{
+    ticket.types = ticket.types.filter(t=>{return t.isPublic});
+    if (ticket.types.length){
+      newTickets.push(ticket);
+    }
+  });
+  return newTickets;
+}
+
+const getTickets = async (eventId, c, reserved = true, justPublic = true)=>{
+  let tickets = reserved
+  ? (await getEventDatas(eventId, c)).tickets
+  : (await getTicketByReadableId(req.params.id)).tickets;
+
+return justPublic && tickets ? getPublicTickets(tickets) : tickets && !justPublic ? tickets : [];
+}
+
 app.get(
   "/api/v1/tickets/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
     console.log("req.query.c", req.query.c);
     if (req.params && req.params.id) {
-      let reserved = req.query.reserved == "true";
-      let tickets = reserved
-        ? (await getEventDatas(req.params.id, req.query ? req.query.c : false)).tickets
-        : (await getTicketByReadableId(req.params.id)).tickets;
-      return res.send(tickets ? tickets : []);
+      return res.send(await getTickets(req.params.id, req.query ? req.query.c : false, reserved = req.query.reserved == "true", justPublic = true));
     }
     return handleError(logger, "400", res);
+  },
+);
+
+app.post(
+  "/api/v1/tickets/:id",
+  (req, res, next) => parseBodyMiddleeware(req, next),
+  async (req, res) => {
+    if (
+      req.body &&
+      typeof req.body == TypeOfBody &&
+      req.body.token
+    ) {
+      let access = await control_Token(req.body.token, req);
+      if (access && access.includes("local-sale")) {
+        if (req.params && req.params.id) {
+          return res.send(await getTickets(req.params.id, req.query ? req.query.c : false, reserved = req.query.reserved == "true", justPublic = false));
+          /*let reserved = req.query.reserved == "true";
+          let tickets = reserved
+            ? (await getEventDatas(req.params.id, req.query ? req.query.c : false)).tickets
+            : (await getTicketByReadableId(req.params.id)).tickets;
+    
+          return res.send(tickets ? tickets : []);*/
+        }
+        return handleError(logger, "400", res);
+      }
+      else{
+        return handleError(logger, "003", res);
+      }
+    }
+      return handleError(logger, "400", res);
   },
 );
 
@@ -490,6 +535,100 @@ app.get(
   "/api/v1/venue/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
   async (req, res) => {
+    if (req.params && req.params.id) {
+      let objectid;
+      try {
+        objectid = ObjectId(req.params.id);
+      } catch {
+        console.log("The objectId couldnt be generated");
+      }
+      let eventId = req.query.event;
+      //console.log(eventId, r, req.params.id);
+      const { collection, database } = new Database("venue");
+      let eventDatas = {};
+      if (eventId) {
+        eventDatas = await getTicketByReadableId(eventId);
+        if (eventDatas.venue != req.params.id)
+          return handleError(logger, "035", res);
+      }
+      let venue = await collection.findOne(
+        { _id: objectid },
+        {
+          projection: {
+            "content.name": 1,
+            "content.colorOfBackGround": 1,
+            "content.sizeOfArea": 1,
+            "content.background": 1,
+            "content.seats": 1,
+            "content.groups": 1,
+            "content.sizeOfSeat": 1,
+            "content.colorOfSeat": 1,
+            "content.stages": 1,
+          },
+        },
+      );
+      closeConnection(database);
+      if (venue && venue.content.seats){
+        let sectors = venue.content.seats;
+        venue.content.groups = createArrayOfGroups(sectors);
+      }
+      if (venue && venue.content.seats) {
+        let { stages, seats } = seatMatrixToArray(
+          venue.content.seats,
+          venue.content.stages,
+        );
+        venue.content.stages = stages;
+        venue.content.seats = seats;
+      } else if (!venue) {
+        return handleError(logger, "035", res);
+      }
+      console.log(eventId);
+      if (!eventId && venue) {
+        return venue
+          ? res.send(
+              {venue : {...venue.content}}
+            )
+          : handleError(logger, "400", res);
+      } else {
+        if (venue && eventDatas) {
+          placesOfEvent = [];
+          if (venue.content.seats && venue.content.seats.length) {
+            for (let i = 0; i < eventDatas.tickets.length; i++) {
+              for (let j = 0; j < eventDatas.tickets[i].seats.length; j++) {
+                if (eventDatas.tickets[i]?.types && eventDatas.tickets[i]?.types?.filter((type)=>type.isPublic).length){
+                placesOfEvent.push(
+                  venue.content.seats.find(
+                    (seat) => eventDatas.tickets[i].seats[j] == seat.id,
+                  ),
+                );
+              }
+              }
+            }
+            venue.content.seats = placesOfEvent;
+            console.log("placesOfEvent", placesOfEvent);
+            return res.send({ venue: venue.content });
+          }
+          venue.content.seatsDatas = false;
+          return res.send({ venue: venue.content });
+        }
+        return handleError(logger, "400", res);
+      }
+    }
+    return handleError(logger, "400", res);
+  },
+);
+
+app.post(
+  "/api/v1/venue-details/:id",
+  (req, res, next) => parseBodyMiddleeware(req, next),
+  async (req, res) => {
+    if (
+      req.body &&
+      typeof req.body == TypeOfBody &&
+      req.body.token
+    ) {
+      let access = await control_Token(req.body.token, req);
+      if (access && access.includes("local-sale")) {
     if (req.params && req.params.id) {
       let objectid;
       try {
@@ -558,7 +697,6 @@ app.get(
               }
             }
             venue.content.seats = placesOfEvent;
-            console.log("placesOfEvent", placesOfEvent);
             return res.send({ venue: venue.content });
           }
           venue.content.seatsDatas = false;
@@ -568,7 +706,12 @@ app.get(
       }
     }
     return handleError(logger, "400", res);
-  },
+  }
+else{
+  return handleError(logger, "003", res);
+}}
+return handleError(logger, "400", res);
+},
 );
 
 app.post(
@@ -1533,9 +1676,11 @@ app.post("/api/v1/add-event", async (req, res) => {
       if (body.data && body.data.tickets && body.data?.tickets.length) {
         body.data.tickets.forEach((tickets, index) => {
           try {
-            body.data.tickets[index].price = Number(tickets.price);
-            body.data.tickets[index].minPrice = Number(tickets.minPrice);
-            body.data.tickets[index].maxPrice = Number(tickets.maxPrice);
+            if (body.data.tickets[index] && body.data.tickets[index].types && body.data.tickets[index].types.length){
+              body.data.tickets[index].types.forEach((type, j)=>{
+                body.data.tickets[index].types[j].price = Number(type.price);
+              })
+            }
             body.data.tickets[index].numberOfTicket = Number(
               tickets.numberOfTicket,
             );
@@ -1645,9 +1790,10 @@ app.post("/api/v1/add-event/:id", async (req, res) => {
       if (body.data && body.data.tickets && body.data?.tickets.length) {
         body.data.tickets.forEach((tickets, index) => {
           try {
-            body.data.tickets[index].price = Number(tickets.price);
-            body.data.tickets[index].minPrice = Number(tickets.minPrice);
-            body.data.tickets[index].maxPrice = Number(tickets.maxPrice);
+            if (body.data.tickets[index] && body.data.tickets[index].types && body.data.tickets[index].types.length){
+              body.data.tickets[index].types.forEach((type, j)=>{
+                body.data.tickets[index].types[j].price = Number(type.price);
+              })}
             body.data.tickets[index].numberOfTicket = Number(
               tickets.numberOfTicket,
             );
@@ -2181,7 +2327,12 @@ app.post("/api/v1/get-coupons", async (req, res) => {
         closeConnection(database);
         return handleError(logger, "500", res);
       }
+      let salesDatabase = new Database("buy");
+      for (let i = 0; i < sendDatas.length; i++){
+        sendDatas[i].usedTicket = (await salesDatabase.collection.find({ $and : [{coupon : sendDatas[i].name}, {$or : [{$and : [{time : { $gt : new Date().getTime()-getTime("RESERVATION_TIME")}}, {pending : true}, {bought : false}]}, {bought : true}]}] }).toArray()).length;
+      }
       res.send({ coupons: sendDatas });
+      closeConnection(salesDatabase.database)
       closeConnection(database);
       return;
     } else return handleError(logger, "004", res);
@@ -2423,6 +2574,7 @@ app.post(
             req.body.datas.tickets,
             req.body.datas.eventId,
           );
+          console.log("PRICE", price);
           if (!price.error) {
             const uid = new ShortUniqueId({ length: 32 });
             const uuid = uid();
@@ -2616,6 +2768,7 @@ app.post(
             name: req.body.datas.name,
             tax: req.body.datas.taxNumber,
             website: req.body.datas.website,
+            address : req.body.datas.address,
             otherDatas: await otherData(req, req.body.token),
           });
           return res.send({ error: result.insertedId > 0 });
@@ -2643,6 +2796,7 @@ app.post(
             name: datas[i].name,
             tax: datas[i].tax,
             _id: datas[i]._id,
+            address : datas[i].address
           });
         }
         closeConnection(database);
@@ -2693,6 +2847,8 @@ app.post(
                 name: req.body.datas.name,
                 tax: req.body.datas.taxNumber,
                 website: req.body.datas.website,
+                address : req.body.datas.address,
+                edited : await otherData(req, req.body.token)
               },
             },
           );

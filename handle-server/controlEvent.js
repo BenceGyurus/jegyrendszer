@@ -6,7 +6,6 @@ const { closeConnection } = require("./functions.js");
 const Functions = require("./functions.js");
 
 const controlEvent = async (eventId, ticketIds, thisEventId, orderId) => {
-  // ticketIds is an Array
   let result = { error: false, errorCode: "" };
   let objectId = Functions.createObjectId(orderId);
   if (eventId) {
@@ -80,10 +79,10 @@ const controlEvent = async (eventId, ticketIds, thisEventId, orderId) => {
               }
               boughtTickets.forEach((boughtTicket) => {
                 if (String(boughtTicket._id) != String(thisEventId)) {
+                  reservedSeats = boughtTicket?.tickets.find((ticket) => ticket.ticketId === thisTicket.id);
                   if (
-                    boughtTicket?.tickets
-                      .find((ticket) => ticket.ticketId === thisTicket.id)
-                      ?.places?.includes(seat)
+                    reservedSeats && reservedSeats.length &&
+                      reservedSeats.places?.includes(seat)
                   ) {
                     result = { error: true, errorCode: "033" };
                   }

@@ -7,6 +7,8 @@ import { MapInteractionCSS } from "react-map-interaction";
 import typeOfStage from "./types/typeOfStage";
 import drawStage from "./drawStage";
 
+
+
 type typeOfSeatPostions = {
   x: number;
   y: number;
@@ -48,6 +50,7 @@ type typeOfAmountTicket = {
   selected: number;
   pendingPlaces: Array<string>;
   boughtPlaces: Array<string>;
+  types: any
 };
 
 type typeOfSeatVisualizationParams = {
@@ -61,6 +64,14 @@ type typeOfSeatVisualizationParams = {
   sizeOfScale?: number;
   disabled?: boolean;
   stages?: Array<typeOfStage>;
+};
+
+const getTotalAmountOfSeatsInACategorie = (types:Array<any>)=>{
+  let amount = 0;
+  types.forEach(type=>{
+    amount += type.amount;
+  });
+  return amount
 };
 
 const SeatVisualization = ({
@@ -129,11 +140,6 @@ const SeatVisualization = ({
       const newScale =
         startTransform.scale +
         progress * (targetTransform.scale - startTransform.scale);
-      console.log(
-        "target",
-        progress *
-          (targetTransform.translation.x - startTransform.translation.x),
-      );
       const newTranslation = {
         x: startTransform.translation.x,
         y: startTransform.translation.y,
@@ -171,7 +177,7 @@ const SeatVisualization = ({
                 !ticket.boughtPlaces.includes(seat.id),
                 selectedSeats.includes(seat.id),
                 ticket.pendingPlaces.includes(seat.id),
-                ticket.amount <= ticket.selected,
+                getTotalAmountOfSeatsInACategorie(ticket.types) <= ticket.selected,
                 ctx,
                 seat.size.width,
                 seat.size.height,
@@ -211,7 +217,6 @@ const SeatVisualization = ({
           ? windowWidth / area.width
           : (window.innerHeight - 180) / area.height;
           lstate.translation.x = (windowWidth - lstate.scale*area.width)/2;
-          console.log((windowWidth - lstate.scale*area.width)/2);
     setState(lstate);
   }, []);
 
@@ -304,7 +309,6 @@ const SeatVisualization = ({
   };
 
   const handleSeatClick = (x: number, y: number) => {
-    console.log(x, y, state.scale);
     if (!disabled) {
       //let sizeOfGroups:any = (getMinMaxCoordinatesByGroup(seatPositions));
       const clickedSeat = seatPositions.find(
@@ -315,7 +319,6 @@ const SeatVisualization = ({
           seat.y <= y &&
           y <= seat.y + seat.size.height,
       );
-      console.log(clickedSeat);
       if (clickedSeat) {
         //controlZoom(sizeOfGroups[clickedSeat.group])
       }

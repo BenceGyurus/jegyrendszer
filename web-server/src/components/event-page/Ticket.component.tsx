@@ -5,10 +5,11 @@ type typeOfTicketParams = {
     id : string,
     incrementFunction : Function,
     decrementFunction : Function,
-    free : number
+    free : number,
+    typeId : string
 }
 
-const Ticket = ({name, amount, price, id, incrementFunction, decrementFunction, free}:typeOfTicketParams)=>{
+const Ticket = ({name, amount, price, id, incrementFunction, decrementFunction, free, typeId}:typeOfTicketParams)=>{
     return (
      <div className="ticket-item" key = {id}>
        <div className="ticket-info">
@@ -17,9 +18,9 @@ const Ticket = ({name, amount, price, id, incrementFunction, decrementFunction, 
        </div>
        {free > 0 ? 
         (<div className="quantity-selector">
-         <button className="quantity-btn" onClick={(e)=>{decrementFunction(id)}}>-</button>
+         <button className="quantity-btn" onClick={(e)=>{decrementFunction(id, typeId)}}>-</button>
          <div className="ticket-quantity">{amount}</div> 
-         <button className="quantity-btn" onClick={(e)=>{incrementFunction(id)}}>+</button>
+         <button className="quantity-btn" onClick={(e)=>{incrementFunction(id, typeId)}}>+</button>
          </div>) :
          <div className="quantity-selector">
          <div className="ticket-sold-out">Elfogyott</div>

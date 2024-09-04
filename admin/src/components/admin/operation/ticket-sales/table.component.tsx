@@ -95,8 +95,8 @@ const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTa
     },
     {
         title : "Teljes ár",
-        dataIndex : "fullPrice",
-        key : "fullPrice",
+        dataIndex : "price",
+        key : "price",
         render : (text) => <span>{text.toLocaleString('hu-HU', { useGrouping: true, minimumFractionDigits: 0 })} Ft</span>,
         sorter: (a, b) => a.fullPrice - b.fullPrice,
     },
@@ -133,6 +133,7 @@ const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTa
             numberOfTickets : getFullNumberOfTicket(ticket.tickets),
             isLocal : ticket.local,
             tickets : ticket.tickets,
+            price : ticket.price,
             actions : <span><DeleteFilled onClick={e=>deleteFunction(ticket.buyId)}/><PrinterFilled onClick={e=>printFunction(ticket.buyId)} /></span>,
             nameOfCustomer : {customerName : ticket?.customerName ? ticket?.customerName : "", cusotmerEmail : ticket?.cusotmerEmail, phoneNumber : ticket?.phoneNumber}
         }

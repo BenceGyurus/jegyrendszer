@@ -48,6 +48,7 @@ type typeOfAmountTicket = {
   selected: number;
   pendingPlaces: Array<string>;
   boughtPlaces: Array<string>;
+  types : {name : string, id : string, price : number, amount : number}
 };
 
 type typeOfSeatVisualizationParams = {
@@ -61,6 +62,14 @@ type typeOfSeatVisualizationParams = {
   sizeOfScale?: number;
   disabled?: boolean;
   stages?: Array<typeOfStage>;
+};
+
+const sumTotalAmountOfTicketGroup = (types:any)=>{
+  let amount = 0;
+  types.forEach((type:any) => {
+    amount += type.amount
+  });
+  return amount
 };
 
 const SeatVisualization = ({
@@ -171,7 +180,7 @@ const SeatVisualization = ({
                 !ticket.boughtPlaces.includes(seat.id),
                 selectedSeats.includes(seat.id),
                 ticket.pendingPlaces.includes(seat.id),
-                ticket.amount <= ticket.selected,
+                sumTotalAmountOfTicketGroup(ticket.types) <= ticket.selected,
                 ctx,
                 seat.size.width,
                 seat.size.height,

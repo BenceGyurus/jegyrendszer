@@ -16,11 +16,19 @@ type typeOfCoupon = {
   money: boolean;
 };
 
+type typeOfTicketType = {
+  name : string,
+  price : number,
+  id : string,
+  amount : number
+}
+
 type typeOfTickets = {
   name: string;
   places: Array<string> | boolean;
   amount: number;
   price: number;
+  types : Array<typeOfTicketType>
 };
 
 const Details = ({

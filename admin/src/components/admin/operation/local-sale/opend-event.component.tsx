@@ -53,6 +53,13 @@ type typeOfEventDatas = {
     title : string
 }
 
+type typeOfAmountTicketType = {
+    name : string,
+    price : number,
+    id : string,
+    amount : number
+}
+
 type typeOfAmountTicket = {
     id : string,
     numberOfTicket : number,
@@ -65,7 +72,8 @@ type typeOfAmountTicket = {
     pendingPlaces : Array<string>,
     numberOfFreeTickets : number,
     boughtPlaces : Array<string>,
-    _id : string
+    _id : string,
+    type : typeOfAmountTicketType
 }
 
 type typeOfDiscount = {
@@ -75,13 +83,24 @@ type typeOfDiscount = {
     _id : string
 }
 
+const sumAmountOfAllTypes = (types:Array<typeOfAmountTicketType>)=>{
+    let sum = 0;
+    types.forEach(type=>{
+      sum += type.amount;
+    });
+    return sum
+  };
+
 const Local_Sale_Event = ()=>{
 
     const genereateTicketAmout = (tickets:any):Array<any>=>{
+    
         let newList:Array<typeOfAmountTicket> = [];
-        for (let i = 0; i < tickets.length; i++){
-            newList.push({...tickets[i], amount : 0, selected : 0})
-        }
+        for (let i = 0; i < tickets.length; i++) {
+            tickets[i].types = tickets[i].types.map((type:any)=> {return {...type, amount : 0}});
+            tickets[i].selected = 0;
+            newList.push({ ...tickets[i]});
+          }
         return newList;
     }
 
@@ -96,19 +115,17 @@ const Local_Sale_Event = ()=>{
         }
     }
 
-    const incrementAmountOfTickets = (id:String)=>{
+    const incrementAmountOfTickets = (id:String, typeId:string)=>{
         if (!userSelecting){
-        let l = [...amountTickets];
-        for (let i = 0; i < l.length; i++){
-            if (l[i].id === id && l[i].amount < l[i].numberOfFreeTickets){
-                l[i].amount++;
+            let l = [...amountTickets];
+            for (let i = 0; i < l.length; i++) {
+              if (l[i].id === id && sumAmountOfAllTypes(l[i].types) < l[i].numberOfFreeTickets) {
+                let thisType = l[i].types.find((k:typeOfAmountTicketType)=>k.id==typeId);
+                thisType.amount++;
+                l[i].types = [...l[i].types.filter((type:typeOfAmountTicketType)=> type.id != typeId), thisType];
+              }
             }
-        }
-        let summ = 0;
-        for (let i = 0; i < l.length; i++){
-            summ += l[i].amount*l[i].price;
-            }
-            setPrice(summ);
+            //setPrice()
             setAmountTickets(l);
     }
     else{
@@ -117,42 +134,39 @@ const Local_Sale_Event = ()=>{
     }
 
 
-    const decrementAmountOfTickets = (id:string) => {
+    const decrementAmountOfTickets = (id:string, typeId:string) => {
         if (!userSelecting){
-        let l = [...amountTickets];
-        let newList:Array<string> = [];
-        for (let i = 0; i < l.length; i++){
-            if (l[i].id === id && l[i].amount > 0){
-                l[i].amount--;
-                if (l[i].selected > 0){
-                    l[i].selected--;
-                }
+            let l = [...amountTickets];
+            let newList: Array<string> = [];
+            for (let i = 0; i < l.length; i++) {
+              if (l[i].id === id && sumAmountOfAllTypes(l[i].types) > 0) {
+                let thisType = l[i].types.find((k:typeOfAmountTicketType)=>k.id==typeId);
+                thisType.amount--;
+                l[i].types = [...l[i].types.filter((type:typeOfAmountTicketType)=> type.id != typeId), thisType];
                 let deleted = false;
-                if (l[i].selected >= l[i].amount){
-                let lamdba = [...selectedTickets];
-                for (let j = lamdba.length-1; j >= 0; j--){
-                    if (!l[i].seats.includes(lamdba[j]) || deleted){
-                        newList.push(lamdba[j]);
+                if (l[i].selected >= sumAmountOfAllTypes(l[i].types)) {
+                  l[i].selected--;
+                  let lamdba = [...selectedTickets];
+                  for (let j = lamdba.length - 1; j >= 0; j--) {
+                    if (!l[i].seats.includes(lamdba[j]) || deleted) {
+                      newList.push(lamdba[j]);
                     }
-                    if (l[i].seats.includes(lamdba[j])){
-                        deleted = true;
+                    if (l[i].seats.includes(lamdba[j])) {
+                      deleted = true;
                     }
+                  }
+                  setSelectedTickets(newList);
                 }
-                setSelectedTickets(newList);
-                }
+              }
             }
-        }
-        let summ = 0;
-        for (let i = 0; i < l.length; i++){
-            summ += l[i].amount*l[i].price;
-        }
-            setPrice(summ);
             setAmountTickets(l);
         }
         else{
             setError("A jegyek mennyiségének változtatásához szakítsa meg a külső kiválasztást.")
         }
     }
+
+
 
     const getDiscounts = ()=>{
         postData("/get-local-discounts", {token : ParseLocalStorage("long_token")})
@@ -197,9 +211,8 @@ const Local_Sale_Event = ()=>{
                 setEventDatas(response);
                 //setAmountTickets(genereateTicketAmout(response.tickets));
                 if (response.venue){
-                    fetch(`/api/v1/venue/${response.venue}?event=${id}`).then(
-                        async (response)=>{
-                            let v =(await response.json());
+                    postData(`/venue-details/${response.venue}?event=${id}`, {token : ParseLocalStorage("long_token")}).then(
+                        async (v)=>{
                             if (v && !v.error){
                                 setVenue(v.venue);
                             }
@@ -215,9 +228,8 @@ const Local_Sale_Event = ()=>{
                 response.message ? setError(response.message) : setError("Váratlan hiba történet az esemény betöltése közben")
             }
         })
-        fetch(`/api/v1/tickets/${id}?reserved=true`)
-        .then(async (response)=>{
-            let tickets = await response.json();
+        postData(`/tickets/${id}?reserved=true`, {token : ParseLocalStorage("long_token")})
+        .then(async (tickets)=>{
             if (!tickets.error && tickets.length){
                 setAmountTickets(genereateTicketAmout(tickets));
             }
@@ -262,26 +274,32 @@ const Local_Sale_Event = ()=>{
 
     const selectSeat = (id:string)=>{
         let lTicketAmount = [...amountTickets];
-        for (let i = 0; i < lTicketAmount.length; i++){
-            if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selectedTickets.includes(id)){
-                let l = [...selectedTickets, id];
-                setSelectedTickets(l);
-                lTicketAmount[i].selected++;
+        for (let i = 0; i < lTicketAmount.length; i++) {
+          if (
+            lTicketAmount[i].seats.includes(id) &&
+            sumAmountOfAllTypes(lTicketAmount[i].types) > lTicketAmount[i].selected &&
+            !selectedTickets.includes(id)
+          ) {
+            let l = [...selectedTickets, id];
+            setSelectedTickets(l);
+            lTicketAmount[i].selected++;
+          } else if (
+            lTicketAmount[i].seats.includes(id) &&
+            selectedTickets.includes(id)
+          ) {
+            if (lTicketAmount[i].selected > 0) {
+              lTicketAmount[i].selected--;
             }
-            else if (lTicketAmount[i].seats.includes(id) && selectedTickets.includes(id)){
-                if (lTicketAmount[i].selected > 0){
-                    lTicketAmount[i].selected--;
-                }
-                let l = [...selectedTickets];
-                let newList:Array<string> = [];
-                newList = l.filter(item=>item != id);
-                setSelectedTickets(newList);
-            }
+            let l = [...selectedTickets];
+            let newList: Array<string> = [];
+            newList = l.filter((item) => item != id);
+            setSelectedTickets(newList);
+          }
         }
         setAmountTickets(lTicketAmount);
     }
 
-
+    console.log(selectedTickets);
 
     const getPlacesOfTicket = (places:Array<string>)=>{
         let selectedPlaces = [];
@@ -294,8 +312,8 @@ const Local_Sale_Event = ()=>{
     const controlAmountTickets = ()=>{
         let sendTickets = [];
         for (let i = 0; i < amountTickets.length; i++){
-            if (amountTickets[i].amount > 0){
-                sendTickets.push({amount : amountTickets[i].amount, name : amountTickets[i].name, ticketId : amountTickets[i].id, places : getPlacesOfTicket(amountTickets[i].seats)});
+            if (sumAmountOfAllTypes(amountTickets[i].types) > 0){
+                sendTickets.push({amount : sumAmountOfAllTypes(amountTickets[i].types), name : amountTickets[i].name, ticketId : amountTickets[i].id, places : getPlacesOfTicket(amountTickets[i].seats), types : amountTickets[i].types.filter((type:any)=>{return type.amount > 0})});
             }
         }
         return sendTickets;

@@ -12,6 +12,7 @@ const SeatList = ({
   return (
     <div>
       {seats.map((seatsArray) => {
+        console.log(seatsArray);
         return seatsArray
           ? seatsArray?.seats?.map((seatList) => {
               return seatList.map((seat) => {

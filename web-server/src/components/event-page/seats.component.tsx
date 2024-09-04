@@ -39,7 +39,8 @@ type typeOfAmountTicket = {
     amount : number,
     selected : number,
     pendingPlaces : Array<string>,
-    boughtPlaces : Array<string>
+    boughtPlaces : Array<string>,
+    types: any
 }
 
 type typeOfSeatsParams = {
@@ -84,15 +85,6 @@ const Seats = ({places, tickets, seleted,onClickFunction, disabled}:typeOfSeatsP
         return {
             width : maxX,
             height : maxY+120
-        }
-    }
-
-    const getSizeOfStage = (type:number, sizeOfArea:{width : number, height : number})=>{
-        return {
-            width : type == 1 || type == 4 ? sizeOfArea.width * 0.3 : 50,
-            height : type == 2 || type == 3 ? sizeOfArea.height * 0.3 : 50,
-            x : type == 1 || type == 4 ? sizeOfArea.width/2-(sizeOfArea.width * 0.3/2) : type == 2 ? 10 : sizeOfArea.width-50,
-            y : type == 2 || type == 3 ? sizeOfArea.height / 2 - (sizeOfArea.height * 0.3/2) : type == 1 ? 10 : sizeOfArea.height-50
         }
     }
 

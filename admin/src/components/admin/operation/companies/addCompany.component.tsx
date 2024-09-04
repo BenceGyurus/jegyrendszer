@@ -14,18 +14,20 @@ type typeOfAddCompanyParams = {
     nameOfCompany : string,
     tax : string,
     id : string
-    website : string
+    website : string,
+    address : string
 }
 
-const AddCompany = ({ closeWindowFunction, errorFunction, updateFunction, nameOfCompany, tax, id, website}:typeOfAddCompanyParams)=>{
+const AddCompany = ({ closeWindowFunction, errorFunction, updateFunction, nameOfCompany, tax, id, website, address}:typeOfAddCompanyParams)=>{
 
     const [name, setName] = useState(nameOfCompany ? nameOfCompany : "");
     const [taxNumber, setTaxNumber] = useState(tax ? tax : "");
     const [webSite, setWebSite] = useState(website ? website : "");
+    const [companyAddress, setAddress] = useState(address ? address : "");
 
     const save = ()=>{
         if (name && taxNumber){
-            postData(id ? `/edit-company/${id}` : "/new-company", {token : ParseLocalStorage("long_token"), datas : {name : name, taxNumber : taxNumber, website : webSite}})
+            postData(id ? `/edit-company/${id}` : "/new-company", {token : ParseLocalStorage("long_token"), datas : {name : name, taxNumber : taxNumber, website : webSite, address : companyAddress}})
                 .then(async (response)=>{
                     if (response.responseData){
                         //errorFunction((await response.responseData).message)
@@ -45,6 +47,7 @@ const AddCompany = ({ closeWindowFunction, errorFunction, updateFunction, nameOf
         <Window closeFunction={closeWindowFunction} title = "Vállalatok hozzáadása">
             <InputText value={name} onChangeFunction={setName} title = "Vállalat neve" />
             <InputText value={taxNumber} onChangeFunction={setTaxNumber} title = "Vállalat adószáma" />
+            <InputText value ={companyAddress} onChangeFunction={setAddress} title = "Vállalat címe" />
             <InputText value ={webSite} onChangeFunction={setWebSite} title = "Weboldal (pl.: http://agorasavaria.hu)" />
             <Button title = "Mentés" onClickFunction={save} />
         </Window>
