@@ -49,6 +49,7 @@ const RedisMiddleware = require("./redishMiddleware.js");
 const zlib = require('node:zlib');
 const { Buffer } = require('buffer');
 const { createObjectCsvStringifier } = require('csv-writer');
+const { Queue } = require('bullmq');
 var cookieParser = require("cookie-parser");
 var redisOptions = {
   port: 6379 , //30036,
@@ -71,6 +72,46 @@ const readFromRedisCache = async (key) => {
     return result;
   });
 };
+
+// TICKET HANLDING
+var redis_con = {
+  host: "redis-release-master.service.svc.cluster.local",
+  port: 6379,
+  username: "default",
+  password: process.env.REDIS_PASS,
+  db: 1,
+}
+if (process.env.NODE_ENV != "production") {
+  redis_con = {
+    host: "localhost",
+    port: 6379,
+    db: 1,
+  }
+}
+const queue = new Queue('mail', { connection: redis_con})
+/**
+ * Send message to queue based on provided object
+ * @param {mailData}: MailDTO - all information regarding the ema
+ * 
+ * @example
+ * await sendMail({
+ *      type: 'TICKET',
+ *      recip: 'asdasd@asdasd.com',
+ *      body: {
+ *        name: 'Teszt Jancsi',
+ *        fileName: 'x.pdf',
+ *        ticketName: 'X Előadás',
+ *        ticketType: 'Normál',
+ *        ticketQty: 10,
+ *        ticketDate: '2025-01-01',
+ *      },
+ * })
+ */
+const sendMail = async (mailData) => {
+  await queue.add('send', mailData);
+}
+
+console.log(`Running in ${process.env.NODE_ENV} mode.`)
 
 const Cache = new NodeCache();
 
