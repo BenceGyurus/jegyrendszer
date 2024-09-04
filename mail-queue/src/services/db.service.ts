@@ -10,7 +10,11 @@ export class DbService {
     @InjectModel(Mail.name) private readonly mailDb: Model<MailDocument>,
   ) {}
 
-  logMail = async (mail: MailDTO, completed = false, jobId?: number) =>
+  logMail = async (
+    mail: MailDTO,
+    completed = false,
+    jobId?: number,
+  ): Promise<MailDocument> =>
     this.mailDb.create({
       created: new Date(),
       completed: completed,

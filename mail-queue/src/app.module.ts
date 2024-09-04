@@ -10,6 +10,7 @@ import { MAIL_QUEUE } from './constants/constants';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Mail, MailSchema } from './schemas/mail.schema';
 import { DbService } from './services/db.service';
+import { LokiLogger } from './logger';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { DbService } from './services/db.service';
     MailService,
     QueueService,
     TestService,
+    { provide: 'LOGGER', useFactory: () => LokiLogger.initLogger() },
   ],
 })
 export class AppModule {}
