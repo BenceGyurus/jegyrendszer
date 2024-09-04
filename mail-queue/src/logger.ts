@@ -10,7 +10,7 @@ export class LokiLogger {
       return createLogger({
         transports: [
           new LokiTransport({
-            host: 'process.env.LOKI_URL',
+            host: process.env.LOKI_URL,
             labels: { app: 'mail' },
             json: true,
             format: format.json(),
@@ -31,6 +31,4 @@ export class LokiLogger {
         ],
       });
   };
-
-  static getLogger = () => LokiLogger.initLogger();
 }
