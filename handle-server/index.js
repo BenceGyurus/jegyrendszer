@@ -202,7 +202,7 @@ app.get(
         let companiesDatabase = new Database("companies");
         let datas = await collection
           .find(
-            {},
+            { $or : [{"archived": { $exists: false }}, {"archived" : false}] },
             {
               projection: {
                 "eventData.name": 1,
@@ -231,7 +231,7 @@ app.get(
           if (
             datas[i].eventData.objectDateOfRelease.getTime() <=
               new Date().getTime() &&
-            datas[i].eventData.objectDateOfEvent.getTime() >=
+            datas[i].eventData.objectDateOfEvent.getTime() + getTime("EVENT_AVAILABILITY_AFTER_EVENT") >=
               new Date().getTime()
           ) {
             let companyId = datas[i].eventData.company;
@@ -1175,7 +1175,7 @@ app.post("/api/v1/add-new-user", async (req, res) => {
         datas: await otherData(req, body.token),
         externalSeller: body.externalSeller,
       });
-      res.send({ token: token, url: "/uj-profil/" });
+      res.send({ token: token, url: "/admin/uj-profil/" });
       closeConnection(database);
     } else {
       handleError(logger, "004", res);
@@ -2018,7 +2018,7 @@ app.post("/api/v1/order-ticket", async (req, res) => {
   ) {
     let eventData = await getTicketByReadableId(body.eventId);
     if (eventData && eventData.tickets && eventData.tickets.length) {
-      let error = await controlEvent(body.eventId, body.datas, orderId);
+      let error = await controlEvent(body.eventId, body.datas, orderId, true);
       if (!error.error) {
         let fullPrice = await GetFullPrice(body.datas, body.eventId);
         if (fullPrice.error) {
@@ -3636,12 +3636,12 @@ cron.schedule("30 3 * * 6", async () => {
 cron.schedule("* * * * 3", async () => {
   let eventsDatabase = new Database("events");
   let addition = getTime("DELETABLE_EVENT");
-  let deleted = await eventsDatabase.collection.deleteMany({
+  let deleted = await eventsDatabase.collection.updateMany({
     "eventData.objectDateOfEvent": {
       $lt: new Date(new Date().getTime() - addition),
     },
-  });
-  console.log(`[Autómatikus törlés lefutott]`, deleted);
+  }, { $set: { archived : true } } );
+  console.log(`[Autómatikus archiválás lefutott]`, deleted);
   closeConnection(database);
   closeConnection(eventsDatabase.database);
   //let orders = DELETABLE_ORDERS

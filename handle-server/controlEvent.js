@@ -5,7 +5,7 @@ require("mongodb");
 const { closeConnection } = require("./functions.js");
 const Functions = require("./functions.js");
 
-const controlEvent = async (eventId, ticketIds, thisEventId, orderId) => {
+const controlEvent = async (eventId, ticketIds, thisEventId, orderId, isPublic) => {
   let result = { error: false, errorCode: "" };
   let objectId = Functions.createObjectId(orderId);
   if (eventId) {
@@ -17,7 +17,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId, orderId) => {
         $and: [
           { "eventData.readable_event_name": eventId },
           { "eventData.objectDateOfRelease": { $lt: new Date() } },
-          { "eventData.objectDateOfEvent": { $gt: new Date() } },
+          { "eventData.objectDateOfEvent": { $gt: new Date(new Date().getTime - getTime("EVENT_AVAILABILITY_AFTER_EVENT")) } },
         ],
       },
       { projection: { "eventData.venue": 1, "eventData.tickets": 1 } },
@@ -62,6 +62,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId, orderId) => {
           thisTicket = eventDatas.eventData.tickets.find(
             (eventTicket) => eventTicket.id === ticketId.ticketId,
           );
+          if (isPublic ? ticketId.types ? !ticketId.types.map(type=>type.isPublic).find(l=>false) : false : true){
           if (
             thisTicket &&
             thisTicket.seats.length &&
@@ -121,10 +122,14 @@ const controlEvent = async (eventId, ticketIds, thisEventId, orderId) => {
               result = { error: true, errorCode: "038" };
           }
         }
+      }
       } else {
         return { error: true, errorCode: "032" };
       }
-    }
+      }
+      else{
+        return { error : true, errorCode : "032" }
+      }
   }
   return result;
 };
