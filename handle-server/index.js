@@ -281,6 +281,7 @@ app.get(
         }
         closeConnection(database);
         closeConnection(companiesDatabase.database);
+        sendDatas.sort((a, b) => new Date(a.date) - new Date(b.date));
         res.status(200).send({ events: sendDatas });
       } catch {
         handleError(logger, "500", res);
@@ -3633,7 +3634,7 @@ cron.schedule("30 3 * * 6", async () => {
   closeConnection(database);
 });
 
-cron.schedule("* * * * 3", async () => {
+cron.schedule("59 * * * * *", async () => {
   let eventsDatabase = new Database("events");
   let addition = getTime("DELETABLE_EVENT");
   let deleted = await eventsDatabase.collection.updateMany({

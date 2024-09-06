@@ -17,9 +17,9 @@ class Functions {
       return process.env.NODE_ENV === "production" ? req.headers["cf-connecting-ip"] : req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     }else {
       try {
-        return (
+        return process.env.NODE_ENV === "production" ? (
           req.handshake.headers["cf-connecting-ip"]
-        );
+        ) : socket.handshake.address;
       } catch {
         return "";
       }
