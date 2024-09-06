@@ -313,7 +313,7 @@ const Page = ({
           ticketsAmount[i].numberOfTicket > 0
         ) {
           sendData.push({
-            types : ticketsAmount[i].types,
+            types : ticketsAmount[i].types.filter((type:any)=>type.amount),
             amount: sumAmountOfAllTypes(ticketsAmount[i].types),
             ticketId: ticketsAmount[i].id,
             places: false,
