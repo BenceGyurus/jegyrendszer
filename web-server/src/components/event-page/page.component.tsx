@@ -3,7 +3,6 @@ import Alert from "@mui/material/Alert";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import { useEffect, useState } from "react";
-import "../../css/buy-ticket-page.css";
 import postDataJson from "../connection/postDataJson";
 import Error from "../notification/error.component";
 import BuyButton from "./buy-button.component";
@@ -15,6 +14,7 @@ import Tickets from "./tickets.component";
 import Cookies from 'universal-cookie';
 import Schema from "./schema";
 import TypeOfTicketType from "./types/TypeOfTicketType";
+import '../../css/buy-ticket-page.css';
 
 type typeOfTicket = {
   id: string;
@@ -133,6 +133,8 @@ const Page = ({
   const [ticketsAmount, setTicketsAmount]: [Array<any>, Function] = useState(
     [],
   );
+
+
   const [loadingTickets, setLoadingTickets] = useState<boolean>(false);
   const genereateTicketAmoutWithOutCookie = (tickets:Array<typeOfTicket>)=>{
     let newList: Array<any> = [];
@@ -143,8 +145,6 @@ const Page = ({
     }
    setTicketsAmount(newList);
   }
-
-  console.log(ticketsAmount);
 
 
   const genereateTicketAmout = (

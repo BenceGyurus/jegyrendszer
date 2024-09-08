@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import typeOfReadQrCodeParams from './types/readQrCodeParams';
 import Camera from '../camera/camera.component';
 import postData from '../../request/post';
@@ -10,20 +10,25 @@ import Response from './response.component';
 import ReadQrCodeStyle from './style/readQrCodeStyle';
 import Theme from '../../theme/defaultSettings';
 import Loader from '../loader/loader.component';
+import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 const ReadQrCode = ({id, backFunction}: typeOfReadQrCodeParams) => {
   const [opened, setOpened] = useState<boolean>(false);
   const [eventResponse, setEventResponse] = useState<any>();
+  const [cameraUsage, setCameraUsage] = useState(true);
   const handleQrCodeReading = async (data: string) => {
     postData(`ticket-validation/${data}`, {
       eventId: id,
       token: await AsyncStorage.getItem('token'),
     }).then(response => {
-      console.log(response);
       setEventResponse(response);
     });
     setOpened(true);
   };
+
+  console.log("opened", opened);
+  console.log("eventResponse", eventResponse);
+
 
   return (
     <View>
@@ -33,7 +38,7 @@ const ReadQrCode = ({id, backFunction}: typeOfReadQrCodeParams) => {
             <Response
               description={
                 <View>
-                  <Text
+                  {eventResponse.seatName ? <Text
                     style={{
                       ...ReadQrCodeStyle.description,
                       fontFamily: Theme.default.fontFamily,
@@ -42,12 +47,8 @@ const ReadQrCode = ({id, backFunction}: typeOfReadQrCodeParams) => {
                           ? Theme.dark.color
                           : Theme.light.color,
                     }}>
-                    {eventResponse
-                      ? eventResponse.seatName
-                        ? eventResponse.seatName
-                        : ''
-                      : ''}
-                  </Text>
+                    {eventResponse.seatName}
+                  </Text> : <></>}
                 </View>
               }
               type={
@@ -73,11 +74,12 @@ const ReadQrCode = ({id, backFunction}: typeOfReadQrCodeParams) => {
       {opened ? (
         <></>
       ) : (
+        cameraUsage ? 
         <Camera
           closeFunction={backFunction}
           onReadFunction={handleQrCodeReading}
         />
-      )}
+       : <text>Camera doesnt allowed</text>)}
     </View>
   );
 };

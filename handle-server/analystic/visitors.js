@@ -24,8 +24,6 @@ const visitors = async (fromDate, toDate)=>{
     else if (conditions && conditions.length === 1){
         conditions = conditions;
     }
-    console.log("\n");
-    console.log(conditions);
     if (conditions){
         result = await collection.aggregate([
             {

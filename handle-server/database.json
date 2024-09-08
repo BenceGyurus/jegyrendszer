@@ -48,7 +48,7 @@
     "collection": "buying"
   },
   "companies": {
-    "database": "users",
+    "database": "event",
     "collection": "companies"
   },
   "login-tried": {

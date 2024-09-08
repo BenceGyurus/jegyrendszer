@@ -27,7 +27,6 @@ const CompanyDatas = {
 }
 
 const controlTypeOfBillingAddress = (inputs)=>{
-    console.log(inputs);
     if (inputs.isCompany){
         return ControlDatas(inputs, CompanyDatas);
     }

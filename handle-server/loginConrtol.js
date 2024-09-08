@@ -10,7 +10,6 @@ const logger = Logger();
 const ControlLoginRequest = async (req, res)=>{
     let browserData = Functions.getBrowerDatas(req);
     let ip = Functions.getIp(req);
-    console.log("getIp", ip);
         if (ip){
             const bannedUsersDatabase = new Database("banned");
             let bannedDatas =  await bannedUsersDatabase.collection.find({ip : ip}).toArray();

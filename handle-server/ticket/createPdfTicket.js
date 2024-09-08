@@ -74,7 +74,6 @@ async function createTicket(
 
     doc.font('media/fonts/Rubik/static/Rubik-Bold.ttf', 30).fillColor('black');
     y = autoSplit(event_title, doc, logoY + 100, 50, 30);
-    console.log(y)
 
     doc.font('media/fonts/Rubik/static/Rubik-Bold.ttf', 11).text(ticket_name, 50, y += 10);
     if (seatName) {

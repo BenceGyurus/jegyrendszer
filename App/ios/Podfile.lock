@@ -75,8 +75,6 @@ PODS:
   - hermes-engine/Pre-built (0.72.17)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
-  - Permission-Camera (3.10.1):
-    - RNPermissions
   - RCT-Folly (2021.07.22.00):
     - boost
     - DoubleConversion
@@ -557,7 +555,6 @@ DEPENDENCIES:
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
   - OpenSSL-Universal (= 1.1.1100)
-  - Permission-Camera (from `../node_modules/react-native-permissions/ios/Camera`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -632,8 +629,6 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
-  Permission-Camera:
-    :path: "../node_modules/react-native-permissions/ios/Camera"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -736,7 +731,6 @@ SPEC CHECKSUMS:
   hermes-engine: 982096772bd947125ee3b4f72ace6cb9a33f1d02
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
-  Permission-Camera: 9b70902f34a83c10e198d2d01f0e453e58842776
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: 01c639ec840ee03928b2d65f5cd5297d737b3834
   RCTTypeSafety: 9623592521a1576363baf3d6ab8d164cfe9062bf
@@ -773,7 +767,7 @@ SPEC CHECKSUMS:
   ReactNativeUiLib: deb877cd9b36cf5cad3c72b226bb330060681351
   RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNGestureHandler: 9e0d0a46b7af6d21fbe3343912502afa8baf755e
-  RNPermissions: 4e3714e18afe7141d000beae3755e5b5fb2f5e05
+  RNPermissions: a446c2ce1f3bf54383c283798307cca5f50d70e4
   RNReanimated: c2027c397233801d4aceb7375e000ac87ec2e67d
   RNSVG: af3907ac5d4fa26a862b75a16d8f15bc74f2ceda
   RNVectorIcons: 32462e7c7e58fe457474fc79c4d7de3f0ef08d70
@@ -781,6 +775,6 @@ SPEC CHECKSUMS:
   Yoga: ef534101bb891fb09bae657417f34d399c1efe38
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 073cd3b34c7bb96e408f0093bfb9f1e1963d3cf9
+PODFILE CHECKSUM: d10f68b921a77c42123ccb0eea25ef62819378b0
 
 COCOAPODS: 1.15.2

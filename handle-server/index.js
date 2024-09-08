@@ -10,6 +10,8 @@ const Topology = require("./databasesTopology.js");
 const handleError = require("./handleError.js");
 const multer = require("multer");
 const Jimp = require("jimp");
+const sharp = require('sharp');
+const path = require('path');
 const controlTypesOfVenues = require("./typesOfDatas/veunes.js");
 const { ObjectId } = require("mongodb");
 const controlTypeOfEvents = require("./typesOfDatas/events.js");
@@ -191,7 +193,7 @@ app.get(
   async (req, res, next) => {
     await statsMiddleware(req, res, next);
   },
-  async (req, res) => {
+  Functions.measureExecutionTime(async (req, res) => {
     // const cachedData = await readFromRedisCache('eventstest');
     const cachedData = Cache.get("events");
     if (cachedData) {
@@ -200,9 +202,10 @@ app.get(
       try {
         let { collection, database } = new Database("events");
         let companiesDatabase = new Database("companies");
+
         let datas = await collection
           .find(
-            { $or : [{"archived": { $exists: false }}, {"archived" : false}] },
+            { $and : [{$or : [{"archived": { $exists: false }}, {"archived" : false}]} , {"eventData.objectDateOfRelease" : { $lt :  new Date() }}, {"eventData.objectDateOfEvent" : { $gt : new Date(new Date().getTime()-getTime("EVENT_AVAILABILITY_AFTER_EVENT")) }} ]},
             {
               projection: {
                 "eventData.name": 1,
@@ -225,15 +228,8 @@ app.get(
           )
           .toArray();
         let sendDatas = [];
-        let cache = true;
         let cacheTime = getTime("CACHE_TIME");
         for (let i = 0; i < datas.length; i++) {
-          if (
-            datas[i].eventData.objectDateOfRelease.getTime() <=
-              new Date().getTime() &&
-            datas[i].eventData.objectDateOfEvent.getTime() + getTime("EVENT_AVAILABILITY_AFTER_EVENT") >=
-              new Date().getTime()
-          ) {
             let companyId = datas[i].eventData.company;
             try {
               companyId = ObjectId(companyId);
@@ -268,15 +264,9 @@ app.get(
             new Date().getTime()
               ? (cache = false)
               : false;
-          } else if (
-            datas[i].eventData.objectDateOfRelease.getTime() >=
-            new Date().getTime() + cacheTime
-          ) {
-            cache = false;
-          }
+          
         }
-        if (cache) {
-          // redis.set('events', sendDatas, cacheTime/1000);
+        if (datas.length) {
           Cache.set("events", sendDatas, cacheTime / 1000);
         }
         closeConnection(database);
@@ -287,7 +277,7 @@ app.get(
         handleError(logger, "500", res);
       }
     }
-  },
+  }, (time)=>console.log(`/api/v1/events have been run in ${time}ms`)),
 );
 
 app.post(
@@ -534,14 +524,13 @@ return justPublic && tickets ? getPublicTickets(tickets) : tickets && !justPubli
 app.get(
   "/api/v1/tickets/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
+  Functions.measureExecutionTime(
   async (req, res) => {
-    console.log("req.query.c", req.query.c);
     if (req.params && req.params.id) {
       return res.send(await getTickets(req.params.id, req.query ? req.query.c : false, reserved = req.query.reserved == "true", justPublic = true));
     }
     return handleError(logger, "400", res);
-  },
-);
+  }, (time)=>console.log(`[/api/v1/tickets/:id] ${time}ms`)));
 
 app.post(
   "/api/v1/tickets/:id",
@@ -576,7 +565,7 @@ app.post(
 app.get(
   "/api/v1/venue/:id",
   (req, res, next) => parseBodyMiddleeware(req, next),
-  async (req, res) => {
+  Functions.measureExecutionTime(async (req, res) => {
     if (req.params && req.params.id) {
       let objectid;
       try {
@@ -624,7 +613,6 @@ app.get(
       } else if (!venue) {
         return handleError(logger, "035", res);
       }
-      console.log(eventId);
       if (!eventId && venue) {
         return venue
           ? res.send(
@@ -647,7 +635,6 @@ app.get(
               }
             }
             venue.content.seats = placesOfEvent;
-            console.log("placesOfEvent", placesOfEvent);
             return res.send({ venue: venue.content });
           }
           venue.content.seatsDatas = false;
@@ -657,7 +644,7 @@ app.get(
       }
     }
     return handleError(logger, "400", res);
-  },
+  }, (time)=>{console.log(`[/api/v1/venue/:id] ${time}ms`)})
 );
 
 app.post(
@@ -718,7 +705,6 @@ app.post(
       } else if (!venue) {
         return handleError(logger, "035", res);
       }
-      console.log(eventId);
       if (!eventId && venue) {
         return venue
           ? res.send(
@@ -2302,6 +2288,9 @@ app.post("/api/v1/download-report/:reportId", (req,res,next)=>parseBodyMiddleewa
         report = await collection.findOne({_id : id}, {projection : {report : 1}});
         Functions.closeConnection(database);
         if (report.report){
+          report.report.forEach(rep=>{
+            rep.time = new Date(rep.time).toISOString().split('T')[0];
+          })
           let keys = config.CSV_HEADER;
           let csvStringifier = createObjectCsvStringifier({
             header: keys
@@ -2616,7 +2605,6 @@ app.post(
             req.body.datas.tickets,
             req.body.datas.eventId,
           );
-          console.log("PRICE", price);
           if (!price.error) {
             const uid = new ShortUniqueId({ length: 32 });
             const uuid = uid();
@@ -2971,14 +2959,32 @@ app.post(
         try {
           const scale = 400;
           let imageBuffer = fs.readFileSync(process.env.NODE_ENV === "production" ? `${file.path}` : `${file.path}`);
-          let jimage = await Jimp.read(imageBuffer);
-          width = jimage.bitmap.width;
-          height = jimage.bitmap.height;
-          await jimage.scale(scale/height).write(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${smallImageFileName}` : `${__dirname}/uploads/${smallImageFileName}`);
+          try {
+            console.log('Processing image from buffer');
+    
+            // Get metadata (width, height, etc.)
+            const metadata = await sharp(imageBuffer).metadata();
+            const width = metadata.width;
+            const height = metadata.height;
+            console.log(`Width: ${width}, Height: ${height}`);
+    
+            const outputPath = process.env.NODE_ENV === "production" 
+                ? path.join(config["IMAGES_NODE_SHARE"], smallImageFileName)
+                : path.join(__dirname, 'uploads', smallImageFileName);
+    
+            // Scale the image based on the height and save it
+            await sharp(imageBuffer)
+                .resize({ height: Math.round(height * (scale / height)) })  // Scale based on the height
+                .toFile(outputPath);  // Write the scaled image to the specified path
+    
+            console.log(`Image saved to ${outputPath}`);
+        } catch (error) {
+            console.error('Error processing image:', error);
+        }
           /*sharp(imageBuffer)
           .resize(Math.ceil((scale/height)*width), scale)
           .toFile(process.env.NODE_ENV === "production" ? `${config["IMAGES_NODE_SHARE"]}/${smallImageFileName}` : `${__dirname}/uploads/${smallImageFileName}`, (err, info) => {});*/
-        } catch {}
+        } catch(err) {console.log(err)}
         res.send({
           path: `/api/v1${newFilePath}`, 
           width: width,
@@ -3634,16 +3640,17 @@ cron.schedule("30 3 * * 6", async () => {
   closeConnection(database);
 });
 
-cron.schedule("59 * * * * *", async () => {
+cron.schedule("59 * * * *", async () => {
   let eventsDatabase = new Database("events");
   let addition = getTime("DELETABLE_EVENT");
   let deleted = await eventsDatabase.collection.updateMany({
-    "eventData.objectDateOfEvent": {
-      $lt: new Date(new Date().getTime() - addition),
+    "eventData.objectDateOfEvent": { and : [
+      {$lt: new Date(new Date().getTime() - addition)},
+      {archived : { $not : true }}
+    ]
     },
   }, { $set: { archived : true } } );
   console.log(`[Autómatikus archiválás lefutott]`, deleted);
-  closeConnection(database);
   closeConnection(eventsDatabase.database);
   //let orders = DELETABLE_ORDERS
 });

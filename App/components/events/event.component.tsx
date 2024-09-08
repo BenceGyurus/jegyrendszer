@@ -40,7 +40,7 @@ const Event = ({event, onSelectFunction}: typeOfEventParams) => {
         actions={[
           <Pressable onPress={() => onSelectFunction(event._id)}>
             <FontAwesomeIcon
-              size={20}
+              size={24}
               icon={faQrcode}
               color={
                 useColorScheme() === 'dark'

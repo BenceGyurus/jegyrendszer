@@ -216,6 +216,20 @@ class Functions {
       console.error(err);
     }
   }
+
+  static measureExecutionTime(fn, log) {
+    return function(...args) {
+      const start = performance.now();
+      const result = fn(...args);
+      const end = performance.now();
+      if (log){
+        log(end - start)
+      }else {
+        console.log(`Execution time: ${end - start}ms`);
+      }
+      return result;
+    };
+  }
 }
 
 module.exports = Functions;

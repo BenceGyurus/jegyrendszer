@@ -1,6 +1,5 @@
 import Discount from "./discount.component"
 import { useState } from 'react'
-import { RadioGroup } from '@headlessui/react'
 
 
 type typeOfDiscount = {

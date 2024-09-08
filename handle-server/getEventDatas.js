@@ -11,14 +11,6 @@ const getEventDatas = async (eventId, objectId) => {
   if (eventDatas) {
     if (eventDatas && eventDatas.eventData) {
       for (let i = 0; i < eventDatas.eventData.tickets.length; i++) {
-        eventDatas.eventData.tickets[i] = Object.keys(
-          eventDatas.eventData.tickets[i],
-        )
-          .filter((objKey) => objKey !== "maxPrice" && objKey !== "minPrice")
-          .reduce((newObj, key) => {
-            newObj[key] = eventDatas.eventData.tickets[i][key];
-            return newObj;
-          }, {});
         eventDatas.eventData.tickets[i].pendingPlaces = [];
         eventDatas.eventData.tickets[i].boughtPlaces = [];
         eventDatas.eventData.tickets[i].numberOfFreeTickets =
