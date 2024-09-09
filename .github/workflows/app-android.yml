@@ -32,9 +32,10 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Run Yarn Install
+      - name: Installing packages
         run: |
              npm i -g corepack
+             npm install
              yarn install
 
       - name: Build application
@@ -49,6 +50,10 @@ jobs:
           path: android/app/build/outputs/apk/release/app-release.apk
           retention-days: 3
     
+      - name: List outputs directory
+        run: |
+          ls android/app/build/outputs/apk/release
+
       - name: Install AWS CLI
         run: |
           sudo apt-get update
