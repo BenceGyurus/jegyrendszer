@@ -47,12 +47,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: app
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: ./android/app/build/outputs/apk/release/app-release.apk
           retention-days: 3
-    
-      - name: List outputs directory
-        run: |
-          ls android/app/build/outputs/apk/release
 
       - name: Install AWS CLI
         run: |
