@@ -1,0 +1,65 @@
+name: "Build Android app"
+
+on: 
+  push:
+    paths:
+      - App/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./App
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: adopt
+          cache: gradle
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup Node  
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Run Yarn Install
+        run: |
+             npm i -g corepack
+             yarn install
+
+      - name: Build application
+        run: |
+             cd android
+             ./gradlew assembleRelease
+
+      - name: Upload application
+        uses: actions/upload-artifact@v2
+        with:
+          name: app
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 3
+    
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install awscli --upgrade
+      
+      - name: Upload APK to Minio via AWS CLI
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.MINIO_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          MINIO_BUCKET: jegyrendszer-app
+          MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+        run: |
+            aws configure set default.s3.signature_version s3v4
+            aws --endpoint-url $MINIO_ENDPOINT s3 cp android/app/build/outputs/apk/release/app-release.apk s3://$MINIO_BUCKET/app-release.apk
