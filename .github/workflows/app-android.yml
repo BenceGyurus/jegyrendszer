@@ -1,9 +1,10 @@
 name: "Build Android app"
 
-on: 
-  push:
-    paths:
-      - App/**
+# on: 
+#   push:
+#     paths:
+#       - App/**
+on: workflow_dispatch
 
 jobs:
   build:
@@ -29,7 +30,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Run Yarn Install
         run: |
