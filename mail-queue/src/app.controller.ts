@@ -7,6 +7,6 @@ export class AppController {
 
   @Get('/test')
   getHello(): string {
-    return this.testService.addToQueue();
+    return this.testService.testMail();
   }
 }
