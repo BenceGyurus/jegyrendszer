@@ -11,6 +11,15 @@ import "../../css/monitor.css";
 import Ads from "../ads/ads.component";
 
 
+const sumAmountOfTypes = (types:Array<{name : string, price : number, amount : number, id : string}>)=>{
+    let sum = 0;
+    types.forEach(type=>{
+        sum += type.amount;
+    });
+    return sum;
+}
+
+
 const TicketMonitor = ()=>{
 
     const [connectionStatus, setConnectionStatus] = useState(false);
@@ -144,10 +153,11 @@ const TicketMonitor = ()=>{
     }, [selected, venue]);
 
 
+
     const selectSeat = (id:string)=>{
         let lTicketAmount = [...venue.tickets];
         for (let i = 0; i < lTicketAmount.length; i++){
-            if (lTicketAmount[i].seats.includes(id) && lTicketAmount[i].amount > lTicketAmount[i].selected && !selected.includes(id)){
+            if (lTicketAmount[i].seats.includes(id) && sumAmountOfTypes(lTicketAmount[i].types) > lTicketAmount[i].selected && !selected.includes(id)){
                 let l = [...selected, id];
                 setSelected(l);
                 lTicketAmount[i].selected++;
@@ -186,13 +196,12 @@ const TicketMonitor = ()=>{
         let isFull = true;
         if (venue && venue.tickets && venue.tickets.length){
         for (let i = 0; i < venue.tickets.length; i++){
-            isFull = venue.tickets[i].selected != venue.tickets[i].amount ? false : isFull;
+            isFull = venue.tickets[i].selected != sumAmountOfTypes(venue.tickets[i].types) ? false : isFull;
         }
         }
         return isFull
     }
 
-    console.log(ads, adsList);
 
     controlTickets()
     //`linear-gradient(45deg, ${topBackgroundColor}, ${topBackgroundColorRight}, ${bottomBackgroundColor}, ${bottomBackgroundColorRight})`

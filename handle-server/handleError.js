@@ -3,7 +3,6 @@ const handleError = (logger, errorCode, res, numberOfTries)=>{
     error = {};
     try{
         error = JSON.parse(fs.readFileSync(`${__dirname}/errorCodes.json`))[errorCode];
-        console.log(error);
         if (!error && numberOfTries < 1){
             handleError("000", res, numberOfTries ? numberOfTries+1 : 0);
             return 0;

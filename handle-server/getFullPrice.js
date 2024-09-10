@@ -19,10 +19,8 @@ const getPriceOfTypes = (types, allTypes)=>{
 }
 
 const GetFullPrice = async (ticketsList, eventId)=>{           //ticketsList : [{ticketId : string, amount : number ...}...]
-    console.log(ticketsList);
     if (ticketsList.length && typeof ticketsList[0] == "object" && Object.keys(ticketsList[0]).includes("ticketId") && eventId){
         const ticketDatas = await getTicketByReadableId(eventId);
-        console.log("ticketDatas", ticketDatas);
         let amountList = [];
         let fullPrice = 0;
         let fullAmount = 0;

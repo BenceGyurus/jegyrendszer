@@ -14,12 +14,13 @@ class Functions {
   }
   static getIp(req) {
     if (req.headers){
+      console.log(process.env.NODE_ENV === "production" ? req.headers["cf-connecting-ip"] : req.headers["x-forwarded-for"] || req.socket.remoteAddress);
       return process.env.NODE_ENV === "production" ? req.headers["cf-connecting-ip"] : req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     }else {
       try {
         return process.env.NODE_ENV === "production" ? (
           req.handshake.headers["cf-connecting-ip"]
-        ) : socket.handshake.address;
+        ) : req.handshake.address == "::1" ? "127.0.0.1" : req.handshake.address;
       } catch {
         return "";
       }
@@ -112,7 +113,6 @@ class Functions {
     text = "";
     text = text.toLowerCase();
     text.split("").forEach((char) => {
-      console.log(char.charCodeAt());
       if (
         (char.charCodeAt() >= 97 && char.charCodeAt() <= 122) ||
         char.charCodeAt() === 45

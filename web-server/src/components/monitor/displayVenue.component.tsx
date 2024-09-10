@@ -26,6 +26,8 @@ const DisplayVenue = ( { venueId, eventId , aTickets,selectEvent, selected }:typ
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [tickets, setTickets] = useState(aTickets);
 
+    console.log(aTickets);
+
     useEffect(()=>{
         fetch(`/api/v1/venue/${venueId}?event=${eventId}`)
         .then(async (response:any)=>{
