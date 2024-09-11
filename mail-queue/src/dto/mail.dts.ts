@@ -10,10 +10,13 @@ export enum MailTypes {
 }
 
 export class MailBody {
-  readonly name?: string;
-  readonly ticketName?: string;
-  readonly ticketDate?: string | Date;
-  readonly ticketType?: string;
-  readonly ticketQty?: number;
-  readonly fileName?: string;
+  readonly name?: string; // vevő neve
+  readonly fileName?: string | string[]; // jegy / jegyek pdfeinek nevei
+  readonly tickets: Ticket[];
+}
+export class Ticket {
+  readonly ticketName?: string; // előadás neve
+  readonly ticketDate?: string | Date; // előadás dátuma
+  readonly ticketType?: string; // jegy típusa (pl. álló, ülő)
+  readonly ticketQty?: number; // jegy mennyiség
 }

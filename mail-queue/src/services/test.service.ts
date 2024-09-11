@@ -16,10 +16,14 @@ export class TestService {
       body: {
         fileName: 'asd',
         name: 'Mr János',
-        ticketDate: '2020-01-01',
-        ticketName: 'Teszt előadás',
-        ticketQty: 3,
-        ticketType: 'Normál',
+        tickets: [
+          {
+            ticketName: 'Előadás 1',
+            ticketDate: '2020-01-01',
+            ticketQty: 4,
+            ticketType: 'Normál',
+          },
+        ],
       },
       recip: 'test@test.com',
       type: MailTypes.TICKET,

@@ -102,10 +102,14 @@ const queue = new Queue('mail', { connection: redis_con})
  *      body: {
  *        name: 'Teszt Jancsi',
  *        fileName: 'x.pdf',
- *        ticketName: 'X Előadás',
- *        ticketType: 'Normál',
- *        ticketQty: 10,
- *        ticketDate: '2025-01-01',
+ *        tickets: [
+ *          {
+ *            ticketName: 'X Előadás',
+ *            ticketType: 'Normál',
+ *            ticketQty: 10,
+ *            ticketDate: '2025-01-01',
+ *          }
+ *        ]
  *      },
  * })
  */
