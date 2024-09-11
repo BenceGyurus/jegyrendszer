@@ -241,9 +241,8 @@ const Page = ({
     let l = [...ticketsAmount];
     let newList: Array<string> = [];
     for (let i = 0; i < l.length; i++) {
-      if (l[i].id === id && sumAmountOfAllTypes(l[i].types) > 0) {
+      if (l[i].id === id && sumAmountOfAllTypes(l[i].types) > 0 && l[i].types.find((type:any) => type.id === typeId).amount > 0) {
         let thisType = l[i].types.find((k:typeOfAmountTicketType)=>k.id==typeId);
-        thisType.amount--;
         l[i].types = [...l[i].types.filter((type:typeOfAmountTicketType)=> type.id != typeId), thisType];
         let deleted = false;
         if (l[i].selected >= sumAmountOfAllTypes(l[i].types)) {
@@ -259,6 +258,7 @@ const Page = ({
           }
           setSelectedTickets(newList);
         }
+        thisType.amount--;
       }
     }
     setTicketsAmount(l);
