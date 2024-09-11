@@ -11,6 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Mail, MailSchema } from './schemas/mail.schema';
 import { DbService } from './services/db.service';
 import { LokiLogger } from './logger';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { LokiLogger } from './logger';
     BullModule.registerQueue({
       name: MAIL_QUEUE,
     }),
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [

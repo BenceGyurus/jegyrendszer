@@ -2,11 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MailDTO } from 'src/dto/mail.dts';
 import { DbService } from './db.service';
 import { Logger } from 'winston';
+import { MailerService } from 'src/mailer/mailer.service';
 
 @Injectable()
 export class MailService {
   constructor(
     private dbService: DbService,
+    private mailer: MailerService,
     @Inject('LOGGER') private readonly logger: Logger,
   ) {}
 
@@ -14,12 +16,9 @@ export class MailService {
     this.logger.info(
       `Processing mail with id ${jobId} for recip: ${mail.recip}...`,
     );
-    const isSuccessful = true;
     await new Promise<void>((res) => setTimeout(() => res(), 5000));
 
-    // MAIL LOGIC, TEMPLATING
-    // ...
-    // ...
+    const isSuccessful = await this.mailer.sendMail(mail);
 
     const dbId = await this.dbService.logMail(
       mail,
