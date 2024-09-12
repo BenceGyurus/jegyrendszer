@@ -198,90 +198,103 @@ app.get(
     await statsMiddleware(req, res, next);
   },
   Functions.measureExecutionTime(async (req, res) => {
-    // const cachedData = await readFromRedisCache('eventstest');
     const cachedData = Cache.get("events");
     if (cachedData) {
       return res.send({ events: cachedData });
-    } else {
-      try {
-        let { collection, database } = new Database("events");
-        let companiesDatabase = new Database("companies");
-
-        let datas = await collection
-          .find(
-            { $and : [{$or : [{"archived": { $exists: false }}, {"archived" : false}]} , {"eventData.objectDateOfRelease" : { $lt :  new Date() }}, {"eventData.objectDateOfEvent" : { $gt : new Date(new Date().getTime()-getTime("EVENT_AVAILABILITY_AFTER_EVENT")) }} ]},
-            {
-              projection: {
-                "eventData.name": 1,
-                "eventData.description": 1,
-                "eventData.location": 1,
-                "eventData.position": 1,
-                "eventData.end_Of_The_Event": 1,
-                "eventData.readable_event_name": 1,
-                "eventData.address": 1,
-                "eventData.objectDateOfRelease": 1,
-                "eventData.objectDateOfEvent": 1,
-                "eventData.background": 1,
-                "eventData.company": 1,
-                "eventData.tickets": 1,
-                "eventData.performer": 1,
-                "eventData.isGroupPerformer": 1,
-                "eventData.smallBackground" : 1
-              },
-            },
-          )
-          .toArray();
-        let sendDatas = [];
-        let cacheTime = getTime("CACHE_TIME");
-        for (let i = 0; i < datas.length; i++) {
-            let companyId = datas[i].eventData.company;
-            try {
-              companyId = ObjectId(companyId);
-            } catch {}
-            let company = await companiesDatabase.collection.findOne(
-              { _id: companyId },
-              { projection: { name: 1, website: 1 } },
-            );
-            sendDatas.push({
-              id: datas[i].eventData.readable_event_name,
-              date: datas[i].eventData.objectDateOfEvent,
-              title: datas[i].eventData.name,
-              description: datas[i].eventData.description,
-              imageName: datas[i].eventData.smallBackground ? datas[i].eventData.smallBackground : datas[i].eventData.background,
-              address: datas[i].eventData.address,
-              location: datas[i].eventData.location,
-              position: datas[i].eventData.position,
-              end: datas[i].eventData.end_Of_The_Event,
-              organiser: {
-                name: company ? company.name : "",
-                website: company ? company.website : "",
-              },
-              performer: {
-                name: datas[i].eventData.performer,
-                isGroupPerformer: datas[i].eventData.isGroupPerformer,
-              },
-              tickets: datas[i].eventData.tickets.map((ticket) => {
-                return { name: ticket.name, price: ticket.price };
-              }),
-            });
-            datas[i].eventData.objectDateOfEvent.getTime() + cacheTime <=
-            new Date().getTime()
-              ? (cache = false)
-              : false;
-          
-        }
-        if (datas.length) {
-          Cache.set("events", sendDatas, cacheTime / 1000);
-        }
-        closeConnection(database);
-        closeConnection(companiesDatabase.database);
-        sendDatas.sort((a, b) => new Date(a.date) - new Date(b.date));
-        res.status(200).send({ events: sendDatas });
-      } catch {
-        handleError(logger, "500", res);
-      }
     }
-  }, (time)=>console.log(`/api/v1/events have been run in ${time}ms`)),
+
+    try {
+      const { collection, database } = new Database("events");
+      const companiesDatabase = new Database("companies");
+
+      const filterConditions = {
+        $and: [
+          { $or: [{ "archived": { $exists: false } }, { "archived": false }] },
+          { "eventData.objectDateOfRelease": { $lt: new Date() } },
+          { "eventData.objectDateOfEvent": { $gt: new Date(new Date().getTime() - getTime("AVAILABLE_FOR_PURCHASE_AFTER_THE_EVENT")) } },
+        ]
+      };
+
+      const projectionFields = {
+        "eventData.name": 1,
+        "eventData.description": 1,
+        "eventData.location": 1,
+        "eventData.position": 1,
+        "eventData.end_Of_The_Event": 1,
+        "eventData.readable_event_name": 1,
+        "eventData.address": 1,
+        "eventData.objectDateOfRelease": 1,
+        "eventData.objectDateOfEvent": 1,
+        "eventData.background": 1,
+        "eventData.company": 1,
+        "eventData.tickets": 1,
+        "eventData.performer": 1,
+        "eventData.isGroupPerformer": 1,
+        "eventData.smallBackground": 1
+      };
+
+      const datas = await collection.find(filterConditions, { projection: projectionFields }).toArray();
+      if (!datas.length) {
+        return res.status(200).send({ events: [] });
+      }
+
+      const companyIds = [...new Set(datas.map(data => data.eventData.company).filter(Boolean))];
+      const companyIdObjects = companyIds.map(id => {
+        try {
+          return ObjectId(id);
+        } catch {
+          return null;
+        }
+      }).filter(Boolean);
+
+      const companies = await companiesDatabase.collection
+        .find({ _id: { $in: companyIdObjects } }, { projection: { name: 1, website: 1 } })
+        .toArray();
+
+      const companyMap = companies.reduce((acc, company) => {
+        acc[company._id] = company;
+        return acc;
+      }, {});
+
+      const sendDatas = datas.map(data => {
+        const companyId = data.eventData.company;
+        const company = companyMap[companyId] || { name: "", website: "" };
+
+        return {
+          id: data.eventData.readable_event_name,
+          date: data.eventData.objectDateOfEvent,
+          title: data.eventData.name,
+          description: data.eventData.description,
+          imageName: data.eventData.smallBackground || data.eventData.background,
+          address: data.eventData.address,
+          location: data.eventData.location,
+          position: data.eventData.position,
+          end: data.eventData.end_Of_The_Event,
+          organiser: { name: company.name, website: company.website },
+          performer: {
+            name: data.eventData.performer,
+            isGroupPerformer: data.eventData.isGroupPerformer,
+          },
+          tickets: data.eventData.tickets.map(ticket => ({
+            name: ticket.name,
+            price: ticket.price
+          }))
+        };
+      });
+
+      const cacheTime = getTime("CACHE_TIME");
+      Cache.set("events", sendDatas, cacheTime / 1000);
+
+      sendDatas.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      closeConnection(database);
+      closeConnection(companiesDatabase.database);
+
+      res.status(200).send({ events: sendDatas });
+    } catch (error) {
+      handleError(logger, "500", res);
+    }
+  }, (time) => console.log(`/api/v1/events have been run in ${time}ms`)),
 );
 
 app.post(
@@ -375,6 +388,7 @@ app.post(
             buyingDatas.tickets.forEach((ticket, index) => {
               if (ticket.ticketId === ticketDatas.ticketId) {
                 buyingDatas.tickets[index].amount = ticket.amount - 1;
+                buyingDatas.tickets[index].price -= ticketDatas.price;
                 if (
                   ticket.places &&
                   ticket.places.includes(ticketDatas.seatId)
@@ -384,10 +398,16 @@ app.post(
                     ticket.seatId,
                   );
                 }
-                if (buyingDatas.tickets[index].amount < 1) {
+                if (Functions.getTotalAmountOfTicket(buyingDatas.tickets[index].types) < 1) {
                   deleteIndex = index;
                 }
               }
+            });
+            buyingDatas.fullAmount = 0;
+            buyingDatas.price = 0;
+            buyingDatas.tickets.forEach(ticket=>{
+              buyingDatas.price += ticket.price;
+              buyingDatas.fullAmount += ticket.amount;
             });
             if (deleteIndex != -1) buyingDatas.tickets.slice(deleteIndex);
             if (!buyingDatas.tickets.length) {

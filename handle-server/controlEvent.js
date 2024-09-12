@@ -17,7 +17,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId, orderId, isPublic) 
         $and: [
           { "eventData.readable_event_name": eventId },
           { "eventData.objectDateOfRelease": { $lt: new Date() } },
-          { "eventData.objectDateOfEvent": { $gt: new Date(new Date().getTime - getTime("EVENT_AVAILABILITY_AFTER_EVENT")) } },
+          { "eventData.objectDateOfEvent": { $gt: new Date(new Date().getTime - getTime("AVAILABLE_FOR_PURCHASE_AFTER_THE_EVENT")) } },
         ],
       },
       { projection: { "eventData.venue": 1, "eventData.tickets": 1 } },

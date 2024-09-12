@@ -230,6 +230,15 @@ class Functions {
       return result;
     };
   }
+
+  static getTotalAmountOfTicket(types){
+    let amount = 0;
+    types.forEach(type=>{
+      amount += type.amount;
+    });
+    return amount;
+  }
+
 }
 
 module.exports = Functions;
