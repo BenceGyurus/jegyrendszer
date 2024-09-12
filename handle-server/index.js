@@ -2672,116 +2672,81 @@ app.post(
 
 app.post(
   "/api/v1/payment/:id",
-  (req, res, next) => parseBodyMiddleeware(req, next),
+  (req,res,next)=>parseBodyMiddleeware(req, next), // Directly pass middleware
   async (req, res) => {
-    if (
-      req.body &&
-      typeof req.body &&
-      req.body.datas &&
-      typeof req.body.datas === "object"
-    ) {
-      if (
-        req.body.datas.customerData &&
-        controlTypeOfBillingAddress(req.body.datas.customerData) &&
-        req.params.id
-      ) {
-        let { collection, database } = new Database("buy");
-        try {
-          req.params.id = ObjectId(req.params.id);
-        } catch {}
-        let buyingDatas = await collection.findOne({ _id: req.params.id });
-        //collection.deleteOne({_id : ObjectId(req.params.id)});
-        closeConnection(database);
-        let ip = Functions.getIp(req);
-        let browserData = Functions.getBrowerDatas(req);
-        if (
-          buyingDatas &&
-          ip == buyingDatas.otherDatas.ip &&
-          browserData.os == buyingDatas.otherDatas.browserData.os &&
-          browserData.name == buyingDatas.otherDatas.browserData.name
-        ) {
-          let error = false;
-          let result = await controlEvent(
-            buyingDatas.eventId,
-            buyingDatas.tickets,
-            buyingDatas._id,
-          );
-          if (result.error)
-            return handleError(
-              logger,
-              result.errorCode ? result.errorCode : "400",
-              res,
-            );
-          if (!result.error) {
-            let simpleBody = {};
-            let saveDatas = {};
-            if (!error) {
-              let { price, error, name } = await controlCoupon(
-                req.body.datas.coupon,
-                buyingDatas.eventId,
-                buyingDatas.fullPrice,
-              );
-              let fullPrice = await GetFullPrice(
-                buyingDatas.tickets,
-                buyingDatas.eventId,
-              );
-              const uid = new ShortUniqueId({ length: 32 });
-              let uuid = uid();
-              saveDatas = {
-                price: price ? price : buyingDatas.fullPrice,
-                fullPrice: fullPrice.fullPrice,
-                customerDatas: {
-                  ...req.body.datas.customerData,
-                  fullName: req.body.datas.customerData?.isCompany ? req.body.datas.customerData?.firstname : `${req.body.datas.customerData?.firstname} ${req.body.datas.customerData?.lastname} `,
-                },
-                time: new Date().getTime(),
-                coupon: !error ? name : false,
-                eventId: buyingDatas.eventId,
-                tickets: buyingDatas.tickets,
-                pending: true,
-                status: false,
-                bought: false,
-                salt: uuid,
-                fullAmount: buyingDatas.fullAmount,
-                otherDatas: await otherData(req),
-              };
-              let l = new Database("buy");
-              
-              if (!buyingDatas.bought && !buyingDatas.isPayingStarted){
-                simpleBody = await SimplePayPayment(
-                    uuid,
-                    req.params.id,
-                    req.body.datas.customerData,
-                    buyingDatas.tickets,
-                    buyingDatas.fullPrice,
-                  );
-                  l.collection.updateOne({_id: ObjectId(req.params.id)}, {$set : {...saveDatas}});
-                  closeConnection(l.database);
-              }else{
-                result = await l.collection.updateOne(
-                  { _id: ObjectId(req.params.id) },
-                  { $set: saveDatas },
-                );
-                closeConnection(l.database);
-                return handleError(logger, "050", res);
-              }
-            }else{
-              return handleError(logger, "400", res);
-            }
-            return res.send({ link: "https://jegy.bnbdevelopment.cloud", datas :  simpleBody});
-          } else {
-            return handleError(
-              logger,
-              result.errorCode ? result.errorCode : "001",
-              res,
-            );
-          }
-        }
-      }
+    const { datas } = req.body;
+    const { id } = req.params;
+
+    // Check required data exists
+    if (!datas || typeof datas !== "object") return handleError(logger, "400", res);
+    if (!datas.customerData || !controlTypeOfBillingAddress(datas.customerData)) {;return handleError(logger, "400", res)};
+
+    // Check valid ID
+    
+    let parsedId = Functions.createObjectId(id);
+
+    let { collection, database } = new Database("buy");
+    const buyingDatas = await collection.findOne({ _id: parsedId });
+    closeConnection(database);
+
+    if (!buyingDatas) return handleError(logger, "404", res); // Handle case where no buying data is found
+
+    const ip = Functions.getIp(req);
+    const browserData = Functions.getBrowerDatas(req);
+    const { os, name } = browserData;
+    
+    // Validate IP and browser data
+    if (ip !== buyingDatas.otherDatas.ip || os !== buyingDatas.otherDatas.browserData.os || name !== buyingDatas.otherDatas.browserData.name) {
+      console.log("brower or ip error");
+      return handleError(logger, "400", res);
     }
-    handleError(logger, "400", res);
-  },
+
+    // Control the event and check for errors
+    const eventResult = await controlEvent(buyingDatas.eventId, buyingDatas.tickets, buyingDatas._id);
+    if (eventResult.error) return handleError(logger, eventResult.errorCode || "400", res);
+
+    // Process coupon
+    const { price, error, name: couponName } = await controlCoupon(datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice);
+
+    const fullPrice = await GetFullPrice(buyingDatas.tickets, buyingDatas.eventId);
+    const uid = new ShortUniqueId({ length: 32 });
+    const uuid = uid();
+    const saveDatas = {
+      price: price || buyingDatas.fullPrice,
+      fullPrice: fullPrice.fullPrice,
+      customerDatas: {
+        ...datas.customerData,
+        fullName: datas.customerData.isCompany ? datas.customerData.firstname : `${datas.customerData.firstname} ${datas.customerData.lastname}`,
+      },
+      time: Date.now(),
+      coupon: couponName || false,
+      eventId: buyingDatas.eventId,
+      tickets: buyingDatas.tickets,
+      pending: true,
+      status: false,
+      bought: false,
+      salt: uuid,
+      fullAmount: buyingDatas.fullAmount,
+      otherDatas: await otherData(req),
+    };
+
+    let l = new Database("buy");
+
+    // Handle payment process
+    if (!buyingDatas.bought && !buyingDatas.isPayingStarted) {
+      const simpleBody = await SimplePayPayment(uuid, parsedId, datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice);
+      await l.collection.updateOne({ _id: parsedId }, { $set: { ...saveDatas } });
+      closeConnection(l.database);
+      return res.send({ link: "https://jegy.bnbdevelopment.cloud", datas: simpleBody });
+    }
+
+    // If the payment process has already started or bought
+    await l.collection.updateOne({ _id: parsedId }, { $set: saveDatas });
+    closeConnection(l.database);
+    return handleError(logger, "050", res);
+  }
 );
+
 
 //COMPANIES
 app.post(

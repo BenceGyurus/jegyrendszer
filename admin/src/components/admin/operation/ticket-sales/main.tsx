@@ -87,6 +87,7 @@ const TicketSalesMain = () => {
         setMaxSales(response.max);
       }
       setIsResponse(true);
+
     });
   };
 
@@ -151,7 +152,7 @@ const TicketSalesMain = () => {
           <Button onClick={()=>setCreateReportWindow(true)}>Jelentés</Button>
         </div>
         </div>
-        {ticketDatas.length ? (
+        {ticketDatas.length && isResponse ? (
           <TicketStats datas={ticketDatas} />
         ) : isResponse ? (
           <Empty />
