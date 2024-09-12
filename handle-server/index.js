@@ -2972,10 +2972,9 @@ app.post(
                 ? path.join(config["IMAGES_NODE_SHARE"], smallImageFileName)
                 : path.join(__dirname, 'uploads', smallImageFileName);
     
-            // Scale the image based on the height and save it
             await sharp(imageBuffer)
-                .resize({ height: Math.round(height * (scale / height)) })  // Scale based on the height
-                .toFile(outputPath);  // Write the scaled image to the specified path
+                .resize({ height: Math.round(height * (scale / height)) })
+                .toFile(outputPath);
     
             console.log(`Image saved to ${outputPath}`);
         } catch (error) {
