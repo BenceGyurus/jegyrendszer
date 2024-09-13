@@ -2692,16 +2692,14 @@ app.post(
 
 app.post(
   "/api/v1/payment/:id",
-  (req,res,next)=>parseBodyMiddleeware(req, next), // Directly pass middleware
+  (req,res,next)=>parseBodyMiddleeware(req, next),
   async (req, res) => {
     const { datas } = req.body;
     const { id } = req.params;
 
-    // Check required data exists
     if (!datas || typeof datas !== "object") return handleError(logger, "400", res);
     if (!datas.customerData || !controlTypeOfBillingAddress(datas.customerData)) {;return handleError(logger, "400", res)};
 
-    // Check valid ID
     
     let parsedId = Functions.createObjectId(id);
 
@@ -2709,23 +2707,20 @@ app.post(
     const buyingDatas = await collection.findOne({ _id: parsedId });
     closeConnection(database);
 
-    if (!buyingDatas) return handleError(logger, "404", res); // Handle case where no buying data is found
+    if (!buyingDatas) return handleError(logger, "404", res); 
 
     const ip = Functions.getIp(req);
     const browserData = Functions.getBrowerDatas(req);
     const { os, name } = browserData;
     
-    // Validate IP and browser data
     if (ip !== buyingDatas.otherDatas.ip || os !== buyingDatas.otherDatas.browserData.os || name !== buyingDatas.otherDatas.browserData.name) {
       console.log("brower or ip error");
       return handleError(logger, "400", res);
     }
 
-    // Control the event and check for errors
     const eventResult = await controlEvent(buyingDatas.eventId, buyingDatas.tickets, buyingDatas._id);
     if (eventResult.error) return handleError(logger, eventResult.errorCode || "400", res);
 
-    // Process coupon
     const { price, error, name: couponName } = await controlCoupon(datas.coupon, buyingDatas.eventId, buyingDatas.fullPrice);
 
     const fullPrice = await GetFullPrice(buyingDatas.tickets, buyingDatas.eventId);
@@ -2752,15 +2747,13 @@ app.post(
 
     let l = new Database("buy");
 
-    // Handle payment process
     if (!buyingDatas.bought && !buyingDatas.isPayingStarted) {
-      const simpleBody = await SimplePayPayment(uuid, parsedId, datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice);
+      const simpleBody = await SimplePayPayment(uuid, parsedId, datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice, String(saveDatas.fullPrice-saveDatas.price));    //couponhoz kellenek dologok még
       await l.collection.updateOne({ _id: parsedId }, { $set: { ...saveDatas } });
       closeConnection(l.database);
       return res.send({ link: "https://jegy.bnbdevelopment.cloud", datas: simpleBody });
     }
 
-    // If the payment process has already started or bought
     await l.collection.updateOne({ _id: parsedId }, { $set: saveDatas });
     closeConnection(l.database);
     return handleError(logger, "050", res);
@@ -3412,6 +3405,7 @@ const { closeConnection } = require("./closeConnection.js");
 const RedishMiddleware = require("./redishMiddleware.js");
 const { createAdapter } = require("@socket.io/redis-streams-adapter");
 const createReport = require("./createReport.js");
+const { save } = require("pdfkit");
 
 
 const io = new Server(server, {

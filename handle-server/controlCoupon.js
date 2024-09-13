@@ -26,29 +26,20 @@ const error = () => {
 const ControlCoupon = async (couponName, eventId, fullPrice) => {
   const { collection, database } = new Database("coupons");
   const buyingDatabase = new Database("buy");
+  console.log("couponName:", couponName);
   let coupon = await collection.findOne({ name: couponName });
-  let used = {};
-  let buyings = await buyingDatabase.collection
-    .find({ coupon: couponName })
-    .toArray();
-  for (let i = 0; i < buyings.length; i++) {
-    if (getTime("RESERVATION_TIME") + buyings[i].time >= new Date().getTime()) {
-      used[buyings[i].eventId]
-        ? used[buyings[i].eventId]++
-        : (used[buyings[i].eventId] = 1);
-    }
-  }
+  let buyings = await buyingDatabase.collection.find({ $and : [{coupon: couponName}, {time : {$gt : new Date().getTime() - getTime("RESERVATION_TIME")}}] }).toArray(); //
+
+
   Functions.closeConnection(database);
   Functions.closeConnection(buyingDatabase.database);
   if (coupon) {
-    if (used[eventId]) {
       if (
-        coupon.type == 2 ||
-        coupon.type == 1 ||
-        (coupon.events.includes(eventId) && used[eventId] >= 1)
+        (coupon.type == 2 ||
+        coupon.type == 1) &&
+        ( coupon.events.includes(eventId) && buyings.filter((buying)=>buying.eventId==eventId).length >= 1)
       )
         return error();
-    }
     if (new Date(coupon.validity).getTime() >= new Date().getTime()) {
       if (coupon.type == 0 && coupon.events.includes(eventId)) {
         return {
@@ -56,17 +47,17 @@ const ControlCoupon = async (couponName, eventId, fullPrice) => {
           name: coupon.name,
         };
       }
-      if (
+      else if (
         coupon.type == 1 &&
         coupon.events.includes(eventId) &&
-        !coupon.usedEvent.includes(eventId)
+        !buyings.filter(buying=>buying.eventId==eventId).length
       ) {
         return {
           ...getPrice(coupon.money, fullPrice, coupon.amount),
           name: coupon.name,
         };
       }
-      if (
+      else if (
         coupon.type == 2 &&
         coupon.events.includes(eventId) &&
         !coupon.usedTicket

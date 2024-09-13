@@ -13,7 +13,7 @@ const closeConnection = (database)=>{
     }
 }
 
-const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, price)=>{
+const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, price, discount)=>{
     return new Promise((resolve, reject)=>{
 
         let body = {
@@ -33,24 +33,28 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
             invoice: {
                     name: customerDatas.isCompany ? customerDatas.firstname : `${customerDatas.firstname} ${customerDatas.lastname}`,
                     company: 'hu',
-                    //state: ,
+                    state: "",  //kell majd state, van adatbázis
                     city: customerDatas.city,
                     zip: customerDatas.postalCode,
                     address: customerDatas.address,
                     address2: customerDatas.address2 == 'null' ? null : customerDatas.address2,
-                    phone: customerDatas.phone
+                    phone: customerDatas.phone,
+                    threeDSReqAuthMethod: "01",
                 },
-                items: [
+                items: [              // ha ez ki küldve van és a total is akkor ez lesz figyelembe véve, így a kuponokkal lehet probléma, erre megoldás lehet a discount -> meg kell adni a kedvezmény mértékét ftban
                     ticketDatas.map(x => {
                         return {
                             ref: x.ticketId,
                             title: x.name,
                             desc: '',
                             amount: x.amount,
-                            price: x.unitPrice
+                            price: x.unitPrice,
+                            tax : 0  // todo: idk meg kell kérdezni
                             }
                         })
-                    ]
+                    ],
+                    discount : discount || "0",
+                    url : `jegy.bnbdevelopment.cloud/statusz?id=${orderRef}`
                 }
 
             const sign = signWithCryptoJS(body);
@@ -72,6 +76,8 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
             .catch(()=>{
                 reject({error : true, response : result});
             })*/
+
+                console.log(config);
 
             resolve(config);
     });
