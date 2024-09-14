@@ -43,12 +43,12 @@ jobs:
              cd android
              ./gradlew assembleRelease
 
-      - name: Upload application
-        uses: actions/upload-artifact@v2
-        with:
-          name: app
-          path: ./android/app/build/outputs/apk/release/app-release.apk
-          retention-days: 3
+      # - name: Upload application
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: app
+      #     path: ./android/app/build/outputs/apk/release/app-release.apk
+      #     retention-days: 3
 
       - name: Install AWS CLI
         run: |
