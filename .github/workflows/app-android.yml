@@ -44,7 +44,9 @@ jobs:
       - name: Build application
         run: |
              unset _JAVA_OPTIONS
+             unset JAVA_TOOL_OPTIONS
              cd android
+             ./gradlew clean
              ./gradlew assembleRelease
 
       # - name: Upload application
