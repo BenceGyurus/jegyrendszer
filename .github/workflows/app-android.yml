@@ -38,12 +38,9 @@ jobs:
              npm install
              yarn install
 
-      - name: Install Android SDK
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 31
-          script: sdkmanager --install "build-tools;31.0.0"
-
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+     
       - name: Build application
         run: |
              cd android
