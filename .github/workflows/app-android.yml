@@ -43,6 +43,7 @@ jobs:
      
       - name: Build application
         run: |
+             unset _JAVA_OPTIONS
              cd android
              ./gradlew assembleRelease
 
