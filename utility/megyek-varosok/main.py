@@ -1,6 +1,6 @@
 import pymongo
 
-myclient = pymongo.MongoClient("mongodb://root:root@localhost:27017/")
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 mydb = myclient["country"]
 states = mydb["states"]
 cities = mydb["cities"]
@@ -55,9 +55,11 @@ states = {
 with open('telepulesek.txt', 'r', encoding='utf-8') as f:
     for line in f.readlines():
         sor = line.strip().split()
-        cities.insert_one({
-            'zip': sor[0],
-            'city': sor[1],
-            'state': states[sor[2]]
-        })
+        if not cities.find_one({'city' : sor[1]}):
+            cities.insert_one({
+                'zip': sor[0],
+                'city': sor[1],
+                'state': states[sor[2]]
+            })
+            print(f"[INSERTED]: {sor[1]}")
 # x = states.insert_one()

@@ -1,3 +1,4 @@
+const Functions = require("./functions");
 const getTime = require("./getTime");
 const Database = require("./mongo/mongo");
 const signWithCryptoJS = require("./simple_signature");
@@ -13,8 +14,17 @@ const closeConnection = (database)=>{
     }
 }
 
+const getStateFromCityName = (city)=>{
+    return new Promise(async (resolve, reject)=>{
+        const { collection, database } = new Database("cities");
+        cityName = (await collection.findOne({city : city}))?.state;
+        Functions.closeConnection(database);
+        return cityName ? resolve(cityName) : reject(false);
+    });
+}
+
 const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, price, discount)=>{
-    return new Promise((resolve, reject)=>{
+    return new Promise(async (resolve, reject)=>{
 
         let body = {
             salt: salt,
@@ -33,7 +43,7 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
             invoice: {
                     name: customerDatas.isCompany ? customerDatas.firstname : `${customerDatas.firstname} ${customerDatas.lastname}`,
                     company: 'hu',
-                    state: "",  //kell majd state, van adatbázis
+                    state: await getStateFromCityName(customerDatas.city),  //kell majd state, van adatbázis
                     city: customerDatas.city,
                     zip: customerDatas.postalCode,
                     address: customerDatas.address,

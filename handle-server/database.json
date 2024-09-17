@@ -98,5 +98,9 @@
   "reports" : {
     "database" : "report",
     "collection" : "report"
+  },
+  "cities" : {
+    "database" : "country",
+    "collection" : "cities"
   }
 }
