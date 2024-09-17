@@ -38,17 +38,23 @@ jobs:
              npm install
              yarn install
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+     
       - name: Build application
         run: |
+             unset _JAVA_OPTIONS
+             unset JAVA_TOOL_OPTIONS
              cd android
+             ./gradlew clean
              ./gradlew assembleRelease
 
-      - name: Upload application
-        uses: actions/upload-artifact@v2
-        with:
-          name: app
-          path: ./android/app/build/outputs/apk/release/app-release.apk
-          retention-days: 3
+      # - name: Upload application
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: app
+      #     path: ./android/app/build/outputs/apk/release/app-release.apk
+      #     retention-days: 3
 
       - name: Install AWS CLI
         run: |
