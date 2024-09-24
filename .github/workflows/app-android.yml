@@ -16,13 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # - name: Install Java
-      #   uses: actions/setup-java@v3
-      #   with:
-      #     java-version: 17
-      #     distribution: adopt
-      #     cache: gradle
-
       - name: Set up OpenJDK 17 (JDK & JRE)
         run: |
           sudo apt-get update
@@ -33,9 +26,6 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.6
-
-      # - name: Validate Gradle wrapper
-      #   uses: gradle/wrapper-validation-action@v1
 
       - name: Setup Node  
         uses: actions/setup-node@v3
@@ -62,12 +52,12 @@ jobs:
         run: |
           ls android/app/build/outputs/apk/release/
 
-      # - name: Upload application
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: app
-      #     path: ./android/app/build/outputs/apk/release/*.apk
-      #     retention-days: 3
+      - name: Upload application
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: android/app/build/outputs/apk/release/*.apk
+          retention-days: 3
 
       - name: Install AWS CLI
         run: |
@@ -81,6 +71,10 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MINIO_SECRET_KEY }}
           MINIO_BUCKET: jegyrendszer-app
           MINIO_ENDPOINT: ${{ secrets.MINIO_ENDPOINT }}
+          GIT_TAG: ${{ github.run_number }}
         run: |
             aws configure set default.s3.signature_version s3v4
-            aws --endpoint-url $MINIO_ENDPOINT s3 cp android/app/build/outputs/apk/release/app-release.apk s3://$MINIO_BUCKET/app-release.apk
+            aws --endpoint-url $MINIO_ENDPOINT s3 cp android/app/build/outputs/apk/release/app-arm64-v8a-release.apk s3://$MINIO_BUCKET/app-arm64-v8a-release-$GIT_TAG.apk
+            aws --endpoint-url $MINIO_ENDPOINT s3 cp android/app/build/outputs/apk/release/app-armeabi-v7a-release.apk s3://$MINIO_BUCKET/app-armeabi-v7a-release-$GIT_TAG.apk
+            aws --endpoint-url $MINIO_ENDPOINT s3 cp android/app/build/outputs/apk/release/app-x86-release.apk s3://$MINIO_BUCKET/app-x86-release-$GIT_TAG.apk
+            aws --endpoint-url $MINIO_ENDPOINT s3 cp android/app/build/outputs/apk/release/app-x86_64-release.apk s3://$MINIO_BUCKET/app-x86_64-release-$GIT_TAG.apk
