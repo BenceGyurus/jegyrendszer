@@ -1,10 +1,9 @@
 name: "Build Android app"
 
-# on: 
-#   push:
-#     paths:
-#       - App/**
-on: workflow_dispatch
+on: 
+  push:
+    paths:
+      - App/**
 
 jobs:
   build:
@@ -57,7 +56,6 @@ jobs:
         with:
           name: app
           path: android/app/build/outputs/apk/release/*.apk
-          retention-days: 3
 
       - name: Install AWS CLI
         run: |
