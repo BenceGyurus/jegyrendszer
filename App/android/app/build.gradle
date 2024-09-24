@@ -102,6 +102,13 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    splits {
+        abi {
+            enable true // Enables APK generation per ABI
+            reset()
+            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64" // Include the ABIs you need
+        }
+    }
 }
 
 dependencies {
