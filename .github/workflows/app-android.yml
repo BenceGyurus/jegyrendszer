@@ -62,12 +62,12 @@ jobs:
         run: |
           ls android/app/build/outputs/apk/release/
 
-      - name: Upload application
-        uses: actions/upload-artifact@v2
-        with:
-          name: app
-          path: ./android/app/build/outputs/apk/release/*.apk
-          retention-days: 3
+      # - name: Upload application
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: app
+      #     path: ./android/app/build/outputs/apk/release/*.apk
+      #     retention-days: 3
 
       - name: Install AWS CLI
         run: |
