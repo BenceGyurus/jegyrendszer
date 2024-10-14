@@ -14,7 +14,7 @@ const closeConnection = (database)=>{
     );
 }
 
-const Sales = async (userId, external, page, limit, search, filters)=>{
+const Sales = async (userId, external, page, limit, search, filters, pagination)=>{
     const eventDatabase = new Database("events");
     let events = await eventDatabase.collection.find({ "eventData.users" :  userId }, { projection : {eventData : 1}}).toArray();
     closeConnection(eventDatabase.database);
@@ -42,11 +42,14 @@ const Sales = async (userId, external, page, limit, search, filters)=>{
     nameIdsObject.forEach(item=>{
         nameIds.push(item._id);
     });
-    let localFilter = filters.web && filters.local ? {} : filters.web ? {local : false} : filters.local ? {local : true} : { $or : [{local : true }, {local : false}]};
+    //let localFilter = filters.web && filters.local ? {} : filters.web ? {local : false} : filters.local ? {local : true} : { $or : [{local : true }, {local : false}]};
     closeConnection(eventsDatabase.database);
     if (search) conditions.push( {$or : [{ "customerDatas.firstname" : {$regex: new RegExp(search, 'g')} }, { "customerDatas.lastname" : {$regex: new RegExp(search, 'g')} }, {id : {$in : nameIds}}, { price : {$regex: new RegExp(search, 'i')}}, { "customerDatas.fullName" : {$regex: new RegExp(search, 'i')}}]} )
-    let sales = await salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions, localFilter]}).sort({ time: -1 }).skip(skipValue).limit(limit).toArray();
-    let max = await salesDatabase.collection.countDocuments({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions]});
+    console.log(conditions);
+    let query = salesDatabase.collection.find({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions]}).sort({ time: -1 })
+    let sales = pagination ? await query.skip(skipValue).limit(limit).toArray() : await query.toArray();
+    let max;
+    if (pagination) max = await salesDatabase.collection.countDocuments({ $and : [ {id : { $in : eventsOfUser}}, {bought : true},  ...conditions]});
     sendSales = [];
     closeConnection(salesDatabase.database);
     const usersDatabase = new Database("admin");

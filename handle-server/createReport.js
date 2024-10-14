@@ -1,13 +1,15 @@
 const otherData = require("./deitals");
 const Functions = require("./functions");
 const getEventByObjectId = require("./getEventByObjectId");
+const getTicketsBuyUser = require("./getTicketsByUser");
 const Database = require("./mongo/mongo");
 
 const createReport = async (startDate, endDate, justLocal, req)=>{
     const {collection, database} = new Database("buy");
     const eventDatabase = new Database("events");
-    let report = await collection.find({$and : [{bought : true}, {pending : false}, {time : {$gte : startDate.getTime()}}, {time : {$lte : endDate.getTime()}}]}, {projection : {eventId : 1, fullPrice : 1, time : 1, tickets : 1, local : 1, id : 1}}).toArray();
-    for (let i = 0; i < report.length; i++){
+    let report = await getTicketsBuyUser(req.body.token);
+    //let report = await collection.find({$and : [{bought : true}, {pending : false}, {time : {$gte : startDate.getTime()}}, {time : {$lte : endDate.getTime()}}]}, {projection : {eventId : 1, fullPrice : 1, time : 1, tickets : 1, local : 1, id : 1}}).toArray();
+    /*for (let i = 0; i < report.length; i++){
         let event ="";
         try{
             event = await eventDatabase.collection.findOne({_id : report[i].id}, {projection : {"eventData.name" : 1, "eventData.tickets" : 1}});
@@ -23,9 +25,12 @@ const createReport = async (startDate, endDate, justLocal, req)=>{
                 }
             }
     }
-    }
-    report.startDate = startDate;
-    report.endDate = endDate;
+    }*/
+    /*report.startDate = startDate;
+    report.endDate = endDate;*/
+    report.forEach(element => {
+        element.startDate = startDate;element.endDate = endDate;
+    });
     const reportDatabase = new Database("reports");
     id = (await reportDatabase.collection.insertOne({report : report, otherDatas : otherData(req, req.body.token), startDate : startDate, endDate : endDate})).insertedId;
     Functions.closeConnection(reportDatabase.database);

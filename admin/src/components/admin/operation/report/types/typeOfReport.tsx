@@ -3,7 +3,7 @@ import typeOfTicket from "../../ticket-sales/types/ticket";
 export default interface typeOfReport{
     _id : string,
     local : boolean,
-    time : number,
+    date : string,
     fullPrice : number,
     tickets : Array<typeOfTicket>,
     eventId : string,

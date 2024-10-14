@@ -9,9 +9,8 @@ const createGroups = (startDate:Date, endDate:Date, data:Array<typeOfReport>, nu
     const interval = (endDate.getTime()-startDate.getTime())/(numberOfGroups);
     let groups:Array<Array<typeOfReport>> = Array.from({ length: numberOfGroups }, () => []);
     data.forEach((element) => {
-        groups[Math.floor((element.time-startDate.getTime())/interval)].push(element);
+        groups[Math.floor((new Date(element.date).getTime()-startDate.getTime())/interval)].push(element);
     });
-    console.log(groups);
     return groups;
 };
 
