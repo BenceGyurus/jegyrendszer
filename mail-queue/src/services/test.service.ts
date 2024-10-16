@@ -14,7 +14,7 @@ export class TestService {
   testMail = (): string => {
     this.mailer.sendMail({
       body: {
-        fileName: 'asd',
+        fileName: ['asd.pdf'],
         name: 'Mr János',
         tickets: [
           {

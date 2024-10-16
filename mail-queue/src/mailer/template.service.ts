@@ -25,6 +25,7 @@ export class TemplateService {
     return compiled;
   };
 
+  // Get the template file
   private getTemplate = async (mailType: MailTypes) => {
     const templateName = this.getTemplateName(mailType);
 
@@ -41,6 +42,7 @@ export class TemplateService {
     }
   };
 
+  // Get the data file
   private getData = async (mailType: MailTypes) => {
     const templateName = this.getTemplateName(mailType);
 
@@ -57,6 +59,7 @@ export class TemplateService {
     }
   };
 
+  // Get the template name
   private getTemplateName = (mailType: MailTypes): string => {
     switch (mailType) {
       case MailTypes.TICKET:
@@ -68,6 +71,7 @@ export class TemplateService {
     }
   };
 
+  // Get the mail subject
   getMailSubject = (mailType: MailTypes, data: string): string => {
     switch (mailType) {
       case MailTypes.TICKET:
