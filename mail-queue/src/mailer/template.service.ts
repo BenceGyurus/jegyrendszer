@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import mjml from 'mjml';
@@ -10,7 +10,10 @@ export class TemplateService {
   constructor() {}
 
   createMail = async (mail: MailDTO) => {
-    const mailFile = await this.getTemplate(mail.type);
+    const mailType: MailTypes = MailTypes[mail.type.toUpperCase()];
+    if (mailType == undefined)
+      throw new BadRequestException('Invalid mail type');
+    const mailFile = await this.getTemplate(mailType);
 
     const compiled = mjml(mailFile, {
       preprocessors: [
@@ -28,7 +31,7 @@ export class TemplateService {
   // Get the template file
   private getTemplate = async (mailType: MailTypes) => {
     const templateName = this.getTemplateName(mailType);
-
+    
     try {
       const file = await readFile(
         path.resolve(__dirname, './templates', `${templateName}.mjml`),
@@ -66,6 +69,8 @@ export class TemplateService {
         return 'ticket';
       case MailTypes.ACC_CONF:
         return 'confirm';
+      case MailTypes.DEBUG:
+        return 'debug';
       default:
         throw new Error(`template type doesn't exist: ${mailType}`);
     }
@@ -78,6 +83,8 @@ export class TemplateService {
         return `Jegyvásárlás - ${data}`;
       case MailTypes.ACC_CONF:
         return 'confirm';
+      case MailTypes.DEBUG:
+        return 'DEBUG EMAIL';
       default:
         throw new Error(`template type doesn't exist: ${mailType}`);
     }

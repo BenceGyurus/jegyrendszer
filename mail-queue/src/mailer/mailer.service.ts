@@ -9,50 +9,48 @@ export class MailerService {
   private transporter;
 
   constructor(private readonly templateService: TemplateService) {
-    // this.transporter = nodemailer.createTransport({
-    //   host: process.env.EMAIL_HOST,
-    //   port: 587,
-    //   secure: false,
-    //   auth: {
-    //     user: process.env.APP_USER,
-    //     pass: process.env.APP_PASS,
-    //   },
-    //   tls: {
-    //     ciphers: 'SSLv3',
-    //   },
-    // });
+    this.transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.APP_USER,
+        pass: process.env.APP_PASS,
+      },
+      tls: {
+        ciphers: 'SSLv3',
+      },
+    });
   }
 
   sendMail = async (mail: MailDTO): Promise<boolean> => {
-    throw new Error('Method not implemented.');
-
     const template = await this.templateService.createMail(mail);
     const attachments = this.getAttachments(mail.body.fileName);
 
-    const mailType: MailTypes =
-      MailTypes[mail.type.toUpperCase() as keyof typeof MailTypes];
+    // const mailType: MailTypes =
+    //   MailTypes[mail.type.toUpperCase() as keyof typeof MailTypes];
+    const mailType: MailTypes = MailTypes[mail.type.toUpperCase()];
     if (mailType == undefined)
       throw new BadRequestException('Invalid mail type');
 
     const mailMessage = {
-      from: process.env.EMAIL_FROM,
+      from: process.env.APP_USER,
       to: mail.recip,
       subject: this.templateService.getMailSubject(
-        mail.type,
+        mailType,
         mail.body.tickets[0].ticketName,
       ),
-      html: template,
+      html: template.html,
       attachments: attachments,
     };
 
-    this.transporter.sendMail(mailMessage, (err: any, info: any) => {
-      if (err) {
-        console.error(err);
-        return false;
-      } else return true;
-    });
-
-    return false;
+    try {
+      const info = await this.transporter.sendMail(mailMessage);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   };
 
   getAttachments = (filePaths: string[]) => {

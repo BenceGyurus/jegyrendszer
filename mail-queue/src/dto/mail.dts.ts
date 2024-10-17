@@ -31,6 +31,7 @@ export class MailDTO {
 export enum MailTypes {
   TICKET = 'ticket',
   ACC_CONF = 'acc_conf',
+  DEBUG = 'debug',
 }
 
 export class MailBody {
