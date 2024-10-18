@@ -3351,6 +3351,34 @@ app.get(
   },
 );
 
+app.post("/api/v1/sold-stats", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+  if (req.body && typeof req.body === TypeOfBody) {
+    let access = await control_Token(req.body.token, req);
+    if (access && access.includes("statistics")) {
+      const {collection, database} = new Database("buy");
+      let start = req.query.start ? new Date(req.query.start) : new Date(new Date().getTime()-604800000);
+      let end = req.query.end ? new Date(req.query.end) : new Date();
+      let soldTickets = await collection.count({ $and : [{bought : true}, {time : {$gt: start.getTime()}}, {time : {$lt : end.getTime()}}] } );
+      closeConnection(database);
+      res.send({numberOfSoldTicket : soldTickets});
+    }
+    else return handleError(logger, res,"004");
+  }
+});
+
+app.post("/api/v1/active-events", (req,res,next)=>parseBodyMiddleeware(req,next), async (req,res)=>{
+  if (req.body && typeof req.body === TypeOfBody) {
+    let access = await control_Token(req.body.token, req);
+    if (access && access.includes("statistics")) {
+      const {collection, database} = new Database("events");
+      let numberOfActiveEvents = await collection.count({ $and : [{"eventData.objectDateOfEvent" : {$gt : new Date()}}, {"eventData.objectDateOfRelease" : {$lt : new Date()}}] } );
+      closeConnection(database);
+      res.send({numberOfActiveEvents : numberOfActiveEvents});
+    }
+    else return handleError(logger, res,"004");
+  }
+});
+
 app.post(
   "/api/v1/feedback",
   (req, res, next) => parseBodyMiddleeware(req, next),

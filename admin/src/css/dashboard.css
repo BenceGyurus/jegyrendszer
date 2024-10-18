@@ -1,0 +1,10 @@
+.dashboard-statistics-card{
+    width: max-content;
+    margin: 13px;
+}
+
+.dashboard-card-holder{
+    width: 90%;
+    display: flex;
+    flex-wrap: wrap;
+}

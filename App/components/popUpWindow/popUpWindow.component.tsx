@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     bottom: -(screenHeight-(screenHeight * 0.2)),
     left: 0,
     right: 0,
-    height: screenHeight * 0.8, // Set height to 80% of the screen height
+    height: screenHeight * 0.8,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     elevation: 5,
