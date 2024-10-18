@@ -2244,6 +2244,7 @@ app.post(
             req.query.search,
             { local : local,
             web : web}
+            ,pagination=true
           ),
         );
       }
