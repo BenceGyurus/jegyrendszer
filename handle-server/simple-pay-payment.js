@@ -64,7 +64,7 @@ const SimplePayPayment = async (salt, orderRef, customerDatas, ticketDatas, pric
                         })
                     ],
                     discount : discount || "0",
-                    url : `jegy.bnbdevelopment.cloud/statusz?id=${orderRef}`
+                    url : `https://jegy-agorasavaria.hu/statusz?id=${orderRef}`
                 }
 
             const sign = signWithCryptoJS(body);

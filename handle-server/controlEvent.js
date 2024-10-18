@@ -62,7 +62,7 @@ const controlEvent = async (eventId, ticketIds, thisEventId, orderId, isPublic) 
           thisTicket = eventDatas.eventData.tickets.find(
             (eventTicket) => eventTicket.id === ticketId.ticketId,
           );
-          if (isPublic ? ticketId.types ? !ticketId.types.map(type=>type.isPublic).find(l=>false) : false : true){
+          if (isPublic ? ticketId.types ? !ticketId.types.map(type=>type.isPublic).find(l=>!l) : false : true){
           if (
             thisTicket &&
             thisTicket.seats.length &&

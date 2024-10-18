@@ -2700,13 +2700,9 @@ app.post(
 
     if (!datas || typeof datas !== "object") return handleError(logger, "400", res);
     if (!datas.customerData || !controlTypeOfBillingAddress(datas.customerData)) {;return handleError(logger, "400", res)};
-
-    
-    let parsedId = Functions.createObjectId(id);
-
-    let { collection, database } = new Database("buy");
-    const buyingDatas = await collection.findOne({ _id: parsedId });
-    closeConnection(database);
+  
+    const purchase = new Purchase(id);
+    const buyingDatas = await purchase.get();
 
     if (!buyingDatas) return handleError(logger, "404", res); 
 
@@ -2727,36 +2723,17 @@ app.post(
     const fullPrice = await GetFullPrice(buyingDatas.tickets, buyingDatas.eventId);
     const uid = new ShortUniqueId({ length: 32 });
     const uuid = uid();
-    const saveDatas = {
-      price: price || buyingDatas.fullPrice,
-      fullPrice: fullPrice.fullPrice,
-      customerDatas: {
-        ...datas.customerData,
-        fullName: datas.customerData.isCompany ? datas.customerData.firstname : `${datas.customerData.firstname} ${datas.customerData.lastname}`,
-      },
-      time: Date.now(),
-      coupon: couponName || false,
-      eventId: buyingDatas.eventId,
-      tickets: buyingDatas.tickets,
-      pending: true,
-      status: false,
-      bought: false,
-      salt: uuid,
-      fullAmount: buyingDatas.fullAmount,
-      otherDatas: await otherData(req),
-    };
-
-    let l = new Database("buy");
 
     if (!buyingDatas.bought && !buyingDatas.isPayingStarted) {
-      const simpleBody = await SimplePayPayment(uuid, parsedId, datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice, String(saveDatas.fullPrice-saveDatas.price));    //couponhoz kellenek dologok még
-      await l.collection.updateOne({ _id: parsedId }, { $set: { ...saveDatas } });
-      closeConnection(l.database);
-      return res.send({ link: "https://jegy.bnbdevelopment.cloud", datas: simpleBody });
+      const simpleBody = await SimplePayPayment(uuid, Functions.createObjectId(id), datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice, String(fullPrice.fullPrice-(price || buyingDatas.fullPrice)));    //couponhoz kellenek dologok még
+      purchase.new(price || buyingDatas.fullPrice, fullPrice.fullPrice, 
+        {
+          ...datas.customerData,
+          fullName: datas.customerData.isCompany ? datas.customerData.firstname : `${datas.customerData.firstname} ${datas.customerData.lastname}`,
+        }, couponName || false, uuid, req
+      )
+      return res.send({ link: "https://jegy-agorasavaria.hu", datas: simpleBody });
     }
-
-    await l.collection.updateOne({ _id: parsedId }, { $set: saveDatas });
-    closeConnection(l.database);
     return handleError(logger, "050", res);
   }
 );
@@ -3435,6 +3412,7 @@ const RedishMiddleware = require("./redishMiddleware.js");
 const { createAdapter } = require("@socket.io/redis-streams-adapter");
 const createReport = require("./createReport.js");
 const { save } = require("pdfkit");
+const Purchase = require("./purchase.js");
 
 
 const io = new Server(server, {
