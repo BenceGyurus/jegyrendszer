@@ -2704,17 +2704,7 @@ app.post(
     const purchase = new Purchase(id);
     const buyingDatas = await purchase.get();
 
-    if (!buyingDatas) return handleError(logger, "404", res); 
-
-    const ip = Functions.getIp(req);
-    const browserData = Functions.getBrowerDatas(req);
-    const { os, name } = browserData;
-    
-    if (ip !== buyingDatas.otherDatas.ip || os !== buyingDatas.otherDatas.browserData.os || name !== buyingDatas.otherDatas.browserData.name) {
-      console.log("brower or ip error");
-      return handleError(logger, "400", res);
-    }
-
+    if (!buyingDatas) return handleError(logger, "404", res);
     const eventResult = await controlEvent(buyingDatas.eventId, buyingDatas.tickets, buyingDatas._id);
     if (eventResult.error) return handleError(logger, eventResult.errorCode || "400", res);
 
@@ -2732,6 +2722,7 @@ app.post(
           fullName: datas.customerData.isCompany ? datas.customerData.firstname : `${datas.customerData.firstname} ${datas.customerData.lastname}`,
         }, couponName || false, uuid, req
       )
+      purchase.close();
       return res.send({ link: "https://jegy-agorasavaria.hu", datas: simpleBody });
     }
     return handleError(logger, "050", res);
