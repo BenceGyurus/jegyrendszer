@@ -101,14 +101,14 @@ const queue = new Queue('mail', { connection: redis_con})
  *      recip: 'asdasd@asdasd.com',
  *      body: {
  *        name: 'Teszt Jancsi',
- *        fileName: 'x.pdf',
+ *        fileName: ['x.pdf', 'y.pdf'],
  *        tickets: [
  *          {
  *            ticketName: 'X Előadás',
  *            ticketType: 'Normál',
  *            ticketQty: 10,
  *            ticketDate: '2025-01-01',
- *          }
+ *          },
  *        ]
  *      },
  * })

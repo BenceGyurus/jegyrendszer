@@ -1,0 +1,42 @@
+<mjml>
+  <mj-head>
+    <mj-title>System Status Update</mj-title>
+    <mj-attributes>
+      <mj-text font-family="Arial, sans-serif" color="#55575d" />
+      <mj-section padding="0px" />
+      <mj-column padding="0px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f5f5f5">
+    <mj-section background-color="#ffffff" padding="20px" border-radius="10px">
+      <mj-column width="100%">
+        <mj-text font-size="30px" font-weight="bold" align="center" color="red">
+          DEBUG EMAIL
+        </mj-text>
+        <mj-text font-size="24px" font-weight="bold" align="center">
+          System Status: Operational
+        </mj-text>
+        <mj-text font-size="16px" color="#4CAF50" align="center">
+          <strong>Mail sending systems are running smoothly!</strong>
+        </mj-text>
+        <mj-divider border-color="#eeeeee" />
+        <mj-text font-size="16px" color="#55575d" align="center">
+          If you have received this email it means that the mail sending system is fully operational.
+          <br></br>
+          You can safely ignore or delete this message.
+        </mj-text>
+        <mj-button background-color="#00a1e0" color="#ffffff" font-size="16px" href="https://jegy-agorasavaria.hu" border-radius="5px">
+          Jegyrendszer
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#ffffff" padding="20px" border-radius="10px">
+      <mj-column>
+        <mj-text align="center" font-size="12px" color="#888888">
+          You are receiving this email because you an administrator manually sent it via our mail sending system.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
