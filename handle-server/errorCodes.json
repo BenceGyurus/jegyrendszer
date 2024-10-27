@@ -103,7 +103,7 @@
         "message" : "A helytelen vagy lejárt token",
         "type" : "error",
         "responseCode" : 400
-    },
+    }, 
     "030": {
         "message" : "Hibás adatok",
         "type" : "error",

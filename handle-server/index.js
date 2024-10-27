@@ -3335,7 +3335,7 @@ app.post("/api/v1/sold-stats", (req,res,next)=>parseBodyMiddleeware(req,next), a
       closeConnection(database);
       res.send({numberOfSoldTicket : soldTickets});
     }
-    else return handleError(logger, res,"004");
+    else return handleError(logger, "004", res);
   }
 });
 

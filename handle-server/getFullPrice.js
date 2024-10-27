@@ -24,10 +24,16 @@ const GetFullPrice = async (ticketsList, eventId)=>{           //ticketsList : [
         let amountList = [];
         let fullPrice = 0;
         let fullAmount = 0;
-        if (ticketDatas){
+        //error handling
+        try{
+        if (ticketDatas && ticketDatas.tickets && ticketDatas.tickets.length){
             for (let i = 0; i < ticketsList.length; i++){
                 if (ticketsList[i].amount && ticketDatas.tickets.length){
                     let typeData = ticketDatas.tickets.find(l=>l.id == ticketsList[i].ticketId);
+                    if (!typeData) return {
+                        error : true,
+                        errorCode : "400"
+                    }
                     ticketsList[i].types = getPricesByTypes(ticketsList[i].types, typeData.types)
                     amountList.push({name: ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).name, price : getPriceOfTypes(ticketsList[i].types, typeData.types), unitPrice : ticketDatas.tickets.find(ticket=>ticket.id === ticketsList[i].ticketId).price, ...ticketsList[i]});
                     fullAmount += ticketsList[i].amount;
@@ -47,6 +53,12 @@ const GetFullPrice = async (ticketsList, eventId)=>{           //ticketsList : [
                 errorCode : "400"
             }
         }
+    }catch{
+        return {
+            error : true,
+            errorCode : "400"
+        }
+    }
         return {tickets : amountList, fullPrice : fullPrice, fullAmount : fullAmount}
     }
     return {

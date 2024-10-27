@@ -42,6 +42,7 @@ const getEventDatas = async (eventId, objectId) => {
         ],
       })
       .toArray();
+      console.log(boughtDatas)
     closeConnection(boughtDatabase.database);
     closeConnection(database);
     for (let i = 0; i < boughtDatas.length; i++) {
@@ -55,7 +56,6 @@ const getEventDatas = async (eventId, objectId) => {
             boughtDatas &&
             boughtDatas[i].bought &&
             boughtDatas[i].tickets &&
-            boughtDatas[i].tickets[j] &&
             boughtDatas[i].tickets[j] &&
             boughtDatas[i].tickets[j].places &&
             boughtDatas[i].tickets[j].places.length
