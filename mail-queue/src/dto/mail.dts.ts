@@ -4,16 +4,20 @@
 //   "body": {
 //     "name": "John Doe",
 //     "fileName": ["ticket_1.pdf", "ticket_2.pdf"],
+//     "event": {
+//       "eventName": "Előadás 1",
+//       "eventDate": "2021-01-01",
+//       "eventLocation": "Budapest",
+//       "eventHref": "eloadas-1"
+//     },
 //     "tickets": [
 //       {
 //         "ticketName": "Előadás 1",
-//         "ticketDate": "2020-01-01",
 //         "ticketQty": 4,
 //         "ticketType": "Normál"
 //       },
 //       {
 //         "ticketName": "Előadás 1",
-//         "ticketDate": "2020-01-01",
 //         "ticketQty": 8,
 //         "ticketType": "VIP"
 //       }
@@ -37,11 +41,18 @@ export enum MailTypes {
 export class MailBody {
   readonly name?: string; // vevő neve
   readonly fileName: string[]; // jegy / jegyek pdfeinek nevei
+  readonly event: Event;
   readonly tickets: Ticket[];
 }
 export class Ticket {
   readonly ticketName?: string; // előadás neve
-  readonly ticketDate?: string | Date; // előadás dátuma
   readonly ticketType?: string; // jegy típusa (pl. álló, ülő)
   readonly ticketQty?: number; // jegy mennyiség
+}
+
+export class Event {
+  readonly eventName: string; // esemény neve
+  readonly eventDate: string | Date; // esemény dátuma
+  readonly eventLocation: string; // esemény helyszíne
+  readonly eventHref: string; // esemény linkje | https://jegy-agorasavaria.hu/rendezveny/{{eventHref}}
 }

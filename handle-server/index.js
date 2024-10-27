@@ -103,13 +103,18 @@ const queue = new Queue('mail', { connection: redis_con})
  *      recip: 'asdasd@asdasd.com',
  *      body: {
  *        name: 'Teszt Jancsi',
- *        fileName: ['x.pdf', 'y.pdf'],
+ *        fileName: ["ticket_1.pdf", "ticket_2.pdf"],
+ *        event: {
+ *          eventName: 'X Előadás',
+ *          eventDate: '2021.07.01',
+ *          eventLocation: 'Budapest',
+ *          eventHref: 'teszt-esemeny',
+ *        },
  *        tickets: [
  *          {
  *            ticketName: 'X Előadás',
  *            ticketType: 'Normál',
  *            ticketQty: 10,
- *            ticketDate: '2025-01-01',
  *          },
  *        ]
  *      },

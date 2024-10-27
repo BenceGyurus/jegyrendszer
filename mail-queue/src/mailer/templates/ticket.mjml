@@ -1,64 +1,64 @@
 <mjml>
   <mj-head>
-    <mj-title>Your Ticket Purchase Confirmation</mj-title>
+    <mj-title>Jegyvásárlás</mj-title>
     <mj-style inline="inline">
       .main-content { color: #4A4A4A; }
-      .table-header { background-color: #FF5A5F; color: #ffffff; font-weight: bold; padding: 10px; }
-      .ticket-row { padding: 10px; border-bottom: 1px solid #E0E0E0; }
+      .table-header { background-color: #97BC62; color: #ffffff; font-weight: bold; padding: 10px; }
+      .ticket-row { padding: 10px; border-bottom: 1px solid #E0E0E0; text-align: center;}
     </mj-style>
   </mj-head>
   <mj-body background-color="#f0f0f0">
     <mj-section background-color="#ffffff" padding="20px">
       <mj-column width="100%">
-        <mj-image width="100px" src="https://yourlogo.url/logo.png" alt="Company Logo" align="center"/>
-        <mj-divider border-color="#FF5A5F"/>
+        <mj-image width="100px" src="https://jegy-agorasavaria.hu/images/logo.png" alt="Agora Logo" align="center" />
+        <mj-divider border-color="#97BC62" />
         <mj-text font-size="20px" font-weight="bold" color="#333333" align="center">
-          Thank You for Your Purchase!
+          Köszönjük a jegyvásárlást!
         </mj-text>
         <mj-text font-size="16px" color="#4A4A4A" css-class="main-content">
-          Hello, thank you for purchasing tickets to our event! Here are the details of your order:
+          Az információk a megvásárolt jegyekkel kapcsolatban:
         </mj-text>
 
         <!-- Event Information -->
         <mj-text font-size="18px" font-weight="bold" color="#333333">
-          Event: Amazing Event 2024
+          Esemény: {{ event.eventName }}
         </mj-text>
         <mj-text font-size="16px" color="#4A4A4A">
-          Date: January 15, 2024<br/>
-          Location: 123 Event St, City
+          Dátum: {{ event.eventDate }}<br />
+          Helyszín: {{ event.eventLocation }}
         </mj-text>
-        
+
         <!-- Start of Ticket Types Table -->
         <mj-table cellpadding="5" cellspacing="0" width="100%">
           <tr class="table-header">
-            <th>Ticket Type</th>
-            <th>Quantity</th>
-            <th>Price</th>
+            <th>Előadás</th>
+            <th>Típus</th>
+            <th>Mennyiség</th>
           </tr>
-          
+
           <!-- Loop through each ticket type and display in a row -->
           {{#each tickets}}
-          <tr class="ticket-row">
-            <td>{{type}}</td>
-            <td>{{quantity}}</td>
-            <td>${{price}}</td>
-          </tr>
+            <tr class="ticket-row">
+              <td>{{ ticketName }}</td>
+              <td>{{ ticketType }}</td>
+              <td>{{ ticketQty }}</td>
+            </tr>
           {{/each}}
         </mj-table>
         <!-- End of Ticket Types Table -->
 
         <mj-text font-size="16px" color="#4A4A4A">
-          Please bring this email and a valid ID for entry. We look forward to seeing you there!
+          Mellékletben csatoljuk a jegyeket, az előadásra az azokon található qr-kód segítségével lehet bejutni.
         </mj-text>
-        <mj-button background-color="#FF5A5F" href="https://yourpage.url/viewtickets?orderId={{orderId}}" font-size="18px" color="white">
-          View Tickets
+        <mj-button background-color="#97BC62" href="https://jegy-agorasavaria.hu/rendezveny/{{ event.eventHref }}" font-size="18px" color="white">
+          Esemény 
         </mj-button>
       </mj-column>
     </mj-section>
     <mj-section background-color="#ffffff" padding="20px">
       <mj-column width="100%">
         <mj-text font-size="12px" color="#888888" align="center">
-          If you have any questions, contact us at support@yourpage.url
+          Bármilyen kérdés esetén üzenjen az alábbi címre: help@valami.hu
         </mj-text>
       </mj-column>
     </mj-section>

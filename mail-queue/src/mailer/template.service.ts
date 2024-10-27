@@ -31,7 +31,7 @@ export class TemplateService {
   // Get the template file
   private getTemplate = async (mailType: MailTypes) => {
     const templateName = this.getTemplateName(mailType);
-    
+
     try {
       const file = await readFile(
         path.resolve(__dirname, './templates', `${templateName}.mjml`),
