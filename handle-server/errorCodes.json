@@ -178,5 +178,15 @@
         "message" : "A vásárlás már megkezdődött",
         "type" : "error",
         "responseCode" : 400
+    },
+    "051" : {
+        "message" : "Nem található vásárlás",
+        "type" : "error",
+        "responseCode" : 404
+    },
+    "052": {
+        "message" : "A vásárlás már lezárult",
+        "type" : "error",
+        "responseCode" : 400
     }
 }

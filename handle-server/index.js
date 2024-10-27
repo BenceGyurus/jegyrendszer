@@ -52,6 +52,7 @@ const zlib = require('node:zlib');
 const { Buffer } = require('buffer');
 const { createObjectCsvStringifier } = require('csv-writer');
 const { Queue } = require('bullmq');
+
 var cookieParser = require("cookie-parser");
 var redisOptions = {
   port: 6379 , //30036,
@@ -74,6 +75,7 @@ const readFromRedisCache = async (key) => {
     return result;
   });
 };
+
 
 // TICKET HANLDING
 var redis_con = {
@@ -2048,7 +2050,7 @@ app.post("/api/v1/order-ticket", async (req, res) => {
         let result;
         if (orderId){
           orderId = Functions.createObjectId(orderId);
-          if (orderId) result = await collection.updateOne({ $and : [{ _id : orderId}, {time: {$gt: new Date().getTime() - getTime("RESERVATION_TIME")}}]}, {
+          if (orderId) result = await collection.updateOne({ $and : [{ _id : orderId}, {time: {$gt: new Date().getTime() - getTime("RESERVATION_TIME")}}, {bought : false}, {pending : true}]}, {
             $set : {...savingDatas,
             otherDatas: await otherData(req),
             pending: true,
@@ -2175,18 +2177,14 @@ app.get("/api/v1/buy-ticket-details/:token", async (req, res) => {
       return handleError(logger, "500", res);
     }
     const { collection, database } = new Database("buy");
-    let datas = await collection.findOne({ _id: token });
+    let datas = await collection.findOne({ $and : [{_id: token}, {time : {$gt : new Date()-getTime("RESERVATION_TIME")}},  {pending : true}] });
     closeConnection(database);
     ip = Functions.getIp(req);
-    let browserData = Functions.getBrowerDatas(req);
+    //let browserData = Functions.getBrowerDatas(req);
     if (
       datas &&
       datas.pending &&
-      datas.time + getTime("RESERVATION_TIME") >= new Date().getTime() &&
-      datas.eventId &&
-      ip == datas.otherDatas.ip &&
-      browserData.os == datas.otherDatas.browserData.os &&
-      browserData.name == datas.otherDatas.browserData.name
+      datas.eventId
     ) {
       let eventDetails = await getTicketByReadableId(datas.eventId);
       if (eventDetails)
@@ -2715,15 +2713,21 @@ app.post(
     const uuid = uid();
 
     if (!buyingDatas.bought && !buyingDatas.isPayingStarted) {
-      const simpleBody = await SimplePayPayment(uuid, Functions.createObjectId(id), datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice, String(fullPrice.fullPrice-(price || buyingDatas.fullPrice)));    //couponhoz kellenek dologok még
-      purchase.new(price || buyingDatas.fullPrice, fullPrice.fullPrice, 
+      let result = await purchase.new(price || buyingDatas.fullPrice, fullPrice.fullPrice, 
         {
           ...datas.customerData,
           fullName: datas.customerData.isCompany ? datas.customerData.firstname : `${datas.customerData.firstname} ${datas.customerData.lastname}`,
         }, couponName || false, uuid, req
       )
+      //if (purchase.get().customerData === )
+      d = await purchase.get();
+      if (result.modifiedCount) {
+        //const simpleBody = await SimplePayPayment(uuid, Functions.createObjectId(id), datas.customerData, buyingDatas.tickets, buyingDatas.fullPrice, String(fullPrice.fullPrice-(price || buyingDatas.fullPrice)));    //couponhoz kellenek dologok még
+        purchase.close();
+        return res.send({ link: "https://jegy-agorasavaria.hu"});
+      }
       purchase.close();
-      return res.send({ link: "https://jegy-agorasavaria.hu", datas: simpleBody });
+      return res.send({error : true, errorCode : "500"});
     }
     return handleError(logger, "050", res);
   }
@@ -3302,9 +3306,9 @@ app.post(
 //SIMPLE PAY RESPONSE
 app.use(express.json());
 
-app.post("/ipn", (req) => {
+app.post("/ipn", (req,res,next)=>parseBodyMiddleeware(req,next), async (req, res) => {
   const body = req.body;
-  if (body.orderRef && body.status) setStatus(body.orderRef, body.status);
+  if (body.orderRef) await paymentResponse(body, res);
 });
 
 app.get(
@@ -3404,6 +3408,7 @@ const { createAdapter } = require("@socket.io/redis-streams-adapter");
 const createReport = require("./createReport.js");
 const { save } = require("pdfkit");
 const Purchase = require("./purchase.js");
+const paymentResponse = require("./simple-ipn.js");
 
 
 const io = new Server(server, {

@@ -82,8 +82,8 @@ const controlEvent = async (eventId, ticketIds, thisEventId, orderId, isPublic) 
                 if (String(boughtTicket._id) != String(thisEventId)) {
                   reservedSeats = boughtTicket?.tickets.find((ticket) => ticket.ticketId === thisTicket.id);
                   if (
-                    reservedSeats && reservedSeats.length &&
-                      reservedSeats.places?.includes(seat)
+                    reservedSeats && reservedSeats.places && reservedSeats.places.length &&
+                      reservedSeats.places.includes(seat)
                   ) {
                     result = { error: true, errorCode: "033" };
                   }

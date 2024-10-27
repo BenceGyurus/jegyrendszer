@@ -10,8 +10,8 @@ class Purchase{
         this.collection = databaseObject.collection;
     }
 
-    async get(filter, projection){
-        return await this.collection.findOne({$and : [{_id : this.objectId, ...filter}]}, {projection : {...projection}});;
+    async get(filter = [], projection){
+        return await this.collection.findOne({$and : [{$and : [{_id : this.objectId}, ...filter]}]}, {projection : {...projection}});;
     }
 
     async update(data){
@@ -48,7 +48,7 @@ class Purchase{
 
     async new(price, fullPrice, customerDatas, couponName, uuid, req) {
         let data = await this.get();
-        this.update({
+        return this.update({
             price: price,
             fullPrice: fullPrice,
             customerDatas : customerDatas,
