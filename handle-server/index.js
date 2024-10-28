@@ -3453,6 +3453,7 @@ io.on("connection", (socket) => {
         id: result.insertedId,
         connected: result.insertedId != "",
         connectedMonitor: false,
+        name : socket.id
       });
       socket.emit("ads", { ads: true, adsList: ads ? ads : [] });
     }
@@ -3473,6 +3474,7 @@ io.on("connection", (socket) => {
           connectedMonitor: true,
           error: monitor.modifiedCount === 0,
           id: monitor.acknowledged ? payload.id : "",
+          name : socket.id
         };
         io.to(`${monitor.socketId} `).emit("connection-status", message);
         socket.emit("connection-status", message);

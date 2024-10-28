@@ -38,6 +38,7 @@ const TicketMonitor = ()=>{
     const [bottomBackgroundColor, setBottomBackgroundColor] = useState('transparent'); 
     const [topBackgroundColorRight, setTopBackgroundColorRight] = useState('transparent'); 
     const [bottomBackgroundColorRight, setBottomBackgroundColorRight] = useState('transparent'); 
+    const [name, setName] = useState("");
     
 
     const valueToHex = (c:number)=> {
@@ -91,6 +92,7 @@ const TicketMonitor = ()=>{
                 if (!payload.error && payload.id && payload.connected){
                     setConnectionStatus(true);
                     setConnected(payload.id);
+                    setName(payload.name);
                 }
                 else if (!payload.connected){
                     setConnectionStatus(false);
@@ -211,6 +213,7 @@ const TicketMonitor = ()=>{
         {event && event.background ? <img style={{width: window.innerWidth*2, height: window.innerWidth*3}} src = {event.background} className = "monitor-event-image-background-animated" /> : ""}
         </div> : ""}
         <ConnectionStatus connected = {connectionStatus} connecting = {connecting} />   
+        {!venue && !event ? <span>név: {name}</span> : <></>}
         {error403 ?  <Result status="403" title="403" subTitle="Hibás azonosítás" extra={<Button type="primary">Vissza főoldalra</Button>}/> : ""}
         {event && selected && venue ? <DisplayVenue venueId={venue.venueId} eventId={venue.eventId}aTickets={venue.tickets} selectEvent={selectSeat} selected={selected} /> : event && selected && !venue ? <EventPage event={event} /> : ads  ? <Ads ads={adsList} /> : <></>}
         { venue ? <button onClick={e=>ready()} className = {`ready-button ${venue && venue.tickets && !controlTickets() ? " disabled-ready-button" : ""}`} disabled = {venue && venue.tickets && !controlTickets()} >Kész</button> : <></>} 
