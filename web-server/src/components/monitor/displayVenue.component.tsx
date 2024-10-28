@@ -11,14 +11,6 @@ type typeOfDisplayVenueParams = {
     selected : Array<string>
 };
 
-const getSizeOfStage = (type:number, sizeOfArea:{width : number, height : number})=>{
-    return {
-        width : type == 1 || type == 4 ? sizeOfArea.width * 0.3 : 50,
-        height : type == 2 || type == 3 ? sizeOfArea.height * 0.3 : 50,
-        x : type == 1 || type == 4 ? sizeOfArea.width/2-(sizeOfArea.width * 0.3/2) : type == 2 ? 10 : sizeOfArea.width-50,
-        y : type == 2 || type == 3 ? sizeOfArea.height / 2 - (sizeOfArea.height * 0.3/2) : type == 1 ? 10 : sizeOfArea.height-50
-    }
-}
 
 const DisplayVenue = ( { venueId, eventId , aTickets,selectEvent, selected }:typeOfDisplayVenueParams )=>{
 
@@ -52,7 +44,7 @@ const DisplayVenue = ( { venueId, eventId , aTickets,selectEvent, selected }:typ
 
     return (<div className = "monitor-ticket-selector">
         {
-            venue && venue.name && tickets.length ? <SeatVisualization seatPositions={venue.seats} sizeOfArea={getSizeOfVenue()} seatSize={0} stages={venue.stages} colorOfSeat={venue.colorOfSeat} tickets={aTickets} selectFunction={selectEvent} selectedSeats={selected} sizeOfScale={1} /> : <></>
+            venue && venue.name && tickets.length ? <SeatVisualization seatPositions={venue.seats} sizeOfArea={{width : window.innerWidth*.8, height : window.innerHeight*.6}} seatSize={0} stages={venue.stages} colorOfSeat={venue.colorOfSeat} tickets={aTickets} selectFunction={selectEvent} selectedSeats={selected} sizeOfScale={1} /> : <></>
         }
     </div>)
 }

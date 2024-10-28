@@ -92,7 +92,7 @@ if (process.env.NODE_ENV != "production") {
     db: 1,
   }
 }
-const queue = new Queue('mail', { connection: redis_con})
+const queue = new Queue('mail', { redis_con})
 /**
  * Send message to queue based on provided object
  * @param {mailData}: MailDTO - all information regarding the ema
@@ -2055,7 +2055,7 @@ app.post("/api/v1/order-ticket", async (req, res) => {
         let result;
         if (orderId){
           orderId = Functions.createObjectId(orderId);
-          if (orderId) result = await collection.updateOne({ $and : [{ _id : orderId}, {time: {$gt: new Date().getTime() - getTime("RESERVATION_TIME")}}, {bought : false}, {pending : true}]}, {
+          if (orderId) result = await collection.updateOne({ $and : [{ _id : orderId}, {time: {$gt: new Date().getTime() - getTime("RESERVATION_TIME")}}, {pending : true}]}, {
             $set : {...savingDatas,
             otherDatas: await otherData(req),
             pending: true,

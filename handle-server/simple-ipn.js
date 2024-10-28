@@ -83,12 +83,11 @@ const paymentResponse = async (response, res)=>{
                 purchase.close();
                 return handleError(logger, "052", res);
             }
-            let update = await purchase.update({status : response.status, bought : true, pending: false, paymentDate : receiveDate, transactionId : response.transactionId, paymentDate : response.paymentDate});
-            if (!update){
+            let update = await purchase.update({status : response.status, bought : true, pending: false, paymentDate : receiveDate, transactionId : response.transactionId, paymentDate : response.paymentDate, isPayingStarted : false, paymentMethod : response.method});
+            if (!update || !update.acknowledged || !update.modifiedCount){
                 purchase.close();
                 return handleError(logger, 500, res);
             }
-            console.log(buying);
             const {collection, database} = new Database("events");
             let event = await collection.findOne({_id : buying.id});
             let venue = "";
@@ -129,6 +128,7 @@ const paymentResponse = async (response, res)=>{
             }
             break;
     }
+    purchase.close();
     return res.status(200).send(
         {
             ...response,

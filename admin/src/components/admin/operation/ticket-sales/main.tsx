@@ -6,7 +6,6 @@ import Loader from "../../../loader/loader.component";
 import { Empty, Pagination, Button, Checkbox, Dropdown, DatePicker } from "antd";
 import typeOfDatas from "./types/tableData";
 import Search from "antd/es/input/Search";
-import TicketRedemptionWindow from "./ticket-redemption-window.component";
 import type { MenuProps } from 'antd';
 import Report from "./report.component";
 import Notification from "../../../notification/notification.component";
@@ -169,11 +168,6 @@ const TicketSalesMain = () => {
         ) : (
           ""
         )}
-        <TicketRedemptionWindow
-          socket={socket}
-          opened={redemptionWindow}
-          closeFunction={() => setRedemptionWindow(false)}
-        />
         <Report closeFunction={()=>setDisplayReport(false)} open = {displayReport} />
         <Notification element={<Error title = "Hiba történt" message={error} open={!!error} setOpen={()=>setError("")} />} />
       </div>

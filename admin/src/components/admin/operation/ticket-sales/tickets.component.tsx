@@ -15,11 +15,13 @@ type typeOfTicketStatsParams = {
 
 const TicketStats = ({datas}:typeOfTicketStatsParams)=>{
 
+    const [loading, setLoading] = useState(false);
+
     const printFunction = (id:string)=>{
-        console.log(id);
+        setLoading(true)
         postFile(`/print-ticket/${id}`, {token : ParseLocalStorage("long_token")})
-        .then(response=>{
-            console.log(response);
+        .then((response:any)=>{
+            if (!response.error) setLoading(false);
         })
     }
 
@@ -28,7 +30,7 @@ const TicketStats = ({datas}:typeOfTicketStatsParams)=>{
     }
 
     return (
-        <TicketsTable tickets={datas} printFunction={printFunction} deleteFunction={deleteFunction}/>
+        <TicketsTable tickets={datas} printFunction={printFunction} deleteFunction={deleteFunction} actionLoading={loading}/>
     )
     
 }

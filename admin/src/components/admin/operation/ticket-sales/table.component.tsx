@@ -1,20 +1,19 @@
-import { Space, Table, Tag, DatePicker,Badge, Dropdown, Button, Tooltip } from 'antd';
-import type { ColumnsType, TableProps } from 'antd/es/table';
+import { Table, DatePicker, Tooltip, Spin } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import type { Dayjs } from 'dayjs';
 import React, { useState } from 'react';
-import { DeleteFilled, DownOutlined, PrinterFilled } from '@ant-design/icons';
+import { PrinterFilled } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import { v4 as uuid } from 'uuid';
 import typeOfTicket from './types/ticket';
 import typeOfDatas from './types/tableData';
 import typeOfCustomerDatas from './types/customerData';
 
-const { RangePicker } = DatePicker;
-
 type typeOfTicketsTable = {
     tickets : Array<typeOfDatas>,
     deleteFunction : Function,
-    printFunction : Function
+    printFunction : Function,
+    actionLoading? : boolean
 }
 
 interface DataType {
@@ -39,7 +38,7 @@ interface ExpandedDataType {
   type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
 
-const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTable) => {
+const TicketsTable = ({ tickets, deleteFunction, printFunction, actionLoading }:typeOfTicketsTable) => {
 
     const [dates, setDates] = useState<RangeValue>(null);
     const [value, setValue] = useState<RangeValue>(null);
@@ -134,7 +133,7 @@ const TicketsTable = ({ tickets, deleteFunction, printFunction }:typeOfTicketsTa
             isLocal : ticket.local,
             tickets : ticket.tickets,
             price : ticket.price,
-            actions : <span><DeleteFilled onClick={e=>deleteFunction(ticket.buyId)}/><PrinterFilled onClick={e=>printFunction(ticket.buyId)} /></span>,
+            actions : <span>{actionLoading ? <Spin /> : <PrinterFilled onClick={e=>printFunction(ticket.buyId)} />}</span>,
             nameOfCustomer : {customerName : ticket?.customerName ? ticket?.customerName : "", cusotmerEmail : ticket?.cusotmerEmail, phoneNumber : ticket?.phoneNumber}
         }
     });
