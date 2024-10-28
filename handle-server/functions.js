@@ -19,7 +19,7 @@ class Functions {
     }else {
       try {
         return process.env.NODE_ENV === "production" ? (
-          req.handshake.headers["cf-connecting-ip"]
+          req.request.headers['cf-connecting-ip']
         ) : req.handshake.address == "::1" ? "127.0.0.1" : req.handshake.address;
       } catch {
         return "";
