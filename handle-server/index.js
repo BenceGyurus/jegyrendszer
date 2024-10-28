@@ -3234,7 +3234,7 @@ app.post(
         const { collection, database } = new Database("monitor");
         let result = await collection
           .find(
-            { "otherDatas.ip": Functions.getIp(req), connected: false },
+            { connected: false },
             {
               projection: {
                 socketId: 1,
@@ -3353,7 +3353,7 @@ app.post("/api/v1/active-events", (req,res,next)=>parseBodyMiddleeware(req,next)
       closeConnection(database);
       res.send({numberOfActiveEvents : numberOfActiveEvents});
     }
-    else return handleError(logger, res,"004");
+    else return handleError(logger,"004", res);
   }
 });
 
