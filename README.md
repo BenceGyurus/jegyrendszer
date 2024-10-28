@@ -1,6 +1,6 @@
 
-- https://jegy.bnbdevelopment.cloud
-- https://jegy.bnbdevelopment.cloud/admin
+- https://jegy-agorasavaria.hu
+- https://jegy-agorasavaria.hu/admin
 
 ## Test run
 
