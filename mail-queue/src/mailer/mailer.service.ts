@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { MailDTO, MailTypes } from 'src/dto/mail.dts';
 import { TemplateService } from './template.service';
-import Handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
 
 @Injectable()
@@ -45,7 +44,7 @@ export class MailerService {
     };
 
     try {
-      const info = await this.transporter.sendMail(mailMessage);
+      await this.transporter.sendMail(mailMessage);
       return true;
     } catch (err) {
       console.error(err);
