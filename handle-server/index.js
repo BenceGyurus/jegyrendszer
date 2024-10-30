@@ -92,7 +92,7 @@ if (process.env.NODE_ENV != "production") {
     db: 1,
   }
 }
-const queue = new Queue('mail', { redis_con})
+const queue = new Queue('mail', { connection: redis_con})
 /**
  * Send message to queue based on provided object
  * @param {mailData}: MailDTO - all information regarding the ema
