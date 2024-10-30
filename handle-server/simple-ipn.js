@@ -12,21 +12,20 @@ const Database = require("./mongo/mongo");
 const logger = LoggerModule();
 
 var redis_con = {
-    host: "redis-release-master.service.svc.cluster.local",
-    port: 6379,
-    username: "default",
-    password: process.env.REDIS_PASS,
-    db: 1,
-  }
-  if (process.env.NODE_ENV != "production") {
+  host: "localhost",
+  port: 6379,
+  db: 1,
+}
+if (process.env.NODE_ENV == "production") {
     redis_con = {
-      host: "localhost",
-      port: 6379,
-      db: 1,
+        host: "redis-release-master.service.svc.cluster.local",
+        port: 6379,
+        username: "default",
+        password: process.env.REDIS_PASS,
+        db: 1,
     }
-  }
-
-const queue = new Queue('mail', {redis_con});
+}
+const queue = new Queue('mail', { connection: redis_con })
 /**
  * Send message to queue based on provided object
  * @param {mailData}: MailDTO - all information regarding the ema
@@ -37,13 +36,18 @@ const queue = new Queue('mail', {redis_con});
  *      recip: 'asdasd@asdasd.com',
  *      body: {
  *        name: 'Teszt Jancsi',
- *        fileName: ['x.pdf', 'y.pdf'],
+ *        fileName: ["ticket_1.pdf", "ticket_2.pdf"],
+ *        event: {
+ *          eventName: 'X Előadás',
+ *          eventDate: '2021.07.01',
+ *          eventLocation: 'Budapest',
+ *          eventHref: 'teszt-esemeny',
+ *        },
  *        tickets: [
  *          {
  *            ticketName: 'X Előadás',
  *            ticketType: 'Normál',
  *            ticketQty: 10,
- *            ticketDate: '2025-01-01',
  *          },
  *        ]
  *      },
